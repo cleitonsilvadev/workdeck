@@ -240,55 +240,51 @@ Para usar outro nome de sessão: `export WORKDECK_SESSION=outro`.
 
 ## Atalhos
 
-Funcionam em qualquer terminal, sem configurar nada:
+O dia a dia, em qualquer terminal e sem configurar nada:
 
-- **<kbd>Shift</kbd>+<kbd>←</kbd> / <kbd>→</kbd>:** janela anterior / próxima.
-- **<kbd>Shift</kbd>+<kbd>↑</kbd> / <kbd>↓</kbd>:** painel anterior / próximo.
-- **Mouse:** clique no nome da janela na barra de baixo para trocar de janela,
-  e num painel para levar o foco até ele. Para mudar o tamanho de um painel,
-  arraste a borda dele.
-- **<kbd>Ctrl</kbd>+<kbd>b</kbd>, solte, e depois a tecla:**
+| Para | Teclas |
+|---|---|
+| **Abrir o menu com tudo** (projetos, IA, revisar, dividir…) | <kbd>Ctrl</kbd>+<kbd>b</kbd> e <kbd>h</kbd> |
+| Abrir a IA ao lado, para te ajudar no projeto | `ai`, ou <kbd>Ctrl</kbd>+<kbd>b</kbd> e <kbd>a</kbd> |
+| Ir para o projeto anterior / próximo | <kbd>Shift</kbd>+<kbd>←</kbd> / <kbd>→</kbd> |
+| Ir direto para a janela N | <kbd>Ctrl</kbd>+<kbd>b</kbd> e <kbd>1</kbd>…<kbd>9</kbd> |
+| Dividir a tela (ao lado ou embaixo, onde couber) | <kbd>Ctrl</kbd>+<kbd>b</kbd> e <kbd>Enter</kbd> |
+| Escolher o sentido: ao lado / embaixo | <kbd>Ctrl</kbd>+<kbd>b</kbd> e <kbd>v</kbd> / <kbd>-</kbd> |
+| Trocar de painel dentro da janela | <kbd>Shift</kbd>+<kbd>↑</kbd> / <kbd>↓</kbd> |
+| Zoom no painel, e de novo para voltar | <kbd>Ctrl</kbd>+<kbd>b</kbd> e <kbd>z</kbd> |
+| Fechar o painel | <kbd>Ctrl</kbd>+<kbd>b</kbd> e <kbd>x</kbd> |
+| Revisar o que a IA mudou antes do commit | `work review` |
 
-| Ação | <kbd>Ctrl</kbd>+<kbd>b</kbd> e depois | Atalho direto, opcional |
-|---|---|---|
-| Vai para a janela N | <kbd>1</kbd>…<kbd>9</kbd> | <kbd>Alt</kbd>+<kbd>1</kbd>…<kbd>9</kbd> |
-| Pula entre os painéis | <kbd>setas</kbd> | <kbd>Alt</kbd>+<kbd>setas</kbd> |
-| Janela anterior / próxima | <kbd>p</kbd> / <kbd>n</kbd> | <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>←</kbd> / <kbd>→</kbd> |
-| Nova janela, na pasta atual | <kbd>c</kbd> | <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>T</kbd> |
-| Divide a tela, no sentido que sobra mais espaço | <kbd>Enter</kbd> | |
-| Divide lado a lado | <kbd>v</kbd> ou <kbd>\|</kbd> | <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>D</kbd> |
-| Divide em cima/embaixo | <kbd>-</kbd> | <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>S</kbd> |
-| Iguala o tamanho dos painéis | <kbd>=</kbd> | |
-| Zoom: o painel ocupa a janela | <kbd>z</kbd> | <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>Z</kbd> |
-| Fecha o painel | <kbd>x</kbd> | <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>X</kbd> |
-| Renomeia a janela | <kbd>,</kbd> | <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>R</kbd> |
-| Abre o agente de IA ao lado | <kbd>a</kbd> | <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>A</kbd> |
-| **Abre o menu: ir para um projeto, adicionar, IA, revisar, dividir, zoom, fechar** | <kbd>h</kbd> | |
-| Solta a sessão (ela continua viva) | <kbd>d</kbd> | <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>E</kbd> |
+<kbd>Ctrl</kbd>+<kbd>b</kbd> quer dizer: aperte <kbd>Ctrl</kbd>+<kbd>b</kbd>,
+solte, e depois a tecla. O mouse também funciona: clique na janela na barra de
+baixo, ou num painel, e arraste a borda para mudar o tamanho.
 
-**Só essas teclas funcionam depois do <kbd>Ctrl</kbd>+<kbd>b</kbd>.** Os outros
-atalhos do tmux ficam desligados, para nada inesperado acontecer; uma tecla fora
-da lista mostra "tecla sem uso no workdeck — Ctrl+b h abre o menu". Também
-valem <kbd>n</kbd> / <kbd>p</kbd> (próxima / anterior), <kbd>,</kbd>
-(renomear), <kbd>?</kbd> (lista de atalhos) e <kbd>r</kbd> (recarregar a
-config). Para ligar um atalho seu, coloque o `bind` no `~/.tmux.conf` depois do
-bloco do workdeck: o que estiver antes dele é desligado junto.
+Só as teclas do workdeck funcionam depois do <kbd>Ctrl</kbd>+<kbd>b</kbd>; uma
+fora da lista mostra "tecla sem uso no workdeck — Ctrl+b h abre o menu". A lista
+completa está em `work help`, ou <kbd>Ctrl</kbd>+<kbd>b</kbd> e <kbd>?</kbd>.
 
-Os atalhos diretos economizam uma tecla. No Linux funcionam de cara; no Mac, a
-tecla Option precisa funcionar como Alt, um ajuste feito uma vez: veja
-[A tecla Option, no macOS](#a-tecla-option-no-macos).
+<details>
+<summary>Atalhos de uma tecla com Alt, e como mudar os atalhos</summary>
 
-**Por que as ações usam Shift.** `Alt`+letra minúscula já tem dono: o readline
-usa <kbd>Alt</kbd>+<kbd>b</kbd>, <kbd>Alt</kbd>+<kbd>f</kbd> e
-<kbd>Alt</kbd>+<kbd>d</kbd> para andar e apagar palavras na linha de comando.
-Mapear essas teclas no tmux roubaria funções que você usa o dia todo. Números
-e setas são seguros; por isso eles ficaram sem Shift.
+Há atalhos diretos com Alt, que economizam uma tecla: <kbd>Alt</kbd>+<kbd>1</kbd>…<kbd>9</kbd>
+vai para a janela, <kbd>Alt</kbd>+setas troca de painel e
+<kbd>Alt</kbd>+<kbd>shift</kbd>+letra faz as ações (<kbd>D</kbd> divide ao lado,
+<kbd>S</kbd> embaixo, <kbd>Z</kbd> zoom, <kbd>X</kbd> fecha, <kbd>A</kbd> abre a
+IA). No Linux funcionam de cara; no Mac, a tecla Option precisa funcionar como
+Alt: veja [A tecla Option, no macOS](#a-tecla-option-no-macos).
 
-**Para mudar um atalho**, edite `config/tmux.conf` e rode `./install.sh`:
+As ações usam Shift porque `Alt`+letra minúscula é do readline (andar e apagar
+palavras na linha de comando).
+
+**Para mudar ou acrescentar um atalho**, edite `config/tmux.conf` e rode
+`./install.sh`. Um atalho seu no `~/.tmux.conf` precisa vir depois do bloco do
+workdeck; o que estiver antes é desligado junto com os do tmux.
 
 ```tmux
 bind -n M-S-G new-window -c "#{pane_current_path}" lazygit
 ```
+
+</details>
 
 ### Terminais
 
