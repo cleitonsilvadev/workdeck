@@ -20,6 +20,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/workdeck"
 BIN_DIR="$HOME/.local/bin"
+CODIGO="${XDG_DATA_HOME:-$HOME/.local/share}/workdeck"
 THEME="catppuccin-mocha"
 TERMINAL=""
 AVISO_OPTION=""
@@ -310,6 +311,20 @@ case ":$PATH:" in
   *":$BIN_DIR:"*) ;;
   *) say "atenção: $BIN_DIR não está no PATH — o bloco do shell resolve isso" ;;
 esac
+if [ "$ROOT" = "$CODIGO" ]; then
+  :
+elif git -C "$ROOT" rev-parse >/dev/null 2>&1; then
+  origem="$(git -C "$ROOT" remote get-url origin 2>/dev/null || true)"
+  run rm -rf "$CODIGO"
+  run mkdir -p "$(dirname "$CODIGO")"
+  run git clone -q "$ROOT" "$CODIGO"
+  [ -n "$origem" ] && run git -C "$CODIGO" remote set-url origin "$origem"
+  run git -C "$CODIGO" checkout -q "$(git -C "$ROOT" rev-parse HEAD)"
+  anota codigo "$CODIGO"
+  say "cópia do código em $(curto "$CODIGO"), para o work update"
+else
+  aviso "$ROOT não é um clone do git; o work update não vai funcionar"
+fi
 resumo "$instalados comandos em $(curto "$BIN_DIR")"
 concluir
 

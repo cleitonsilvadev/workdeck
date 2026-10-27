@@ -17,6 +17,7 @@ MANIFESTO="$CONFIG_DIR/.install-manifest"
 RESTORE=0
 ALL=0
 DRY=0
+APAGAR_CODIGO=""
 
 for arg in "$@"; do
   case "$arg" in
@@ -66,6 +67,15 @@ if [ -f "$MANIFESTO" ]; then
           fi
         fi
         ;;
+      codigo)
+        if [ -d "$alvo" ] && [ "$alvo" != "$ROOT" ]; then
+          run rm -rf "$alvo"
+          say "removido ${alvo#$HOME/}"
+        elif [ -d "$alvo" ]; then
+          APAGAR_CODIGO="$alvo"
+        fi
+        run rm -rf "${XDG_CACHE_HOME:-$HOME/.cache}/workdeck"
+        ;;
       script)
         nome="$(basename "$alvo")"
         origem="$ROOT/bin/$nome"
@@ -109,3 +119,8 @@ fi
 
 echo
 echo "Reabra o terminal, ou:  tmux source-file ~/.tmux.conf"
+
+if [ -n "$APAGAR_CODIGO" ]; then
+  run rm -rf "$APAGAR_CODIGO"
+  say "removido ${APAGAR_CODIGO#$HOME/}"
+fi

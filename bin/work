@@ -6,6 +6,9 @@
 #      work add [pasta] acrescenta a pasta (ou a atual) como janela
 #                       fechar a janela de um projeto (exit) tira ele do work
 #      work escolher    escolhe de novo os projetos da sessão
+#      work update      atualiza para a versão mais nova; --desligar / --ligar o aviso
+#      work versao      mostra a versão instalada
+#      work uninstall   desinstala (aceita --all e --dry-run)
 #      work kill        fecha a sessão inteira
 #      work help        comandos, atalhos e o que falta configurar
 #      work doctor      diz o que funciona no seu ambiente
@@ -17,6 +20,9 @@
 set -euo pipefail
 
 CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/workdeck/projects.conf"
+CODIGO="${XDG_DATA_HOME:-$HOME/.local/share}/workdeck"
+CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/workdeck/atualizacao"
+AVISO_CONF="${XDG_CONFIG_HOME:-$HOME/.config}/workdeck/atualizacao.conf"
 SESSION="${WORKDECK_SESSION:-work}"
 
 mtime() { stat -c %Y "$1" 2>/dev/null || stat -f %m "$1" 2>/dev/null || echo 0; }
@@ -131,6 +137,101 @@ desenhar() {
   done
   if [ $fim -lt $n ]; then printf '  \033[2m… mais %s abaixo\033[0m\n' $((n - fim)); fi
   return 0
+}
+
+git_quieto() {
+  GIT_TERMINAL_PROMPT=0 GIT_SSH_COMMAND="ssh -o BatchMode=yes -o ConnectTimeout=5" git -C "$CODIGO" "$@"
+}
+
+versao_atual() { git -C "$CODIGO" describe --tags --abbrev=0 2>/dev/null || true; }
+
+mais_nova() {
+  printf '%s\n' "$@" | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' \
+    | awk -F'[v.]' '{printf "%09d%09d%09d %s\n", $2, $3, $4, $0}' | sort | tail -1 | cut -d' ' -f2 || true
+}
+
+tem_versao_nova() {
+  [ -n "$1" ] || return 1
+  [ -z "$2" ] && return 0
+  [ "$1" != "$2" ] && [ "$(mais_nova "$1" "$2")" = "$1" ]
+}
+
+aviso_ligado() { ! grep -qx 'AVISO=0' "$AVISO_CONF" 2>/dev/null; }
+
+de_cache() { sed -n "s/^$1=//p" "$CACHE" 2>/dev/null | tail -1; }
+
+gravar_cache() {
+  mkdir -p "$(dirname "$CACHE")"
+  { grep -v "^$1=" "$CACHE" 2>/dev/null || true; echo "$1=$2"; } > "$CACHE.tmp" && mv "$CACHE.tmp" "$CACHE"
+}
+
+novidades() {
+  git -C "$CODIGO" show "$1:CHANGELOG.md" 2>/dev/null \
+    | awk -v v="## $1" '$0 == v {f = 1; next} /^## / {f = 0} f' | sed '/^[[:space:]]*$/d' | head -8 | sed 's/^/  /'
+}
+
+verificar_em_segundo_plano() {
+  local agora ultima
+  aviso_ligado || return 0
+  [ -d "$CODIGO/.git" ] || return 0
+  agora=$(date +%s)
+  ultima="$(de_cache checado)"
+  if [ -n "$ultima" ] && [ $((agora - ultima)) -lt 86400 ]; then return 0; fi
+  (
+    git_quieto fetch -q --tags origin || exit 0
+    gravar_cache nova "$(mais_nova $(git -C "$CODIGO" tag -l 'v*'))"
+    gravar_cache checado "$agora"
+  ) </dev/null >/dev/null 2>&1 &
+  return 0
+}
+
+atualizar() {
+  local perguntar="$1" nova atual r
+  if [ ! -d "$CODIGO/.git" ]; then
+    echo "não achei a cópia do workdeck em $(curto "$CODIGO")."
+    echo "rode o ./install.sh de um clone do repositório uma vez, e o work update passa a funcionar."
+    return 1
+  fi
+  if ! git_quieto fetch -q --tags origin 2>/dev/null; then
+    echo "não consegui falar com o repositório do workdeck; tente de novo mais tarde."
+    return 1
+  fi
+  nova="$(mais_nova $(git -C "$CODIGO" tag -l 'v*'))"
+  atual="$(versao_atual)"
+  gravar_cache checado "$(date +%s)"
+  gravar_cache nova "$nova"
+  if [ -z "$nova" ]; then
+    echo "ainda não há versão publicada do workdeck."
+    return 0
+  fi
+  if ! tem_versao_nova "$nova" "$atual"; then
+    echo "você está na $atual, a mais nova."
+    return 0
+  fi
+  echo "workdeck $nova disponível (você tem ${atual:-uma versão sem número})."
+  novidades "$nova"
+  if [ "$perguntar" = 1 ]; then
+    printf 'Atualizar agora? [S/n] '
+    read -r r || r=n
+    case "${r:-s}" in
+      s|S|y|Y) ;;
+      *) gravar_cache ignorada "$nova"; echo "tudo bem. Quando quiser: work update"; return 0 ;;
+    esac
+  fi
+  git -C "$CODIGO" checkout -q "$nova"
+  bash "$CODIGO/install.sh" --yes --no-deps
+  echo "workdeck atualizado para $nova."
+}
+
+oferecer_atualizacao() {
+  local nova
+  aviso_ligado || return 0
+  [ -t 0 ] && [ -t 1 ] || return 0
+  nova="$(de_cache nova)"
+  tem_versao_nova "$nova" "$(versao_atual)" || return 0
+  [ "$(de_cache ignorada)" = "$nova" ] && return 0
+  atualizar 1 || true
+  echo
 }
 
 com_shell() {
@@ -285,6 +386,17 @@ escolher() {
 
 case "${1:-}" in
   add) shift; adicionar "${1:-.}"; exit $? ;;
+  versao|--version|-v) echo "workdeck $(versao_atual)"; exit 0 ;;
+  uninstall)
+    shift
+    [ -f "$CODIGO/uninstall.sh" ] || { echo "não achei a cópia do workdeck em $(curto "$CODIGO")"; exit 1; }
+    exec bash "$CODIGO/uninstall.sh" "$@" ;;
+  update)
+    case "${2:-}" in
+      --desligar) mkdir -p "$(dirname "$AVISO_CONF")"; echo "AVISO=0" > "$AVISO_CONF"; echo "o work não vai mais perguntar sobre versões novas; work update continua funcionando."; exit 0 ;;
+      --ligar) rm -f "$AVISO_CONF"; echo "o work volta a avisar sobre versões novas, no máximo uma vez por dia."; exit 0 ;;
+    esac
+    atualizar 1; exit $? ;;
   sincronizar) sincronizar; exit 0 ;;
   help|-h|--help) exec workdeck-help ;;
   doctor) shift; exec workdeck-doctor "$@" ;;
@@ -334,6 +446,9 @@ if [ "${1:-}" = "escolher" ]; then
   fi
   shift
 fi
+
+oferecer_atualizacao
+verificar_em_segundo_plano
 
 ler_config
 if ! algum_projeto_existe; then

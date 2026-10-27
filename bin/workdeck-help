@@ -31,6 +31,7 @@ item "work escolher" "escolhe de novo os projetos"
   item "work painel" "abre o painel de contexto"
   item "work agent <cmd>" "define o agente de IA; sem nada, mostra o atual"
   item "work doctor" "diz o que funciona no seu ambiente"
+  item "work update" "atualiza para a versão mais nova; work versao mostra a atual"
   item "work help" "o menu; work help --texto mostra esta lista"
 
   titulo "Navegar"

@@ -231,7 +231,7 @@ sessão; sem fechar, a sessão antiga continua com a lista antiga.
 | `work review` | O mesmo que `git review` |
 | `work painel` | Abre o painel de contexto |
 
-`add`, `help`, `doctor`, `agent`, `review`, `painel`, `escolher` e `kill` são palavras
+`add`, `help`, `doctor`, `agent`, `review`, `painel`, `escolher`, `update`, `versao`, `uninstall` e `kill` são palavras
 reservadas: uma janela com um desses nomes não é aberta por `work <nome>`.
 
 Para usar outro nome de sessão: `export WORKDECK_SESSION=outro`.
@@ -473,6 +473,29 @@ senão o diff fica difícil em tela não-retina.
 ```
 
 ---
+
+## Atualizar
+
+O instalador guarda uma cópia do workdeck em `~/.local/share/workdeck`. Depois
+disso, a pasta que você clonou pode ir embora: atualizar não depende dela.
+
+```bash
+work update              # procura a versão nova, mostra o que mudou e pergunta
+work versao              # a versão instalada
+work update --desligar   # para de avisar; work update continua funcionando
+work update --ligar      # volta a avisar
+work uninstall --all     # desinstala, sem precisar da pasta clonada
+```
+
+O `work` também confere sozinho, no máximo uma vez por dia e em segundo plano:
+nunca fica esperando a internet, e sem rede não acontece nada. Quando há versão
+nova, ele mostra o que mudou e pergunta antes de abrir a sessão; se você disser
+não, ele não pergunta de novo sobre essa versão. O painel mostra
+`● v1.0.0 → v1.1.0: work update` enquanto houver uma versão para instalar.
+
+Só contam versões publicadas como tag (`v1.2.0`), não cada commit. O que muda em
+cada uma está no `CHANGELOG.md`. A atualização troca o código e reaplica a
+instalação; seus projetos, painéis e a escolha do agente ficam como estão.
 
 ## Desinstalar
 

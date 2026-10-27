@@ -7,6 +7,9 @@ if [ -f "$CONFIG_DIR/projects.conf" ]; then
 fi
 AGENT_CMD=""
 [ -f "$CONFIG_DIR/agent.conf" ] && . "$CONFIG_DIR/agent.conf"
+codigo="${XDG_DATA_HOME:-$HOME/.local/share}/workdeck"
+versao="$(git -C "$codigo" describe --tags --abbrev=0 2>/dev/null || true)"
+nova="$(sed -n 's/^nova=//p' "${XDG_CACHE_HOME:-$HOME/.cache}/workdeck/atualizacao" 2>/dev/null | tail -1)"
 problema_agente=""
 [ -n "$AGENT_CMD" ] && problema_agente="$(workdeck-agent --check 2>/dev/null)"
 
@@ -39,10 +42,18 @@ else
   linha_agente="${amarelo}!${x} agente    nenhum ainda"
 fi
 
+linha_versao=""
+maior="$(printf '%s\n%s\n' "$nova" "${versao:-v0.0.0}" | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | awk -F'[v.]' '{printf "%09d%09d%09d %s\n", $2, $3, $4, $0}' | sort | tail -1 | cut -d' ' -f2)"
+if [ -n "$nova" ] && [ "$nova" != "$versao" ] && [ "$maior" = "$nova" ]; then
+  linha_versao="${amarelo}●${x} ${versao:-sem versão} → $nova: work update"
+elif [ -n "$versao" ]; then
+  linha_versao="${dim}$versao${x}"
+fi
+
 texto=(
   ""
   ""
-  "${roxo}workdeck${x}"
+  "${roxo}workdeck${x}  $linha_versao"
   "${dim}terminal para agentes de IA${x}"
   ""
   "$linha_projetos"
