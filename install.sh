@@ -34,6 +34,46 @@ while [ $# -gt 0 ]; do
   esac
 done
 
+BACKUPS="$CONFIG_DIR/.backups"
+MANIFESTO="$CONFIG_DIR/.install-manifest"
+
+anota() { # tipo, caminho, backup
+  [ "$DRY" = 1 ] && return 0
+  mkdir -p "$(dirname "$MANIFESTO")"
+  grep -qxF "$1|$2|${3:-}" "$MANIFESTO" 2>/dev/null || echo "$1|$2|${3:-}" >> "$MANIFESTO"
+}
+
+# Guarda uma cópia do arquivo como ele estava antes de o workdeck existir nele.
+# Só na primeira vez: reinstalar não sobrescreve o backup original.
+faz_backup() { # arquivo → imprime o caminho do backup, ou vazio
+  local file="$1" nome destino
+  [ -f "$file" ] || return 0
+  grep -q "^# >>> workdeck >>>$" "$file" 2>/dev/null && return 0   # já instalado antes
+  nome="$(echo "${file#$HOME/}" | tr '/' '-' | sed 's/^\.//')"
+  destino="$BACKUPS/$nome.$(date +%Y%m%d-%H%M%S)"
+  [ "$DRY" = 1 ] && { echo ""; return 0; }
+  mkdir -p "$BACKUPS"
+  cp "$file" "$destino"
+  echo "$destino"
+}
+
+# Troca o bloco entre os marcadores, ou acrescenta se ainda não existir.
+write_block() { # arquivo, conteúdo
+  local file="$1" body="$2" tmp backup
+  backup="$(faz_backup "$file")"
+  [ -n "$backup" ] && say "cópia do original em ${backup#$HOME/}"
+  anota bloco "$file" "$backup"
+  [ "$DRY" = 1 ] && { say "[dry-run] atualizaria o bloco em $file"; return 0; }
+  mkdir -p "$(dirname "$file")"
+  touch "$file"
+  tmp="$(mktemp)"
+  awk '/^# >>> workdeck >>>$/{s=1} !s{print} /^# <<< workdeck <<<$/{s=0}' "$file" > "$tmp"
+  awk 'BEGIN{n=0} {l[n++]=$0} END{while(n>0 && l[n-1]~/^[[:space:]]*$/) n--; for(i=0;i<n;i++) print l[i]}' "$tmp" > "$tmp.2"
+  { cat "$tmp.2"; [ -s "$tmp.2" ] && echo; echo "$body"; } > "$file"
+  rm -f "$tmp" "$tmp.2"
+}
+
+
 say() { printf '  %s\n' "$*"; }
 run() { [ "$DRY" = 1 ] && { say "[dry-run] $*"; return 0; }; "$@"; }
 
@@ -121,6 +161,7 @@ for script in "$ROOT"/bin/*; do
     say "$nome"
   fi
   run install -m 755 "$script" "$alvo"
+  anota script "$alvo"
 done
 case ":$PATH:" in
   *":$BIN_DIR:"*) ;;
@@ -152,19 +193,6 @@ say "lesskey do git-review"
 echo
 
 # ---- 4. tmux e terminal ----------------------------------------------------
-# Troca o bloco entre os marcadores, ou acrescenta se ainda não existir.
-write_block() { # arquivo, conteúdo
-  local file="$1" body="$2" tmp
-  [ "$DRY" = 1 ] && { say "[dry-run] atualizaria o bloco em $file"; return 0; }
-  mkdir -p "$(dirname "$file")"
-  touch "$file"
-  tmp="$(mktemp)"
-  awk '/^# >>> workdeck >>>$/{s=1} !s{print} /^# <<< workdeck <<<$/{s=0}' "$file" > "$tmp"
-  awk 'BEGIN{n=0} {l[n++]=$0} END{while(n>0 && l[n-1]~/^[[:space:]]*$/) n--; for(i=0;i<n;i++) print l[i]}' "$tmp" > "$tmp.2"
-  { cat "$tmp.2"; [ -s "$tmp.2" ] && echo; echo "$body"; } > "$file"
-  rm -f "$tmp" "$tmp.2"
-}
-
 echo "[4/5] tmux"
 write_block "$HOME/.tmux.conf" \
   "$(sed '$d' "$ROOT/config/tmux.conf" | sed '/^# O tema entra aqui/d'; cat "$ROOT/themes/$THEME.tmux"; echo '# <<< workdeck <<<')"

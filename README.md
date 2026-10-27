@@ -136,6 +136,27 @@ e setas são seguros; por isso eles ficaram sem Shift.
 bind -n M-S-G new-window -c "#{pane_current_path}" lazygit
 ```
 
+### Terminais
+
+Qualquer terminal serve, porque os atalhos são do tmux. Se você ainda não tem
+um preferido, estes são os mais usados em cada sistema:
+
+| Sistema | Terminal | |
+|---|---|---|
+| macOS | Terminal.app | já vem instalado |
+| | [iTerm2](https://iterm2.com) | o mais popular do Mac |
+| | [kitty](https://sw.kovidgoyal.net/kitty/) | rápido, configurado por arquivo de texto |
+| | [WezTerm](https://wezterm.org) | multiplataforma, configurado em Lua |
+| | [Ghostty](https://ghostty.org) | recente, nativo |
+| Linux | GNOME Terminal | padrão no GNOME |
+| | Konsole | padrão no KDE |
+| | [Alacritty](https://alacritty.org) | mínimo, acelerado por GPU |
+| | [kitty](https://sw.kovidgoyal.net/kitty/) · [WezTerm](https://wezterm.org) · [Ghostty](https://ghostty.org) | os mesmos do Mac |
+| Windows | [Windows Terminal](https://learn.microsoft.com/windows/terminal/) | o padrão atual, com suporte a WSL |
+| | [WezTerm](https://wezterm.org) | se você quer a mesma config nos três sistemas |
+
+Em todos eles, `Alt` chega ao tmux e os atalhos funcionam sem configurar nada.
+
 ### Atalhos em `cmd`, no macOS
 
 No Mac, `cmd` nunca chega ao tmux: o sistema intercepta antes. Se você quer
@@ -147,7 +168,7 @@ Só o kitty é instalado automaticamente:
 ./install.sh --terminal kitty
 ```
 
-Nada disso é necessário. É conforto.
+Nada disso é necessário. É conforto, e só no Mac.
 
 ---
 
@@ -177,7 +198,22 @@ editor são filtrados de propósito, senão a trava pegaria sempre. Ele também
 barra quando a pressão de memória do macOS está crítica. `--stat` e `--force`
 passam por cima das duas.
 
-**Para mudar a branch base**, edite `base_candidates` em `bin/git-review`.
+### Configurando
+
+Sem configuração, ele compara com `origin/main`, `origin/master`, `origin/develop`
+ou `origin/dev` — a primeira que existir. Para mudar isso e o resto:
+
+```bash
+cp config/git-review.example.conf ~/.config/workdeck/git-review.conf
+```
+
+| Variável | Padrão |
+|---|---|
+| `BASE_BRANCHES` | `origin/main origin/master origin/develop origin/dev` |
+| `SIDE_BY_SIDE_MIN_COLS` | `160` |
+| `DELTA_SYNTAX_THEME` | vazio (o delta decide, e respeita `BAT_THEME`) |
+| `GUARD_HEAVY_JOBS` | `1` |
+| `HEAVY_JOBS_PATTERN` | runners de JS, Python, Rust, Go, Java, PHP e Ruby |
 
 ---
 
@@ -291,11 +327,22 @@ senão o diff fica difícil em tela não-retina.
 ## Desinstalar
 
 ```bash
-./uninstall.sh
+./uninstall.sh            # tira os blocos e os scripts; sua config fica
+./uninstall.sh --restore  # devolve os arquivos ao estado de antes da instalação
+./uninstall.sh --all      # remove tudo, inclusive ~/.config/workdeck
+./uninstall.sh --dry-run  # mostra o que faria
 ```
 
-Remove os blocos e os scripts. Sua config em `~/.config/workdeck/` fica — para
-apagar também, `rm -rf ~/.config/workdeck`.
+O instalador guarda uma cópia de cada arquivo antes de tocar nele pela primeira
+vez, em `~/.config/workdeck/.backups/`, e anota tudo o que fez num manifesto.
+O `--restore` usa essas cópias: seu `.tmux.conf` e seu `.zshrc` voltam byte a
+byte ao que eram.
+
+Fora isso, ele nunca remove o que não é dele. Script que você alterou depois
+da instalação fica, com aviso. Se existia um script seu com o mesmo nome, o
+instalador guardou em `<nome>.antes-do-workdeck` e o desinstalador devolve.
+
+---
 
 ## Customizando
 
@@ -321,11 +368,20 @@ mexer no que quiser e rodar o `install.sh` do seu fork. O instalador só
 gerencia o que está entre os marcadores `# >>> workdeck >>>`, então o resto
 dos seus arquivos continua seu.
 
-## Isto é uma config pessoal
+## O que esperar
 
-O projeto nasceu da config de uma pessoa e é publicado porque pode ser útil a
-outras, não como produto mantido. Use, copie, dê fork e mude o que precisar.
-Não espere suporte, roadmap ou compatibilidade entre versões.
+O workdeck é um ponto de partida, não um produto. Ele não traz os seus
+projetos, os seus painéis nem o seu tema: traz a estrutura para você montar os
+seus, e três temas para começar.
+
+Isso é intencional. O que torna um setup de terminal bom é ele ser o seu, e
+qualquer coisa que viesse pronta aqui seria a opinião de outra pessoa sobre
+como você deve trabalhar.
+
+Então: use, copie, dê fork, mude o que precisar. Não há roadmap, não há
+garantia de compatibilidade entre versões, e issues podem demorar.
+
+---
 
 ## Licença
 
