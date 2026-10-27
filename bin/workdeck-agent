@@ -57,8 +57,32 @@ FIM
     echo "  work agent <comando>"
     exit 0
     ;;
-  -h|--help)
-    sed -n '2,11p' "$0" | sed 's/^# \{0,1\}//'
+  -h|--help|help)
+    carrega
+    atual="${AGENT_CMD:-nenhum ainda — defina com: work agent <comando>}"
+    cat <<FIM
+ai — abre o seu agente de IA num painel ao lado, na pasta em que você está.
+
+  Seu agente: $atual
+
+  Onde você está          O que acontece
+  dentro do work          divide a janela e abre o agente à direita, na mesma pasta
+  fora do tmux            roda o agente ali mesmo, no terminal atual
+  sem agente definido     explica como definir e lista os que achou no PATH
+
+  Exemplo: no projeto api, digite ai. O agente abre ao lado já em ~/code/api, e
+  do outro lado fica o shell para rodar work review e ver o que ele mudou.
+
+  ai  ou  Ctrl+b a        abre o agente
+  work agent claude       define qual é o seu agente (precisa estar instalado)
+  work agent              mostra o atual
+  work agent --list       procura agentes conhecidos no PATH
+  ai --here               abre no painel atual, sem dividir
+
+  O ai não repassa texto: ai corrige o login só abre o agente; escreva lá dentro.
+  Para abrir embaixo em vez de ao lado, troque AGENT_SPLIT="h" por "v" em
+  ${CONFIG/#$HOME/~}
+FIM
     exit 0
     ;;
 esac

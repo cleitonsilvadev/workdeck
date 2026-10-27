@@ -29,7 +29,7 @@ item "work escolher" "escolhe de novo os projetos"
   item "work review" "revisa o que ainda não foi commitado (ou git review)"
   item "work painel" "abre o painel de contexto"
   item "work agent <cmd>" "define o agente de IA; sem nada, mostra o atual"
-  item "ai" "abre o agente de IA num pane ao lado"
+  item "ai" "abre o agente de IA ao lado; ai help explica"
   item "work doctor" "diz o que funciona no seu ambiente"
   item "work help" "o menu; work help --texto mostra esta lista"
 
