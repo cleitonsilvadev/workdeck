@@ -140,8 +140,8 @@ com_shell() {
 sincronizar() {
   local abertos entry name dir cmd d tmp tirados=""
   tmux has-session -t "$SESSION" 2>/dev/null || return 0
+  [ "$(tmux show -t "$SESSION" -qv @workdeck 2>/dev/null)" = 1 ] || return 0
   abertos="$(tmux list-windows -t "$SESSION" -F '#{@projeto}' | grep -v '^$' || true)"
-  [ -n "$abertos" ] || return 0
   ler_config
   [ ${#windows[@]} -gt 0 ] || return 0
   tmp="$(mktemp)"
@@ -352,6 +352,7 @@ if ! tmux has-session -t "$SESSION" 2>/dev/null; then
       [ "$cmd" = work-panel ] && com_shell "$SESSION:$name"
     fi
   done
+  tmux set -t "$SESSION" @workdeck 1
   tmux select-window -t "$SESSION:1"
 fi
 
