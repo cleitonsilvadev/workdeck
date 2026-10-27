@@ -28,6 +28,9 @@ for arg in "$@"; do
   esac
 done
 
+# Compara conteúdo sem depender do cmp, que não vem em toda distribuição mínima.
+iguais() { [ "$(cksum < "$1")" = "$(cksum < "$2")" ]; }
+
 say() { printf '  %s\n' "$*"; }
 run() { [ "$DRY" = 1 ] && { say "[dry-run] $*"; return 0; }; "$@"; }
 
@@ -56,6 +59,11 @@ if [ -f "$MANIFESTO" ]; then
           say "${alvo#$HOME/} restaurado como estava antes"
         else
           tirar_bloco "$alvo"
+          # Criado pelo instalador e sem nada além do bloco: não sobra arquivo vazio.
+          if [ "${backup:-}" = ":criado" ] && [ -f "$alvo" ] && ! grep -q '[^[:space:]]' "$alvo"; then
+            run rm -f "$alvo"
+            say "${alvo#$HOME/} apagado: foi criado pela instalação"
+          fi
         fi
         ;;
       script)
@@ -63,7 +71,7 @@ if [ -f "$MANIFESTO" ]; then
         origem="$ROOT/bin/$nome"
         if [ ! -f "$alvo" ]; then
           :
-        elif [ -f "$origem" ] && cmp -s "$origem" "$alvo"; then
+        elif [ -f "$origem" ] && iguais "$origem" "$alvo"; then
           run rm -f "$alvo"
           say "removido ${alvo#$HOME/}"
         else
@@ -86,7 +94,7 @@ else
   done
   for script in "$ROOT"/bin/*; do
     alvo="$HOME/.local/bin/$(basename "$script")"
-    if [ -f "$alvo" ] && cmp -s "$script" "$alvo"; then
+    if [ -f "$alvo" ] && iguais "$script" "$alvo"; then
       run rm -f "$alvo"; say "removido ${alvo#$HOME/}"
     elif [ -f "$alvo" ]; then
       say "deixei ${alvo#$HOME/}: foi alterado depois da instalação"

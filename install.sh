@@ -80,7 +80,10 @@ write_block() { # arquivo, conteúdo
   local file="$1" body="$2" tmp backup
   backup="$(faz_backup "$file")"
   [ -n "$backup" ] && say "cópia do original em ${backup#$HOME/}"
-  anota bloco "$file" "$backup"
+  # Arquivo que não existia: o uninstall apaga em vez de deixá-lo vazio.
+  [ -e "$file" ] || backup=":criado"
+  # Só a primeira instalação diz como o arquivo era antes; reinstalar não reescreve isso.
+  grep -qF "bloco|$file|" "$MANIFESTO" 2>/dev/null || anota bloco "$file" "$backup"
   [ "$DRY" = 1 ] && { say "[dry-run] atualizaria o bloco em $file"; return 0; }
   mkdir -p "$(dirname "$file")"
   touch "$file"
@@ -92,6 +95,8 @@ write_block() { # arquivo, conteúdo
 }
 
 
+# Compara conteúdo sem depender do cmp, que não vem em toda distribuição mínima.
+iguais() { [ "$(cksum < "$1")" = "$(cksum < "$2")" ]; }
 say() { printf '  %s\n' "$*"; }
 run() { [ "$DRY" = 1 ] && { say "[dry-run] $*"; return 0; }; "$@"; }
 
@@ -146,15 +151,24 @@ if [ ${#falta[@]} -eq 0 ]; then
 elif [ "$DEPS" = 0 ]; then
   say "faltando: ${falta[*]} — instale por conta (--no-deps)"
 else
-  case "$GERENCIADOR" in
-    brew)    run brew install "${falta[@]}" ;;
-    apt-get) run sudo apt-get update -qq && run sudo apt-get install -y tmux git-delta ;;
-    dnf)     run sudo dnf install -y tmux git-delta ;;
-    pacman)  run sudo pacman -S --needed --noconfirm tmux git-delta ;;
-    zypper)  run sudo zypper install -y tmux git-delta ;;
-    apk)     run sudo apk add tmux delta ;;
-    *)       say "não reconheci o gerenciador de pacotes; instale: ${falta[*]}" ;;
-  esac
+  # Como root (num container, por exemplo) não há sudo, nem precisa.
+  sudo=""; [ "$(id -u)" != 0 ] && sudo="sudo"
+  [ "$GERENCIADOR" = apt-get ] && { run $sudo apt-get update -qq || true; }
+  for pacote in "${falta[@]}"; do
+    [ "$GERENCIADOR" = apk ] && [ "$pacote" = git-delta ] && pacote=delta
+    case "$GERENCIADOR" in
+      brew)    instalar=(brew install "$pacote") ;;
+      apt-get) instalar=($sudo apt-get install -y "$pacote") ;;
+      dnf)     instalar=($sudo dnf install -y "$pacote") ;;
+      pacman)  instalar=($sudo pacman -S --needed --noconfirm "$pacote") ;;
+      zypper)  instalar=($sudo zypper install -y "$pacote") ;;
+      apk)     instalar=($sudo apk add "$pacote") ;;
+      *)       say "não reconheci o gerenciador de pacotes; instale: ${falta[*]}"; break ;;
+    esac
+    # O delta não existe em todo repositório (Debian 12, por exemplo). Sem ele
+    # só o git review deixa de funcionar, então a instalação segue.
+    run "${instalar[@]}" || say "não consegui instalar $pacote pelo $GERENCIADOR; veja https://github.com/dandavison/delta"
+  done
 fi
 
 if [ "$SO" = "macOS" ] && [ "$DEPS" = 1 ] && command -v brew >/dev/null; then
@@ -171,7 +185,7 @@ for script in "$ROOT"/bin/*; do
   alvo="$BIN_DIR/$nome"
   # Se já existe um arquivo diferente com esse nome, ele é de outra pessoa
   # (ou seu, de antes). Guarda uma cópia antes de substituir.
-  if [ -f "$alvo" ] && ! cmp -s "$script" "$alvo"; then
+  if [ -f "$alvo" ] && ! iguais "$script" "$alvo"; then
     backup="$alvo.antes-do-workdeck"
     run cp "$alvo" "$backup"
     say "$nome — já existia e era diferente; guardei em $(basename "$backup")"
