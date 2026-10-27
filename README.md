@@ -20,7 +20,7 @@ terminal. macOS e Linux; no Windows, pelo WSL.
 work                  # abre a sessão, uma janela por projeto
 Ctrl+b h              # dentro do work: o menu com tudo (projetos, IA, revisar, dividir)
 ai                    # abre a IA ao lado, para te ajudar no projeto; ai help explica
-work review           # revisa o que ele escreveu (o mesmo que git review)
+work review           # a IA faz um self code review da mudança antes do commit
 work agent claude     # define qual é o seu agente de IA
 work painel           # abre o painel de contexto
 work doctor           # diz o que funciona no seu ambiente
@@ -114,9 +114,9 @@ oferecer uma lista. Qualquer comando serve.
 
 ### Por que um pane, e não uma janela
 
-O agente escreve código que você precisa ver. Com ele ao lado, o `git review`
-roda no pane de baixo sem trocar de contexto, e o painel fica a um clique na
-barra. É o ponto do projeto.
+O agente escreve código que você precisa ver. Com ele ao lado, o shell fica no
+outro painel para rodar os testes e o `work review` sem trocar de contexto, e o
+painel fica a um clique na barra. É o ponto do projeto.
 
 ---
 
@@ -228,7 +228,7 @@ sessão; sem fechar, a sessão antiga continua com a lista antiga.
 | `work help` | Abre o menu com as ações; `--texto` mostra comandos, atalhos e o que falta configurar |
 | `work doctor` | Diz o que funciona no seu ambiente |
 | `work agent <cmd>` | Define o agente de IA; sem nada, mostra o atual |
-| `work review` | O mesmo que `git review` |
+| `work review [staged\|branch]` | A IA faz um self code review da mudança antes do commit |
 | `work painel` | Abre o painel de contexto |
 
 `add`, `help`, `doctor`, `agent`, `review`, `painel`, `escolher`, `update`, `versao`, `uninstall` e `kill` são palavras
@@ -253,7 +253,7 @@ O dia a dia, em qualquer terminal e sem configurar nada:
 | Trocar de painel dentro da janela | <kbd>Shift</kbd>+<kbd>↑</kbd> / <kbd>↓</kbd> |
 | Zoom no painel, e de novo para voltar | <kbd>Ctrl</kbd>+<kbd>b</kbd> e <kbd>z</kbd> |
 | Fechar o painel | <kbd>Ctrl</kbd>+<kbd>b</kbd> e <kbd>x</kbd> |
-| Revisar o que a IA mudou antes do commit | `work review` |
+| Pedir à IA um self code review antes do commit | `work review` |
 
 <kbd>Ctrl</kbd>+<kbd>b</kbd> quer dizer: aperte <kbd>Ctrl</kbd>+<kbd>b</kbd>,
 solte, e depois a tecla. O mouse também funciona: clique na janela na barra de
@@ -340,7 +340,32 @@ Nada disso é necessário. É conforto, e só no Mac.
 
 ---
 
+## `work review`
+
+Um self code review antes do commit: a sua IA lê a mudança e o código em volta e
+revisa como a pessoa sênior que vai ser chamada se aquilo quebrar.
+
+```bash
+work review            # o que ainda não foi commitado
+work review staged     # só o que está no stage (git add)
+work review branch     # tudo o que a branch mudou em relação à principal
+```
+
+Ela abre numa conversa nova, ao lado, separada da que escreveu o código, e
+procura bugs, falhas de segurança e segredos, código arriscado sem teste,
+trechos lentos, o que dá para cortar e arquivos fora do escopo. Cada achado vem
+com a gravidade (corrigir antes do commit, vale corrigir, opcional), o que o
+código faz, o que dá errado, como corrigir e o que acontece se você não
+corrigir; no fim, um veredito. Ela não altera nada: só revisa.
+
+Com `claude`, `codex` e `gemini`, o pedido já entra na conversa. Com outra IA, ele
+vai para a área de transferência e para `~/.cache/workdeck/pedido-de-review.md`,
+para você colar. A ideia vem do passo de revisão do
+[ponytail](https://github.com/dietrichgebert/ponytail).
+
 ## `git review`
+
+Só o diff, sem IA, para quem quer olhar a mudança por conta própria.
 
 O git expõe qualquer executável `git-algo` do PATH como `git algo`, então o
 comando funciona sem alias nenhum.

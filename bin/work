@@ -13,7 +13,7 @@
 #      work help        comandos, atalhos e o que falta configurar
 #      work doctor      diz o que funciona no seu ambiente
 #      work agent [cmd] mostra o agente de IA, ou define qual é
-#      work review      revisa o que ainda não foi commitado
+#      work review      a IA faz um self code review da mudança (staged, branch)
 #      work painel      abre o painel de contexto
 #
 # Os projetos vêm de ~/.config/workdeck/projects.conf — uma linha por janela.
@@ -234,6 +234,70 @@ oferecer_atualizacao() {
   echo
 }
 
+revisar() {
+  local alvo="${1:-uncommitted}" base descricao comandos pedido
+  if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    echo "$(curto "$PWD") não é um repositório git, então não há o que revisar."
+    echo "Vá para a janela de um projeto (Shift+→) e rode de novo."
+    return 1
+  fi
+  case "$alvo" in
+    uncommitted|"")
+      if [ -z "$(git status --porcelain)" ]; then echo "nada mudou desde o último commit; não há o que revisar."; return 0; fi
+      descricao="o que ainda não foi commitado"
+      comandos="git diff HEAD, e os arquivos novos de git ls-files --others --exclude-standard" ;;
+    staged)
+      if git diff --cached --quiet; then echo "nada no stage (git add); não há o que revisar."; return 0; fi
+      descricao="o que está no stage, pronto para o commit"
+      comandos="git diff --cached" ;;
+    branch)
+      base="$(git symbolic-ref -q --short refs/remotes/origin/HEAD 2>/dev/null || echo main)"
+      descricao="tudo o que esta branch mudou em relação a $base"
+      comandos="git diff $base...HEAD, mais o que ainda não foi commitado (git diff HEAD)" ;;
+    *)
+      echo "não conheço '$alvo'. Use: work review, work review staged ou work review branch"
+      return 1 ;;
+  esac
+  pedido="${XDG_CACHE_HOME:-$HOME/.cache}/workdeck/pedido-de-review.md"
+  mkdir -p "$(dirname "$pedido")"
+  cat > "$pedido" <<FIM
+Faça um self code review desta mudança, antes do commit. Revise como a pessoa
+sênior que vai ser chamada se isso quebrar em produção: cética, concreta, sem
+elogio.
+
+O que revisar: $descricao. Para ver a mudança, rode: $comandos.
+Leia também o código que a mudança toca (quem chama, quem é chamado, os testes),
+não só as linhas do diff.
+
+Procure, nesta ordem:
+1. Bugs: lógica errada, casos de borda, valor vazio ou nulo, erro não tratado.
+2. Segurança: segredos no código ou em arquivo novo (.env, chaves, tokens),
+   entrada sem validação, injeção, permissão demais.
+3. Código arriscado sem teste.
+4. Desempenho com dados reais: consultas repetidas, laço dentro de laço, I/O
+   desnecessário.
+5. O que cortar: código morto ou duplicado, abstração que não se paga, sobras de
+   depuração (console.log, print, debugger, TODO).
+6. Escopo: arquivos que mudaram e não têm a ver com o objetivo da mudança.
+
+Para cada problema, neste formato:
+
+**[Corrigir antes do commit | Vale corrigir | Opcional]** arquivo:linha
+- O que o código faz:
+- O que dá errado:
+- Como corrigir:
+- Se não corrigir:
+
+Do mais grave para o menos grave. Não invente problema: se estiver tudo certo,
+diga isso numa linha. Termine com um veredito: "pode commitar", "commitar depois
+de corrigir os itens marcados como Corrigir antes do commit" ou "rever a
+abordagem".
+
+Não altere nenhum arquivo e não faça commit: só revise. Responda em português.
+FIM
+  workdeck-agent --pedido "$pedido" "review"
+}
+
 com_shell() {
   tmux set -p -t "$1" @papel "workdeck"
   tmux split-window -v -l 8 -t "$1" -c "$HOME"
@@ -400,7 +464,7 @@ case "${1:-}" in
   sincronizar) sincronizar; exit 0 ;;
   help|-h|--help) exec workdeck-help ;;
   doctor) shift; exec workdeck-doctor "$@" ;;
-  review) shift; exec git-review "$@" ;;
+  review) shift; revisar "${1:-}"; exit $? ;;
   agent)
     shift
     case "${1:-}" in

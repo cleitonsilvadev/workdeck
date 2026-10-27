@@ -40,6 +40,35 @@ case "${1:-}" in
     echo "$p"
     exit 1
     ;;
+  --pedido)
+    arquivo="${2:?use: workdeck-agent --pedido <arquivo> [título]}"
+    titulo="${3:-IA}"
+    carrega
+    p="$(problema "$AGENT_CMD")"
+    if [ -n "$p" ]; then
+      echo "$p — defina a sua IA com: work agent <comando>"
+      exit 1
+    fi
+    nome="$(basename "${AGENT_CMD%% *}")"
+    case "$nome" in
+      claude|codex) cmd="$AGENT_CMD \"\$(cat '$arquivo')\"" ;;
+      gemini) cmd="$AGENT_CMD -i \"\$(cat '$arquivo')\"" ;;
+      *)
+        cmd="$AGENT_CMD"
+        if command -v pbcopy >/dev/null; then pbcopy < "$arquivo"
+        elif command -v wl-copy >/dev/null; then wl-copy < "$arquivo"
+        elif command -v xclip >/dev/null; then xclip -selection clipboard < "$arquivo"
+        fi
+        echo "o pedido está na área de transferência e em $arquivo: cole na IA que vai abrir." ;;
+    esac
+    if [ -n "${TMUX:-}" ]; then
+      painel="$(tmux split-window -h -P -F '#{pane_id}' -c "$PWD" "$cmd")"
+      tmux set -p -t "$painel" @papel "$titulo · $nome"
+      tmux set -w -t "$painel" @ia 1
+      exit 0
+    fi
+    exec bash -c "$cmd"
+    ;;
   --set)
     cmd="${2:?use: work agent <comando>}"
     nome="${cmd%% *}"
@@ -93,7 +122,7 @@ ai — abre a IA ao lado, na pasta em que você está, para te ajudar no projeto
   sem agente definido     explica como definir e lista os que achou no PATH
 
   Exemplo: no projeto api, digite ai. O agente abre ao lado já em ~/code/api, e
-  do outro lado fica o shell para rodar work review e ver o que ele mudou.
+  do outro lado fica o shell; antes do commit, work review pede uma revisão.
 
   ai  ou  Ctrl+b a        abre o agente
   work agent claude       define qual é o seu agente (precisa estar instalado)
