@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Carga e disco. Funciona em macOS e Linux.
+if [ -r /proc/loadavg ]; then
+  carga=$(cut -d' ' -f1 /proc/loadavg)
+else
+  carga=$(sysctl -n vm.loadavg 2>/dev/null | awk '{print $2}')
+fi
+disco=$(df -h / | awk 'NR==2 {print $4}')
+echo "carga ${carga:-?} · disco livre ${disco:-?}"

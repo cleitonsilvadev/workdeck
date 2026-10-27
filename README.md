@@ -2,18 +2,20 @@
 
 Um terminal, uma sessão, uma janela por projeto.
 
-O kitty não gerencia abas nem divisões — quem faz isso é o tmux. O kitty só
-traduz os atalhos de macOS para o prefixo do tmux. <kbd>cmd</kbd>+<kbd>3</kbd>
-não troca de aba do terminal: ele manda `Ctrl+b 3` e o tmux troca de janela.
+O tmux cuida das janelas e divisões, não o terminal. A sessão sobrevive a
+fechar o terminal, cair a conexão ou reiniciar a máquina: você volta com
+`work` e tudo está onde estava.
 
-O ganho é que a sessão sobrevive a fechar o terminal, cair a conexão ou
-reiniciar o app. Você volta com `work` e tudo está onde estava.
+Junto vêm um `git review` com diff colorido e um painel onde você põe os
+comandos que quiser ver de relance.
 
-Junto vêm um `git review` com diff colorido e um painel opcional, onde você
-põe os comandos que quiser ver sem sair do terminal.
+**Roda em macOS e Linux.** No Windows, pelo WSL — o tmux não existe no
+Windows nativo, e o instalador diz isso em vez de fingir que funciona.
 
-Feito para macOS e zsh. Nada aqui é amarrado a uma linguagem ou a um serviço:
-os projetos, os atalhos, os painéis e as cores são todos seus para trocar.
+**Não exige um terminal específico.** Os atalhos são `Alt` e quem os
+interpreta é o tmux, então valem no Terminal.app, GNOME Terminal, Konsole,
+Windows Terminal, kitty, WezTerm, Alacritty ou qualquer outro. Há adaptadores
+opcionais em `terminals/` para quem usa Mac e prefere `cmd`.
 
 ---
 
@@ -29,28 +31,42 @@ Depois:
 
 ```bash
 $EDITOR ~/.config/workdeck/projects.conf   # seus projetos
-source ~/.zshrc
+source ~/.zshrc                            # ou ~/.bashrc
 work
 ```
 
-O kitty só pega a config nova ao reabrir, ou com <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>f5</kbd>.
-
-Opções do instalador:
+O instalador detecta o sistema e o gerenciador de pacotes — brew no macOS,
+apt, dnf, pacman, zypper ou apk no Linux — e instala o que faltar (`tmux` e
+`git-delta`). No Windows nativo ele para e mostra o caminho do WSL.
 
 | Flag | O que faz |
 |---|---|
 | `--theme <nome>` | Escolhe um tema de `themes/` (padrão: `catppuccin-mocha`) |
-| `--no-brew` | Não instala nada pelo Homebrew |
+| `--terminal kitty` | Instala também os atalhos `cmd` do kitty |
+| `--no-deps` | Não instala nada pelo gerenciador de pacotes |
+| `--no-reload` | Não recarrega o tmux no fim (útil ao instalar num HOME de teste) |
 | `--dry-run` | Mostra o que faria, sem escrever nada |
 
-O instalador é idempotente: rodar de novo atualiza em vez de duplicar. Tudo o
-que ele escreve nos seus arquivos fica entre marcadores `# >>> workdeck >>>`,
-e o `./uninstall.sh` remove exatamente esse trecho, deixando o resto intacto.
+É idempotente: rodar de novo atualiza em vez de duplicar. Tudo o que ele
+escreve nos seus arquivos fica entre marcadores `# >>> workdeck >>>`, e o
+`./uninstall.sh` remove exatamente esse trecho.
 
-> **Já tem kitty ou tmux configurado?** Rode `./install.sh --dry-run` primeiro.
-> O instalador só gerencia o que está entre os marcadores; se você já tem
-> cores ou `map` definidos fora deles, os dois blocos vão coexistir e o último
-> a ser lido vence. Nesse caso, remova a sua versão antiga antes.
+Se já existir um script seu com o mesmo nome em `~/.local/bin` e com conteúdo
+diferente, o instalador guarda uma cópia em `<nome>.antes-do-workdeck` antes
+de substituir. O `uninstall.sh` só remove o que não foi alterado desde a
+instalação.
+
+### Windows
+
+O tmux não roda no Windows nativo, e é ele que faz o projeto funcionar. O
+caminho é o WSL:
+
+```powershell
+wsl --install          # PowerShell, como administrador
+```
+
+Depois, dentro do WSL, é a instalação normal de Linux. Seu terminal do Windows
+continua sendo o terminal — quem gerencia as janelas é o tmux, lá dentro.
 
 ---
 
@@ -66,7 +82,7 @@ nome|caminho|comando opcional
 api|$HOME/projetos/minha-api
 web|$HOME/projetos/meu-front
 notas|~/notas
-painel|$HOME|tclock
+painel|$HOME|work-panel
 ```
 
 - **nome** vira o nome da janela no tmux, e o argumento de `work <nome>`
@@ -93,29 +109,45 @@ Para usar outro nome de sessão: `export WORKDECK_SESSION=outro`.
 
 ## Atalhos
 
-Todos são <kbd>cmd</kbd>, como em qualquer app de Mac. O kitty manda o
-equivalente do tmux.
+Funcionam em qualquer terminal, porque quem os interpreta é o tmux.
 
 | Atalho | Resultado |
 |---|---|
-| <kbd>cmd</kbd>+<kbd>t</kbd> | Nova janela, na pasta atual |
-| <kbd>cmd</kbd>+<kbd>1</kbd>…<kbd>9</kbd> | Vai direto para a janela N |
-| <kbd>cmd</kbd>+<kbd>[</kbd> / <kbd>]</kbd> | Janela anterior / próxima |
-| <kbd>cmd</kbd>+<kbd>d</kbd> | Divide lado a lado |
-| <kbd>cmd</kbd>+<kbd>shift</kbd>+<kbd>d</kbd> | Divide em cima/embaixo |
-| <kbd>cmd</kbd>+<kbd>alt</kbd>+<kbd>setas</kbd> | Pula entre os painéis |
-| <kbd>cmd</kbd>+<kbd>shift</kbd>+<kbd>enter</kbd> | Zoom: o painel ocupa a janela |
-| <kbd>cmd</kbd>+<kbd>shift</kbd>+<kbd>w</kbd> | Fecha o painel |
-| <kbd>cmd</kbd>+<kbd>shift</kbd>+<kbd>r</kbd> | Renomeia a janela |
-| <kbd>cmd</kbd>+<kbd>shift</kbd>+<kbd>e</kbd> | Solta a sessão (ela continua viva) |
-| <kbd>cmd</kbd>+<kbd>b</kbd> | Prefixo cru, para o que não está mapeado |
+| <kbd>Alt</kbd>+<kbd>1</kbd>…<kbd>9</kbd> | Vai direto para a janela N |
+| <kbd>Alt</kbd>+<kbd>setas</kbd> | Pula entre os painéis |
+| <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>←</kbd> / <kbd>→</kbd> | Janela anterior / próxima |
+| <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>T</kbd> | Nova janela, na pasta atual |
+| <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>D</kbd> | Divide lado a lado |
+| <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>S</kbd> | Divide em cima/embaixo |
+| <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>Z</kbd> | Zoom: o painel ocupa a janela |
+| <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>X</kbd> | Fecha o painel |
+| <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>R</kbd> | Renomeia a janela |
+| <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>E</kbd> | Solta a sessão (ela continua viva) |
 
-**Para mudar um atalho**, edite `config/kitty.conf` e rode `./install.sh` de
-novo. Cada linha é "manda o prefixo (`\x02`, que é Ctrl+b) e depois a tecla":
+**Por que as ações usam Shift.** `Alt`+letra minúscula já tem dono: o readline
+usa <kbd>Alt</kbd>+<kbd>b</kbd>, <kbd>Alt</kbd>+<kbd>f</kbd> e
+<kbd>Alt</kbd>+<kbd>d</kbd> para andar e apagar palavras na linha de comando.
+Mapear essas teclas no tmux roubaria funções que você usa o dia todo. Números
+e setas são seguros; por isso eles ficaram sem Shift.
 
+**Para mudar um atalho**, edite `config/tmux.conf` e rode `./install.sh`:
+
+```tmux
+bind -n M-S-G new-window -c "#{pane_current_path}" lazygit
 ```
-map cmd+shift+s send_text all \x02s    # cmd+shift+s abre a lista de sessões
+
+### Atalhos em `cmd`, no macOS
+
+No Mac, `cmd` nunca chega ao tmux: o sistema intercepta antes. Se você quer
+`cmd+1` em vez de `Alt+1`, o terminal precisa traduzir. Há adaptadores prontos
+em `terminals/` para kitty, WezTerm e Alacritty — veja `terminals/README.md`.
+Só o kitty é instalado automaticamente:
+
+```bash
+./install.sh --terminal kitty
 ```
+
+Nada disso é necessário. É conforto.
 
 ---
 
@@ -151,58 +183,61 @@ passam por cima das duas.
 
 ## Painéis
 
-Um painel é qualquer executável que imprima texto. O `tclock` (opcional) os
-coloca na tela e os atualiza sozinho; fora dele, cada um funciona na linha de
-comando como qualquer comando.
-
-O projeto vem com um só, de propósito — ele serve mais como modelo do que
-como funcionalidade:
-
-| Script | Mostra |
-|---|---|
-| `painel-sistema` | Carga, swap e disco livre |
+O `work-panel` mostra a saída de vários comandos num pane, atualizando
+sozinho. Não depende de nada além do que já está instalado.
 
 ```bash
-$ painel-sistema
-carga 2.14 · swap 1.2G · disco livre 86Gi
+work-panel          # atualiza a cada 60s
+work-panel 10       # a cada 10s
+work-panel --once   # imprime uma vez e sai
+painel              # abre numa janela da sessão e vai até ela
 ```
 
-Ele tem seis linhas. Vale abrir `bin/painel-sistema` antes de escrever o seu.
+Dentro dele, <kbd>q</kbd> sai.
+
+Cada painel é um **executável** em `~/.config/workdeck/panels/`. O nome do
+arquivo vira o título, e a ordem é alfabética — use um prefixo numérico para
+ordenar. Dois vêm prontos:
+
+| Arquivo | Mostra |
+|---|---|
+| `10-maquina` | Carga e disco livre |
+| `20-git` | Em que branch está cada projeto e se há mudança solta |
+
+```
+Maquina
+  carga 1.40 · disco livre 259Gi
+
+Git
+  api            main
+  web            feature/login  (6 alterado(s))
+```
 
 ### Fazendo o seu
 
-Qualquer coisa que você queira olhar de relance serve: containers rodando,
-build quebrado, fila de deploy, tarefas do dia, o tempo, a cotação do dólar,
-quantos commits você fez hoje. Escreva um executável que imprima texto, ponha
-em `bin/`, rode `./install.sh` de novo e acrescente ao `config/tclock.toml`:
+Qualquer coisa que imprima texto serve: containers rodando, build quebrado,
+fila de deploy, tarefas do dia, a cotação do dólar, quantos commits você fez
+hoje.
 
-```toml
-[[clock.widgets]]
-title = "Containers"
-group = "dev"
-command = ["docker", "ps", "--format", "{{.Names}}  {{.Status}}"]
-refresh_secs = 30
+```bash
+cat > ~/.config/workdeck/panels/30-docker <<'EOF'
+#!/usr/bin/env bash
+docker ps --format '{{.Names}}  {{.Status}}'
+EOF
+chmod +x ~/.config/workdeck/panels/30-docker
 ```
 
-Não precisa nem ser um script — `command` aceita qualquer comando com
-argumentos, como no exemplo acima.
+É só isso. Não precisa reinstalar nem reiniciar: o `work-panel` lê o diretório
+a cada ciclo. Esqueceu o `chmod +x`? Ele avisa.
 
-Widgets com o mesmo `group` aparecem juntos; a tecla <kbd>g</kbd> alterna entre
-os grupos. `refresh_secs` diz de quanto em quanto tempo redesenhar, e
-`timeout_secs` desiste se o comando travar. Para uma visão maior sob demanda,
-`popup_actions` cria uma tecla:
-
-```toml
-[[clock.widgets.popup_actions]]
-key = "d"
-label = "docker com detalhe"
-command = ["docker", "ps", "-a"]
-```
+Para versionar os seus junto do projeto, ponha em `config/panels/` e rode
+`./install.sh` — ele copia o que ainda não existe e nunca sobrescreve um
+painel seu.
 
 ### Painéis que precisam de credenciais
 
 Se o seu painel fala com uma API — um board, um CI, um serviço interno —, não
-coloque token nem URL de organização dentro do script. Leia de um arquivo em
+coloque token nem URL dentro do script. Leia de um arquivo em
 `~/.config/workdeck/`, que fica fora do repositório:
 
 ```bash
@@ -211,24 +246,7 @@ CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/workdeck/meu-painel.conf"
 . "$CONFIG"
 ```
 
-Assim o painel pode ser versionado e compartilhado, e o que é seu continua
-sendo seu. O `.gitignore` já ignora `*.conf` soltos por garantia.
-
----
-
-## O painel visual (tclock)
-
-**Esta é a única peça que o instalador não resolve.** O `tclock` é um relógio
-de terminal com suporte a widgets que rodam comandos. Se você tiver o binário,
-ponha em `~/.local/bin/tclock` e rode `./install.sh` de novo — ele cria a
-config. Sem ele, todo o resto funciona; você perde só a janela do painel.
-
-Dentro do painel: <kbd>g</kbd> troca de grupo, <kbd>t</kbd> abre a lista com
-links, <kbd>Esc</kbd> fecha, <kbd>q</kbd> sai. Para redesenhar sem sair de onde
-você está: `tclock run`.
-
-Ele só tem duas alavancas de cor: `color`, um hex único, e `theme`. Não existe
-cor por elemento.
+Assim o painel pode ser compartilhado e o que é seu continua sendo seu.
 
 ---
 
@@ -259,14 +277,16 @@ senão o diff fica difícil em tela não-retina.
 ## O que vai para onde
 
 ```
-~/.local/bin/                     work, git-review, painel-*
-~/.config/workdeck/               projects.conf e o que seus painéis precisarem
-~/.config/kitty/kitty.conf        bloco entre os marcadores
+~/.local/bin/                     work, work-panel, git-review
+~/.config/workdeck/projects.conf  seus projetos
+~/.config/workdeck/panels/        seus painéis
 ~/.tmux.conf                      bloco entre os marcadores
-~/.zshrc                          bloco entre os marcadores
+~/.zshrc ou ~/.bashrc             bloco entre os marcadores
 ~/.config/git-review/lesskey      navegação dentro do diff
-~/.config/tclock/config.toml      se o tclock existir
+~/.config/kitty/kitty.conf        só com --terminal kitty
 ```
+
+---
 
 ## Desinstalar
 
@@ -284,16 +304,16 @@ Quase tudo aqui é para ser trocado. O resumo:
 | Quero mudar | Onde | Depois |
 |---|---|---|
 | Os projetos e a ordem das janelas | `~/.config/workdeck/projects.conf` | `work kill` e `work` |
-| Um atalho do teclado | `config/kitty.conf` | `./install.sh` |
-| Um comportamento do tmux | `config/tmux.conf` | `./install.sh` |
+| Um atalho do teclado | `config/tmux.conf` | `./install.sh` |
+| Os atalhos `cmd` no Mac | `terminals/kitty.conf` | `./install.sh --terminal kitty` |
 | As cores | `themes/<nome>.conf` e `.tmux` | `./install.sh --theme <nome>` |
-| O que aparece no painel | `config/tclock.toml` | `tclock run` |
+| O que aparece no painel | `~/.config/workdeck/panels/` | nada, ele relê sozinho |
 | A branch base do `git review` | `bin/git-review`, em `base_candidates` | `./install.sh` |
 | O nome da sessão | `export WORKDECK_SESSION=outro` | — |
 | Algo que não existe aqui | escreva em `bin/` | `./install.sh` |
 
 Qualquer executável que você puser em `bin/` vai para o `PATH` no próximo
-`install.sh`. É assim que o `work`, o `git-review` e o `painel-sistema`
+`install.sh`. É assim que o `work`, o `git-review` e o `work-panel`
 chegam lá — não há nada de especial neles.
 
 Se você for manter sua própria versão, o caminho mais confortável é dar fork,

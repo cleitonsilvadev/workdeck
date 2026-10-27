@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-# Carga, swap e disco, em uma linha. A RAM fica no Stats (brew install --cask stats).
-load=$(sysctl -n vm.loadavg 2>/dev/null | awk '{print $2}')
-swap=$(sysctl -n vm.swapusage 2>/dev/null | awk '{print $6}')
-disk=$(df -h / | awk 'NR==2 {print $4}')
-echo "carga ${load:-?} · swap ${swap:-?} · disco livre $disk"
