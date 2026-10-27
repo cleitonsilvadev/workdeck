@@ -23,7 +23,11 @@ case "${1:-}" in
   *) echo "opção desconhecida: $1 (veja git review -h)"; exit 1 ;;
 esac
 
-git rev-parse --is-inside-work-tree >/dev/null 2>&1 || { echo "não é um repositório git"; exit 1; }
+if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  echo "$(pwd | sed "s|^$HOME|~|") não é um repositório git, então não há o que revisar."
+  echo "Vá para a janela de um projeto (Shift+→) e rode de novo."
+  exit 1
+fi
 command -v delta >/dev/null || { echo "instale o delta: https://github.com/dandavison/delta"; exit 1; }
 
 bold=$'\e[1m'; dim=$'\e[2m'; cyan=$'\e[36m'; green=$'\e[32m'; red=$'\e[31m'; reset=$'\e[0m'

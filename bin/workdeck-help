@@ -110,7 +110,12 @@ executar() {
       read -r cmd || cmd=""
       [ -n "$cmd" ] && exec workdeck-agent --set "$cmd"
       exit 0 ;;
-    r) exec git-review ;;
+    r)
+      git-review
+      printf '\n  %squalquer tecla volta%s ' "$d" "$r"
+      read -rsn1 _ || true
+      echo
+      exit 0 ;;
     p) exec work painel ;;
     d) exec workdeck-doctor ;;
     '?') texto; exit 0 ;;
