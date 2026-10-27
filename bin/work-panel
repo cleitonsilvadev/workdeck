@@ -7,7 +7,8 @@
 #
 # Cada painel é um executável em ~/.config/workdeck/panels/. O nome do arquivo
 # vira o título, e a ordem é alfabética — use um prefixo numérico para ordenar
-# (10-maquina, 20-docker). Qualquer coisa que imprima texto serve.
+# (10-maquina, 20-docker). Qualquer coisa que imprima texto serve. Os que
+# começam com 00- aparecem sem título.
 set -uo pipefail
 
 PANELS="${XDG_CONFIG_HOME:-$HOME/.config}/workdeck/panels"
@@ -45,7 +46,10 @@ desenha() {
   for painel in "$PANELS"/*; do
     [ -x "$painel" ] || continue
     achou=1
-    printf '%s%s%s\n' "$bold" "$(titulo_de "$painel")" "$reset"
+    case "$(basename "$painel")" in
+      00-*) ;;
+      *) printf '%s%s%s\n' "$bold" "$(titulo_de "$painel")" "$reset" ;;
+    esac
     "$painel" 2>&1 | sed 's/^/  /'
     echo
   done
@@ -66,8 +70,7 @@ printf '\e[?25l'                                  # esconde o cursor
 
 while true; do
   saida="$(desenha)"
-  printf '\e[H\e[2J%s\n%sq para sair · atualiza a cada %ss · %s%s\n' \
-    "$saida" "$dim" "$INTERVAL" "$(date '+%H:%M:%S')" "$reset"
+  printf '\e[H\e[2J%s\n' "$saida"
   read -r -t "$INTERVAL" -n 1 tecla && [ "$tecla" = "q" ] && break
 done
 

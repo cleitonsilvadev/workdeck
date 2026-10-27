@@ -372,11 +372,11 @@ Dentro dele, <kbd>q</kbd> sai.
 
 Cada painel é um **executável** em `~/.config/workdeck/panels/`. O nome do
 arquivo vira o título, e a ordem é alfabética — use um prefixo numérico para
-ordenar. Três vêm prontos:
+ordenar; os que começam com `00-` aparecem sem título. Três vêm prontos:
 
 | Arquivo | Mostra |
 |---|---|
-| `00-comece-aqui` | O que falta configurar: projetos e agente. Some quando estiver tudo pronto, e fica só a linha de atalhos |
+| `00-workdeck` | O logo, quantos projetos e qual agente, e o que falta configurar |
 | `10-maquina` | Carga e disco livre |
 | `20-git` | Em que branch está cada projeto e se há mudança solta |
 

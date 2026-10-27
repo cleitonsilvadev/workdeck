@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/workdeck"
+
+projetos=0
+if [ -f "$CONFIG_DIR/projects.conf" ]; then
+  projetos=$(grep -v '^[[:space:]]*#' "$CONFIG_DIR/projects.conf" | awk -F'|' 'NF >= 2 && $3 == ""' | wc -l | tr -d ' ')
+fi
+AGENT_CMD=""
+[ -f "$CONFIG_DIR/agent.conf" ] && . "$CONFIG_DIR/agent.conf"
+
+m=$'\033[48;5;183m'; e=$'\033[48;5;234m'; x=$'\033[0m'
+roxo=$'\033[1;38;5;183m'; dim=$'\033[2m'; amarelo=$'\033[33m'; verde=$'\033[32m'
+
+desenho=(
+  ".MMMMMMMMM."
+  "MMMMMMMMMMM"
+  "MMEMMMMMMMM"
+  "MMMEMMMMMMM"
+  "MMMMEMMMMMM"
+  "MMMEMMMMMMM"
+  "MMEMMEEEEMM"
+  "MMMMMMMMMMM"
+  ".MMMMMMMMM."
+)
+
+if [ "$projetos" -gt 0 ]; then
+  linha_projetos="${verde}✓${x} projetos  $projetos"
+else
+  linha_projetos="${amarelo}!${x} projetos  nenhum ainda"
+fi
+if [ -n "$AGENT_CMD" ]; then
+  linha_agente="${verde}✓${x} agente    $AGENT_CMD"
+else
+  linha_agente="${amarelo}!${x} agente    nenhum ainda"
+fi
+
+texto=(
+  ""
+  ""
+  "${roxo}workdeck${x}"
+  "${dim}terminal para agentes de IA${x}"
+  ""
+  "$linha_projetos"
+  "$linha_agente"
+  ""
+  ""
+)
+
+for ((i = 0; i < ${#desenho[@]}; i++)); do
+  linha=""
+  row="${desenho[$i]}"
+  for ((j = 0; j < ${#row}; j++)); do
+    case "${row:$j:1}" in
+      M) linha="$linha$m  " ;;
+      E) linha="$linha$e  " ;;
+      *) linha="$linha$x  " ;;
+    esac
+  done
+  printf '%s%s   %s\n' "$linha" "$x" "${texto[$i]}"
+done
+echo
+
+if [ "$projetos" = 0 ]; then
+  echo "Adicione seus projetos no terminal aqui embaixo; cada um vira uma janela:"
+  echo "  work add ~/caminho/do/projeto     Tab completa o caminho"
+  echo
+fi
+if [ -z "$AGENT_CMD" ]; then
+  echo "Ligue um agente de IA:  work agent <comando>   (claude, codex, aider…)"
+  echo
+fi
+printf '%sShift+←/→ janelas · Shift+↑/↓ painéis · Ctrl+b h menu%s\n' "$dim" "$x"
