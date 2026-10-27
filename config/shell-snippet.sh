@@ -16,7 +16,7 @@ painel() {
   if tmux list-windows -t "$sessao" -F '#W' | grep -qx painel; then
     tmux respawn-pane -k -t "$sessao:painel" -c "$HOME" work-panel
   else
-    tmux new-window -d -t "$sessao" -n painel -c "$HOME" work-panel
+    tmux new-window -d -t "$sessao:" -n painel -c "$HOME" work-panel
   fi
   if [ -n "${TMUX:-}" ]; then
     tmux switch-client -t "$sessao" \; select-window -t "$sessao:painel"

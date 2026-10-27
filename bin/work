@@ -52,7 +52,7 @@ if ! tmux has-session -t "$SESSION" 2>/dev/null; then
       tmux new-session -d -s "$SESSION" -n "$name" -c "$dir" ${cmd:+"$cmd"}
       first=0
     else
-      tmux new-window -t "$SESSION" -n "$name" -c "$dir" ${cmd:+"$cmd"}
+      tmux new-window -t "$SESSION:" -n "$name" -c "$dir" ${cmd:+"$cmd"}
     fi
   done
   if [ "$first" = 1 ]; then
