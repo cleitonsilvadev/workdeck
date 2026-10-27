@@ -3,6 +3,10 @@
 O `work update` mostra o trecho da versão nova antes de perguntar se quer
 atualizar. Cada versão é uma tag `vX.Y.Z`.
 
+## v1.0.3
+
+- Depois de atualizar pelo `work`, a sessão já abre com a versão nova.
+
 ## v1.0.2
 
 - A aba da janela atual fica sem fundo: só o número em destaque.

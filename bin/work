@@ -20,6 +20,7 @@
 # Os projetos vêm de ~/.config/workdeck/projects.conf — uma linha por janela.
 set -euo pipefail
 
+ARGUMENTOS=("$@")
 CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/workdeck/projects.conf"
 CODIGO="${XDG_DATA_HOME:-$HOME/.local/share}/workdeck"
 CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/workdeck/atualizacao"
@@ -246,8 +247,10 @@ oferecer_atualizacao() {
   nova="$(de_cache nova)"
   tem_versao_nova "$nova" "$(versao_atual)" || return 0
   [ "$(de_cache ignorada)" = "$nova" ] && return 0
-  atualizar 1 || true
-  echo
+  atualizar 1 || return 0
+  if [ "$(versao_atual)" = "$nova" ] && [ -x "$HOME/.local/bin/work" ]; then
+    exec "$HOME/.local/bin/work" ${ARGUMENTOS[@]+"${ARGUMENTOS[@]}"}
+  fi
 }
 
 revisar() {
