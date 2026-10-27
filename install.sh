@@ -246,7 +246,11 @@ FIM
 esac
 
 if [ "$BONITO" = 1 ]; then
-  printf '\033[?25l\n  %sworkdeck%s %s· %s · %s%s\n\n' "$bold" "$reset" "$dim" "$SO" "$THEME" "$reset"
+  if [ -n "${WORKDECK_ATUALIZANDO:-}" ]; then
+    printf '\033[?25l'
+  else
+    printf '\033[?25l\n  %sworkdeck%s %s· %s · %s%s\n\n' "$bold" "$reset" "$dim" "$SO" "$THEME" "$reset"
+  fi
 else
   echo "workdeck → $SO, tema $THEME"
   echo
@@ -520,6 +524,8 @@ concluir
 if [ "$RELOAD" = 1 ] && command -v tmux >/dev/null && tmux info >/dev/null 2>&1; then
   run tmux source-file "$HOME/.tmux.conf" && say "tmux recarregado"
 fi
+
+[ -n "${WORKDECK_ATUALIZANDO:-}" ] && exit 0
 
 if [ "$BONITO" = 1 ]; then
   printf '\n  %s✓ pronto em %ss%s\n' "$verde" "$SECONDS" "$reset"

@@ -174,8 +174,11 @@ gravar_cache() {
 }
 
 novidades() {
+  local c="" x=""
+  if [ -t 1 ]; then c=$'\033[38;5;183m'; x=$'\033[0m'; fi
   git -C "$CODIGO" show "$1:CHANGELOG.md" 2>/dev/null \
-    | awk -v v="## $1" '$0 == v {f = 1; next} /^## / {f = 0} f' | sed '/^[[:space:]]*$/d' | head -8 | sed 's/^/  /'
+    | awk -v v="## $1" '$0 == v {f = 1; next} /^## / {f = 0} f' | sed '/^[[:space:]]*$/d' | head -8 \
+    | sed "s/^- /    • /; s/\`\([^\`]*\)\`/$c\\1$x/g"
 }
 
 verificar_em_segundo_plano() {
@@ -216,19 +219,24 @@ atualizar() {
     echo "você está na $atual, a mais nova."
     return 0
   fi
-  echo "workdeck $nova disponível (você tem ${atual:-uma versão sem número})."
+  local t="" d="" v="" x=""
+  if [ -t 1 ]; then t=$'\033[1;38;5;183m'; d=$'\033[2m'; v=$'\033[32m'; x=$'\033[0m'; fi
+  printf '\n  %sworkdeck%s  %s%s%s → %s%s%s  %suma versão nova%s\n\n' \
+    "$t" "$x" "$d" "${atual:-sem versão}" "$x" "$v" "$nova" "$x" "$d" "$x"
+  printf '  %sO que mudou%s\n' "$t" "$x"
   novidades "$nova"
+  echo
   if [ "$perguntar" = 1 ]; then
-    printf 'Atualizar agora? [S/n] '
+    printf '  Atualizar agora? [S/n] '
     read -r r || r=n
     case "${r:-s}" in
       s|S|y|Y) ;;
-      *) gravar_cache ignorada "$nova"; echo "tudo bem. Quando quiser: work update"; return 0 ;;
+      *) gravar_cache ignorada "$nova"; printf '  %studo bem; quando quiser: work update%s\n\n' "$d" "$x"; return 0 ;;
     esac
   fi
   git -C "$CODIGO" checkout -q "$nova"
-  bash "$CODIGO/install.sh" --yes --no-deps
-  echo "workdeck atualizado para $nova."
+  WORKDECK_ATUALIZANDO=1 bash "$CODIGO/install.sh" --yes --no-deps
+  printf '\n  %s✓ workdeck atualizado para %s%s\n\n' "$v" "$nova" "$x"
 }
 
 oferecer_atualizacao() {
