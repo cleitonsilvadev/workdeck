@@ -1,3 +1,13 @@
+export const released = false
+
+export const comingSoonPhrases = [
+  "repositório público, licença mit",
+  "polindo o readme antes de abrir",
+  "feat: abrir o código para todos",
+  "git push origin main",
+  "private → public",
+] as const
+
 export const repoUrl = "https://github.com/thiagofeliperibeiro/workdeck"
 
 export const installCommand = `git clone ${repoUrl}.git && cd workdeck && ./install.sh`
@@ -138,4 +148,14 @@ export const uninstall = [
   { cmd: "./uninstall.sh --restore", desc: "Devolve os arquivos ao estado de antes da instalação." },
   { cmd: "./uninstall.sh --all", desc: "Remove tudo, inclusive ~/.config/workdeck." },
   { cmd: "./uninstall.sh --dry-run", desc: "Mostra o que faria, sem escrever nada." },
+]
+
+export const testimonials = [
+  {
+    name: "Thiago Ribeiro",
+    role: "Desenvolvedor frontend · criador do workdeck",
+    github: "https://github.com/thiagofeliperibeiro",
+    photo: "",
+    quote: "Abra, delegue e revise. Cada projeto na sua janela, o agente ao lado e o diff à vista antes de cada commit. Meu dia inteiro cabe num terminal.",
+  },
 ]

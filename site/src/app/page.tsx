@@ -2,13 +2,16 @@ import { ArrowRight, Bot, History, LayoutPanelLeft, Palette, Stethoscope, Termin
 import { AnimatedGridPattern } from "@/components/ui/animated-grid-pattern"
 import { AnimatedShinyText } from "@/components/ui/animated-shiny-text"
 import { buttonVariants } from "@/components/ui/button"
+import { ComingSoon } from "@/components/coming-soon"
 import { CommandLine } from "@/components/copy-button"
+import { GlowCard } from "@/components/glow-card"
 import { InstallTabs } from "@/components/install-tabs"
 import { Reveal, Stagger, StaggerItem } from "@/components/reveal"
 import { ShortcutList } from "@/components/shortcut-list"
 import { TerminalDemo } from "@/components/terminal-demo"
+import { Testimonials } from "@/components/testimonials"
 import { ThemePreview } from "@/components/theme-preview"
-import { commands, features, installCommand, repoUrl, uninstall } from "@/lib/site"
+import { commands, features, installCommand, released, repoUrl, uninstall } from "@/lib/site"
 import { cn } from "@/lib/utils"
 
 const icons = {
@@ -50,7 +53,9 @@ export default function Home() {
             <span className="grid size-6 place-items-center rounded-md bg-ctp-mauve text-ctp-crust">
               <Terminal className="size-3.5" />
             </span>
-            workdeck
+            <span>
+              workdeck<span className="text-ctp-mauve">.dev</span>
+            </span>
           </a>
           <nav className="hidden items-center gap-6 text-sm text-ctp-subtext0 md:flex">
             <a href="#recursos" className="transition-colors hover:text-ctp-text">Recursos</a>
@@ -58,10 +63,14 @@ export default function Home() {
             <a href="#temas" className="transition-colors hover:text-ctp-text">Temas</a>
             <a href="#instalar" className="transition-colors hover:text-ctp-text">Instalar</a>
           </nav>
-          <a href={repoUrl} target="_blank" rel="noreferrer" className={cn(buttonVariants({ variant: "outline", size: "sm" }), "gap-2")}>
-            <GithubMark className="size-3.5" />
-            GitHub
-          </a>
+          {released ? (
+            <a href={repoUrl} target="_blank" rel="noreferrer" className={cn(buttonVariants({ variant: "outline", size: "sm" }), "gap-2")}>
+              <GithubMark className="size-3.5" />
+              GitHub
+            </a>
+          ) : (
+            <span className="rounded-full border border-ctp-surface0 px-3 py-1 font-mono text-xs text-ctp-subtext0">em breve</span>
+          )}
         </div>
       </header>
 
@@ -75,12 +84,20 @@ export default function Home() {
           />
           <div className="relative mx-auto grid max-w-6xl grid-cols-1 items-center gap-14 px-4 pt-20 pb-24 sm:px-6 lg:grid-cols-[1fr_1.15fr] lg:pt-28">
             <Reveal className="min-w-0">
-              <a href={repoUrl} target="_blank" rel="noreferrer" className="group mb-6 inline-flex items-center rounded-full border border-ctp-surface0 bg-ctp-mantle/80 px-3 py-1 text-xs">
-                <AnimatedShinyText className="mx-0 inline-flex items-center gap-1.5 text-ctp-subtext0 dark:via-ctp-text/90">
-                  open source · MIT · macOS, Linux e WSL
-                  <ArrowRight className="size-3 transition-transform group-hover:translate-x-0.5" />
-                </AnimatedShinyText>
-              </a>
+              {released ? (
+                <a href={repoUrl} target="_blank" rel="noreferrer" className="group mb-6 inline-flex items-center rounded-full border border-ctp-surface0 bg-ctp-mantle/80 px-3 py-1 text-xs">
+                  <AnimatedShinyText className="mx-0 inline-flex items-center gap-1.5 text-ctp-subtext0 dark:via-ctp-text/90">
+                    open source · MIT · macOS, Linux e WSL
+                    <ArrowRight className="size-3 transition-transform group-hover:translate-x-0.5" />
+                  </AnimatedShinyText>
+                </a>
+              ) : (
+                <span className="mb-6 inline-flex items-center rounded-full border border-ctp-surface0 bg-ctp-mantle/80 px-3 py-1 text-xs">
+                  <AnimatedShinyText className="mx-0 inline-flex items-center gap-1.5 text-ctp-subtext0 dark:via-ctp-text/90">
+                    em breve · macOS, Linux e WSL
+                  </AnimatedShinyText>
+                </span>
+              )}
               <h1 className="text-4xl leading-[1.05] font-semibold tracking-tight text-balance text-ctp-text sm:text-6xl">
                 O terminal onde você e o <span className="text-gradient">agente de IA</span> trabalham lado a lado.
               </h1>
@@ -92,12 +109,14 @@ export default function Home() {
                   Instalar
                   <ArrowRight className="size-4" />
                 </a>
-                <a href={repoUrl} target="_blank" rel="noreferrer" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "h-11 gap-2 px-5 text-sm")}>
-                  <GithubMark className="size-4" />
-                  Ver no GitHub
-                </a>
+                {released && (
+                  <a href={repoUrl} target="_blank" rel="noreferrer" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "h-11 gap-2 px-5 text-sm")}>
+                    <GithubMark className="size-4" />
+                    Ver no GitHub
+                  </a>
+                )}
               </div>
-              <CommandLine command={installCommand} className="mt-8 max-w-xl" />
+              {released ? <CommandLine command={installCommand} className="mt-8 max-w-xl" /> : <ComingSoon className="mt-8 max-w-xl" />}
             </Reveal>
             <Reveal delay={0.15} className="min-w-0">
               <TerminalDemo />
@@ -108,12 +127,16 @@ export default function Home() {
         <Section eyebrow="cinco comandos" title="Tudo o que você digita" desc="O resto são atalhos de teclado. Nada de alias para decorar.">
           <Stagger className="mx-auto grid max-w-4xl gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {commands.map((c) => (
-              <StaggerItem key={c.cmd} className="group rounded-xl border border-border bg-ctp-mantle/60 p-5 transition-colors hover:border-ctp-surface1 hover:bg-ctp-mantle">
-                <code className="font-mono text-sm text-ctp-mauve">
-                  <span className="text-ctp-overlay0">$ </span>
-                  {c.cmd}
-                </code>
-                <p className="mt-2 text-sm text-ctp-subtext0">{c.desc}</p>
+              <StaggerItem key={c.cmd}>
+                <GlowCard className="rounded-xl">
+                  <div className="p-5">
+                    <code className="font-mono text-sm text-ctp-mauve">
+                      <span className="text-ctp-overlay0">$ </span>
+                      {c.cmd}
+                    </code>
+                    <p className="mt-2 text-sm text-ctp-subtext0">{c.desc}</p>
+                  </div>
+                </GlowCard>
               </StaggerItem>
             ))}
           </Stagger>
@@ -124,12 +147,16 @@ export default function Home() {
             {features.map((f) => {
               const Icon = icons[f.icon]
               return (
-                <StaggerItem key={f.title} className="relative overflow-hidden rounded-2xl border border-border bg-ctp-mantle/60 p-6">
-                  <div className="mb-4 grid size-10 place-items-center rounded-lg border border-ctp-surface0 bg-ctp-base text-ctp-mauve">
-                    <Icon className="size-5" />
-                  </div>
-                  <h3 className="font-medium text-ctp-text">{f.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-ctp-subtext0">{f.desc}</p>
+                <StaggerItem key={f.title}>
+                  <GlowCard>
+                    <div className="p-6">
+                      <div className="mb-4 grid size-10 place-items-center rounded-lg border border-ctp-surface0 bg-ctp-base text-ctp-mauve">
+                        <Icon className="size-5" />
+                      </div>
+                      <h3 className="font-medium text-ctp-text">{f.title}</h3>
+                      <p className="mt-2 text-sm leading-relaxed text-ctp-subtext0">{f.desc}</p>
+                    </div>
+                  </GlowCard>
                 </StaggerItem>
               )
             })}
@@ -150,32 +177,40 @@ export default function Home() {
 
         <Section id="instalar" eyebrow="instalar" title="Um script, e ele desfaz o que fez" desc="O instalador detecta o sistema e o gerenciador de pacotes e instala o que faltar: tmux e git-delta. É idempotente; rodar de novo atualiza em vez de duplicar.">
           <Reveal className="mx-auto max-w-3xl">
-            <InstallTabs />
+            {released ? <InstallTabs /> : <ComingSoon />}
           </Reveal>
           <Reveal className="mx-auto mt-10 max-w-3xl">
-            <div className="rounded-2xl border border-border bg-ctp-mantle/60 p-6">
-              <div className="mb-4 flex items-center gap-2 text-ctp-text">
-                <Undo2 className="size-4 text-ctp-green" />
-                <h3 className="font-medium">Desinstalar devolve tudo</h3>
+            <GlowCard>
+              <div className="p-6">
+                <div className="mb-4 flex items-center gap-2 text-ctp-text">
+                  <Undo2 className="size-4 text-ctp-green" />
+                  <h3 className="font-medium">Desinstalar devolve tudo</h3>
+                </div>
+                <p className="mb-5 text-sm text-ctp-subtext0">
+                  Antes de tocar num arquivo pela primeira vez, o instalador guarda uma cópia e anota o que fez num manifesto. Seu <code className="font-mono text-ctp-subtext1">.tmux.conf</code> e seu <code className="font-mono text-ctp-subtext1">.zshrc</code> voltam byte a byte.
+                </p>
+                <dl className="grid gap-x-6 gap-y-3 font-mono text-sm sm:grid-cols-[auto_1fr]">
+                  {uninstall.map((u) => (
+                    <div key={u.cmd} className="contents">
+                      <dt className="text-ctp-text">{u.cmd}</dt>
+                      <dd className="font-sans text-ctp-subtext0">{u.desc}</dd>
+                    </div>
+                  ))}
+                </dl>
               </div>
-              <p className="mb-5 text-sm text-ctp-subtext0">
-                Antes de tocar num arquivo pela primeira vez, o instalador guarda uma cópia e anota o que fez num manifesto. Seu <code className="font-mono text-ctp-subtext1">.tmux.conf</code> e seu <code className="font-mono text-ctp-subtext1">.zshrc</code> voltam byte a byte.
-              </p>
-              <dl className="grid gap-x-6 gap-y-3 font-mono text-sm sm:grid-cols-[auto_1fr]">
-                {uninstall.map((u) => (
-                  <div key={u.cmd} className="contents">
-                    <dt className="text-ctp-text">{u.cmd}</dt>
-                    <dd className="font-sans text-ctp-subtext0">{u.desc}</dd>
-                  </div>
-                ))}
-              </dl>
-            </div>
+            </GlowCard>
           </Reveal>
           <Reveal className="mx-auto mt-6 flex max-w-3xl items-start gap-3 rounded-2xl border border-dashed border-ctp-surface1 p-5 text-sm text-ctp-subtext0">
             <Stethoscope className="mt-0.5 size-4 shrink-0 text-ctp-teal" />
             <p>
               Antes de abrir uma issue, rode <code className="font-mono text-ctp-text">workdeck-doctor</code>: ele diz se o tmux e o delta estão instalados, se o terminal suporta cores de 24 bits, se há um agente configurado e se o <code className="font-mono text-ctp-text">~/.local/bin</code> está no PATH.
             </p>
+          </Reveal>
+        </Section>
+
+        <Section id="quem-usa" eyebrow="quem usa" title="O que mudou no dia a dia">
+          <Reveal>
+            <Testimonials />
           </Reveal>
         </Section>
 
@@ -187,7 +222,7 @@ export default function Home() {
               <p className="mx-auto mt-4 max-w-xl text-pretty text-ctp-subtext0">
                 Ele não traz os seus projetos, os seus painéis nem o seu tema: traz a estrutura para você montar os seus. Use, copie, dê fork, mude o que precisar.
               </p>
-              <CommandLine command={installCommand} className="mx-auto mt-8 max-w-xl text-left" />
+              {released ? <CommandLine command={installCommand} className="mx-auto mt-8 max-w-xl text-left" /> : <ComingSoon className="mx-auto mt-8 max-w-xl text-left" />}
             </div>
           </Reveal>
         </section>
@@ -196,10 +231,12 @@ export default function Home() {
       <footer className="border-t border-ctp-surface0/60">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 py-8 text-sm text-ctp-overlay1 sm:flex-row sm:px-6">
           <span className="font-mono">workdeck · licença MIT</span>
-          <a href={repoUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 transition-colors hover:text-ctp-text">
-            <GithubMark className="size-4" />
-            código no GitHub
-          </a>
+          {released && (
+            <a href={repoUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 transition-colors hover:text-ctp-text">
+              <GithubMark className="size-4" />
+              código no GitHub
+            </a>
+          )}
         </div>
       </footer>
     </>
