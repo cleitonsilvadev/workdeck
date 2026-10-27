@@ -89,8 +89,8 @@ workdeck-agent --show           # ver o atual
 ai                              # abre num pane ao lado
 ```
 
-<kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>A</kbd> faz o mesmo sem sair das mãos no
-teclado.
+<kbd>Ctrl</kbd>+<kbd>b</kbd> e depois <kbd>a</kbd> faz o mesmo sem tirar as
+mãos do teclado.
 
 O comando pode ter argumentos:
 
@@ -108,8 +108,8 @@ oferecer uma lista. Qualquer comando serve.
 ### Por que um pane, e não uma janela
 
 O agente escreve código que você precisa ver. Com ele ao lado, o `git review`
-roda no pane de baixo sem trocar de contexto, e o painel fica a um
-<kbd>Alt</kbd>+<kbd>7</kbd>. É o ponto do projeto.
+roda no pane de baixo sem trocar de contexto, e o painel fica a um clique na
+barra. É o ponto do projeto.
 
 ---
 
@@ -187,22 +187,29 @@ Para usar outro nome de sessão: `export WORKDECK_SESSION=outro`.
 
 ## Atalhos
 
-Funcionam em qualquer terminal, porque quem os interpreta é o tmux. No Mac,
-a tecla Option precisa funcionar como Alt, um ajuste feito uma vez só: veja
-[A tecla Option, no macOS](#a-tecla-option-no-macos).
+Funcionam em qualquer terminal, sem configurar nada:
 
-| Atalho | Resultado |
-|---|---|
-| <kbd>Alt</kbd>+<kbd>1</kbd>…<kbd>9</kbd> | Vai direto para a janela N |
-| <kbd>Alt</kbd>+<kbd>setas</kbd> | Pula entre os painéis |
-| <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>←</kbd> / <kbd>→</kbd> | Janela anterior / próxima |
-| <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>T</kbd> | Nova janela, na pasta atual |
-| <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>D</kbd> | Divide lado a lado |
-| <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>S</kbd> | Divide em cima/embaixo |
-| <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>Z</kbd> | Zoom: o painel ocupa a janela |
-| <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>X</kbd> | Fecha o painel |
-| <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>R</kbd> | Renomeia a janela |
-| <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>E</kbd> | Solta a sessão (ela continua viva) |
+- **Mouse:** clique no nome da janela na barra de baixo para trocar de janela,
+  e num painel para levar o foco até ele.
+- **<kbd>Ctrl</kbd>+<kbd>b</kbd>, solte, e depois a tecla:**
+
+| Ação | <kbd>Ctrl</kbd>+<kbd>b</kbd> e depois | Atalho direto, opcional |
+|---|---|---|
+| Vai para a janela N | <kbd>1</kbd>…<kbd>9</kbd> | <kbd>Alt</kbd>+<kbd>1</kbd>…<kbd>9</kbd> |
+| Pula entre os painéis | <kbd>setas</kbd> | <kbd>Alt</kbd>+<kbd>setas</kbd> |
+| Janela anterior / próxima | <kbd>p</kbd> / <kbd>n</kbd> | <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>←</kbd> / <kbd>→</kbd> |
+| Nova janela, na pasta atual | <kbd>c</kbd> | <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>T</kbd> |
+| Divide lado a lado | <kbd>\|</kbd> | <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>D</kbd> |
+| Divide em cima/embaixo | <kbd>-</kbd> | <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>S</kbd> |
+| Zoom: o painel ocupa a janela | <kbd>z</kbd> | <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>Z</kbd> |
+| Fecha o painel | <kbd>x</kbd> | <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>X</kbd> |
+| Renomeia a janela | <kbd>,</kbd> | <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>R</kbd> |
+| Abre o agente de IA ao lado | <kbd>a</kbd> | <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>A</kbd> |
+| Solta a sessão (ela continua viva) | <kbd>d</kbd> | <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>E</kbd> |
+
+Os atalhos diretos economizam uma tecla. No Linux funcionam de cara; no Mac, a
+tecla Option precisa funcionar como Alt, um ajuste feito uma vez: veja
+[A tecla Option, no macOS](#a-tecla-option-no-macos).
 
 **Por que as ações usam Shift.** `Alt`+letra minúscula já tem dono: o readline
 usa <kbd>Alt</kbd>+<kbd>b</kbd>, <kbd>Alt</kbd>+<kbd>f</kbd> e
@@ -240,10 +247,10 @@ configurar nada. No Mac, veja a seção abaixo.
 
 ### A tecla Option, no macOS
 
-No Mac, a tecla Option escreve caracteres especiais por padrão: <kbd>Option</kbd>+<kbd>2</kbd>
-vira `™` em vez de trocar de janela. Para os atalhos funcionarem, ela precisa
-agir como Alt. É uma vez só, e o instalador e o `workdeck-doctor` avisam quando
-falta:
+Opcional: só para os atalhos diretos. No Mac, a tecla Option (⌥) escreve
+caracteres especiais por padrão: <kbd>Option</kbd>+<kbd>2</kbd> vira `™` em vez
+de trocar de janela. Para ela agir como Alt, é um ajuste feito uma vez, e o
+instalador e o `workdeck-doctor` dizem onde fica:
 
 | Terminal | Onde ligar |
 |---|---|
@@ -253,11 +260,6 @@ falta:
 | Ghostty | na config: `macos-option-as-alt = left` |
 | Alacritty | no `alacritty.toml`, em `[window]`: `option_as_alt = "OnlyLeft"` |
 | WezTerm | nada, já vem assim |
-
-Enquanto isso, dois caminhos funcionam em qualquer terminal, sem ajuste:
-<kbd>Ctrl</kbd>+<kbd>b</kbd> e depois <kbd>1</kbd>…<kbd>9</kbd> troca de janela,
-<kbd>Ctrl</kbd>+<kbd>b</kbd> e depois uma seta troca de painel, e clicar no nome
-da janela na barra também troca.
 
 ### Atalhos em `cmd`, no macOS
 

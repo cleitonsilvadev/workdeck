@@ -250,7 +250,7 @@ echo
 echo "[4/7] tmux"
 write_block "$HOME/.tmux.conf" \
   "$(sed '$d' "$ROOT/config/tmux.conf" | sed '/^# O tema entra aqui/d'; cat "$ROOT/themes/$THEME.tmux"; echo '# <<< workdeck <<<')"
-say "tmux.conf — atalhos em Alt"
+say "tmux.conf — Ctrl+b, mouse e atalhos em Alt"
 
 case "$TERMINAL" in
   "")
@@ -261,7 +261,7 @@ case "$TERMINAL" in
       else
         AVISO_OPTION="$(como_ligar_option "$term")"
         if [ -n "$AVISO_OPTION" ]; then
-          say "no Mac, a tecla Option precisa funcionar como Alt; veja o aviso no fim"
+          say "dica: para os atalhos de uma tecla (Alt+2), veja o fim"
         fi
       fi
     else
@@ -390,8 +390,9 @@ Pronto. Faltam três passos que são seus:
   3. Abra:
        work
 
-  Os atalhos são Alt+número para trocar de janela e Alt+Shift+letra para as
-  ações. Se instalou um adaptador de terminal, ele precisa reabrir.
+  Para navegar, clique no nome da janela na barra, ou use Ctrl+b e depois
+  1…9. Ctrl+b e uma seta troca de painel. A lista está no README.
+  Se instalou um adaptador de terminal, ele precisa reabrir.
 
   Para ver o que funciona no seu ambiente e o que não vai funcionar:
        workdeck-doctor
@@ -400,9 +401,8 @@ FIM
 if [ -n "$AVISO_OPTION" ]; then
   cat <<FIM
 
-  Antes dos atalhos, uma vez só: no Mac, a tecla Option precisa funcionar
-  como Alt, senão Alt+2 escreve ™ em vez de trocar de janela.
+  Dica, opcional: para atalhos de uma tecla só (Alt+2 em vez de Ctrl+b 2),
+  a tecla Option do Mac precisa funcionar como Alt:
        $AVISO_OPTION
-  Enquanto isso, Ctrl+b e depois 1…9 troca de janela, e clicar na barra também.
 FIM
 fi

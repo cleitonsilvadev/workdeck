@@ -95,7 +95,7 @@ if [ "$SO" = "macOS" ]; then
       Alacritty) como='no alacritty.toml, em [window]: option_as_alt = "OnlyLeft"' ;;
       *) como='nas preferências do terminal, faça a tecla Option funcionar como Alt (Meta)' ;;
     esac
-    linha "$aviso" "a tecla Option pode não funcionar como Alt; Alt+2 escreveria ™" "$como"
+    linha "$ok" "Ctrl+b e o mouse funcionam" "opcional, para Alt+2 em vez de Ctrl+b 2: $como"
   fi
   case "$TERMINAL" in
     kitty|WezTerm|Alacritty|iTerm.app)

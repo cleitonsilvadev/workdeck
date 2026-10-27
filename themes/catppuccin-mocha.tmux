@@ -1,6 +1,6 @@
 set -g status-style "bg=#181825,fg=#7f849c"
 set -g status-left "#[fg=#cba6f7,bold] #S #[default] "
-set -g status-right "#[fg=#6c7086] %H:%M "
+set -g status-right "#[fg=#6c7086] ctrl+b 1-9 janela · %H:%M "
 setw -g window-status-style "fg=#7f849c"
 setw -g window-status-current-style "bg=#313244,fg=#cdd6f4,bold"
 setw -g pane-border-style "fg=#313244"
