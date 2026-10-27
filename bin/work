@@ -158,7 +158,7 @@ tem_versao_nova() {
 
 aviso_ligado() { ! grep -qx 'AVISO=0' "$AVISO_CONF" 2>/dev/null; }
 
-de_cache() { sed -n "s/^$1=//p" "$CACHE" 2>/dev/null | tail -1; }
+de_cache() { { sed -n "s/^$1=//p" "$CACHE" 2>/dev/null || true; } | tail -1; }
 
 gravar_cache() {
   mkdir -p "$(dirname "$CACHE")"
@@ -450,7 +450,10 @@ escolher() {
 
 case "${1:-}" in
   add) shift; adicionar "${1:-.}"; exit $? ;;
-  versao|--version|-v) echo "workdeck $(versao_atual)"; exit 0 ;;
+  versao|--version|-v)
+    v="$(versao_atual)"
+    if [ -n "$v" ]; then echo "workdeck $v"; else echo "workdeck sem versão publicada ($(git -C "$CODIGO" rev-parse --short HEAD 2>/dev/null || echo 'sem a cópia em ~/.local/share/workdeck'))"; fi
+    exit 0 ;;
   uninstall)
     shift
     [ -f "$CODIGO/uninstall.sh" ] || { echo "não achei a cópia do workdeck em $(curto "$CODIGO")"; exit 1; }
