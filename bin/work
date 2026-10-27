@@ -133,7 +133,7 @@ desenhar() {
 }
 
 adicionar() {
-  local alvo="${1:-.}" d nome usados entry name dir cmd tmp feito=0
+  local alvo="${1:-.}" d nome usados entry name dir cmd tmp
   if [ ! -d "$alvo" ]; then
     echo "não achei a pasta: $alvo"
     return 1
@@ -152,22 +152,15 @@ adicionar() {
   nome="$(nome_de "$d")"
   case "$usados" in *" $nome "*) nome="$(nome_de "$(dirname "$d")")-$nome" ;; esac
   mkdir -p "$(dirname "$CONFIG")"
-  tmp="$(mktemp)"
-  for entry in ${windows[@]+"${windows[@]}"}; do
-    IFS="|" read -r name dir cmd <<< "$entry"
-    if [ "$feito" = 0 ] && [ -n "$cmd" ]; then
-      echo "$nome|$(curto "$d")" >> "$tmp"; feito=1
-    fi
-    echo "$entry" >> "$tmp"
-  done
-  if [ "$feito" = 0 ]; then
-    echo "$nome|$(curto "$d")" >> "$tmp"
-    [ ${#windows[@]} -gt 0 ] || echo "painel|~|work-panel" >> "$tmp"
-  fi
-  mv "$tmp" "$CONFIG"
+  if [ -s "$CONFIG" ] && [ -n "$(tail -c1 "$CONFIG")" ]; then echo >> "$CONFIG"; fi
+  [ ${#windows[@]} -gt 0 ] || echo "painel|~|work-panel" >> "$CONFIG"
+  echo "$nome|$(curto "$d")" >> "$CONFIG"
   echo "$(curto "$d") entrou no seu work como $nome"
   if command -v tmux >/dev/null && tmux has-session -t "$SESSION" 2>/dev/null; then
     tmux new-window -d -t "$SESSION:" -n "$nome" -c "$d"
+    if tmux list-windows -t "$SESSION" -F '#W' | grep -qx painel; then
+      tmux respawn-pane -k -t "$SESSION:painel" 2>/dev/null || true
+    fi
     echo "a janela $nome já está aberta na sessão $SESSION"
   fi
 }
@@ -182,6 +175,7 @@ gravar() {
   [ ${#extras[@]} -gt 0 ] || extras=("painel|~|work-panel")
   mkdir -p "$(dirname "$CONFIG")"
   tmp="$(mktemp)"
+  printf '%s\n' "${extras[@]}" > "$tmp"
   for ((i = 0; i < ${#P_DIR[@]}; i++)); do
     [ "${P_MARK[$i]}" = 1 ] || continue
     d="${P_DIR[$i]}"
@@ -190,7 +184,6 @@ gravar() {
     usados="$usados$nome "
     echo "$nome|$(curto "$d")" >> "$tmp"
   done
-  printf '%s\n' "${extras[@]}" >> "$tmp"
   mv "$tmp" "$CONFIG"
 }
 
@@ -295,12 +288,14 @@ fi
 
 ler_config
 if ! algum_projeto_existe; then
-  echo "Seu work ainda não tem projetos. Adicione o primeiro:"
-  echo
-  echo "  work add ~/caminho/do/projeto      (Tab completa o caminho)"
-  echo
-  echo "Depois, work abre a sessão. Para procurar seus repositórios git: work escolher"
-  exit 1
+  if [ -t 0 ] && [ -t 1 ]; then
+    windows=("painel|~|work-panel")
+  else
+    echo "Seu work ainda não tem projetos. Adicione o primeiro:"
+    echo
+    echo "  work add ~/caminho/do/projeto      (Tab completa o caminho)"
+    exit 1
+  fi
 fi
 
 if ! tmux has-session -t "$SESSION" 2>/dev/null; then

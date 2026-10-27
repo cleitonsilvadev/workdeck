@@ -1,13 +1,15 @@
 #!/usr/bin/env bash
 # Em que branch está cada projeto do seu projects.conf, e se há mudança solta.
 CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/workdeck/projects.conf"
-[ -f "$CONFIG" ] || { echo "sem projects.conf"; exit 0; }
+[ -f "$CONFIG" ] || { echo "nenhum projeto ainda"; exit 0; }
 
+achou=0
 while IFS= read -r line; do
   line="${line%%#*}"; [ -z "${line// }" ] && continue
   IFS="|" read -r nome dir _ <<< "$line"
-  dir="$(eval echo "${dir/#\~/$HOME}")"
+  dir="${dir/#\~/$HOME}"; dir="${dir//\$\{HOME\}/$HOME}"; dir="${dir//\$HOME/$HOME}"
   [ -d "$dir/.git" ] || continue
+  achou=1
   branch=$(git -C "$dir" branch --show-current 2>/dev/null)
   sujo=$(git -C "$dir" status --porcelain 2>/dev/null | wc -l | tr -d ' ')
   if [ "$sujo" -gt 0 ]; then
@@ -16,3 +18,4 @@ while IFS= read -r line; do
     printf '%-14s %s\n' "$nome" "${branch:-?}"
   fi
 done < "$CONFIG"
+[ "$achou" = 1 ] || echo "nenhum projeto com git ainda"

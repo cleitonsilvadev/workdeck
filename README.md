@@ -193,10 +193,10 @@ nome|caminho|comando opcional
 ```
 
 ```
+painel|$HOME|work-panel
 api|$HOME/projetos/minha-api
 web|$HOME/projetos/meu-front
 notas|~/notas
-painel|$HOME|work-panel
 ```
 
 - **nome** vira o nome da janela no tmux, e o argumento de `work <nome>`
@@ -354,24 +354,28 @@ cp config/git-review.example.conf ~/.config/workdeck/git-review.conf
 
 ## Painéis
 
-O `work-panel` mostra a saída de vários comandos num pane, atualizando
+O painel é a janela 1 da sessão: a visão geral do seu work. Sem nenhum projeto,
+o `work` abre só com ele, mostrando o que falta fazer.
+
+Por baixo, o `work-panel` mostra a saída de vários comandos, atualizando
 sozinho. Não depende de nada além do que já está instalado.
 
 ```bash
+work painel         # abre ou redesenha a janela do painel e vai até ela
 work-panel          # atualiza a cada 60s
 work-panel 10       # a cada 10s
 work-panel --once   # imprime uma vez e sai
-painel              # abre numa janela da sessão e vai até ela
 ```
 
 Dentro dele, <kbd>q</kbd> sai.
 
 Cada painel é um **executável** em `~/.config/workdeck/panels/`. O nome do
 arquivo vira o título, e a ordem é alfabética — use um prefixo numérico para
-ordenar. Dois vêm prontos:
+ordenar. Três vêm prontos:
 
 | Arquivo | Mostra |
 |---|---|
+| `00-comece-aqui` | O que falta configurar: projetos e agente. Some quando estiver tudo pronto, e fica só a linha de atalhos |
 | `10-maquina` | Carga e disco livre |
 | `20-git` | Em que branch está cada projeto e se há mudança solta |
 
