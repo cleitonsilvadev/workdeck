@@ -170,11 +170,6 @@ else
     run "${instalar[@]}" || say "não consegui instalar $pacote pelo $GERENCIADOR; veja https://github.com/dandavison/delta"
   done
 fi
-
-if [ "$SO" = "macOS" ] && [ "$DEPS" = 1 ] && command -v brew >/dev/null; then
-  ls ~/Library/Fonts 2>/dev/null | grep -qi jetbrains \
-    || run brew install --cask font-jetbrains-mono
-fi
 echo
 
 # ---- 2. scripts ------------------------------------------------------------
