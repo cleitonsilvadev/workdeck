@@ -494,7 +494,7 @@ cat <<FIM
 
   Para navegar, clique no nome da janela na barra, ou use Ctrl+b e depois
   1…9. Ctrl+b e uma seta troca de painel. Para mudar os projetos: work escolher
-  Diagnóstico: workdeck-doctor
+  Ajuda a qualquer hora: workdeck-help, ou Ctrl+b e h dentro do work.
 FIM
 
 if [ -n "$AVISO_OPTION" ]; then

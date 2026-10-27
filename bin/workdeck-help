@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+set -uo pipefail
+
+CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/workdeck"
+SESSION="${WORKDECK_SESSION:-work}"
+
+b=""; d=""; v=""; a=""; r=""
+if [ -t 1 ] && [ -z "${NO_COLOR:-}" ]; then
+  b=$'\033[1m'; d=$'\033[2m'; v=$'\033[32m'; a=$'\033[33m'; r=$'\033[0m'
+fi
+
+curto() { case "$1" in "$HOME"/*) echo "~/${1#"$HOME"/}" ;; *) echo "$1" ;; esac; }
+titulo() { printf '\n  %s%s%s\n' "$b" "$1" "$r"; }
+item() { printf '    %-22s %s%s%s\n' "$1" "$d" "$2" "$r"; }
+ok() { printf '    %s✓%s %s\n' "$v" "$r" "$1"; }
+falta() { printf '    %s!%s %s\n' "$a" "$r" "$1"; }
+
+titulo "Comandos"
+item "work" "abre a sessão, ou volta para ela"
+item "work <janela>" "abre e vai direto para a janela"
+item "work escolher" "escolhe de novo os projetos"
+item "work kill" "fecha a sessão inteira"
+item "ai" "abre o agente de IA num pane ao lado"
+item "git review" "revisa o que ainda não foi commitado"
+item "painel" "abre o painel de contexto"
+item "workdeck-doctor" "diz o que funciona no seu ambiente"
+item "workdeck-help" "esta ajuda"
+
+titulo "Navegar"
+item "clique na barra" "troca de janela; clique num painel para focar"
+item "Ctrl+b e 1-9" "vai para a janela N"
+item "Ctrl+b e setas" "troca de painel"
+item "Ctrl+b e c" "nova janela"
+item "Ctrl+b e | ou -" "divide ao lado ou embaixo"
+item "Ctrl+b e z" "zoom no painel"
+item "Ctrl+b e x" "fecha o painel"
+item "Ctrl+b e a" "abre o agente ao lado"
+item "Ctrl+b e d" "solta a sessão; ela continua viva"
+item "Ctrl+b e h" "mostra esta ajuda"
+printf '    %sCtrl+b quer dizer: aperte Ctrl+b, solte, e depois a tecla.%s\n' "$d" "$r"
+
+titulo "Seu ambiente"
+projetos=0
+if [ -f "$CONFIG_DIR/projects.conf" ]; then
+  projetos=$(grep -v '^[[:space:]]*#' "$CONFIG_DIR/projects.conf" | grep -c '|' || true)
+fi
+if [ "$projetos" -gt 0 ]; then
+  ok "$projetos janelas em $(curto "$CONFIG_DIR/projects.conf")"
+else
+  falta "nenhum projeto ainda — rode work e escolha os seus"
+fi
+
+AGENT_CMD=""
+[ -f "$CONFIG_DIR/agent.conf" ] && . "$CONFIG_DIR/agent.conf"
+if [ -n "$AGENT_CMD" ]; then
+  ok "agente de IA: $AGENT_CMD"
+else
+  falta "nenhum agente de IA configurado. Para ligar um:"
+  printf '        1. instale o agente que quiser, pelo método dele (claude, codex, aider, gemini…)\n'
+  printf '        2. workdeck-agent --set <comando>\n'
+  printf '        3. ai, ou Ctrl+b e a\n'
+fi
+
+if command -v tmux >/dev/null && tmux has-session -t "$SESSION" 2>/dev/null; then
+  ok "sessão $SESSION aberta"
+else
+  printf '    %s·%s sessão %s fechada — abra com work\n' "$d" "$r" "$SESSION"
+fi
+echo

@@ -22,6 +22,7 @@ ai                    # abre o agente num pane ao lado
 git review            # revisa o que ele escreveu
 painel                # abre o painel de contexto
 workdeck-doctor       # diz o que funciona no seu ambiente
+workdeck-help         # comandos, atalhos e o que falta configurar
 ```
 
 ---
@@ -90,6 +91,10 @@ ai                              # abre num pane ao lado
 
 <kbd>Ctrl</kbd>+<kbd>b</kbd> e depois <kbd>a</kbd> faz o mesmo sem tirar as
 mãos do teclado.
+
+**Sem agente na instalação?** Não precisa instalar de novo. Instale o agente que
+quiser pelo método dele, rode `workdeck-agent --set <comando>` e abra com `ai`.
+O `workdeck-help` mostra se falta esse passo.
 
 O comando pode ter argumentos:
 
@@ -223,6 +228,7 @@ Funcionam em qualquer terminal, sem configurar nada:
 | Fecha o painel | <kbd>x</kbd> | <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>X</kbd> |
 | Renomeia a janela | <kbd>,</kbd> | <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>R</kbd> |
 | Abre o agente de IA ao lado | <kbd>a</kbd> | <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>A</kbd> |
+| Mostra a ajuda | <kbd>h</kbd> | |
 | Solta a sessão (ela continua viva) | <kbd>d</kbd> | <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>E</kbd> |
 
 Os atalhos diretos economizam uma tecla. No Linux funcionam de cara; no Mac, a
