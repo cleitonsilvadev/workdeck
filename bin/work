@@ -134,11 +134,24 @@ desenhar() {
 }
 
 com_shell() {
+  tmux set -p -t "$1" @papel "workdeck"
   tmux split-window -v -l 8 -t "$1" -c "$HOME"
+  tmux set -p -t "$1" @papel "terminal"
+}
+
+enfeitar() {
+  local jan n ia
+  tmux list-windows -a -F '#{window_id} #{window_panes}' 2>/dev/null | while read -r jan n; do
+    if [ "$n" -gt 1 ]; then tmux setw -t "$jan" pane-border-status top; else tmux setw -t "$jan" pane-border-status off; fi
+    ia="$(tmux list-panes -t "$jan" -F '#{@papel}' | grep -c '^IA' || true)"
+    if [ "$ia" -gt 0 ]; then tmux set -w -t "$jan" @ia 1; else tmux set -w -u -t "$jan" @ia 2>/dev/null || true; fi
+  done
+  return 0
 }
 
 sincronizar() {
   local abertos entry name dir cmd d tmp tirados=""
+  enfeitar
   tmux has-session -t "$SESSION" 2>/dev/null || return 0
   [ "$(tmux show -t "$SESSION" -qv @workdeck 2>/dev/null)" = 1 ] || return 0
   abertos="$(tmux list-windows -t "$SESSION" -F '#{@projeto}' | grep -v '^$' || true)"

@@ -1,11 +1,12 @@
+set -g @wd_accent "#88c0d0"
+set -g @wd_on_accent "#2e3440"
+set -g @wd_surface "#434c5e"
+set -g @wd_text "#eceff4"
+set -g @wd_muted "#81a1c1"
 # No Nord a barra é mais CLARA que o fundo: a paleta não tem nada
 # abaixo do nord0, então a hierarquia se faz por elevação.
 set -g status-style "bg=#3b4252,fg=#81a1c1"
-set -g status-left "#[bg=#5e81ac,fg=#eceff4,bold] #S #[default] "
-set -g status-right "#[fg=#4c566a] ctrl+b h menu · %H:%M "
-setw -g window-status-style "fg=#81a1c1"
-setw -g window-status-current-style "bg=#434c5e,fg=#eceff4,bold"
 setw -g pane-border-style "fg=#3b4252"
-setw -g pane-active-border-style "fg=#81a1c1"
+setw -g pane-active-border-style "fg=#88c0d0"
 set -g message-style "bg=#5e81ac,fg=#eceff4,bold"
 set -g mode-style "bg=#434c5e,fg=#eceff4"
