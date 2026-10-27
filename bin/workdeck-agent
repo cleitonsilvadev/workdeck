@@ -20,7 +20,13 @@ case "${1:-}" in
   --set)
     cmd="${2:?use: work agent <comando>}"
     nome="${cmd%% *}"
-    command -v "$nome" >/dev/null || {
+    case "$(basename "$nome")" in
+      work|work-panel|workdeck-*|git-review|ai|help)
+        echo "'$nome' é um comando do próprio workdeck, não um agente de IA."
+        echo "Use o comando do seu agente, por exemplo: work agent claude"
+        exit 1 ;;
+    esac
+    type -P "$nome" >/dev/null || {
       echo "'$nome' não está no PATH. Instale primeiro, ou use outro comando."
       exit 1
     }

@@ -250,6 +250,7 @@ case "${1:-}" in
     shift
     case "${1:-}" in
       "") exec workdeck-agent --show ;;
+      help) exec workdeck-agent --help ;;
       -*) exec workdeck-agent "$@" ;;
       *) exec workdeck-agent --set "$*" ;;
     esac ;;
