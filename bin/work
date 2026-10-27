@@ -8,6 +8,7 @@
 #      work escolher    escolhe de novo os projetos da sessão
 #      work update      atualiza para a versão mais nova; --desligar / --ligar o aviso
 #      work versao      mostra a versão instalada
+#      work install     roda a instalação de novo, com opções (--theme, --terminal…)
 #      work uninstall   desinstala (aceita --all e --dry-run)
 #      work kill        fecha a sessão inteira
 #      work help        comandos, atalhos e o que falta configurar
@@ -461,6 +462,10 @@ case "${1:-}" in
     v="$(versao_atual)"
     if [ -n "$v" ]; then echo "workdeck $v"; else echo "workdeck sem versão publicada ($(git -C "$CODIGO" rev-parse --short HEAD 2>/dev/null || echo 'sem a cópia em ~/.local/share/workdeck'))"; fi
     exit 0 ;;
+  install)
+    shift
+    [ -f "$CODIGO/install.sh" ] || { echo "não achei a cópia do workdeck em $(curto "$CODIGO")"; exit 1; }
+    exec bash "$CODIGO/install.sh" "$@" ;;
   uninstall)
     shift
     [ -f "$CODIGO/uninstall.sh" ] || { echo "não achei a cópia do workdeck em $(curto "$CODIGO")"; exit 1; }

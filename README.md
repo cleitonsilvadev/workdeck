@@ -46,14 +46,6 @@ curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/i
 less instalar.sh && bash instalar.sh
 ```
 
-Ou pelo clone, para quem quer mexer no código:
-
-```bash
-git clone https://github.com/<voce>/workdeck.git
-cd workdeck
-./install.sh
-```
-
 Depois:
 
 ```bash
@@ -76,12 +68,12 @@ apt, dnf, pacman, zypper ou apk no Linux — e instala o que faltar (`tmux` e
 
 É idempotente: rodar de novo atualiza em vez de duplicar. Tudo o que ele
 escreve nos seus arquivos fica entre marcadores `# >>> workdeck >>>`, e o
-`./uninstall.sh` remove exatamente esse trecho.
+`work uninstall` remove exatamente esse trecho.
 
-Se já existir um script seu com o mesmo nome em `~/.local/bin` e com conteúdo
-diferente, o instalador guarda uma cópia em `<nome>.antes-do-workdeck` antes
-de substituir. O `uninstall.sh` só remove o que não foi alterado desde a
-instalação.
+Se já existir um script seu com o mesmo nome em `~/.local/bin`, o instalador não
+o substitui e avisa. O `work uninstall` só remove o que não foi alterado desde a
+instalação. Para rodar a instalação de novo com outras opções, use
+`work install`, por exemplo `work install --theme nord`.
 
 ### Windows
 
@@ -143,8 +135,8 @@ Nada é instalado por padrão. Cada integração é uma peça de terceiros que v
 pode querer ou não:
 
 ```bash
-./install.sh --list-integrations   # ver o que existe
-./install.sh --with ai-memory      # ativar (vírgula separa várias)
+work install --list-integrations   # ver o que existe
+work install --with ai-memory      # ativar (vírgula separa várias)
 ```
 
 O instalador mostra o que a integração é e de quem é, e só age depois de você
@@ -248,7 +240,7 @@ sessão; sem fechar, a sessão antiga continua com a lista antiga.
 | `work review [staged\|branch]` | A IA faz um self code review da mudança antes do commit |
 | `work painel` | Abre o painel de contexto |
 
-`add`, `help`, `doctor`, `agent`, `review`, `painel`, `escolher`, `update`, `versao`, `uninstall` e `kill` são palavras
+`add`, `help`, `doctor`, `agent`, `review`, `painel`, `escolher`, `update`, `versao`, `install`, `uninstall` e `kill` são palavras
 reservadas: uma janela com um desses nomes não é aberta por `work <nome>`.
 
 Para usar outro nome de sessão: `export WORKDECK_SESSION=outro`.
@@ -293,9 +285,9 @@ Alt: veja [A tecla Option, no macOS](#a-tecla-option-no-macos).
 As ações usam Shift porque `Alt`+letra minúscula é do readline (andar e apagar
 palavras na linha de comando).
 
-**Para mudar ou acrescentar um atalho**, edite `config/tmux.conf` e rode
-`./install.sh`. Um atalho seu no `~/.tmux.conf` precisa vir depois do bloco do
-workdeck; o que estiver antes é desligado junto com os do tmux.
+**Para acrescentar ou trocar um atalho**, ponha o `bind` no seu `~/.tmux.conf`,
+depois do bloco do workdeck: o que estiver antes é desligado junto com os do
+tmux, e o bloco é reescrito a cada atualização.
 
 ```tmux
 bind -n M-S-G new-window -c "#{pane_current_path}" lazygit
@@ -350,7 +342,7 @@ do workdeck — veja `terminals/README.md`.
 Só o kitty é instalado automaticamente:
 
 ```bash
-./install.sh --terminal kitty
+work install --terminal kitty
 ```
 
 Nada disso é necessário. É conforto, e só no Mac.
@@ -458,9 +450,8 @@ chmod +x ~/.config/workdeck/panels/30-docker
 É só isso. Não precisa reinstalar nem reiniciar: o `work-panel` lê o diretório
 a cada ciclo. Esqueceu o `chmod +x`? Ele avisa.
 
-Para versionar os seus junto do projeto, ponha em `config/panels/` e rode
-`./install.sh` — ele copia o que ainda não existe e nunca sobrescreve um
-painel seu.
+Os painéis que vêm com o workdeck são atualizados pelo `work update`; um painel
+que você editou ou criou nunca é sobrescrito.
 
 ### Painéis que precisam de credenciais
 
@@ -487,7 +478,7 @@ Assim o painel pode ser compartilhado e o que é seu continua sendo seu.
 | `min-dark` | `#1f1f1f` | Neutro, derivado do tema Min Dark do VS Code, com o contraste do texto baixado para ~9,6:1. |
 
 ```bash
-./install.sh --theme nord
+work install --theme nord
 ```
 
 **Para criar um tema**, copie dois arquivos em `themes/`: `<nome>.conf` com as
@@ -542,10 +533,10 @@ instalação; seus projetos, painéis e a escolha do agente ficam como estão.
 ## Desinstalar
 
 ```bash
-./uninstall.sh            # tira os blocos e os scripts; sua config fica
-./uninstall.sh --restore  # devolve os arquivos ao estado de antes da instalação
-./uninstall.sh --all      # remove tudo, inclusive ~/.config/workdeck
-./uninstall.sh --dry-run  # mostra o que faria
+work uninstall            # tira os blocos e os scripts; sua config fica
+work uninstall --restore  # devolve os arquivos ao estado de antes da instalação
+work uninstall --all      # remove tudo, inclusive ~/.config/workdeck e a cópia do código
+work uninstall --dry-run  # mostra o que faria
 ```
 
 O instalador guarda uma cópia de cada arquivo antes de tocar nele pela primeira
@@ -554,8 +545,8 @@ O `--restore` usa essas cópias: seu `.tmux.conf` e seu `.zshrc` voltam byte a
 byte ao que eram.
 
 Fora isso, ele nunca remove o que não é dele. Script que você alterou depois
-da instalação fica, com aviso. Se existia um script seu com o mesmo nome, o
-instalador guardou em `<nome>.antes-do-workdeck` e o desinstalador devolve.
+da instalação fica, com aviso. Se já existia um script seu com o mesmo nome, o
+instalador não o substituiu, e o desinstalador também não mexe nele.
 
 ---
 
@@ -566,16 +557,16 @@ Quase tudo aqui é para ser trocado. O resumo:
 | Quero mudar | Onde | Depois |
 |---|---|---|
 | Os projetos e a ordem das janelas | `~/.config/workdeck/projects.conf` | `work kill` e `work` |
-| Um atalho do teclado | `config/tmux.conf` | `./install.sh` |
-| Os atalhos `cmd` no Mac | `terminals/kitty.conf` | `./install.sh --terminal kitty` |
-| As cores | `themes/<nome>.conf` e `.tmux` | `./install.sh --theme <nome>` |
+| Um atalho do teclado | o seu `~/.tmux.conf`, depois do bloco do workdeck | `Ctrl+b r` |
+| Os atalhos `cmd` e o visual do kitty | `work install --terminal kitty` | reabra o kitty |
+| As cores | `work install --theme <nome>` | — |
 | O que aparece no painel | `~/.config/workdeck/panels/` | nada, ele relê sozinho |
 | O nome da sessão | `export WORKDECK_SESSION=outro` | — |
-| Algo que não existe aqui | escreva em `bin/` | `./install.sh` |
+| Algo que não existe aqui | um fork do repositório, com o seu script em `bin/` | `./install.sh` no fork |
 
-Qualquer executável que você puser em `bin/` vai para o `PATH` no próximo
-`install.sh`. É assim que o `work`, o `git-review` e o `work-panel`
-chegam lá — não há nada de especial neles.
+Qualquer executável em `bin/` vai para o `PATH` na instalação. É assim que o
+`work`, o `git-review` e o `work-panel` chegam lá — não há nada de especial
+neles.
 
 Se você for manter sua própria versão, o caminho mais confortável é dar fork,
 mexer no que quiser e rodar o `install.sh` do seu fork. O instalador só
