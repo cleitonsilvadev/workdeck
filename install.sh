@@ -289,10 +289,38 @@ else
     run "${instalar[@]}" || aviso "não consegui instalar $pacote pelo $GERENCIADOR; veja https://github.com/dandavison/delta"
   done
 fi
+if [ "$SO" = macOS ]; then PASTA_FONTES="$HOME/Library/Fonts"; else PASTA_FONTES="${XDG_DATA_HOME:-$HOME/.local/share}/fonts"; fi
+tem_fonte() {
+  ls "$PASTA_FONTES" /Library/Fonts 2>/dev/null | grep -qi jetbrainsmono && return 0
+  command -v fc-list >/dev/null && fc-list 2>/dev/null | grep -qi 'JetBrains Mono' && return 0
+  return 1
+}
+fonte=""
+if tem_fonte; then
+  fonte="JetBrains Mono"
+elif [ "$DEPS" = 0 ]; then
+  say "fonte JetBrains Mono não instalada (--no-deps)"
+elif [ "$DRY" = 1 ]; then
+  say "[dry-run] baixaria a fonte JetBrains Mono para $PASTA_FONTES"
+elif ! command -v curl >/dev/null || ! command -v unzip >/dev/null; then
+  aviso "sem curl ou unzip; a fonte JetBrains Mono fica para depois"
+else
+  zip="$(mktemp)"
+  if curl -fsSL -o "$zip" https://github.com/JetBrains/JetBrainsMono/releases/download/v2.304/JetBrainsMono-2.304.zip >> "$LOG" 2>&1 \
+     && mkdir -p "$PASTA_FONTES" && unzip -qo -j "$zip" 'fonts/ttf/*.ttf' -d "$PASTA_FONTES" >> "$LOG" 2>&1; then
+    command -v fc-cache >/dev/null && fc-cache -f "$PASTA_FONTES" >> "$LOG" 2>&1
+    anota fonte "$PASTA_FONTES"
+    fonte="JetBrains Mono instalada"
+  else
+    aviso "não consegui baixar a fonte JetBrains Mono; o resto segue normal"
+  fi
+  rm -f "$zip"
+fi
+
 versoes=""
 command -v tmux >/dev/null && versoes="tmux $(tmux -V | awk '{print $2}')"
 command -v delta >/dev/null && versoes="${versoes:+$versoes · }delta $(delta --version | awk '{print $2}')"
-resumo "$versoes"
+resumo "${versoes}${fonte:+ · $fonte}"
 concluir
 
 # ---- 2. scripts ------------------------------------------------------------
@@ -545,6 +573,14 @@ cat <<FIM
   também funciona. Para mudar os projetos: work escolher
   Ajuda a qualquer hora: work help, ou Ctrl+b e h dentro do work.
 FIM
+
+if [ "$SO" = macOS ] && [ "$(terminal_atual)" = Apple_Terminal ] && [ -n "$fonte" ]; then
+  cat <<FIM
+
+  ${dim}Dica: para o Terminal.app ficar com a fonte do workdeck, escolha a
+  JetBrains Mono em Terminal → Settings → Profiles → Text → Font.${reset}
+FIM
+fi
 
 if [ -n "$AVISO_OPTION" ]; then
   cat <<FIM

@@ -520,8 +520,9 @@ work update --ligar      # volta a avisar
 work uninstall --all     # desinstala, sem precisar da pasta clonada
 ```
 
-O `work` e o painel também conferem sozinhos, no máximo uma vez por hora e em
-segundo plano: nunca ficam esperando a internet, e sem rede não acontece nada. Quando há versão
+O `work` e o painel também conferem sozinhos, no máximo uma vez por dia e em
+segundo plano: nunca ficam esperando a internet, e sem rede não acontece nada.
+Para atualizar na hora, `work update`. Quando há versão
 nova, ele mostra o que mudou e pergunta antes de abrir a sessão; se você disser
 não, ele não pergunta de novo sobre essa versão. O painel mostra
 `● v1.0.0 → v1.1.0: work update` enquanto houver uma versão para instalar.

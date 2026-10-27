@@ -3,6 +3,13 @@
 O `work update` mostra o trecho da versão nova antes de perguntar se quer
 atualizar. Cada versão é uma tag `vX.Y.Z`.
 
+## v1.0.4
+
+- A instalação baixa a fonte JetBrains Mono para a sua pasta de fontes, sem brew.
+- A aba da janela atual não fica mais sublinhada.
+- O terminal do painel abre com 8 linhas em qualquer tamanho de janela.
+- A verificação de versão nova volta a ser uma vez por dia; work update atualiza na hora.
+
 ## v1.0.3
 
 - Depois de atualizar pelo `work`, a sessão já abre com a versão nova.

@@ -67,6 +67,12 @@ if [ -f "$MANIFESTO" ]; then
           fi
         fi
         ;;
+      fonte)
+        if [ "$ALL" = 1 ]; then
+          run rm -f "$alvo"/JetBrainsMono*.ttf
+          say "fonte JetBrains Mono removida de ${alvo#$HOME/}"
+        fi
+        ;;
       codigo)
         if [ -d "$alvo" ] && [ "$alvo" != "$ROOT" ]; then
           run rm -rf "$alvo"

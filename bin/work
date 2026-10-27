@@ -188,7 +188,7 @@ verificar_em_segundo_plano() {
   [ -d "$CODIGO/.git" ] || return 0
   agora=$(date +%s)
   ultima="$(de_cache checado)"
-  if [ -n "$ultima" ] && [ $((agora - ultima)) -lt 3600 ]; then return 0; fi
+  if [ -n "$ultima" ] && [ $((agora - ultima)) -lt 86400 ]; then return 0; fi
   (
     git_quieto fetch -q --tags origin || exit 0
     gravar_cache nova "$(mais_nova $(git -C "$CODIGO" tag -l 'v*'))"
@@ -575,6 +575,9 @@ if ! tmux has-session -t "$SESSION" 2>/dev/null; then
     fi
   done
   tmux set -t "$SESSION" @workdeck 1
+  if tmux list-windows -t "$SESSION" -F '#W' | grep -qx painel; then
+    ( sleep 0.6; tmux resize-pane -t "$SESSION:painel.{bottom}" -y 8 ) </dev/null >/dev/null 2>&1 &
+  fi
   tmux select-window -t "$SESSION:1"
 fi
 
