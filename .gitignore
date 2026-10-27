@@ -5,4 +5,3 @@ projects.conf
 *.conf.local
 *.local
 .DS_Store
-HANDOFF.md
