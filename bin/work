@@ -295,9 +295,9 @@ fi
 
 ler_config
 if ! algum_projeto_existe; then
-  echo "Seu work ainda não tem projetos. Entre na pasta de um e adicione:"
+  echo "Seu work ainda não tem projetos. Adicione o primeiro:"
   echo
-  echo "  cd ~/caminho/do/projeto && work add"
+  echo "  work add ~/caminho/do/projeto      (Tab completa o caminho)"
   echo
   echo "Depois, work abre a sessão. Para procurar seus repositórios git: work escolher"
   exit 1

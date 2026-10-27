@@ -143,7 +143,7 @@ if [ -f "$WD/projects.conf" ]; then
   n=$(grep -vcE '^\s*#|^\s*$' "$WD/projects.conf" 2>/dev/null || echo 0)
   linha "$ok" "$n projeto(s) em projects.conf"
 else
-  linha "$aviso" "nenhum projeto escolhido ainda" "entre na pasta do projeto e rode: work add"
+  linha "$aviso" "nenhum projeto escolhido ainda" "adicione com: work add <caminho>"
 fi
 if [ -d "$WD/panels" ]; then
   n=$(find "$WD/panels" -type f -perm -u+x 2>/dev/null | wc -l | tr -d ' ')

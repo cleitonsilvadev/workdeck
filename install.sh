@@ -319,7 +319,7 @@ run mkdir -p "$CONFIG_DIR/panels"
 if [ -f "$CONFIG_DIR/projects.conf" ]; then
   say "projects.conf já existe — não toquei nele"
 else
-  say "projetos: entre na pasta de cada um e rode work add"
+  say "projetos: adicione com work add <caminho>"
 fi
 for painel in "$ROOT"/config/panels/*; do
   nome="$(basename "$painel")"
@@ -490,7 +490,7 @@ cat <<FIM
 
   Agora:
        source ${rc:-seu arquivo de shell}
-       cd <pasta do projeto> && work add     ${dim}um por vez; Tab completa o caminho${reset}
+       work add ~/caminho/do/projeto     ${dim}um por vez; Tab completa o caminho${reset}
        work
 
   Para navegar: Shift+← / Shift+→ troca de janela, Shift+↑ / Shift+↓ troca de

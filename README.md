@@ -40,7 +40,7 @@ Depois:
 
 ```bash
 source ~/.zshrc             # ou ~/.bashrc
-cd ~/code/api && work add   # um projeto por vez, de dentro da pasta
+work add ~/code/api         # um projeto por vez; Tab completa o caminho
 work
 ```
 
@@ -156,11 +156,11 @@ Rode isso antes de abrir uma issue dizendo que algo não funciona.
 
 ## Os projetos
 
-O jeito mais direto é entrar na pasta e adicionar:
+Adicione um projeto por vez, passando o caminho:
 
 ```bash
-cd ~/code/api && work add        # a pasta atual vira uma janela
-work add ~/code/web              # ou passe o caminho; Tab completa
+work add ~/code/api              # Tab completa o caminho
+work add                         # sem caminho, usa a pasta atual
 ```
 
 O nome da janela é o nome da pasta. Se a sessão já estiver aberta, a janela
@@ -207,7 +207,7 @@ A ordem do arquivo é a ordem das janelas, numeradas a partir de 1. Projeto que
 não existe no disco é pulado sem erro, então dá para deixar linhas de coisas
 que você ainda não clonou.
 
-**Para adicionar um projeto:** `work add`, de dentro da pasta. Para tirar ou
+**Para adicionar um projeto:** `work add <caminho>`. Para tirar ou
 reordenar, `work escolher` ou edite o arquivo, e depois feche a sessão com
 `work kill` e abra de novo com `work`. As janelas são criadas na abertura da
 sessão; sem fechar, a sessão antiga continua com a lista antiga.
@@ -216,7 +216,7 @@ sessão; sem fechar, a sessão antiga continua com a lista antiga.
 |---|---|
 | `work` | Abre a sessão, ou volta para ela |
 | `work api` | Abre e já vai para a janela `api` |
-| `work add [pasta]` | Acrescenta a pasta, ou a atual, como janela |
+| `work add <caminho>` | Acrescenta o projeto como janela; sem caminho, usa a pasta atual |
 | `work escolher` | Escolhe de novo os projetos |
 | `work kill` | Fecha a sessão inteira |
 | `work help` | Abre o menu com as ações; `--texto` mostra comandos, atalhos e o que falta configurar |
