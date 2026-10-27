@@ -492,8 +492,9 @@ cat <<FIM
        source ${rc:-seu arquivo de shell}
        work              ${dim}na primeira vez, você escolhe os projetos${reset}
 
-  Para navegar, clique no nome da janela na barra, ou use Ctrl+b e depois
-  1…9. Ctrl+b e uma seta troca de painel. Para mudar os projetos: work escolher
+  Para navegar: Shift+← / Shift+→ troca de janela, Shift+↑ / Shift+↓ troca de
+  painel, e Ctrl+b e depois 1…9 vai direto para uma janela. Clicar na barra
+  também funciona. Para mudar os projetos: work escolher
   Ajuda a qualquer hora: workdeck-help, ou Ctrl+b e h dentro do work.
 FIM
 

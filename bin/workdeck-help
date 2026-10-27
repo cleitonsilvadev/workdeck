@@ -11,7 +11,11 @@ fi
 
 curto() { case "$1" in "$HOME"/*) echo "~/${1#"$HOME"/}" ;; *) echo "$1" ;; esac; }
 titulo() { printf '\n  %s%s%s\n' "$b" "$1" "$r"; }
-item() { printf '    %-22s %s%s%s\n' "$1" "$d" "$2" "$r"; }
+item() {
+  local n
+  n=$(printf '%s' "$1" | LC_ALL=C tr -d '\200-\277' | wc -c)
+  printf '    %s%*s %s%s%s\n' "$1" $((22 - n)) "" "$d" "$2" "$r"
+}
 ok() { printf '    %s✓%s %s\n' "$v" "$r" "$1"; }
 falta() { printf '    %s!%s %s\n' "$a" "$r" "$1"; }
 
@@ -27,6 +31,8 @@ item "workdeck-doctor" "diz o que funciona no seu ambiente"
 item "workdeck-help" "esta ajuda"
 
 titulo "Navegar"
+item "Shift+← / Shift+→" "janela anterior / próxima"
+item "Shift+↑ / Shift+↓" "painel anterior / próximo"
 item "clique na barra" "troca de janela; clique num painel para focar"
 item "Ctrl+b e 1-9" "vai para a janela N"
 item "Ctrl+b e setas" "troca de painel"

@@ -212,6 +212,8 @@ Para usar outro nome de sessão: `export WORKDECK_SESSION=outro`.
 
 Funcionam em qualquer terminal, sem configurar nada:
 
+- **<kbd>Shift</kbd>+<kbd>←</kbd> / <kbd>→</kbd>:** janela anterior / próxima.
+- **<kbd>Shift</kbd>+<kbd>↑</kbd> / <kbd>↓</kbd>:** painel anterior / próximo.
 - **Mouse:** clique no nome da janela na barra de baixo para trocar de janela,
   e num painel para levar o foco até ele.
 - **<kbd>Ctrl</kbd>+<kbd>b</kbd>, solte, e depois a tecla:**
