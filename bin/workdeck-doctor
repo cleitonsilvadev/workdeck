@@ -1,0 +1,149 @@
+#!/usr/bin/env bash
+# workdeck-doctor — diz o que funciona no seu ambiente e o que não vai funcionar.
+#
+#   workdeck-doctor          diagnóstico completo
+#   workdeck-doctor --quiet  só os problemas
+set -uo pipefail
+
+QUIET=0
+[ "${1:-}" = "--quiet" ] && QUIET=1
+
+ok=$'\e[32m✓\e[0m'; aviso=$'\e[33m!\e[0m'; erro=$'\e[31m✗\e[0m'; dim=$'\e[2m'; bold=$'\e[1m'; reset=$'\e[0m'
+problemas=0
+
+linha() { # marca, texto, detalhe
+  [ "$QUIET" = 1 ] && [ "$1" = "$ok" ] && return 0
+  printf '  %s %s\n' "$1" "$2"
+  [ -n "${3:-}" ] && printf '      %s%s%s\n' "$dim" "$3" "$reset"
+  return 0
+}
+
+secao() { [ "$QUIET" = 1 ] || printf '\n%s%s%s\n' "$bold" "$1" "$reset"; }
+
+# ---- sistema ---------------------------------------------------------------
+secao "Sistema"
+case "$(uname -s)" in
+  Darwin) SO=macOS ;;
+  Linux)  grep -qi microsoft /proc/version 2>/dev/null && SO="Linux (WSL)" || SO=Linux ;;
+  MINGW*|MSYS*|CYGWIN*) SO="Windows nativo" ;;
+  *) SO="$(uname -s)" ;;
+esac
+if [ "$SO" = "Windows nativo" ]; then
+  linha "$erro" "Windows nativo" "o tmux não roda aqui; use o WSL"
+  problemas=$((problemas+1))
+else
+  linha "$ok" "$SO"
+fi
+
+# ---- o essencial -----------------------------------------------------------
+secao "O essencial"
+if command -v tmux >/dev/null; then
+  linha "$ok" "tmux $(tmux -V 2>/dev/null | awk '{print $2}')"
+else
+  linha "$erro" "tmux não encontrado" "sem ele nada funciona"
+  problemas=$((problemas+1))
+fi
+if command -v git >/dev/null; then linha "$ok" "git"; else linha "$erro" "git não encontrado"; problemas=$((problemas+1)); fi
+if command -v delta >/dev/null; then
+  linha "$ok" "delta $(delta --version 2>/dev/null | awk '{print $2}')"
+else
+  linha "$aviso" "delta não encontrado" "só o git review deixa de funcionar"
+fi
+
+# ---- terminal --------------------------------------------------------------
+secao "Terminal"
+TERMINAL="desconhecido"
+if [ -n "${KITTY_WINDOW_ID:-}" ]; then TERMINAL="kitty"
+elif [ -n "${WEZTERM_PANE:-}" ]; then TERMINAL="WezTerm"
+elif [ -n "${ALACRITTY_WINDOW_ID:-}" ] || [ "${TERM:-}" = "alacritty" ]; then TERMINAL="Alacritty"
+elif [ -n "${WT_SESSION:-}" ]; then TERMINAL="Windows Terminal"
+elif [ -n "${GHOSTTY_RESOURCES_DIR:-}" ]; then TERMINAL="Ghostty"
+elif [ -n "${TERM_PROGRAM:-}" ]; then TERMINAL="$TERM_PROGRAM"
+elif [ -n "${KONSOLE_VERSION:-}" ]; then TERMINAL="Konsole"
+elif [ -n "${VTE_VERSION:-}" ]; then TERMINAL="GNOME Terminal ou outro VTE"
+fi
+linha "$ok" "$TERMINAL" "TERM=${TERM:-vazio}"
+
+# cores de 24 bits: os temas dependem disso
+if [ "${COLORTERM:-}" = "truecolor" ] || [ "${COLORTERM:-}" = "24bit" ]; then
+  linha "$ok" "cores de 24 bits"
+else
+  linha "$aviso" "não consigo confirmar cores de 24 bits" \
+    "COLORTERM não está definido; os temas podem sair aproximados"
+fi
+
+# atalhos cmd: só no Mac, e só com adaptador
+if [ "$SO" = "macOS" ]; then
+  case "$TERMINAL" in
+    kitty|WezTerm|Alacritty|iTerm.app)
+      linha "$ok" "dá para usar cmd em vez de Alt" "veja terminals/ — é opcional" ;;
+    Apple_Terminal)
+      linha "$aviso" "o Terminal.app não envia texto por atalho" \
+        "use os atalhos em Alt; eles funcionam igual" ;;
+    *)
+      linha "$aviso" "não sei se este terminal traduz cmd" \
+        "os atalhos em Alt funcionam de qualquer jeito" ;;
+  esac
+else
+  case "$TERMINAL" in
+    "GNOME Terminal ou outro VTE"|Konsole)
+      linha "$ok" "Alt chega ao tmux" "este terminal não envia texto por atalho, mas aqui não precisa" ;;
+    *) linha "$ok" "Alt chega ao tmux" ;;
+  esac
+fi
+
+# ---- agente de IA ----------------------------------------------------------
+secao "Agente de IA"
+CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/workdeck/agent.conf"
+AGENT_CMD=""
+[ -f "$CONFIG" ] && . "$CONFIG"
+if [ -n "${AGENT_CMD:-}" ]; then
+  nome="${AGENT_CMD%% *}"
+  if command -v "$nome" >/dev/null; then
+    linha "$ok" "configurado: $AGENT_CMD"
+  else
+    linha "$erro" "configurado como '$AGENT_CMD', mas '$nome' não está no PATH"
+    problemas=$((problemas+1))
+  fi
+else
+  achados=()
+  for c in claude codex copilot aider gemini opencode cursor-agent crush goose q; do
+    command -v "$c" >/dev/null && achados+=("$c")
+  done
+  if [ ${#achados[@]} -gt 0 ]; then
+    linha "$aviso" "nenhum agente configurado" "achei no PATH: ${achados[*]}"
+    linha " " "configure com: workdeck-agent --set ${achados[0]}"
+  else
+    linha "$aviso" "nenhum agente de IA encontrado no PATH" \
+      "o workdeck funciona sem, mas é para isso que ele existe"
+  fi
+fi
+
+# ---- a sua config ----------------------------------------------------------
+secao "Sua config"
+WD="${XDG_CONFIG_HOME:-$HOME/.config}/workdeck"
+if [ -f "$WD/projects.conf" ]; then
+  n=$(grep -vcE '^\s*#|^\s*$' "$WD/projects.conf" 2>/dev/null || echo 0)
+  linha "$ok" "$n projeto(s) em projects.conf"
+else
+  linha "$aviso" "sem projects.conf" "rode o install, ou copie o projects.example.conf"
+fi
+if [ -d "$WD/panels" ]; then
+  n=$(find "$WD/panels" -type f -perm -u+x 2>/dev/null | wc -l | tr -d ' ')
+  if [ "$n" -gt 0 ]; then linha "$ok" "$n painel(éis)"
+  else linha "$aviso" "nenhum painel executável" "lembre do chmod +x"; fi
+else
+  linha "$aviso" "sem painéis"
+fi
+case ":$PATH:" in
+  *":$HOME/.local/bin:"*) linha "$ok" "~/.local/bin está no PATH" ;;
+  *) linha "$erro" "~/.local/bin não está no PATH" "os comandos não vão ser encontrados"; problemas=$((problemas+1)) ;;
+esac
+
+echo
+if [ "$problemas" -eq 0 ]; then
+  printf '%sTudo pronto.%s\n' "$bold" "$reset"
+else
+  printf '%s%s problema(s) a resolver.%s\n' "$bold" "$problemas" "$reset"
+  exit 1
+fi

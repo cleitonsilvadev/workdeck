@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+# workdeck-agent — abre o seu agente de IA num pane ao lado, ou configura qual é.
+#
+#   workdeck-agent              abre o agente num pane ao lado
+#   workdeck-agent --here       roda o agente no pane atual
+#   workdeck-agent --set <cmd>  define qual comando é o seu agente
+#   workdeck-agent --show       mostra o configurado
+#   workdeck-agent --list       procura agentes conhecidos no PATH
+#
+# O comando pode ter argumentos: workdeck-agent --set "aider --no-auto-commits"
+set -uo pipefail
+
+CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/workdeck"
+CONFIG="$CONFIG_DIR/agent.conf"
+CONHECIDOS="claude codex copilot aider gemini opencode cursor-agent crush goose q"
+
+carrega() { AGENT_CMD=""; AGENT_SPLIT="${AGENT_SPLIT:-h}"; [ -f "$CONFIG" ] && . "$CONFIG"; }
+
+case "${1:-}" in
+  --set)
+    cmd="${2:?use: workdeck-agent --set <comando>}"
+    nome="${cmd%% *}"
+    command -v "$nome" >/dev/null || {
+      echo "'$nome' não está no PATH. Instale primeiro, ou use outro comando."
+      exit 1
+    }
+    mkdir -p "$CONFIG_DIR"
+    cat > "$CONFIG" <<FIM
+# Qual agente de IA o workdeck abre. Pode ter argumentos.
+AGENT_CMD="$cmd"
+# Como dividir o pane: h lado a lado, v em cima/embaixo.
+AGENT_SPLIT="${AGENT_SPLIT:-h}"
+FIM
+    echo "agente definido: $cmd"
+    exit 0
+    ;;
+  --show)
+    carrega
+    [ -n "$AGENT_CMD" ] && echo "$AGENT_CMD" || echo "nenhum agente configurado"
+    exit 0
+    ;;
+  --list)
+    echo "Agentes conhecidos encontrados no PATH:"
+    achou=0
+    for c in $CONHECIDOS; do
+      command -v "$c" >/dev/null && { echo "  $c"; achou=1; }
+    done
+    [ "$achou" = 0 ] && echo "  nenhum"
+    echo
+    echo "Qualquer CLI serve, não só estas. Para definir:"
+    echo "  workdeck-agent --set <comando>"
+    exit 0
+    ;;
+  -h|--help)
+    sed -n '2,11p' "$0" | sed 's/^# \{0,1\}//'
+    exit 0
+    ;;
+esac
+
+carrega
+if [ -z "$AGENT_CMD" ]; then
+  echo "Nenhum agente configurado."
+  echo
+  "$0" --list
+  exit 1
+fi
+
+nome="${AGENT_CMD%% *}"
+command -v "$nome" >/dev/null || { echo "'$nome' não está no PATH"; exit 1; }
+
+if [ "${1:-}" = "--here" ] || [ -z "${TMUX:-}" ]; then
+  exec $AGENT_CMD
+fi
+
+flag="-h"; [ "${AGENT_SPLIT:-h}" = "v" ] && flag="-v"
+exec tmux split-window "$flag" -c "#{pane_current_path}" "$AGENT_CMD"

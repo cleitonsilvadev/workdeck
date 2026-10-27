@@ -4,6 +4,10 @@
 #   ./install.sh                      instala com o tema padrão
 #   ./install.sh --theme nord         escolhe um tema de themes/
 #   ./install.sh --terminal kitty     instala também os atalhos cmd do kitty
+#   ./install.sh --agent claude       define o seu agente de IA
+#   ./install.sh --with ai-memory     ativa integrações opcionais (vírgula separa)
+#   ./install.sh --list-integrations  mostra as integrações disponíveis e sai
+#   ./install.sh --yes                não pergunta nada; usa os padrões
 #   ./install.sh --no-deps            não instala nada pelo gerenciador de pacotes
 #   ./install.sh --no-reload          não recarrega o tmux no fim
 #   ./install.sh --dry-run            só mostra o que faria
@@ -18,6 +22,9 @@ CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/workdeck"
 BIN_DIR="$HOME/.local/bin"
 THEME="catppuccin-mocha"
 TERMINAL=""
+AGENT=""
+WITH=""
+YES=0
 DEPS=1
 RELOAD=1
 DRY=0
@@ -26,6 +33,17 @@ while [ $# -gt 0 ]; do
   case "$1" in
     --theme) THEME="${2:?--theme precisa de um nome}"; shift 2 ;;
     --terminal) TERMINAL="${2:?--terminal precisa de um nome}"; shift 2 ;;
+    --agent) AGENT="${2:?--agent precisa de um comando}"; shift 2 ;;
+    --with) WITH="${2:?--with precisa de um nome}"; shift 2 ;;
+    --yes|-y) YES=1; shift ;;
+    --list-integrations)
+      for f in "$ROOT"/integrations/*.sh; do
+        [ "$(basename "$f")" = "exemplo.sh" ] && continue
+        ( . "$f"; printf '  %s\n' "$(descrever | head -1)"
+          descrever | tail -n +2 | sed 's/^/      /' )
+        echo
+      done
+      exit 0 ;;
     --no-deps) DEPS=0; shift ;;
     --no-reload) RELOAD=0; shift ;;
     --dry-run) DRY=1; shift ;;
@@ -118,7 +136,7 @@ echo "workdeck → $SO, tema $THEME"
 echo
 
 # ---- 1. dependências -------------------------------------------------------
-echo "[1/5] dependências"
+echo "[1/7] dependências"
 falta=()
 command -v tmux >/dev/null || falta+=(tmux)
 command -v delta >/dev/null || falta+=(git-delta)
@@ -146,7 +164,7 @@ fi
 echo
 
 # ---- 2. scripts ------------------------------------------------------------
-echo "[2/5] scripts em $BIN_DIR"
+echo "[2/7] scripts em $BIN_DIR"
 run mkdir -p "$BIN_DIR"
 for script in "$ROOT"/bin/*; do
   nome="$(basename "$script")"
@@ -170,7 +188,7 @@ esac
 echo
 
 # ---- 3. config do usuário --------------------------------------------------
-echo "[3/5] config em $CONFIG_DIR"
+echo "[3/7] config em $CONFIG_DIR"
 run mkdir -p "$CONFIG_DIR/panels"
 if [ -f "$CONFIG_DIR/projects.conf" ]; then
   say "projects.conf já existe — não toquei nele"
@@ -193,7 +211,7 @@ say "lesskey do git-review"
 echo
 
 # ---- 4. tmux e terminal ----------------------------------------------------
-echo "[4/5] tmux"
+echo "[4/7] tmux"
 write_block "$HOME/.tmux.conf" \
   "$(sed '$d' "$ROOT/config/tmux.conf" | sed '/^# O tema entra aqui/d'; cat "$ROOT/themes/$THEME.tmux"; echo '# <<< workdeck <<<')"
 say "tmux.conf — atalhos em Alt, que funcionam em qualquer terminal"
@@ -219,7 +237,7 @@ esac
 echo
 
 # ---- 5. shell --------------------------------------------------------------
-echo "[5/5] shell"
+echo "[5/7] shell"
 rc=""
 case "$(basename "${SHELL:-/bin/bash}")" in
   zsh)  rc="$HOME/.zshrc" ;;
@@ -232,6 +250,78 @@ if [ -n "$rc" ]; then
 else
   say "shell '$SHELL' não reconhecido — adicione à mão:"
   say "  source $ROOT/config/shell-snippet.sh"
+fi
+echo
+
+# ---- 6. agente de IA -------------------------------------------------------
+echo "[6/7] agente de IA"
+agente_atual=""
+[ -f "$CONFIG_DIR/agent.conf" ] && agente_atual="$(. "$CONFIG_DIR/agent.conf"; echo "${AGENT_CMD:-}")"
+
+if [ -n "$AGENT" ]; then
+  run "$BIN_DIR/workdeck-agent" --set "$AGENT" && say "agente: $AGENT"
+elif [ -n "$agente_atual" ]; then
+  say "agente já configurado: $agente_atual"
+else
+  achados=()
+  for c in claude codex copilot aider gemini opencode cursor-agent crush goose q; do
+    command -v "$c" >/dev/null && achados+=("$c")
+  done
+  if [ ${#achados[@]} -eq 0 ]; then
+    say "nenhum agente de IA encontrado no PATH"
+    say "quando tiver um: workdeck-agent --set <comando>"
+  elif [ "$YES" = 1 ] || [ ! -t 0 ]; then
+    say "achei no PATH: ${achados[*]}"
+    say "para escolher: workdeck-agent --set <comando>"
+  else
+    echo
+    echo "  Achei estes agentes de IA no seu PATH:"
+    i=1; for a in "${achados[@]}"; do echo "    $i) $a"; i=$((i+1)); done
+    echo "    0) nenhum por enquanto"
+    echo
+    printf '  Qual você usa? [0-%s] ' "${#achados[@]}"
+    read -r escolha || escolha=0
+    if [ "${escolha:-0}" -ge 1 ] 2>/dev/null && [ "$escolha" -le "${#achados[@]}" ]; then
+      run "$BIN_DIR/workdeck-agent" --set "${achados[$((escolha-1))]}" >/dev/null \
+        && say "agente: ${achados[$((escolha-1))]}"
+    else
+      say "nenhum agente definido; depois use workdeck-agent --set <comando>"
+    fi
+  fi
+fi
+echo
+
+# ---- 7. integrações opcionais ----------------------------------------------
+echo "[7/7] integrações"
+if [ -z "$WITH" ]; then
+  say "nenhuma pedida (--with <nome>); veja --list-integrations"
+else
+  IFS=',' read -r -a pedidas <<< "$WITH"
+  for nome in "${pedidas[@]}"; do
+    arquivo="$ROOT/integrations/$nome.sh"
+    if [ ! -f "$arquivo" ]; then
+      say "não conheço a integração '$nome'"
+      continue
+    fi
+    (
+      . "$arquivo"
+      titulo="$(descrever | head -1)"
+      if verificar 2>/dev/null; then
+        say "$titulo já está instalada"
+        exit 0
+      fi
+      echo
+      descrever | sed 's/^/    /'
+      echo
+      if [ "$YES" = 0 ] && [ -t 0 ]; then
+        printf '  Instalar %s? [s/N] ' "$titulo"
+        read -r r || r=n
+        case "$r" in s|S|y|Y) ;; *) say "pulada"; exit 0 ;; esac
+      fi
+      [ "$DRY" = 1 ] && { say "[dry-run] instalaria $titulo"; exit 0; }
+      instalar | sed 's/^/    /'
+    )
+  done
 fi
 echo
 
@@ -254,4 +344,7 @@ Pronto. Faltam três passos que são seus:
 
   Os atalhos são Alt+número para trocar de janela e Alt+Shift+letra para as
   ações. Se instalou um adaptador de terminal, ele precisa reabrir.
+
+  Para ver o que funciona no seu ambiente e o que não vai funcionar:
+       workdeck-doctor
 FIM

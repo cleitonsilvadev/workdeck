@@ -1,21 +1,28 @@
 # workdeck
 
-Um terminal, uma sessão, uma janela por projeto.
+Um workflow de terminal para trabalhar com agentes de IA.
 
-O tmux cuida das janelas e divisões, não o terminal. A sessão sobrevive a
-fechar o terminal, cair a conexão ou reiniciar a máquina: você volta com
-`work` e tudo está onde estava.
+Uma sessão do tmux, uma janela por projeto, o agente num pane ao lado, e o que
+você precisa olhar enquanto ele trabalha: o diff do que ele escreveu, o estado
+dos seus repositórios, o que mais você quiser.
 
-Junto vêm um `git review` com diff colorido e um painel onde você põe os
-comandos que quiser ver de relance.
+A sessão sobrevive a fechar o terminal, cair a conexão ou reiniciar a máquina.
+Você volta com `work` e tudo está onde estava, agente incluso.
 
-**Roda em macOS e Linux.** No Windows, pelo WSL — o tmux não existe no
-Windows nativo, e o instalador diz isso em vez de fingir que funciona.
+**Funciona com qualquer agente de CLI** — Claude Code, Codex, Copilot CLI,
+Aider, Gemini, o que você usar. O projeto não embute nenhum: ele abre o
+comando que você escolher.
 
-**Não exige um terminal específico.** Os atalhos são `Alt` e quem os
-interpreta é o tmux, então valem no Terminal.app, GNOME Terminal, Konsole,
-Windows Terminal, kitty, WezTerm, Alacritty ou qualquer outro. Há adaptadores
-opcionais em `terminals/` para quem usa Mac e prefere `cmd`.
+**Funciona em qualquer terminal**, porque os atalhos são do tmux e não do
+terminal. macOS e Linux; no Windows, pelo WSL.
+
+```bash
+work                  # abre a sessão, uma janela por projeto
+ai                    # abre o agente num pane ao lado
+git review            # revisa o que ele escreveu
+painel                # abre o painel de contexto
+workdeck-doctor       # diz o que funciona no seu ambiente
+```
 
 ---
 
@@ -67,6 +74,77 @@ wsl --install          # PowerShell, como administrador
 
 Depois, dentro do WSL, é a instalação normal de Linux. Seu terminal do Windows
 continua sendo o terminal — quem gerencia as janelas é o tmux, lá dentro.
+
+---
+
+## O agente de IA
+
+O workdeck não traz nenhum agente. Ele abre o comando que você indicar, num
+pane ao lado do seu shell, já na pasta do projeto.
+
+```bash
+workdeck-agent --list           # procura agentes conhecidos no PATH
+workdeck-agent --set claude     # define o seu
+workdeck-agent --show           # ver o atual
+ai                              # abre num pane ao lado
+```
+
+<kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>A</kbd> faz o mesmo sem sair das mãos no
+teclado.
+
+O comando pode ter argumentos:
+
+```bash
+workdeck-agent --set "aider --no-auto-commits"
+```
+
+Na instalação, se você não passar `--agent`, ele procura no seu PATH e pergunta
+qual usar. `--yes` pula a pergunta.
+
+O instalador conhece `claude`, `codex`, `copilot`, `aider`, `gemini`,
+`opencode`, `cursor-agent`, `crush`, `goose` e `q` — mas isso é só para
+oferecer uma lista. Qualquer comando serve.
+
+### Por que um pane, e não uma janela
+
+O agente escreve código que você precisa ver. Com ele ao lado, o `git review`
+roda no pane de baixo sem trocar de contexto, e o painel fica a um
+<kbd>Alt</kbd>+<kbd>7</kbd>. É o ponto do projeto.
+
+---
+
+## Integrações
+
+Nada é instalado por padrão. Cada integração é uma peça de terceiros que você
+pode querer ou não:
+
+```bash
+./install.sh --list-integrations   # ver o que existe
+./install.sh --with ai-memory      # ativar (vírgula separa várias)
+```
+
+O instalador mostra o que a integração é e de quem é, e só age depois de você
+confirmar. Para escrever a sua, veja `integrations/README.md`.
+
+O workdeck é um workflow, não um gerenciador de pacotes. Estas integrações
+estão aqui porque aparecem muito em trabalho com agentes — não porque o
+projeto as mantém ou as auditou.
+
+---
+
+## Diagnóstico
+
+```bash
+workdeck-doctor
+```
+
+Diz o que funciona no seu ambiente e o que não vai funcionar: se o tmux e o
+delta estão instalados, qual terminal você está usando, se ele suporta cores
+de 24 bits, se os atalhos em `cmd` são possíveis aí, se há um agente
+configurado e se o `~/.local/bin` está no PATH. Com `--quiet`, só os
+problemas.
+
+Rode isso antes de abrir uma issue dizendo que algo não funciona.
 
 ---
 

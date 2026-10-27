@@ -2,6 +2,10 @@
 # Serve para bash e zsh.
 export PATH="$HOME/.local/bin:$PATH"
 
+# ai → abre o agente de IA num pane ao lado, na pasta em que você está.
+# Configure qual com: workdeck-agent --set <comando>
+ai() { workdeck-agent "$@"; }
+
 # painel → abre (ou redesenha) o painel numa janela da sessão e vai até ela.
 painel() {
   local sessao="${WORKDECK_SESSION:-work}"
