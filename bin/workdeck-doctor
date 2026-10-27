@@ -72,17 +72,34 @@ else
     "COLORTERM não está definido; os temas podem sair aproximados"
 fi
 
-# atalhos cmd: só no Mac, e só com adaptador
 if [ "$SO" = "macOS" ]; then
+  option_ok=0
+  if [ "$TERMINAL" = Apple_Terminal ]; then
+    perfil="$(defaults read com.apple.Terminal "Default Window Settings" 2>/dev/null || echo Basic)"
+    tmp="$(mktemp)"
+    defaults export com.apple.Terminal "$tmp" 2>/dev/null
+    [ "$(/usr/libexec/PlistBuddy -c "Print ':Window Settings:$perfil:useOptionAsMetaKey'" "$tmp" 2>/dev/null)" = true ] && option_ok=1
+    rm -f "$tmp"
+  fi
+  case "$TERMINAL" in
+    WezTerm) option_ok=1 ;;
+  esac
+  if [ "$option_ok" = 1 ]; then
+    linha "$ok" "Option funciona como Alt"
+  else
+    case "$TERMINAL" in
+      Apple_Terminal) como='Terminal → Ajustes → Perfis → Teclado → marque "Usar Option como tecla Meta"' ;;
+      iTerm.app) como='iTerm2 → Settings → Profiles → Keys → General → "Left Option key": Esc+' ;;
+      kitty) como='no kitty.conf, acrescente: macos_option_as_alt left' ;;
+      Ghostty) como='na config do Ghostty, acrescente: macos-option-as-alt = left' ;;
+      Alacritty) como='no alacritty.toml, em [window]: option_as_alt = "OnlyLeft"' ;;
+      *) como='nas preferências do terminal, faça a tecla Option funcionar como Alt (Meta)' ;;
+    esac
+    linha "$aviso" "a tecla Option pode não funcionar como Alt; Alt+2 escreveria ™" "$como"
+  fi
   case "$TERMINAL" in
     kitty|WezTerm|Alacritty|iTerm.app)
       linha "$ok" "dá para usar cmd em vez de Alt" "veja terminals/ — é opcional" ;;
-    Apple_Terminal)
-      linha "$aviso" "o Terminal.app não envia texto por atalho" \
-        "use os atalhos em Alt; eles funcionam igual" ;;
-    *)
-      linha "$aviso" "não sei se este terminal traduz cmd" \
-        "os atalhos em Alt funcionam de qualquer jeito" ;;
   esac
 else
   case "$TERMINAL" in

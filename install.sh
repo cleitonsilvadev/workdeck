@@ -22,6 +22,7 @@ CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/workdeck"
 BIN_DIR="$HOME/.local/bin"
 THEME="catppuccin-mocha"
 TERMINAL=""
+AVISO_OPTION=""
 AGENT=""
 WITH=""
 YES=0
@@ -100,37 +101,34 @@ iguais() { [ "$(cksum < "$1")" = "$(cksum < "$2")" ]; }
 say() { printf '  %s\n' "$*"; }
 run() { [ "$DRY" = 1 ] && { say "[dry-run] $*"; return 0; }; "$@"; }
 
-option_como_meta() {
-  local dominio="com.apple.Terminal" pb=/usr/libexec/PlistBuddy perfil chave atual tmp r
-  perfil="$(defaults read "$dominio" "Default Window Settings" 2>/dev/null || echo Basic)"
-  chave=":Window Settings:$perfil:useOptionAsMetaKey"
+terminal_atual() {
+  if [ -n "${KITTY_WINDOW_ID:-}" ]; then echo kitty
+  elif [ -n "${WEZTERM_PANE:-}" ]; then echo WezTerm
+  elif [ -n "${ALACRITTY_WINDOW_ID:-}" ] || [ "${TERM:-}" = alacritty ]; then echo Alacritty
+  elif [ -n "${GHOSTTY_RESOURCES_DIR:-}" ]; then echo Ghostty
+  else echo "${TERM_PROGRAM:-}"; fi
+}
+
+option_ligado_no_terminal_app() {
+  local perfil tmp v
+  perfil="$(defaults read com.apple.Terminal "Default Window Settings" 2>/dev/null || echo Basic)"
   tmp="$(mktemp)"
-  defaults export "$dominio" "$tmp"
-  atual="$("$pb" -c "Print '$chave'" "$tmp" 2>/dev/null || echo ausente)"
-  if [ "$atual" = true ]; then
-    say "Terminal.app: Option já funciona como Alt no perfil $perfil"
-    rm -f "$tmp"; return 0
-  fi
-  if [ "$YES" = 0 ] && [ -t 0 ]; then
-    printf '  O Terminal.app precisa de "Option como Meta" para os atalhos em Alt.\n'
-    printf '  Ligar agora no perfil %s? [S/n] ' "$perfil"
-    read -r r || r=n
-    case "${r:-s}" in s|S|y|Y) ;; *)
-      say "não liguei; ative em Ajustes → Perfis → Teclado → Usar Option como tecla Meta"
-      rm -f "$tmp"; return 0 ;;
-    esac
-  fi
-  if [ "$DRY" = 1 ]; then say "[dry-run] ligaria Option como Meta no perfil $perfil"; rm -f "$tmp"; return 0; fi
-  "$pb" -c "Add ':Window Settings' dict" "$tmp" 2>/dev/null || true
-  if "$pb" -c "Add ':Window Settings:$perfil' dict" "$tmp" 2>/dev/null; then
-    "$pb" -c "Add ':Window Settings:$perfil:name' string '$perfil'" \
-          -c "Add ':Window Settings:$perfil:type' string 'Window Settings'" "$tmp"
-  fi
-  "$pb" -c "Set '$chave' true" "$tmp" 2>/dev/null || "$pb" -c "Add '$chave' bool true" "$tmp"
-  defaults import "$dominio" "$tmp"
+  defaults export com.apple.Terminal "$tmp" 2>/dev/null
+  v="$(/usr/libexec/PlistBuddy -c "Print ':Window Settings:$perfil:useOptionAsMetaKey'" "$tmp" 2>/dev/null)"
   rm -f "$tmp"
-  anota terminal-app "$perfil" "$atual"
-  say "Terminal.app: Option ligado como Alt no perfil $perfil — feche e abra o Terminal"
+  [ "$v" = true ]
+}
+
+como_ligar_option() {
+  case "$1" in
+    Apple_Terminal) echo 'Terminal → Ajustes → Perfis → Teclado → marque "Usar Option como tecla Meta"' ;;
+    iTerm.app) echo 'iTerm2 → Settings → Profiles → Keys → General → "Left Option key": Esc+' ;;
+    kitty) echo 'no kitty.conf, acrescente: macos_option_as_alt left' ;;
+    Ghostty) echo 'na config do Ghostty, acrescente: macos-option-as-alt = left' ;;
+    Alacritty) echo 'no alacritty.toml, em [window]: option_as_alt = "OnlyLeft"' ;;
+    WezTerm) ;;
+    *) echo 'nas preferências do seu terminal, faça a tecla Option funcionar como Alt (Meta)' ;;
+  esac
 }
 
 [ -f "$ROOT/themes/$THEME.conf" ] || {
@@ -252,14 +250,22 @@ echo
 echo "[4/7] tmux"
 write_block "$HOME/.tmux.conf" \
   "$(sed '$d' "$ROOT/config/tmux.conf" | sed '/^# O tema entra aqui/d'; cat "$ROOT/themes/$THEME.tmux"; echo '# <<< workdeck <<<')"
-say "tmux.conf — atalhos em Alt, que funcionam em qualquer terminal"
+say "tmux.conf — atalhos em Alt"
 
 case "$TERMINAL" in
   "")
-    if [ "$SO" = macOS ] && [ "${TERM_PROGRAM:-}" = Apple_Terminal ]; then
-      option_como_meta
+    if [ "$SO" = macOS ]; then
+      term="$(terminal_atual)"
+      if [ "$term" = Apple_Terminal ] && option_ligado_no_terminal_app; then
+        say "Terminal.app: Option já funciona como Alt"
+      else
+        AVISO_OPTION="$(como_ligar_option "$term")"
+        if [ -n "$AVISO_OPTION" ]; then
+          say "no Mac, a tecla Option precisa funcionar como Alt; veja o aviso no fim"
+        fi
+      fi
     else
-      say "nenhum terminal escolhido; os atalhos em Alt já funcionam onde você está"
+      say "os atalhos em Alt já funcionam neste terminal"
     fi
     ;;
   kitty)
@@ -390,3 +396,13 @@ Pronto. Faltam três passos que são seus:
   Para ver o que funciona no seu ambiente e o que não vai funcionar:
        workdeck-doctor
 FIM
+
+if [ -n "$AVISO_OPTION" ]; then
+  cat <<FIM
+
+  Antes dos atalhos, uma vez só: no Mac, a tecla Option precisa funcionar
+  como Alt, senão Alt+2 escreve ™ em vez de trocar de janela.
+       $AVISO_OPTION
+  Enquanto isso, Ctrl+b e depois 1…9 troca de janela, e clicar na barra também.
+FIM
+fi

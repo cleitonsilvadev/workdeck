@@ -187,7 +187,9 @@ Para usar outro nome de sessão: `export WORKDECK_SESSION=outro`.
 
 ## Atalhos
 
-Funcionam em qualquer terminal, porque quem os interpreta é o tmux.
+Funcionam em qualquer terminal, porque quem os interpreta é o tmux. No Mac,
+a tecla Option precisa funcionar como Alt, um ajuste feito uma vez só: veja
+[A tecla Option, no macOS](#a-tecla-option-no-macos).
 
 | Atalho | Resultado |
 |---|---|
@@ -233,7 +235,29 @@ um preferido, estes são os mais usados em cada sistema:
 | Windows | [Windows Terminal](https://learn.microsoft.com/windows/terminal/) | o padrão atual, com suporte a WSL |
 | | [WezTerm](https://wezterm.org) | se você quer a mesma config nos três sistemas |
 
-Em todos eles, `Alt` chega ao tmux e os atalhos funcionam sem configurar nada.
+No Linux e no Windows, `Alt` chega ao tmux e os atalhos funcionam sem
+configurar nada. No Mac, veja a seção abaixo.
+
+### A tecla Option, no macOS
+
+No Mac, a tecla Option escreve caracteres especiais por padrão: <kbd>Option</kbd>+<kbd>2</kbd>
+vira `™` em vez de trocar de janela. Para os atalhos funcionarem, ela precisa
+agir como Alt. É uma vez só, e o instalador e o `workdeck-doctor` avisam quando
+falta:
+
+| Terminal | Onde ligar |
+|---|---|
+| Terminal.app | Ajustes → Perfis → Teclado → marque "Usar Option como tecla Meta" |
+| iTerm2 | Settings → Profiles → Keys → General → "Left Option key": Esc+ |
+| kitty | no `kitty.conf`: `macos_option_as_alt left` |
+| Ghostty | na config: `macos-option-as-alt = left` |
+| Alacritty | no `alacritty.toml`, em `[window]`: `option_as_alt = "OnlyLeft"` |
+| WezTerm | nada, já vem assim |
+
+Enquanto isso, dois caminhos funcionam em qualquer terminal, sem ajuste:
+<kbd>Ctrl</kbd>+<kbd>b</kbd> e depois <kbd>1</kbd>…<kbd>9</kbd> troca de janela,
+<kbd>Ctrl</kbd>+<kbd>b</kbd> e depois uma seta troca de painel, e clicar no nome
+da janela na barra também troca.
 
 ### Atalhos em `cmd`, no macOS
 
