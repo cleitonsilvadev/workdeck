@@ -266,6 +266,14 @@ Funcionam em qualquer terminal, sem configurar nada:
 | **Abre o menu: ir para um projeto, adicionar, IA, revisar, dividir, zoom, fechar** | <kbd>h</kbd> | |
 | Solta a sessão (ela continua viva) | <kbd>d</kbd> | <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>E</kbd> |
 
+**Só essas teclas funcionam depois do <kbd>Ctrl</kbd>+<kbd>b</kbd>.** Os outros
+atalhos do tmux ficam desligados, para nada inesperado acontecer; uma tecla fora
+da lista mostra "tecla sem uso no workdeck — Ctrl+b h abre o menu". Também
+valem <kbd>n</kbd> / <kbd>p</kbd> (próxima / anterior), <kbd>,</kbd>
+(renomear), <kbd>?</kbd> (lista de atalhos) e <kbd>r</kbd> (recarregar a
+config). Para ligar um atalho seu, coloque o `bind` no `~/.tmux.conf` depois do
+bloco do workdeck: o que estiver antes dele é desligado junto.
+
 Os atalhos diretos economizam uma tecla. No Linux funcionam de cara; no Mac, a
 tecla Option precisa funcionar como Alt, um ajuste feito uma vez: veja
 [A tecla Option, no macOS](#a-tecla-option-no-macos).
