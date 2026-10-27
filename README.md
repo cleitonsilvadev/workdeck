@@ -166,9 +166,11 @@ work add ~/code/web              # ou passe o caminho; Tab completa
 O nome da janela é o nome da pasta. Se a sessão já estiver aberta, a janela
 aparece na hora; se a pasta já estiver no work, nada muda.
 
-Se você não adicionar nenhum, o primeiro `work`, ele procura os repositórios git da sua pasta pessoal (até 4
-níveis, sem `Library`, `node_modules` nem pastas ocultas) e mostra uma lista,
-dos mais usados para os menos:
+Para escolher vários de uma vez, `work escolher` procura os repositórios git da
+sua pasta pessoal (até 4 níveis, sem `Library`, `node_modules` nem pastas
+ocultas) e mostra uma lista, dos mais usados para os menos. A busca pode
+demorar numa pasta pessoal grande, ou quando o macOS pede permissão para
+pastas como Documentos:
 
 ```
   Escolha os projetos do seu work
@@ -180,8 +182,8 @@ dos mais usados para os menos:
 ```
 
 Os cinco mais usados já vêm marcados; na maioria das vezes basta um
-<kbd>enter</kbd>. A escolha fica salva, e os próximos `work` abrem direto. Para
-mudar depois, `work escolher` mostra a lista de novo com os atuais marcados.
+<kbd>enter</kbd>. A escolha fica salva, e os próximos `work` abrem direto. Rodar
+`work escolher` de novo mostra a lista com os atuais marcados.
 
 A escolha vira `~/.config/workdeck/projects.conf`, uma linha por janela, que
 também dá para editar à mão:

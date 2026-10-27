@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # work — abre (ou volta para) a sessão tmux de trabalho, com uma janela por projeto.
 #
-# Uso: work             abre/volta para a sessão; na primeira vez, pergunta os projetos
+# Uso: work             abre/volta para a sessão
 #      work <janela>    abre e já vai para a janela com esse nome
 #      work add [pasta] acrescenta a pasta (ou a atual) como janela
 #      work escolher    escolhe de novo os projetos da sessão
@@ -295,14 +295,12 @@ fi
 
 ler_config
 if ! algum_projeto_existe; then
-  if [ -t 0 ] && [ -t 1 ]; then
-    escolher || exit 0
-    ler_config
-  else
-    echo "nenhum projeto de $CONFIG existe no disco."
-    echo "rode work escolher num terminal para escolher os seus."
-    exit 1
-  fi
+  echo "Seu work ainda não tem projetos. Entre na pasta de um e adicione:"
+  echo
+  echo "  cd ~/caminho/do/projeto && work add"
+  echo
+  echo "Depois, work abre a sessão. Para procurar seus repositórios git: work escolher"
+  exit 1
 fi
 
 if ! tmux has-session -t "$SESSION" 2>/dev/null; then

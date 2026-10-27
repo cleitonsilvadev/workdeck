@@ -319,7 +319,7 @@ run mkdir -p "$CONFIG_DIR/panels"
 if [ -f "$CONFIG_DIR/projects.conf" ]; then
   say "projects.conf já existe — não toquei nele"
 else
-  say "projetos: o primeiro work mostra os seus repositórios para escolher"
+  say "projetos: entre na pasta de cada um e rode work add"
 fi
 for painel in "$ROOT"/config/panels/*; do
   nome="$(basename "$painel")"
