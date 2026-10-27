@@ -548,7 +548,11 @@ if ! tmux has-session -t "$SESSION" 2>/dev/null; then
     dir="$(resolver "$dir")"
     [ -d "$dir" ] || { echo "pulando $name: $dir não existe"; continue; }
     if [ "$first" = 1 ]; then
-      jan="$(tmux new-session -d -P -F '#{window_id}' -s "$SESSION" -n "$name" -c "$dir" ${cmd:+"$cmd"})"
+      tamanho=()
+      if [ -t 1 ] && read -r linhas colunas < <(stty size </dev/tty 2>/dev/null) && [ "${colunas:-0}" -gt 0 ]; then
+        tamanho=(-x "$colunas" -y "$linhas")
+      fi
+      jan="$(tmux new-session -d -P -F '#{window_id}' -s "$SESSION" "${tamanho[@]+"${tamanho[@]}"}" -n "$name" -c "$dir" ${cmd:+"$cmd"})"
       [ -n "$cmd" ] || tmux set -w -t "$jan" @projeto "$dir"
       [ "$cmd" = work-panel ] && com_shell "$SESSION:$name"
       first=0
