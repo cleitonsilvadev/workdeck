@@ -58,6 +58,10 @@ FIM
 esac
 
 carrega
+if [ -z "$AGENT_CMD" ] && [ ! -t 1 ] && [ -n "${TMUX:-}" ]; then
+  tmux display-message -d 6000 "nenhum agente de IA configurado — rode: workdeck-agent --set <comando>"
+  exit 0
+fi
 if [ -z "$AGENT_CMD" ]; then
   echo "Nenhum agente configurado."
   echo
@@ -66,7 +70,14 @@ if [ -z "$AGENT_CMD" ]; then
 fi
 
 nome="${AGENT_CMD%% *}"
-command -v "$nome" >/dev/null || { echo "'$nome' não está no PATH"; exit 1; }
+if ! command -v "$nome" >/dev/null; then
+  if [ ! -t 1 ] && [ -n "${TMUX:-}" ]; then
+    tmux display-message -d 6000 "'$nome' não está no PATH — instale ou troque com workdeck-agent --set"
+    exit 0
+  fi
+  echo "'$nome' não está no PATH"
+  exit 1
+fi
 
 if [ "${1:-}" = "--here" ] || [ -z "${TMUX:-}" ]; then
   exec $AGENT_CMD
