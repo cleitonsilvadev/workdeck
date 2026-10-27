@@ -76,8 +76,8 @@ if [ "$projetos" = 0 ] || [ -z "$AGENT_CMD" ]; then
 fi
 
 printf '%sO dia a dia%s\n' "$roxo" "$x"
-passo "Shift+← / →" "vai para o projeto anterior / próximo"
 passo "ai  ou  Ctrl+b a" "abre o agente ao lado, na pasta do projeto"
+passo "Shift+← / →" "vai para o projeto anterior / próximo"
 passo "Ctrl+b |  ou  -" "divide a tela ao lado / embaixo"
 passo "Shift+↑ / ↓" "troca de painel dentro da janela"
 passo "Ctrl+b z · Ctrl+b x" "zoom no painel · fecha o painel"

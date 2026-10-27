@@ -18,9 +18,9 @@ terminal. macOS e Linux; no Windows, pelo WSL.
 
 ```bash
 work                  # abre a sessão, uma janela por projeto
-work agent claude     # define o seu agente de IA
-ai                    # abre o agente num pane ao lado
+ai                    # abre o agente ao lado, na pasta do projeto; ai help explica
 work review           # revisa o que ele escreveu (o mesmo que git review)
+work agent claude     # define qual é o seu agente de IA
 work painel           # abre o painel de contexto
 work doctor           # diz o que funciona no seu ambiente
 work help             # menu com as ações, os atalhos e o que falta configurar
