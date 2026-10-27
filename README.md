@@ -37,9 +37,8 @@ cd workdeck
 Depois:
 
 ```bash
-$EDITOR ~/.config/workdeck/projects.conf   # seus projetos
-source ~/.zshrc                            # ou ~/.bashrc
-work
+source ~/.zshrc     # ou ~/.bashrc
+work                # na primeira vez, você escolhe os projetos
 ```
 
 O instalador detecta o sistema e o gerenciador de pacotes — brew no macOS,
@@ -150,7 +149,25 @@ Rode isso antes de abrir uma issue dizendo que algo não funciona.
 
 ## Os projetos
 
-Tudo vem de `~/.config/workdeck/projects.conf`, uma linha por janela:
+No primeiro `work`, ele procura os repositórios git da sua pasta pessoal (até 4
+níveis, sem `Library`, `node_modules` nem pastas ocultas) e mostra uma lista,
+dos mais usados para os menos:
+
+```
+  Escolha os projetos do seu work
+  ↑↓ move · espaço marca · a marca todos · enter confirma · q sai
+
+  [x] api                  ~/code/api                                 hoje
+  [x] web                  ~/code/web                                 ontem
+  [ ] blog                 ~/projetos/blog                            há 2 meses
+```
+
+Os cinco mais usados já vêm marcados; na maioria das vezes basta um
+<kbd>enter</kbd>. A escolha fica salva, e os próximos `work` abrem direto. Para
+mudar depois, `work escolher` mostra a lista de novo com os atuais marcados.
+
+A escolha vira `~/.config/workdeck/projects.conf`, uma linha por janela, que
+também dá para editar à mão:
 
 ```
 nome|caminho|comando opcional
@@ -171,14 +188,15 @@ A ordem do arquivo é a ordem das janelas, numeradas a partir de 1. Projeto que
 não existe no disco é pulado sem erro, então dá para deixar linhas de coisas
 que você ainda não clonou.
 
-**Para adicionar um projeto:** acrescente uma linha, feche a sessão com
-`work kill` e abra de novo com `work`. As janelas são criadas na abertura da
+**Para adicionar um projeto:** rode `work escolher`, ou acrescente uma linha,
+e depois feche a sessão com `work kill` e abra de novo com `work`. As janelas são criadas na abertura da
 sessão; sem fechar, a sessão antiga continua com a lista antiga.
 
 | Comando | O que faz |
 |---|---|
 | `work` | Abre a sessão, ou volta para ela |
 | `work api` | Abre e já vai para a janela `api` |
+| `work escolher` | Escolhe de novo os projetos |
 | `work kill` | Fecha a sessão inteira |
 
 Para usar outro nome de sessão: `export WORKDECK_SESSION=outro`.

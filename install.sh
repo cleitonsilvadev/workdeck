@@ -79,6 +79,10 @@ faz_backup() { # arquivo → imprime o caminho do backup, ou vazio
 # Troca o bloco entre os marcadores, ou acrescenta se ainda não existir.
 write_block() { # arquivo, conteúdo
   local file="$1" body="$2" tmp backup
+  if [ -e "$file" ] && [ ! -f "$file" ]; then
+    aviso "$(curto "$file") não é um arquivo comum; não mexi nele"
+    return 0
+  fi
   backup="$(faz_backup "$file")"
   [ -n "$backup" ] && say "cópia do original em ${backup#$HOME/}"
   # Arquivo que não existia: o uninstall apaga em vez de deixá-lo vazio.
@@ -98,8 +102,80 @@ write_block() { # arquivo, conteúdo
 
 # Compara conteúdo sem depender do cmp, que não vem em toda distribuição mínima.
 iguais() { [ "$(cksum < "$1")" = "$(cksum < "$2")" ]; }
-say() { printf '  %s\n' "$*"; }
-run() { [ "$DRY" = 1 ] && { say "[dry-run] $*"; return 0; }; "$@"; }
+BONITO=0
+if [ -t 1 ] && [ -z "${NO_COLOR:-}" ] && [ "${TERM:-dumb}" != dumb ] && [ "$DRY" = 0 ]; then BONITO=1; fi
+verde=""; amarelo=""; vermelho=""; roxo=""; dim=""; bold=""; reset=""
+if [ "$BONITO" = 1 ]; then
+  verde=$'\033[32m'; amarelo=$'\033[33m'; vermelho=$'\033[31m'; roxo=$'\033[35m'
+  dim=$'\033[2m'; bold=$'\033[1m'; reset=$'\033[0m'
+fi
+LOG="$(mktemp)"
+ETAPA=""; RESUMO=""; AVISOS=(); GIRO=""
+
+say() {
+  if [ "$BONITO" = 1 ]; then printf '%s\n' "$*" >> "$LOG"; else printf '  %s\n' "$*"; fi
+}
+aviso() {
+  [ "$BONITO" = 1 ] && AVISOS+=("$*")
+  say "$*"
+}
+resumo() { RESUMO="$*"; }
+curto() { case "$1" in "$HOME"/*) echo "~/${1#"$HOME"/}" ;; *) echo "$1" ;; esac; }
+run() {
+  [ "$DRY" = 1 ] && { say "[dry-run] $*"; return 0; }
+  if [ "$BONITO" = 1 ]; then "$@" >> "$LOG" 2>&1; else "$@"; fi
+}
+
+girar() {
+  [ "$BONITO" = 1 ] || return 0
+  (
+    quadros=(⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏); i=0
+    while :; do
+      printf '\r  %s%s%s %s' "$roxo" "${quadros[$((i % 10))]}" "$reset" "$ETAPA"
+      i=$((i + 1)); sleep 0.08
+    done
+  ) &
+  GIRO=$!
+}
+parar() {
+  if [ -n "$GIRO" ]; then
+    kill "$GIRO" 2>/dev/null || true
+    wait "$GIRO" 2>/dev/null || true
+    GIRO=""
+    printf '\r\033[K'
+  fi
+  return 0
+}
+etapa() {
+  ETAPA="$2"; RESUMO=""; AVISOS=()
+  if [ "$BONITO" = 1 ]; then girar; else echo "[$1/7] $2"; fi
+}
+concluir() {
+  local a marca largura
+  if [ "$BONITO" = 1 ]; then
+    parar
+    marca="${verde}✓${reset}"
+    [ ${#AVISOS[@]} -gt 0 ] && marca="${amarelo}!${reset}"
+    largura=$(printf '%s' "$ETAPA" | LC_ALL=C tr -d '\200-\277' | wc -c)
+    printf '  %s %s%*s %s%s%s\n' "$marca" "$ETAPA" $((14 - largura)) "" "$dim" "$RESUMO" "$reset"
+    for a in ${AVISOS[@]+"${AVISOS[@]}"}; do printf '      %s%s%s\n' "$amarelo" "$a" "$reset"; done
+  else
+    echo
+  fi
+  ETAPA=""
+}
+ao_sair() {
+  local status=$?
+  parar
+  if [ "$status" != 0 ] && [ "$BONITO" = 1 ] && [ -n "$ETAPA" ]; then
+    printf '  %s✗%s %s\n' "$vermelho" "$reset" "$ETAPA"
+    tail -n 15 "$LOG" | sed 's/^/      /'
+  fi
+  [ "$BONITO" = 1 ] && printf '\033[?25h'
+  rm -f "$LOG"
+}
+trap ao_sair EXIT
+[ "$BONITO" = 1 ] && exec 2>>"$LOG"
 
 terminal_atual() {
   if [ -n "${KITTY_WINDOW_ID:-}" ]; then echo kitty
@@ -168,11 +244,15 @@ FIM
   *) SO="$(uname -s)"; GERENCIADOR="" ;;
 esac
 
-echo "workdeck → $SO, tema $THEME"
-echo
+if [ "$BONITO" = 1 ]; then
+  printf '\033[?25l\n  %sworkdeck%s %s· %s · %s%s\n\n' "$bold" "$reset" "$dim" "$SO" "$THEME" "$reset"
+else
+  echo "workdeck → $SO, tema $THEME"
+  echo
+fi
 
 # ---- 1. dependências -------------------------------------------------------
-echo "[1/7] dependências"
+etapa 1 "dependências"
 falta=()
 command -v tmux >/dev/null || falta+=(tmux)
 command -v delta >/dev/null || falta+=(git-delta)
@@ -180,10 +260,13 @@ command -v delta >/dev/null || falta+=(git-delta)
 if [ ${#falta[@]} -eq 0 ]; then
   say "tmux e git-delta já instalados"
 elif [ "$DEPS" = 0 ]; then
-  say "faltando: ${falta[*]} — instale por conta (--no-deps)"
+  aviso "faltando: ${falta[*]} — instale por conta (--no-deps)"
 else
   # Como root (num container, por exemplo) não há sudo, nem precisa.
   sudo=""; [ "$(id -u)" != 0 ] && sudo="sudo"
+  if [ -n "$sudo" ] && [ "$GERENCIADOR" != brew ] && [ "$BONITO" = 1 ]; then
+    parar; sudo -v; girar
+  fi
   [ "$GERENCIADOR" = apt-get ] && { run $sudo apt-get update -qq || true; }
   for pacote in "${falta[@]}"; do
     [ "$GERENCIADOR" = apk ] && [ "$pacote" = git-delta ] && pacote=delta
@@ -194,43 +277,49 @@ else
       pacman)  instalar=($sudo pacman -S --needed --noconfirm "$pacote") ;;
       zypper)  instalar=($sudo zypper install -y "$pacote") ;;
       apk)     instalar=($sudo apk add "$pacote") ;;
-      *)       say "não reconheci o gerenciador de pacotes; instale: ${falta[*]}"; break ;;
+      *)       aviso "não reconheci o gerenciador de pacotes; instale: ${falta[*]}"; break ;;
     esac
     # O delta não existe em todo repositório (Debian 12, por exemplo). Sem ele
     # só o git review deixa de funcionar, então a instalação segue.
-    run "${instalar[@]}" || say "não consegui instalar $pacote pelo $GERENCIADOR; veja https://github.com/dandavison/delta"
+    run "${instalar[@]}" || aviso "não consegui instalar $pacote pelo $GERENCIADOR; veja https://github.com/dandavison/delta"
   done
 fi
-echo
+versoes=""
+command -v tmux >/dev/null && versoes="tmux $(tmux -V | awk '{print $2}')"
+command -v delta >/dev/null && versoes="${versoes:+$versoes · }delta $(delta --version | awk '{print $2}')"
+resumo "$versoes"
+concluir
 
 # ---- 2. scripts ------------------------------------------------------------
-echo "[2/7] scripts em $BIN_DIR"
+etapa 2 "scripts"
 run mkdir -p "$BIN_DIR"
+instalados=0
 for script in "$ROOT"/bin/*; do
   nome="$(basename "$script")"
   alvo="$BIN_DIR/$nome"
   if [ -f "$alvo" ] && ! iguais "$script" "$alvo" && ! grep -qxF "script|$alvo|" "$MANIFESTO" 2>/dev/null; then
-    say "$nome — já existe um $nome que não é do workdeck; não substituí"
+    aviso "$nome — já existe um $nome que não é do workdeck; não substituí"
     continue
   fi
   say "$nome"
   run install -m 755 "$script" "$alvo"
   anota script "$alvo"
+  instalados=$((instalados + 1))
 done
 case ":$PATH:" in
   *":$BIN_DIR:"*) ;;
   *) say "atenção: $BIN_DIR não está no PATH — o bloco do shell resolve isso" ;;
 esac
-echo
+resumo "$instalados comandos em $(curto "$BIN_DIR")"
+concluir
 
 # ---- 3. config do usuário --------------------------------------------------
-echo "[3/7] config em $CONFIG_DIR"
+etapa 3 "config"
 run mkdir -p "$CONFIG_DIR/panels"
 if [ -f "$CONFIG_DIR/projects.conf" ]; then
   say "projects.conf já existe — não toquei nele"
 else
-  run cp "$ROOT/projects.example.conf" "$CONFIG_DIR/projects.conf"
-  say "projects.conf criado — edite com os seus projetos"
+  say "projetos: o primeiro work mostra os seus repositórios para escolher"
 fi
 for painel in "$ROOT"/config/panels/*; do
   nome="$(basename "$painel")"
@@ -244,13 +333,15 @@ done
 run mkdir -p "${XDG_CONFIG_HOME:-$HOME/.config}/git-review"
 run cp "$ROOT/config/git-review-lesskey" "${XDG_CONFIG_HOME:-$HOME/.config}/git-review/lesskey"
 say "lesskey do git-review"
-echo
+resumo "$(curto "$CONFIG_DIR")"
+concluir
 
 # ---- 4. tmux e terminal ----------------------------------------------------
-echo "[4/7] tmux"
+etapa 4 "tmux"
 write_block "$HOME/.tmux.conf" \
   "$(sed '$d' "$ROOT/config/tmux.conf" | sed '/^# O tema entra aqui/d'; cat "$ROOT/themes/$THEME.tmux"; echo '# <<< workdeck <<<')"
 say "tmux.conf — Ctrl+b, mouse e atalhos em Alt"
+resumo "Ctrl+b, mouse e atalhos em Alt"
 
 case "$TERMINAL" in
   "")
@@ -272,6 +363,7 @@ case "$TERMINAL" in
     write_block "$HOME/.config/kitty/kitty.conf" \
       "$(sed '$d' "$ROOT/terminals/kitty.conf" | sed '/^# O tema entra aqui/d'; cat "$ROOT/themes/$THEME.conf"; echo '# <<< workdeck <<<')"
     say "kitty.conf — atalhos em cmd e as cores do tema"
+    resumo "Ctrl+b, mouse e Alt · kitty com cmd (reabra o kitty)"
     ;;
   wezterm|alacritty)
     say "o adaptador do $TERMINAL é um trecho para colar, não instalo automático:"
@@ -279,13 +371,13 @@ case "$TERMINAL" in
     say "o instalador não edita Lua nem TOML de terceiros — veja terminals/README.md"
     ;;
   *)
-    say "não tenho adaptador para '$TERMINAL'. Disponíveis: kitty, wezterm, alacritty"
+    aviso "não tenho adaptador para '$TERMINAL'. Disponíveis: kitty, wezterm, alacritty"
     ;;
 esac
-echo
+concluir
 
 # ---- 5. shell --------------------------------------------------------------
-echo "[5/7] shell"
+etapa 5 "shell"
 rc=""
 case "$(basename "${SHELL:-/bin/bash}")" in
   zsh)  rc="$HOME/.zshrc" ;;
@@ -295,21 +387,23 @@ esac
 if [ -n "$rc" ]; then
   write_block "$rc" "$(cat "$ROOT/config/shell-snippet.sh")"
   say "$(basename "$rc")"
+  resumo "$(curto "$rc")"
 else
-  say "shell '$SHELL' não reconhecido — adicione à mão:"
-  say "  source $ROOT/config/shell-snippet.sh"
+  aviso "shell '$SHELL' não reconhecido — adicione à mão: source $ROOT/config/shell-snippet.sh"
 fi
-echo
+concluir
 
 # ---- 6. agente de IA -------------------------------------------------------
-echo "[6/7] agente de IA"
+etapa 6 "agente de IA"
 agente_atual=""
 [ -f "$CONFIG_DIR/agent.conf" ] && agente_atual="$(. "$CONFIG_DIR/agent.conf"; echo "${AGENT_CMD:-}")"
 
 if [ -n "$AGENT" ]; then
   run "$BIN_DIR/workdeck-agent" --set "$AGENT" && say "agente: $AGENT"
+  resumo "$AGENT"
 elif [ -n "$agente_atual" ]; then
   say "agente já configurado: $agente_atual"
+  resumo "$agente_atual"
 else
   achados=()
   for c in claude codex copilot aider gemini opencode cursor-agent crush goose q; do
@@ -318,10 +412,13 @@ else
   if [ ${#achados[@]} -eq 0 ]; then
     say "nenhum agente de IA encontrado no PATH"
     say "quando tiver um: workdeck-agent --set <comando>"
+    resumo "nenhum no PATH; depois: workdeck-agent --set <comando>"
   elif [ "$YES" = 1 ] || [ ! -t 0 ]; then
     say "achei no PATH: ${achados[*]}"
     say "para escolher: workdeck-agent --set <comando>"
+    resumo "achei ${achados[*]}; escolha com workdeck-agent --set"
   else
+    parar
     echo
     echo "  Achei estes agentes de IA no seu PATH:"
     i=1; for a in "${achados[@]}"; do echo "    $i) $a"; i=$((i+1)); done
@@ -332,23 +429,29 @@ else
     if [ "${escolha:-0}" -ge 1 ] 2>/dev/null && [ "$escolha" -le "${#achados[@]}" ]; then
       run "$BIN_DIR/workdeck-agent" --set "${achados[$((escolha-1))]}" >/dev/null \
         && say "agente: ${achados[$((escolha-1))]}"
+      resumo "${achados[$((escolha-1))]}"
     else
       say "nenhum agente definido; depois use workdeck-agent --set <comando>"
+      resumo "nenhum; depois: workdeck-agent --set <comando>"
     fi
+    echo
   fi
 fi
-echo
+concluir
 
 # ---- 7. integrações opcionais ----------------------------------------------
-echo "[7/7] integrações"
+etapa 7 "integrações"
 if [ -z "$WITH" ]; then
   say "nenhuma pedida (--with <nome>); veja --list-integrations"
+  resumo "nenhuma (--with <nome>)"
 else
+  parar
+  resumo "$WITH"
   IFS=',' read -r -a pedidas <<< "$WITH"
   for nome in "${pedidas[@]}"; do
     arquivo="$ROOT/integrations/$nome.sh"
     if [ ! -f "$arquivo" ]; then
-      say "não conheço a integração '$nome'"
+      aviso "não conheço a integração '$nome'"
       continue
     fi
     (
@@ -371,38 +474,34 @@ else
     )
   done
 fi
-echo
+concluir
 
 if [ "$RELOAD" = 1 ] && command -v tmux >/dev/null && tmux info >/dev/null 2>&1; then
   run tmux source-file "$HOME/.tmux.conf" && say "tmux recarregado"
 fi
 
+if [ "$BONITO" = 1 ]; then
+  printf '\n  %s✓ pronto em %ss%s\n' "$verde" "$SECONDS" "$reset"
+else
+  echo "Pronto."
+fi
+
 cat <<FIM
 
-Pronto. Faltam três passos que são seus:
-
-  1. Edite os seus projetos:
-       \$EDITOR $CONFIG_DIR/projects.conf
-
-  2. Recarregue o shell:
+  Agora:
        source ${rc:-seu arquivo de shell}
-
-  3. Abra:
-       work
+       work              ${dim}na primeira vez, você escolhe os projetos${reset}
 
   Para navegar, clique no nome da janela na barra, ou use Ctrl+b e depois
-  1…9. Ctrl+b e uma seta troca de painel. A lista está no README.
-  Se instalou um adaptador de terminal, ele precisa reabrir.
-
-  Para ver o que funciona no seu ambiente e o que não vai funcionar:
-       workdeck-doctor
+  1…9. Ctrl+b e uma seta troca de painel. Para mudar os projetos: work escolher
+  Diagnóstico: workdeck-doctor
 FIM
 
 if [ -n "$AVISO_OPTION" ]; then
   cat <<FIM
 
-  Dica, opcional: para atalhos de uma tecla só (Alt+2 em vez de Ctrl+b 2),
-  a tecla Option do Mac precisa funcionar como Alt:
+  ${dim}Dica, opcional: para atalhos de uma tecla só (Alt+2 em vez de Ctrl+b 2),
+  a tecla Option do Mac precisa funcionar como Alt:${reset}
        $AVISO_OPTION
 FIM
 fi
