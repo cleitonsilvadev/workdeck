@@ -1,9 +1,57 @@
-# workdeck — atalhos cmd traduzidos para o prefixo do tmux (Ctrl+b = \x02).
-# Cole dentro da sua config do Alacritty, em ~/.config/alacritty/alacritty.toml.
-# No Linux troque "Command" por "Alt" — ou não use isto, já que lá os atalhos
-# em Alt do tmux funcionam direto.
-#
-# \u0002 é o Ctrl+b. O caractere depois dele é o comando do tmux.
+# workdeck no Alacritty: tema, fonte e atalhos cmd traduzidos para o tmux.
+# Cole na sua config, em ~/.config/alacritty/alacritty.toml.
+# \u0002 é o Ctrl+b; o caractere depois dele é a tecla do workdeck.
+# No Linux, tire os [[keyboard.bindings]]: lá o tmux já recebe tudo.
+
+[window]
+padding = { x = 8, y = 8 }
+option_as_alt = "OnlyLeft"
+
+[font]
+normal = { family = "JetBrains Mono" }
+size = 13.0
+
+[colors.primary]
+background = "#1e1e2e"
+foreground = "#cdd6f4"
+
+[colors.cursor]
+text = "#1e1e2e"
+cursor = "#f5e0dc"
+
+[colors.selection]
+text = "#cdd6f4"
+background = "#45475a"
+
+[colors.normal]
+black = "#45475a"
+red = "#f38ba8"
+green = "#a6e3a1"
+yellow = "#f9e2af"
+blue = "#89b4fa"
+magenta = "#f5c2e7"
+cyan = "#94e2d5"
+white = "#bac2de"
+
+[colors.bright]
+black = "#585b70"
+red = "#f38ba8"
+green = "#a6e3a1"
+yellow = "#f9e2af"
+blue = "#89b4fa"
+magenta = "#f5c2e7"
+cyan = "#94e2d5"
+white = "#a6adc8"
+
+[[keyboard.bindings]]
+key = "H"
+mods = "Command"
+chars = "\u0002h"
+
+[[keyboard.bindings]]
+key = "Enter"
+mods = "Command"
+chars = "\u0002\r"
 
 [[keyboard.bindings]]
 key = "T"
@@ -28,7 +76,7 @@ chars = "\u00023"
 [[keyboard.bindings]]
 key = "D"
 mods = "Command"
-chars = "\u0002|"
+chars = "\u0002v"
 
 [[keyboard.bindings]]
 key = "D"
@@ -39,5 +87,3 @@ chars = "\u0002-"
 key = "Z"
 mods = "Command|Shift"
 chars = "\u0002z"
-
-# Siga o mesmo padrão para 4 a 9 e para as demais teclas.

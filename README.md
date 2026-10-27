@@ -328,7 +328,8 @@ instalador e o `workdeck-doctor` dizem onde fica:
 
 No Mac, `cmd` nunca chega ao tmux: o sistema intercepta antes. Se você quer
 `cmd+1` em vez de `Alt+1`, o terminal precisa traduzir. Há adaptadores prontos
-em `terminals/` para kitty, WezTerm e Alacritty — veja `terminals/README.md`.
+em `terminals/` para kitty, Ghostty, WezTerm e Alacritty, com o tema e a fonte
+do workdeck — veja `terminals/README.md`.
 Só o kitty é instalado automaticamente:
 
 ```bash

@@ -384,16 +384,20 @@ case "$TERMINAL" in
   kitty)
     write_block "$HOME/.config/kitty/kitty.conf" \
       "$(sed '$d' "$ROOT/terminals/kitty.conf" | sed '/^# O tema entra aqui/d'; cat "$ROOT/themes/$THEME.conf"; echo '# <<< workdeck <<<')"
-    say "kitty.conf — atalhos em cmd e as cores do tema"
-    resumo "Ctrl+b, mouse e Alt · kitty com cmd (reabra o kitty)"
+    say "kitty.conf — tema, fonte, Option como Alt e atalhos em cmd"
+    resumo "Ctrl+b, mouse e Alt · kitty com tema e cmd (reabra o kitty)"
+    if [ "$SO" = macOS ] && ! ls ~/Library/Fonts /Library/Fonts 2>/dev/null | grep -qi jetbrains; then
+      aviso "a fonte JetBrains Mono não está instalada; para ela: brew install --cask font-jetbrains-mono"
+    fi
     ;;
-  wezterm|alacritty)
+  wezterm|alacritty|ghostty)
     say "o adaptador do $TERMINAL é um trecho para colar, não instalo automático:"
     say "  $ROOT/terminals/$TERMINAL.*"
     say "o instalador não edita Lua nem TOML de terceiros — veja terminals/README.md"
+    resumo "Ctrl+b, mouse e Alt · cole terminals/$TERMINAL.* para tema e cmd"
     ;;
   *)
-    aviso "não tenho adaptador para '$TERMINAL'. Disponíveis: kitty, wezterm, alacritty"
+    aviso "não tenho adaptador para '$TERMINAL'. Disponíveis: kitty, ghostty, wezterm, alacritty"
     ;;
 esac
 concluir

@@ -1,17 +1,27 @@
--- workdeck — atalhos cmd traduzidos para o prefixo do tmux (Ctrl+b = \x02).
--- Cole dentro da sua config do WezTerm, em ~/.wezterm.lua.
--- No Linux e no Windows troque "CMD" por "ALT" — ou não use isto, já que lá
--- os atalhos em Alt do tmux funcionam direto.
+-- workdeck no WezTerm: tema, fonte e atalhos cmd traduzidos para o tmux.
+-- Cole dentro da sua config, em ~/.wezterm.lua, ou use como ponto de partida.
+-- \x02 é o Ctrl+b; o caractere depois dele é a tecla do workdeck.
+-- No Linux e no Windows, tire a parte de keys: lá o tmux já recebe tudo.
 
 local wezterm = require 'wezterm'
 local act = wezterm.action
 
-local function tmux(suffix)
-  return act.SendString('\x02' .. suffix)
+local function tmux(tecla)
+  return act.SendString('\x02' .. tecla)
 end
 
 return {
+  color_scheme = 'Catppuccin Mocha',
+  font = wezterm.font_with_fallback { 'JetBrains Mono', 'Menlo' },
+  font_size = 13.0,
+  line_height = 1.1,
+  window_padding = { left = 8, right = 8, top = 8, bottom = 8 },
+  hide_tab_bar_if_only_one_tab = true,
+  send_composed_key_when_left_alt_is_pressed = false,
+
   keys = {
+    { key = 'h', mods = 'CMD', action = tmux('h') },
+    { key = 'Enter', mods = 'CMD', action = tmux('\r') },
     { key = 't', mods = 'CMD', action = tmux('c') },
     { key = '1', mods = 'CMD', action = tmux('1') },
     { key = '2', mods = 'CMD', action = tmux('2') },
@@ -24,7 +34,7 @@ return {
     { key = '9', mods = 'CMD', action = tmux('9') },
     { key = '[', mods = 'CMD', action = tmux('p') },
     { key = ']', mods = 'CMD', action = tmux('n') },
-    { key = 'd', mods = 'CMD', action = tmux('|') },
+    { key = 'd', mods = 'CMD', action = tmux('v') },
     { key = 'd', mods = 'CMD|SHIFT', action = tmux('-') },
     { key = 'Enter', mods = 'CMD|SHIFT', action = tmux('z') },
     { key = 'w', mods = 'CMD|SHIFT', action = tmux('x') },
