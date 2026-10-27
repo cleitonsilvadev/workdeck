@@ -255,31 +255,15 @@ Nada disso é necessário. É conforto, e só no Mac.
 O git expõe qualquer executável `git-algo` do PATH como `git algo`, então o
 comando funciona sem alias nenhum.
 
-| Comando | Mostra |
-|---|---|
-| `git review` | O que ainda não foi commitado, incluindo arquivos novos |
-| `git review branch` | O que a branch tem a mais que a `origin/dev` (ou `develop`) |
-| `git review qa` | O mesmo, comparando com a `origin/qa` |
-| `git review qa src/` | Só os arquivos dentro do caminho |
-| `git review --stat` | Só o resumo, sem o código |
-| `git review --force` | Roda mesmo com teste ou build pesado em andamento |
+`git review` mostra o que ainda não foi commitado, incluindo arquivos novos.
 
 Dentro do diff: <kbd>espaço</kbd> pula para o próximo arquivo, <kbd>b</kbd>
 volta, setas rolam, <kbd>q</kbd> sai. Acima de 160 colunas ele abre lado a lado
 sozinho.
 
-**Duas decisões que valem conhecer.** Ele se recusa a rodar quando detecta
-jest, vitest, cypress, tsc, eslint, vite build, storybook ou playwright
-disparados por node na linha de comando: é um diff com syntax highlight, e
-junto de uma suíte rodando ele trava a máquina. Servidores de linguagem do
-editor são filtrados de propósito, senão a trava pegaria sempre. Ele também
-barra quando a pressão de memória do macOS está crítica. `--stat` e `--force`
-passam por cima das duas.
-
 ### Configurando
 
-Sem configuração, ele compara com `origin/main`, `origin/master`, `origin/develop`
-ou `origin/dev` — a primeira que existir. Para mudar isso e o resto:
+Para mudar o layout ou o tema:
 
 ```bash
 cp config/git-review.example.conf ~/.config/workdeck/git-review.conf
@@ -287,11 +271,8 @@ cp config/git-review.example.conf ~/.config/workdeck/git-review.conf
 
 | Variável | Padrão |
 |---|---|
-| `BASE_BRANCHES` | `origin/main origin/master origin/develop origin/dev` |
 | `SIDE_BY_SIDE_MIN_COLS` | `160` |
 | `DELTA_SYNTAX_THEME` | vazio (o delta decide, e respeita `BAT_THEME`) |
-| `GUARD_HEAVY_JOBS` | `1` |
-| `HEAVY_JOBS_PATTERN` | runners de JS, Python, Rust, Go, Java, PHP e Ruby |
 
 ---
 
@@ -433,7 +414,6 @@ Quase tudo aqui é para ser trocado. O resumo:
 | Os atalhos `cmd` no Mac | `terminals/kitty.conf` | `./install.sh --terminal kitty` |
 | As cores | `themes/<nome>.conf` e `.tmux` | `./install.sh --theme <nome>` |
 | O que aparece no painel | `~/.config/workdeck/panels/` | nada, ele relê sozinho |
-| A branch base do `git review` | `bin/git-review`, em `base_candidates` | `./install.sh` |
 | O nome da sessão | `export WORKDECK_SESSION=outro` | — |
 | Algo que não existe aqui | escreva em `bin/` | `./install.sh` |
 

@@ -3,11 +3,6 @@
 #
 # Uso:
 #   git review              o que ainda não foi commitado (staged, unstaged e novos)
-#   git review branch       o que a sua branch tem a mais que a branch base
-#   git review main|qa|…    o mesmo, comparando com essa branch
-#   git review <caminho>    só os arquivos dentro de <caminho>
-#   git review --stat       só o resumo, sem o código
-#   git review --force      roda mesmo com teste ou build pesado em andamento
 #   git review -h           esta ajuda
 #
 # Dentro do diff: espaço pula para o próximo arquivo · b volta · setas rolam · q sai.
@@ -16,120 +11,47 @@
 set -uo pipefail
 
 # ---- valores padrão, todos substituíveis pela config -----------------------
-BASE_BRANCHES="origin/main origin/master origin/develop origin/dev"
 SIDE_BY_SIDE_MIN_COLS=160
 DELTA_SYNTAX_THEME=""        # vazio: deixa o delta decidir (respeita BAT_THEME)
-GUARD_HEAVY_JOBS=1
-HEAVY_JOBS_PATTERN='jest|vitest|cypress|playwright|tsc -b|eslint|vite build|storybook build|pytest|cargo test|cargo build|go test|gradle|mvn |phpunit|rspec'
 
 CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/workdeck/git-review.conf"
 [ -f "$CONFIG" ] && . "$CONFIG"
 
+case "${1:-}" in
+  "") ;;
+  -h|help|--help) sed -n '2,9p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+  *) echo "opção desconhecida: $1 (veja git review -h)"; exit 1 ;;
+esac
+
 git rev-parse --is-inside-work-tree >/dev/null 2>&1 || { echo "não é um repositório git"; exit 1; }
 command -v delta >/dev/null || { echo "instale o delta: https://github.com/dandavison/delta"; exit 1; }
 
-mode="worktree"
-read -r -a base_candidates <<< "$BASE_BRANCHES"
-stat_only=0
-force=0
-paths=()
-
-for arg in "$@"; do
-  case "$arg" in
-    branch|-b) mode="branch" ;;
-    --stat) stat_only=1 ;;
-    --force|-f) force=1 ;;
-    -h|help|--help) sed -n '2,15p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
-    *)
-      # Um caminho que existe é sempre um caminho. Senão, se for uma branch
-      # conhecida (remota ou local), vira a base da comparação.
-      if [ -e "$arg" ]; then
-        paths+=("$arg")
-      elif git rev-parse --verify -q "origin/$arg" >/dev/null 2>&1; then
-        mode="branch"; base_candidates=("origin/$arg")
-      elif git rev-parse --verify -q "$arg" >/dev/null 2>&1; then
-        mode="branch"; base_candidates=("$arg")
-      else
-        paths+=("$arg")
-      fi
-      ;;
-  esac
-done
-
-# ---- trava contra travar a máquina -----------------------------------------
-# Só conta o que de fato come CPU: um runner disparado na linha de comando.
-# Editores carregam "eslint" e "tsc" em servidores de linguagem que vivem o
-# tempo todo, e contá-los faria a trava bloquear sempre que o editor estivesse
-# aberto. Desligue com GUARD_HEAVY_JOBS=0 na config.
-heavy_jobs() {
-  pgrep -fl "$HEAVY_JOBS_PATTERN" 2>/dev/null \
-    | grep -v -e 'git-review' -e 'pgrep' \
-    | grep -v -e 'Code Helper' -e 'Visual Studio Code' -e 'Cursor' -e 'Electron' \
-              -e 'JetBrains' -e 'language-server' -e 'tsserver' -e 'extensionHost' \
-    | awk '{$1=""; print substr($0, 2, 90)}'
-}
-
-memory_critical() {
-  # macOS: 1 normal, 2 aviso, 4 crítico. Em Linux não há equivalente simples.
-  local nivel
-  nivel=$(sysctl -n kern.memorystatus_vm_pressure_level 2>/dev/null) || return 1
-  [ "${nivel:-1}" -ge 4 ]
-}
-
-if [ "$GUARD_HEAVY_JOBS" = 1 ] && [ "$force" = 0 ] && [ "$stat_only" = 0 ]; then
-  jobs_running=$(heavy_jobs)
-  mem=0; memory_critical && mem=1
-  if [ -n "$jobs_running" ] || [ "$mem" = 1 ]; then
-    echo "git review parado para não travar a máquina."
-    [ -n "$jobs_running" ] && { echo "Rodando agora:"; echo "$jobs_running" | sort -u | head -5 | sed 's/^/  • /'; }
-    [ "$mem" = 1 ] && echo "A memória está em pressão crítica."
-    echo "Espere terminar, ou use: git review --stat (leve) · git review --force (roda mesmo assim)"
-    exit 2
-  fi
-fi
-
-bold=$'\e[1m'; dim=$'\e[2m'; cyan=$'\e[36m'; green=$'\e[32m'; red=$'\e[31m'; yellow=$'\e[33m'; reset=$'\e[0m'
+bold=$'\e[1m'; dim=$'\e[2m'; cyan=$'\e[36m'; green=$'\e[32m'; red=$'\e[31m'; reset=$'\e[0m'
 
 branch=$(git branch --show-current 2>/dev/null)
-base_ref="HEAD"
-base_label="último commit"
-if [ "$mode" = "branch" ]; then
-  for candidate in "${base_candidates[@]}"; do
-    if git rev-parse --verify -q "$candidate" >/dev/null; then
-      base_ref=$(git merge-base HEAD "$candidate")
-      base_label="$candidate (desde $(git rev-parse --short "$base_ref"))"
-      break
-    fi
-  done
-  [ "$base_ref" = "HEAD" ] && base_label="último commit (nenhuma de ${base_candidates[*]} existe)"
-fi
 
 untracked=()
 while IFS= read -r file; do
   [ -n "$file" ] && untracked+=("$file")
-done < <(git ls-files --others --exclude-standard -- "${paths[@]+"${paths[@]}"}")
+done < <(git ls-files --others --exclude-standard)
 
 render_diff() {
-  git -c color.diff=always diff "$base_ref" -- "${paths[@]+"${paths[@]}"}"
+  git -c color.diff=always diff HEAD
   for file in "${untracked[@]+"${untracked[@]}"}"; do
     git -c color.diff=always diff --no-index -- /dev/null "$file"
   done
 }
 
 header() {
-  echo "${bold}${cyan}git review${reset}  ${bold}${branch:-HEAD destacado}${reset}  ${dim}comparando com: ${base_label}${reset}"
-  if [ "$mode" = "branch" ] && [ "$base_ref" != "HEAD" ]; then
-    echo "${dim}$(git rev-list --count "$base_ref"..HEAD) commit(s) na branch${reset}"
-    git log --oneline --no-decorate "$base_ref"..HEAD | sed "s/^/  ${yellow}•${reset} /"
-  fi
+  echo "${bold}${cyan}git review${reset}  ${bold}${branch:-HEAD destacado}${reset}  ${dim}comparando com: último commit${reset}"
   echo
-  git -c color.diff=always diff --stat=120 "$base_ref" -- "${paths[@]+"${paths[@]}"}" | sed '$d'
+  git -c color.diff=always diff --stat=120 HEAD | sed '$d'
   for file in "${untracked[@]+"${untracked[@]}"}"; do
     lines=$(wc -l < "$file" 2>/dev/null | tr -d ' ')
     printf " %s ${green}(novo, %s linhas)${reset}\n" "$file" "${lines:-0}"
   done
   read -r files added removed < <(
-    { git diff --numstat "$base_ref" -- "${paths[@]+"${paths[@]}"}"
+    { git diff --numstat HEAD
       for file in "${untracked[@]+"${untracked[@]}"}"; do
         printf "%s\t0\t%s\n" "$(wc -l < "$file" 2>/dev/null | tr -d ' ')" "$file"
       done
@@ -139,14 +61,9 @@ header() {
   echo "${bold}${files} arquivo(s)${reset}  ${green}+${added}${reset}  ${red}-${removed}${reset}  ${dim}(${#untracked[@]} novo(s))${reset}"
 }
 
-if [ "$(git diff --name-only "$base_ref" -- "${paths[@]+"${paths[@]}"}" | wc -l)" -eq 0 ] && [ ${#untracked[@]} -eq 0 ]; then
+if [ "$(git diff --name-only HEAD | wc -l)" -eq 0 ] && [ ${#untracked[@]} -eq 0 ]; then
   header
   echo "${dim}nada mudou${reset}"
-  exit 0
-fi
-
-if [ "$stat_only" = 1 ]; then
-  header
   exit 0
 fi
 
