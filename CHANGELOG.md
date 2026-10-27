@@ -3,6 +3,15 @@
 O `work update` mostra o trecho da versão nova antes de perguntar se quer
 atualizar. Cada versão é uma tag `vX.Y.Z`.
 
+## v1.0.1
+
+- Instalação numa linha, sem clonar: curl … instalar.sh | bash.
+- `work install` roda a instalação de novo com opções (--theme, --terminal).
+- O fundo da tela fica na cor do tema em qualquer terminal, não só no kitty.
+- O terminal do painel abre com 8 linhas no tamanho real da janela.
+- Corrige o erro "missing or unsuitable terminal: xterm-kitty".
+- `work uninstall --all` apaga também a cópia do código.
+
 ## v1.0.0
 
 - `work add <caminho>` acrescenta um projeto; fechar a janela tira ele do work.
