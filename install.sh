@@ -411,12 +411,12 @@ else
   done
   if [ ${#achados[@]} -eq 0 ]; then
     say "nenhum agente de IA encontrado no PATH"
-    say "quando tiver um: workdeck-agent --set <comando>"
-    resumo "nenhum no PATH; depois: workdeck-agent --set <comando>"
+    say "quando tiver um: work agent <comando>"
+    resumo "nenhum no PATH; depois: work agent <comando>"
   elif [ "$YES" = 1 ] || [ ! -t 0 ]; then
     say "achei no PATH: ${achados[*]}"
-    say "para escolher: workdeck-agent --set <comando>"
-    resumo "achei ${achados[*]}; escolha com workdeck-agent --set"
+    say "para escolher: work agent <comando>"
+    resumo "achei ${achados[*]}; escolha com work agent <comando>"
   else
     parar
     echo
@@ -431,8 +431,8 @@ else
         && say "agente: ${achados[$((escolha-1))]}"
       resumo "${achados[$((escolha-1))]}"
     else
-      say "nenhum agente definido; depois use workdeck-agent --set <comando>"
-      resumo "nenhum; depois: workdeck-agent --set <comando>"
+      say "nenhum agente definido; depois use work agent <comando>"
+      resumo "nenhum; depois: work agent <comando>"
     fi
     echo
   fi
@@ -495,7 +495,7 @@ cat <<FIM
   Para navegar: Shift+← / Shift+→ troca de janela, Shift+↑ / Shift+↓ troca de
   painel, e Ctrl+b e depois 1…9 vai direto para uma janela. Clicar na barra
   também funciona. Para mudar os projetos: work escolher
-  Ajuda a qualquer hora: workdeck-help, ou Ctrl+b e h dentro do work.
+  Ajuda a qualquer hora: work help, ou Ctrl+b e h dentro do work.
 FIM
 
 if [ -n "$AVISO_OPTION" ]; then

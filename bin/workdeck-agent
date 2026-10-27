@@ -18,7 +18,7 @@ carrega() { AGENT_CMD=""; AGENT_SPLIT="${AGENT_SPLIT:-h}"; [ -f "$CONFIG" ] && .
 
 case "${1:-}" in
   --set)
-    cmd="${2:?use: workdeck-agent --set <comando>}"
+    cmd="${2:?use: work agent <comando>}"
     nome="${cmd%% *}"
     command -v "$nome" >/dev/null || {
       echo "'$nome' não está no PATH. Instale primeiro, ou use outro comando."
@@ -48,7 +48,7 @@ FIM
     [ "$achou" = 0 ] && echo "  nenhum"
     echo
     echo "Qualquer CLI serve, não só estas. Para definir:"
-    echo "  workdeck-agent --set <comando>"
+    echo "  work agent <comando>"
     exit 0
     ;;
   -h|--help)
@@ -59,7 +59,7 @@ esac
 
 carrega
 if [ -z "$AGENT_CMD" ] && [ ! -t 1 ] && [ -n "${TMUX:-}" ]; then
-  tmux display-message -d 6000 "nenhum agente de IA configurado — rode: workdeck-agent --set <comando>"
+  tmux display-message -d 6000 "nenhum agente de IA configurado — rode: work agent <comando>"
   exit 0
 fi
 if [ -z "$AGENT_CMD" ]; then
@@ -72,7 +72,7 @@ fi
 nome="${AGENT_CMD%% *}"
 if ! command -v "$nome" >/dev/null; then
   if [ ! -t 1 ] && [ -n "${TMUX:-}" ]; then
-    tmux display-message -d 6000 "'$nome' não está no PATH — instale ou troque com workdeck-agent --set"
+    tmux display-message -d 6000 "'$nome' não está no PATH — instale ou troque com work agent <comando>"
     exit 0
   fi
   echo "'$nome' não está no PATH"

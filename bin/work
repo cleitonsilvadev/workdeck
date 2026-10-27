@@ -5,6 +5,11 @@
 #      work <janela>    abre e já vai para a janela com esse nome
 #      work escolher    escolhe de novo os projetos da sessão
 #      work kill        fecha a sessão inteira
+#      work help        comandos, atalhos e o que falta configurar
+#      work doctor      diz o que funciona no seu ambiente
+#      work agent [cmd] mostra o agente de IA, ou define qual é
+#      work review      revisa o que ainda não foi commitado
+#      work painel      abre o painel de contexto
 #
 # Os projetos vêm de ~/.config/workdeck/projects.conf — uma linha por janela.
 set -euo pipefail
@@ -198,6 +203,35 @@ escolher() {
   echo "$marcados projetos salvos em $CONFIG"
 }
 
+case "${1:-}" in
+  help|-h|--help) exec workdeck-help ;;
+  doctor) shift; exec workdeck-doctor "$@" ;;
+  review) shift; exec git-review "$@" ;;
+  agent)
+    shift
+    case "${1:-}" in
+      "") exec workdeck-agent --show ;;
+      -*) exec workdeck-agent "$@" ;;
+      *) exec workdeck-agent --set "$*" ;;
+    esac ;;
+  painel)
+    if ! tmux has-session -t "$SESSION" 2>/dev/null; then
+      echo "sessão $SESSION não está aberta; rode: work"
+      exit 1
+    fi
+    if tmux list-windows -t "$SESSION" -F '#W' | grep -qx painel; then
+      tmux respawn-pane -k -t "$SESSION:painel" -c "$HOME" work-panel
+    else
+      tmux new-window -d -t "$SESSION:" -n painel -c "$HOME" work-panel
+    fi
+    if [ -n "${TMUX:-}" ]; then
+      tmux switch-client -t "$SESSION" \; select-window -t "$SESSION:painel"
+    else
+      tmux select-window -t "$SESSION:painel" && tmux attach -t "$SESSION"
+    fi
+    exit 0 ;;
+esac
+
 if [ "${1:-}" = "kill" ]; then
   if tmux has-session -t "$SESSION" 2>/dev/null; then
     tmux kill-session -t "$SESSION"
@@ -245,7 +279,14 @@ if ! tmux has-session -t "$SESSION" 2>/dev/null; then
   tmux select-window -t "$SESSION:1"
 fi
 
-[ $# -gt 0 ] && tmux select-window -t "$SESSION:$1"
+if [ $# -gt 0 ]; then
+  if ! tmux list-windows -t "$SESSION" -F '#W' | grep -qxF "$1"; then
+    echo "não há janela '$1' na sessão $SESSION. Janelas: $(tmux list-windows -t "$SESSION" -F '#W' | tr '\n' ' ')"
+    echo "comandos: work help"
+    exit 1
+  fi
+  tmux select-window -t "$SESSION:$1"
+fi
 
 if [ -n "${TMUX:-}" ]; then
   tmux switch-client -t "$SESSION"

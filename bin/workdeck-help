@@ -24,11 +24,12 @@ item "work" "abre a sessão, ou volta para ela"
 item "work <janela>" "abre e vai direto para a janela"
 item "work escolher" "escolhe de novo os projetos"
 item "work kill" "fecha a sessão inteira"
+item "work review" "revisa o que ainda não foi commitado (ou git review)"
+item "work painel" "abre o painel de contexto"
+item "work agent <cmd>" "define o agente de IA; sem nada, mostra o atual"
 item "ai" "abre o agente de IA num pane ao lado"
-item "git review" "revisa o que ainda não foi commitado"
-item "painel" "abre o painel de contexto"
-item "workdeck-doctor" "diz o que funciona no seu ambiente"
-item "workdeck-help" "esta ajuda"
+item "work doctor" "diz o que funciona no seu ambiente"
+item "work help" "esta ajuda"
 
 titulo "Navegar"
 item "Shift+← / Shift+→" "janela anterior / próxima"
@@ -63,7 +64,7 @@ if [ -n "$AGENT_CMD" ]; then
 else
   falta "nenhum agente de IA configurado. Para ligar um:"
   printf '        1. instale o agente que quiser, pelo método dele (claude, codex, aider, gemini…)\n'
-  printf '        2. workdeck-agent --set <comando>\n'
+  printf '        2. work agent <comando>\n'
   printf '        3. ai, ou Ctrl+b e a\n'
 fi
 

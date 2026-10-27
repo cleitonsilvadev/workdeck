@@ -18,11 +18,12 @@ terminal. macOS e Linux; no Windows, pelo WSL.
 
 ```bash
 work                  # abre a sessão, uma janela por projeto
+work agent claude     # define o seu agente de IA
 ai                    # abre o agente num pane ao lado
-git review            # revisa o que ele escreveu
-painel                # abre o painel de contexto
-workdeck-doctor       # diz o que funciona no seu ambiente
-workdeck-help         # comandos, atalhos e o que falta configurar
+work review           # revisa o que ele escreveu (o mesmo que git review)
+work painel           # abre o painel de contexto
+work doctor           # diz o que funciona no seu ambiente
+work help             # comandos, atalhos e o que falta configurar
 ```
 
 ---
@@ -83,9 +84,9 @@ O workdeck não traz nenhum agente. Ele abre o comando que você indicar, num
 pane ao lado do seu shell, já na pasta do projeto.
 
 ```bash
-workdeck-agent --list           # procura agentes conhecidos no PATH
-workdeck-agent --set claude     # define o seu
-workdeck-agent --show           # ver o atual
+work agent --list               # procura agentes conhecidos no PATH
+work agent claude               # define o seu
+work agent                      # mostra o atual
 ai                              # abre num pane ao lado
 ```
 
@@ -93,13 +94,13 @@ ai                              # abre num pane ao lado
 mãos do teclado.
 
 **Sem agente na instalação?** Não precisa instalar de novo. Instale o agente que
-quiser pelo método dele, rode `workdeck-agent --set <comando>` e abra com `ai`.
-O `workdeck-help` mostra se falta esse passo.
+quiser pelo método dele, rode `work agent <comando>` e abra com `ai`.
+O `work help` mostra se falta esse passo.
 
 O comando pode ter argumentos:
 
 ```bash
-workdeck-agent --set "aider --no-auto-commits"
+work agent "aider --no-auto-commits"
 ```
 
 Na instalação, se você não passar `--agent`, ele procura no seu PATH e pergunta
@@ -203,6 +204,14 @@ sessão; sem fechar, a sessão antiga continua com a lista antiga.
 | `work api` | Abre e já vai para a janela `api` |
 | `work escolher` | Escolhe de novo os projetos |
 | `work kill` | Fecha a sessão inteira |
+| `work help` | Comandos, atalhos e o que falta configurar |
+| `work doctor` | Diz o que funciona no seu ambiente |
+| `work agent <cmd>` | Define o agente de IA; sem nada, mostra o atual |
+| `work review` | O mesmo que `git review` |
+| `work painel` | Abre o painel de contexto |
+
+`help`, `doctor`, `agent`, `review`, `painel`, `escolher` e `kill` são palavras
+reservadas: uma janela com um desses nomes não é aberta por `work <nome>`.
 
 Para usar outro nome de sessão: `export WORKDECK_SESSION=outro`.
 
