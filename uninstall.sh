@@ -78,6 +78,23 @@ if [ -f "$MANIFESTO" ]; then
           say "deixei ${alvo#$HOME/}: foi alterado depois da instalação"
         fi
         ;;
+      terminal-app)
+        chave=":Window Settings:$alvo:useOptionAsMetaKey"
+        if [ "$DRY" = 1 ]; then
+          say "[dry-run] desfaria Option como Meta no perfil $alvo do Terminal.app"
+        else
+          tmp="$(mktemp)"
+          defaults export com.apple.Terminal "$tmp"
+          if [ "$backup" = ausente ]; then
+            /usr/libexec/PlistBuddy -c "Delete '$chave'" "$tmp" 2>/dev/null || true
+          else
+            /usr/libexec/PlistBuddy -c "Set '$chave' $backup" "$tmp" 2>/dev/null || true
+          fi
+          defaults import com.apple.Terminal "$tmp"
+          rm -f "$tmp"
+          say "Terminal.app: Option voltou ao que era no perfil $alvo"
+        fi
+        ;;
     esac
   done < "$MANIFESTO"
 else

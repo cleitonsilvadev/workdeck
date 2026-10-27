@@ -100,6 +100,39 @@ iguais() { [ "$(cksum < "$1")" = "$(cksum < "$2")" ]; }
 say() { printf '  %s\n' "$*"; }
 run() { [ "$DRY" = 1 ] && { say "[dry-run] $*"; return 0; }; "$@"; }
 
+option_como_meta() {
+  local dominio="com.apple.Terminal" pb=/usr/libexec/PlistBuddy perfil chave atual tmp r
+  perfil="$(defaults read "$dominio" "Default Window Settings" 2>/dev/null || echo Basic)"
+  chave=":Window Settings:$perfil:useOptionAsMetaKey"
+  tmp="$(mktemp)"
+  defaults export "$dominio" "$tmp"
+  atual="$("$pb" -c "Print '$chave'" "$tmp" 2>/dev/null || echo ausente)"
+  if [ "$atual" = true ]; then
+    say "Terminal.app: Option já funciona como Alt no perfil $perfil"
+    rm -f "$tmp"; return 0
+  fi
+  if [ "$YES" = 0 ] && [ -t 0 ]; then
+    printf '  O Terminal.app precisa de "Option como Meta" para os atalhos em Alt.\n'
+    printf '  Ligar agora no perfil %s? [S/n] ' "$perfil"
+    read -r r || r=n
+    case "${r:-s}" in s|S|y|Y) ;; *)
+      say "não liguei; ative em Ajustes → Perfis → Teclado → Usar Option como tecla Meta"
+      rm -f "$tmp"; return 0 ;;
+    esac
+  fi
+  if [ "$DRY" = 1 ]; then say "[dry-run] ligaria Option como Meta no perfil $perfil"; rm -f "$tmp"; return 0; fi
+  "$pb" -c "Add ':Window Settings' dict" "$tmp" 2>/dev/null || true
+  if "$pb" -c "Add ':Window Settings:$perfil' dict" "$tmp" 2>/dev/null; then
+    "$pb" -c "Add ':Window Settings:$perfil:name' string '$perfil'" \
+          -c "Add ':Window Settings:$perfil:type' string 'Window Settings'" "$tmp"
+  fi
+  "$pb" -c "Set '$chave' true" "$tmp" 2>/dev/null || "$pb" -c "Add '$chave' bool true" "$tmp"
+  defaults import "$dominio" "$tmp"
+  rm -f "$tmp"
+  anota terminal-app "$perfil" "$atual"
+  say "Terminal.app: Option ligado como Alt no perfil $perfil — feche e abra o Terminal"
+}
+
 [ -f "$ROOT/themes/$THEME.conf" ] || {
   echo "tema '$THEME' não existe. Disponíveis:"
   ls "$ROOT/themes"/*.conf | xargs -n1 basename | sed 's/\.conf$//; s/^/  /'
@@ -223,7 +256,11 @@ say "tmux.conf — atalhos em Alt, que funcionam em qualquer terminal"
 
 case "$TERMINAL" in
   "")
-    say "nenhum terminal escolhido; os atalhos em Alt já funcionam onde você está"
+    if [ "$SO" = macOS ] && [ "${TERM_PROGRAM:-}" = Apple_Terminal ]; then
+      option_como_meta
+    else
+      say "nenhum terminal escolhido; os atalhos em Alt já funcionam onde você está"
+    fi
     ;;
   kitty)
     write_block "$HOME/.config/kitty/kitty.conf" \
