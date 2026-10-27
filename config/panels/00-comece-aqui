@@ -8,7 +8,7 @@ AGENT_CMD=""
 [ -f "$CONFIG_DIR/agent.conf" ] && . "$CONFIG_DIR/agent.conf"
 
 if [ "$projetos" = 0 ]; then
-  echo "Adicione seus projetos; cada um vira uma janela:"
+  echo "Adicione seus projetos no terminal aqui embaixo; cada um vira uma janela:"
   echo
   echo "  work add ~/caminho/do/projeto     Tab completa o caminho"
   echo

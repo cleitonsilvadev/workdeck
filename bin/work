@@ -132,6 +132,10 @@ desenhar() {
   return 0
 }
 
+com_shell() {
+  tmux split-window -v -l 30% -t "$1" -c "$HOME"
+}
+
 adicionar() {
   local alvo="${1:-.}" d nome usados entry name dir cmd tmp
   if [ ! -d "$alvo" ]; then
@@ -159,7 +163,7 @@ adicionar() {
   if command -v tmux >/dev/null && tmux has-session -t "$SESSION" 2>/dev/null; then
     tmux new-window -d -t "$SESSION:" -n "$nome" -c "$d"
     if tmux list-windows -t "$SESSION" -F '#W' | grep -qx painel; then
-      tmux respawn-pane -k -t "$SESSION:painel" 2>/dev/null || true
+      tmux respawn-pane -k -t "$SESSION:painel.{top}" 2>/dev/null || true
     fi
     echo "a janela $nome já está aberta na sessão $SESSION"
   fi
@@ -255,9 +259,10 @@ case "${1:-}" in
       exit 1
     fi
     if tmux list-windows -t "$SESSION" -F '#W' | grep -qx painel; then
-      tmux respawn-pane -k -t "$SESSION:painel" -c "$HOME" work-panel
+      tmux respawn-pane -k -t "$SESSION:painel.{top}" -c "$HOME" work-panel
     else
       tmux new-window -d -t "$SESSION:" -n painel -c "$HOME" work-panel
+      com_shell "$SESSION:painel"
     fi
     if [ -n "${TMUX:-}" ]; then
       tmux switch-client -t "$SESSION" \; select-window -t "$SESSION:painel"
@@ -306,9 +311,11 @@ if ! tmux has-session -t "$SESSION" 2>/dev/null; then
     [ -d "$dir" ] || { echo "pulando $name: $dir não existe"; continue; }
     if [ "$first" = 1 ]; then
       tmux new-session -d -s "$SESSION" -n "$name" -c "$dir" ${cmd:+"$cmd"}
+      [ "$cmd" = work-panel ] && com_shell "$SESSION:$name"
       first=0
     else
       tmux new-window -t "$SESSION:" -n "$name" -c "$dir" ${cmd:+"$cmd"}
+      [ "$cmd" = work-panel ] && com_shell "$SESSION:$name"
     fi
   done
   tmux select-window -t "$SESSION:1"
