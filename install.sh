@@ -330,13 +330,28 @@ for velho in 10-maquina 00-comece-aqui; do
       say "painel antigo $velho removido" ;;
   esac
 done
+versao_distribuida() {
+  local alvo="$1" caminho="$2" atual c
+  atual="$(cksum < "$alvo")"
+  git -C "$ROOT" rev-parse >/dev/null 2>&1 || return 1
+  for c in $(git -C "$ROOT" log --format=%h -- "$caminho" 2>/dev/null); do
+    [ "$(git -C "$ROOT" show "$c:$caminho" 2>/dev/null | cksum)" = "$atual" ] && return 0
+  done
+  return 1
+}
 for painel in "$ROOT"/config/panels/*; do
   nome="$(basename "$painel")"
-  if [ -f "$CONFIG_DIR/panels/$nome" ]; then
-    say "painel $nome já existe — não toquei nele"
-  else
-    run install -m 755 "$painel" "$CONFIG_DIR/panels/$nome"
+  alvo="$CONFIG_DIR/panels/$nome"
+  if [ ! -f "$alvo" ]; then
+    run install -m 755 "$painel" "$alvo"
     say "painel $nome"
+  elif iguais "$painel" "$alvo"; then
+    say "painel $nome"
+  elif versao_distribuida "$alvo" "config/panels/$nome"; then
+    run install -m 755 "$painel" "$alvo"
+    say "painel $nome atualizado"
+  else
+    say "painel $nome foi editado por você — não toquei nele"
   fi
 done
 run mkdir -p "${XDG_CONFIG_HOME:-$HOME/.config}/git-review"
