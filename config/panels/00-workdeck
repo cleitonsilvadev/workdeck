@@ -81,10 +81,10 @@ if [ "$projetos" = 0 ] || [ -z "$AGENT_CMD" ]; then
 fi
 
 printf '%sO dia a dia%s\n' "$roxo" "$x"
+passo "Ctrl+b h" "o menu: projetos, IA, revisar, dividir a tela e mais"
 passo "ai  ou  Ctrl+b a" "abre a IA ao lado, para te ajudar no projeto"
 passo "Shift+← / →" "vai para o projeto anterior / próximo"
 passo "Ctrl+b Enter" "divide a tela; v ao lado, - embaixo, = iguala"
 passo "Shift+↑ / ↓" "troca de painel dentro da janela"
 passo "Ctrl+b z · Ctrl+b x" "zoom no painel · fecha o painel"
 passo "work review" "revisa o que o agente mudou antes do commit"
-passo "Ctrl+b h" "menu com tudo isso e mais"

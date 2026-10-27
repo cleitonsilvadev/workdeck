@@ -18,6 +18,7 @@ terminal. macOS e Linux; no Windows, pelo WSL.
 
 ```bash
 work                  # abre a sessão, uma janela por projeto
+Ctrl+b h              # dentro do work: o menu com tudo (projetos, IA, revisar, dividir)
 ai                    # abre a IA ao lado, para te ajudar no projeto; ai help explica
 work review           # revisa o que ele escreveu (o mesmo que git review)
 work agent claude     # define qual é o seu agente de IA
@@ -262,7 +263,7 @@ Funcionam em qualquer terminal, sem configurar nada:
 | Fecha o painel | <kbd>x</kbd> | <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>X</kbd> |
 | Renomeia a janela | <kbd>,</kbd> | <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>R</kbd> |
 | Abre o agente de IA ao lado | <kbd>a</kbd> | <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>A</kbd> |
-| Abre o menu: projetos, agente, revisão, painel, diagnóstico | <kbd>h</kbd> | |
+| **Abre o menu: ir para um projeto, adicionar, IA, revisar, dividir, zoom, fechar** | <kbd>h</kbd> | |
 | Solta a sessão (ela continua viva) | <kbd>d</kbd> | <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>E</kbd> |
 
 Os atalhos diretos economizam uma tecla. No Linux funcionam de cara; no Mac, a
