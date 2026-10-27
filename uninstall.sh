@@ -77,11 +77,6 @@ if [ -f "$MANIFESTO" ]; then
         else
           say "deixei ${alvo#$HOME/}: foi alterado depois da instalação"
         fi
-        # devolve o script que existia antes com esse nome, se houver
-        if [ -f "$alvo.antes-do-workdeck" ]; then
-          run mv "$alvo.antes-do-workdeck" "$alvo"
-          say "devolvi o seu $nome anterior"
-        fi
         ;;
     esac
   done < "$MANIFESTO"

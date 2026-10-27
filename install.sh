@@ -178,15 +178,11 @@ run mkdir -p "$BIN_DIR"
 for script in "$ROOT"/bin/*; do
   nome="$(basename "$script")"
   alvo="$BIN_DIR/$nome"
-  # Se já existe um arquivo diferente com esse nome, ele é de outra pessoa
-  # (ou seu, de antes). Guarda uma cópia antes de substituir.
-  if [ -f "$alvo" ] && ! iguais "$script" "$alvo"; then
-    backup="$alvo.antes-do-workdeck"
-    run cp "$alvo" "$backup"
-    say "$nome — já existia e era diferente; guardei em $(basename "$backup")"
-  else
-    say "$nome"
+  if [ -f "$alvo" ] && ! iguais "$script" "$alvo" && ! grep -qxF "script|$alvo|" "$MANIFESTO" 2>/dev/null; then
+    say "$nome — já existe um $nome que não é do workdeck; não substituí"
+    continue
   fi
+  say "$nome"
   run install -m 755 "$script" "$alvo"
   anota script "$alvo"
 done
