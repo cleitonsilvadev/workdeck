@@ -25,6 +25,13 @@ CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/workdeck/atualizacao"
 AVISO_CONF="${XDG_CONFIG_HOME:-$HOME/.config}/workdeck/atualizacao.conf"
 SESSION="${WORKDECK_SESSION:-work}"
 
+if [ -n "${TERM:-}" ] && command -v infocmp >/dev/null && ! infocmp "$TERM" >/dev/null 2>&1; then
+  for d in /Applications/kitty.app/Contents/Resources/kitty/terminfo "$HOME/.local/kitty.app/share/terminfo" "$HOME/.terminfo"; do
+    if [ -d "$d" ] && TERMINFO="$d" infocmp "$TERM" >/dev/null 2>&1; then export TERMINFO="$d"; break; fi
+  done
+  infocmp "$TERM" >/dev/null 2>&1 || export TERM=xterm-256color
+fi
+
 mtime() { stat -c %Y "$1" 2>/dev/null || stat -f %m "$1" 2>/dev/null || echo 0; }
 
 atividade() {
