@@ -78,7 +78,7 @@ fi
 printf '%sO dia a dia%s\n' "$roxo" "$x"
 passo "ai  ou  Ctrl+b a" "abre o agente ao lado, na pasta do projeto"
 passo "Shift+← / →" "vai para o projeto anterior / próximo"
-passo "Ctrl+b |  ou  -" "divide a tela ao lado / embaixo"
+passo "Ctrl+b Enter" "divide a tela; v ao lado, - embaixo, = iguala"
 passo "Shift+↑ / ↓" "troca de painel dentro da janela"
 passo "Ctrl+b z · Ctrl+b x" "zoom no painel · fecha o painel"
 passo "work review" "revisa o que o agente mudou antes do commit"

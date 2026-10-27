@@ -239,7 +239,8 @@ Funcionam em qualquer terminal, sem configurar nada:
 - **<kbd>Shift</kbd>+<kbd>←</kbd> / <kbd>→</kbd>:** janela anterior / próxima.
 - **<kbd>Shift</kbd>+<kbd>↑</kbd> / <kbd>↓</kbd>:** painel anterior / próximo.
 - **Mouse:** clique no nome da janela na barra de baixo para trocar de janela,
-  e num painel para levar o foco até ele.
+  e num painel para levar o foco até ele. Para mudar o tamanho de um painel,
+  arraste a borda dele.
 - **<kbd>Ctrl</kbd>+<kbd>b</kbd>, solte, e depois a tecla:**
 
 | Ação | <kbd>Ctrl</kbd>+<kbd>b</kbd> e depois | Atalho direto, opcional |
@@ -248,8 +249,10 @@ Funcionam em qualquer terminal, sem configurar nada:
 | Pula entre os painéis | <kbd>setas</kbd> | <kbd>Alt</kbd>+<kbd>setas</kbd> |
 | Janela anterior / próxima | <kbd>p</kbd> / <kbd>n</kbd> | <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>←</kbd> / <kbd>→</kbd> |
 | Nova janela, na pasta atual | <kbd>c</kbd> | <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>T</kbd> |
-| Divide lado a lado | <kbd>\|</kbd> | <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>D</kbd> |
+| Divide a tela, no sentido que sobra mais espaço | <kbd>Enter</kbd> | |
+| Divide lado a lado | <kbd>v</kbd> ou <kbd>\|</kbd> | <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>D</kbd> |
 | Divide em cima/embaixo | <kbd>-</kbd> | <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>S</kbd> |
+| Iguala o tamanho dos painéis | <kbd>=</kbd> | |
 | Zoom: o painel ocupa a janela | <kbd>z</kbd> | <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>Z</kbd> |
 | Fecha o painel | <kbd>x</kbd> | <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>X</kbd> |
 | Renomeia a janela | <kbd>,</kbd> | <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>R</kbd> |
@@ -372,18 +375,14 @@ Dentro dele, <kbd>q</kbd> sai.
 
 Cada painel é um **executável** em `~/.config/workdeck/panels/`. O nome do
 arquivo vira o título, e a ordem é alfabética — use um prefixo numérico para
-ordenar; os que começam com `00-` aparecem sem título. Três vêm prontos:
+ordenar; os que começam com `00-` aparecem sem título. Dois vêm prontos:
 
 | Arquivo | Mostra |
 |---|---|
 | `00-workdeck` | O logo, quantos projetos e qual agente, e o que falta configurar |
-| `10-maquina` | Carga e disco livre |
 | `20-git` | Em que branch está cada projeto e se há mudança solta |
 
 ```
-Maquina
-  carga 1.40 · disco livre 259Gi
-
 Git
   api            main
   web            feature/login  (6 alterado(s))

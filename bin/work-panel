@@ -7,7 +7,7 @@
 #
 # Cada painel é um executável em ~/.config/workdeck/panels/. O nome do arquivo
 # vira o título, e a ordem é alfabética — use um prefixo numérico para ordenar
-# (10-maquina, 20-docker). Qualquer coisa que imprima texto serve. Os que
+# (10-docker, 20-git). Qualquer coisa que imprima texto serve. Os que
 # começam com 00- aparecem sem título.
 set -uo pipefail
 
