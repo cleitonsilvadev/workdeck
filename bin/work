@@ -3,6 +3,7 @@
 #
 # Uso: work             abre/volta para a sessão; na primeira vez, pergunta os projetos
 #      work <janela>    abre e já vai para a janela com esse nome
+#      work add [pasta] acrescenta a pasta (ou a atual) como janela
 #      work escolher    escolhe de novo os projetos da sessão
 #      work kill        fecha a sessão inteira
 #      work help        comandos, atalhos e o que falta configurar
@@ -131,6 +132,46 @@ desenhar() {
   return 0
 }
 
+adicionar() {
+  local alvo="${1:-.}" d nome usados entry name dir cmd tmp feito=0
+  if [ ! -d "$alvo" ]; then
+    echo "não achei a pasta: $alvo"
+    return 1
+  fi
+  d="$(cd "$alvo" && pwd)"
+  ler_config
+  usados=" "
+  for entry in ${windows[@]+"${windows[@]}"}; do
+    IFS="|" read -r name dir cmd <<< "$entry"
+    if [ -z "$cmd" ] && [ "$(resolver "$dir")" = "$d" ]; then
+      echo "$(curto "$d") já está no seu work, como $name"
+      return 0
+    fi
+    usados="$usados$name "
+  done
+  nome="$(nome_de "$d")"
+  case "$usados" in *" $nome "*) nome="$(nome_de "$(dirname "$d")")-$nome" ;; esac
+  mkdir -p "$(dirname "$CONFIG")"
+  tmp="$(mktemp)"
+  for entry in ${windows[@]+"${windows[@]}"}; do
+    IFS="|" read -r name dir cmd <<< "$entry"
+    if [ "$feito" = 0 ] && [ -n "$cmd" ]; then
+      echo "$nome|$(curto "$d")" >> "$tmp"; feito=1
+    fi
+    echo "$entry" >> "$tmp"
+  done
+  if [ "$feito" = 0 ]; then
+    echo "$nome|$(curto "$d")" >> "$tmp"
+    [ ${#windows[@]} -gt 0 ] || echo "painel|~|work-panel" >> "$tmp"
+  fi
+  mv "$tmp" "$CONFIG"
+  echo "$(curto "$d") entrou no seu work como $nome"
+  if command -v tmux >/dev/null && tmux has-session -t "$SESSION" 2>/dev/null; then
+    tmux new-window -d -t "$SESSION:" -n "$nome" -c "$d"
+    echo "a janela $nome já está aberta na sessão $SESSION"
+  fi
+}
+
 gravar() {
   local i d nome usados=" " extras=() entry name dir cmd tmp
   ler_config
@@ -204,6 +245,7 @@ escolher() {
 }
 
 case "${1:-}" in
+  add) shift; adicionar "${1:-.}"; exit $? ;;
   help|-h|--help) exec workdeck-help ;;
   doctor) shift; exec workdeck-doctor "$@" ;;
   review) shift; exec git-review "$@" ;;

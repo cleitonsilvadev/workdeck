@@ -39,8 +39,9 @@ cd workdeck
 Depois:
 
 ```bash
-source ~/.zshrc     # ou ~/.bashrc
-work                # na primeira vez, você escolhe os projetos
+source ~/.zshrc             # ou ~/.bashrc
+cd ~/code/api && work add   # um projeto por vez, de dentro da pasta
+work
 ```
 
 O instalador detecta o sistema e o gerenciador de pacotes — brew no macOS,
@@ -155,7 +156,17 @@ Rode isso antes de abrir uma issue dizendo que algo não funciona.
 
 ## Os projetos
 
-No primeiro `work`, ele procura os repositórios git da sua pasta pessoal (até 4
+O jeito mais direto é entrar na pasta e adicionar:
+
+```bash
+cd ~/code/api && work add        # a pasta atual vira uma janela
+work add ~/code/web              # ou passe o caminho; Tab completa
+```
+
+O nome da janela é o nome da pasta. Se a sessão já estiver aberta, a janela
+aparece na hora; se a pasta já estiver no work, nada muda.
+
+Se você não adicionar nenhum, o primeiro `work`, ele procura os repositórios git da sua pasta pessoal (até 4
 níveis, sem `Library`, `node_modules` nem pastas ocultas) e mostra uma lista,
 dos mais usados para os menos:
 
@@ -194,14 +205,16 @@ A ordem do arquivo é a ordem das janelas, numeradas a partir de 1. Projeto que
 não existe no disco é pulado sem erro, então dá para deixar linhas de coisas
 que você ainda não clonou.
 
-**Para adicionar um projeto:** rode `work escolher`, ou acrescente uma linha,
-e depois feche a sessão com `work kill` e abra de novo com `work`. As janelas são criadas na abertura da
+**Para adicionar um projeto:** `work add`, de dentro da pasta. Para tirar ou
+reordenar, `work escolher` ou edite o arquivo, e depois feche a sessão com
+`work kill` e abra de novo com `work`. As janelas são criadas na abertura da
 sessão; sem fechar, a sessão antiga continua com a lista antiga.
 
 | Comando | O que faz |
 |---|---|
 | `work` | Abre a sessão, ou volta para ela |
 | `work api` | Abre e já vai para a janela `api` |
+| `work add [pasta]` | Acrescenta a pasta, ou a atual, como janela |
 | `work escolher` | Escolhe de novo os projetos |
 | `work kill` | Fecha a sessão inteira |
 | `work help` | Abre o menu com as ações; `--texto` mostra comandos, atalhos e o que falta configurar |
@@ -210,7 +223,7 @@ sessão; sem fechar, a sessão antiga continua com a lista antiga.
 | `work review` | O mesmo que `git review` |
 | `work painel` | Abre o painel de contexto |
 
-`help`, `doctor`, `agent`, `review`, `painel`, `escolher` e `kill` são palavras
+`add`, `help`, `doctor`, `agent`, `review`, `painel`, `escolher` e `kill` são palavras
 reservadas: uma janela com um desses nomes não é aberta por `work <nome>`.
 
 Para usar outro nome de sessão: `export WORKDECK_SESSION=outro`.

@@ -24,4 +24,28 @@ painel() {
     tmux select-window -t "$sessao:painel" && tmux attach -t "$sessao"
   fi
 }
+_work_janelas() {
+  local f="${XDG_CONFIG_HOME:-$HOME/.config}/workdeck/projects.conf"
+  [ -f "$f" ] && grep -v '^[[:space:]]*#' "$f" | cut -d'|' -f1
+}
+if [ -n "${ZSH_VERSION:-}" ]; then
+  _work() {
+    if (( CURRENT == 2 )); then
+      compadd add escolher kill help doctor agent review painel $(_work_janelas)
+    elif [[ ${words[2]} == add ]]; then
+      _directories
+    fi
+  }
+  (( $+functions[compdef] )) && compdef _work work
+elif [ -n "${BASH_VERSION:-}" ]; then
+  _work() {
+    local cur="${COMP_WORDS[COMP_CWORD]}"
+    if [ "$COMP_CWORD" = 1 ]; then
+      COMPREPLY=($(compgen -W "add escolher kill help doctor agent review painel $(_work_janelas)" -- "$cur"))
+    elif [ "${COMP_WORDS[1]}" = add ]; then
+      COMPREPLY=($(compgen -d -- "$cur"))
+    fi
+  }
+  complete -o filenames -F _work work
+fi
 # <<< workdeck <<<

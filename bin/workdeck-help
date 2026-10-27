@@ -23,7 +23,8 @@ texto() {
   titulo "Comandos"
   item "work" "abre a sessão, ou volta para ela"
   item "work <janela>" "abre e vai direto para a janela"
-  item "work escolher" "escolhe de novo os projetos"
+  item "work add [pasta]" "acrescenta a pasta, ou a atual, como janela"
+item "work escolher" "escolhe de novo os projetos"
   item "work kill" "fecha a sessão inteira"
   item "work review" "revisa o que ainda não foi commitado (ou git review)"
   item "work painel" "abre o painel de contexto"
@@ -55,7 +56,7 @@ texto() {
   if [ "$projetos" -gt 0 ]; then
     ok "$projetos janelas em $(curto "$CONFIG_DIR/projects.conf")"
   else
-    falta "nenhum projeto ainda — rode work e escolha os seus"
+    falta "nenhum projeto ainda — entre na pasta do projeto e rode: work add"
   fi
 
   AGENT_CMD=""

@@ -490,7 +490,8 @@ cat <<FIM
 
   Agora:
        source ${rc:-seu arquivo de shell}
-       work              ${dim}na primeira vez, você escolhe os projetos${reset}
+       cd <pasta do projeto> && work add     ${dim}um por vez; Tab completa o caminho${reset}
+       work
 
   Para navegar: Shift+← / Shift+→ troca de janela, Shift+↑ / Shift+↓ troca de
   painel, e Ctrl+b e depois 1…9 vai direto para uma janela. Clicar na barra
