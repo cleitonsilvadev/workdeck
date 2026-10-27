@@ -355,7 +355,7 @@ cp config/git-review.example.conf ~/.config/workdeck/git-review.conf
 ## Painéis
 
 O painel é a janela 1 da sessão: a visão geral do seu work em cima, e um
-terminal embaixo para digitar. Sem nenhum projeto, o `work` abre só com ele,
+terminal de 8 linhas embaixo para digitar. Sem nenhum projeto, o `work` abre só com ele,
 mostrando o que falta fazer, e o `work add` digitado ali já cria a janela.
 
 Por baixo, o `work-panel` mostra a saída de vários comandos, atualizando

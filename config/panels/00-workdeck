@@ -60,13 +60,26 @@ for ((i = 0; i < ${#desenho[@]}; i++)); do
 done
 echo
 
-if [ "$projetos" = 0 ]; then
-  echo "Adicione seus projetos no terminal aqui embaixo; cada um vira uma janela:"
-  echo "  work add ~/caminho/do/projeto     Tab completa o caminho"
+passo() {
+  local n
+  n=$(printf '%s' "$1" | LC_ALL=C tr -d '\200-\277' | wc -c)
+  printf '  %s%s%*s%s %s\n' "$roxo" "$1" $((22 - n)) "" "$x" "$2"
+}
+
+if [ "$projetos" = 0 ] || [ -z "$AGENT_CMD" ]; then
+  printf '%sPara começar%s, no terminal aqui embaixo:\n' "$roxo" "$x"
+  [ "$projetos" = 0 ] && passo "work add ~/projeto" "cada projeto vira uma janela; Tab completa o caminho"
+  if [ -z "$AGENT_CMD" ]; then
+    passo "work agent claude" "define o seu agente (instale antes: claude, codex, aider…)"
+  fi
   echo
 fi
-if [ -z "$AGENT_CMD" ]; then
-  echo "Ligue um agente de IA:  work agent <comando>   (claude, codex, aider…)"
-  echo
-fi
-printf '%sShift+←/→ janelas · Shift+↑/↓ painéis · Ctrl+b h menu%s\n' "$dim" "$x"
+
+printf '%sO dia a dia%s\n' "$roxo" "$x"
+passo "Shift+← / →" "vai para o projeto anterior / próximo"
+passo "ai  ou  Ctrl+b a" "abre o agente ao lado, na pasta do projeto"
+passo "Ctrl+b |  ou  -" "divide a tela ao lado / embaixo"
+passo "Shift+↑ / ↓" "troca de painel dentro da janela"
+passo "Ctrl+b z · Ctrl+b x" "zoom no painel · fecha o painel"
+passo "work review" "revisa o que o agente mudou antes do commit"
+passo "Ctrl+b h" "menu com tudo isso e mais"

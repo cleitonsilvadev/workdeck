@@ -133,7 +133,7 @@ desenhar() {
 }
 
 com_shell() {
-  tmux split-window -v -l 30% -t "$1" -c "$HOME"
+  tmux split-window -v -l 8 -t "$1" -c "$HOME"
 }
 
 adicionar() {
