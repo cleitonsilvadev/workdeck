@@ -1,0 +1,45 @@
+# Painel do workdeck. Teclas: g troca grupo · t abre a lista com links · Esc fecha · q sai
+#
+# Cada widget é um comando que o tclock roda e redesenha de tempos em tempos.
+# Os comandos abaixo vêm do bin/ deste projeto e precisam do az cli configurado
+# (veja azure.example.conf). O painel-sistema funciona sem nenhuma configuração.
+
+[clock]
+show_date = true
+# Cor dos textos. Aceita um hex ou um nome (Red, Blue, Cyan...).
+color = "#d58a9d"
+
+[[clock.widgets]]
+title = "Minhas tasks"
+group = "meus"
+command = ["painel-tasks"]
+refresh_secs = 600
+
+[[clock.widgets.popup_actions]]
+key = "t"
+label = "tasks com links"
+command = ["painel-tasks", "--links"]
+
+[[clock.widgets]]
+title = "PRs abertos"
+group = "prs"
+command = ["painel-prs"]
+refresh_secs = 600
+
+[[clock.widgets.popup_actions]]
+key = "p"
+label = "PRs com links"
+command = ["painel-prs", "--links"]
+
+[[clock.widgets]]
+title = "Último deploy"
+group = "deploy"
+command = ["painel-pipelines"]
+refresh_secs = 900
+timeout_secs = 60
+
+[[clock.widgets]]
+title = "Máquina"
+group = "deploy"
+command = ["painel-sistema"]
+refresh_secs = 60

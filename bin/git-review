@@ -1,0 +1,143 @@
+#!/usr/bin/env bash
+# git review — mostra de forma visual o que mudou, com o delta (diff com cor de sintaxe e número de linha).
+#
+# Uso:
+#   git review              o que mudou e ainda não foi commitado (staged, unstaged e arquivos novos)
+#   git review branch       tudo o que a branch tem a mais que a dev (ou develop, no mobile),
+#                           somado ao que ainda não foi commitado
+#   git review dev | qa     o mesmo, comparando com a origin/dev ou a origin/qa
+#   git review <caminho>    só os arquivos dentro de <caminho> (vale nos outros modos: git review qa src/)
+#   git review --stat       só o resumo, sem o código
+#   git review --force      roda mesmo com teste, build ou lint pesado em andamento
+#   git review -h           esta ajuda
+#
+# Dentro do diff: espaço pula para o próximo arquivo · b volta para o anterior · setas rolam · q sai.
+set -uo pipefail
+
+git rev-parse --is-inside-work-tree >/dev/null 2>&1 || { echo "não é um repositório git"; exit 1; }
+command -v delta >/dev/null || { echo "instale o delta: brew install git-delta"; exit 1; }
+
+mode="worktree"
+base_candidates=(origin/dev origin/develop)
+stat_only=0
+force=0
+paths=()
+for arg in "$@"; do
+  case "$arg" in
+    branch|-b) mode="branch" ;;
+    dev|develop|qa) mode="branch"; base_candidates=("origin/$arg") ;;
+    --stat) stat_only=1 ;;
+    --force|-f) force=1 ;;
+    -h|help) sed -n '2,14p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    *) paths+=("$arg") ;;
+  esac
+done
+
+# Só conta o que de fato come CPU: um runner disparado por node/npx na linha de comando.
+# Editores carregam "eslint" e "tsc" em servidores de linguagem que vivem o tempo todo,
+# e contá-los faria a trava bloquear sempre que o editor estivesse aberto.
+heavy_jobs() {
+  pgrep -fl 'jest|vitest|cypress|tsc -b|eslint|vite build|storybook build|playwright' 2>/dev/null \
+    | grep -v -e 'git-review' -e 'pgrep' \
+    | grep -v -e 'Code Helper' -e 'Visual Studio Code' -e 'Cursor' -e 'Electron' \
+                -e 'JetBrains' -e 'language-server' -e 'tsserver' -e 'extensionHost' \
+    | grep -E '(^| )[^ ]*(node|npx|bun|deno)( |$)|node_modules/\.bin' \
+    | awk '{$1=""; print substr($0, 2, 90)}'
+}
+
+# 1 = normal, 2 = aviso (estado comum de um Mac em uso), 4 = crítico.
+# Só o crítico justifica barrar sozinho; no aviso, barra apenas se houver runner rodando.
+memory_pressure_level=$(sysctl -n kern.memorystatus_vm_pressure_level 2>/dev/null || echo 1)
+if [ "$force" = 0 ] && [ "$stat_only" = 0 ]; then
+  jobs_running=$(heavy_jobs)
+  memory_critical=0
+  [ "${memory_pressure_level:-1}" -ge 4 ] && memory_critical=1
+  if [ -n "$jobs_running" ] || [ "$memory_critical" = 1 ]; then
+    echo "git review parado para não travar o Mac."
+    [ -n "$jobs_running" ] && { echo "Rodando agora:"; echo "$jobs_running" | sort -u | head -5 | sed 's/^/  • /'; }
+    [ "$memory_critical" = 1 ] && echo "A memória está em pressão crítica."
+    echo "Espere terminar, ou use: git review --stat (leve) · git review --force (roda mesmo assim)"
+    exit 2
+  fi
+fi
+
+bold=$'\e[1m'; dim=$'\e[2m'; cyan=$'\e[36m'; green=$'\e[32m'; red=$'\e[31m'; yellow=$'\e[33m'; reset=$'\e[0m'
+
+branch=$(git branch --show-current 2>/dev/null)
+base_ref="HEAD"
+base_label="último commit"
+if [ "$mode" = "branch" ]; then
+  for candidate in "${base_candidates[@]}"; do
+    if git rev-parse --verify -q "$candidate" >/dev/null; then
+      base_ref=$(git merge-base HEAD "$candidate")
+      base_label="$candidate (desde $(git rev-parse --short "$base_ref"))"
+      break
+    fi
+  done
+  [ "$base_ref" = "HEAD" ] && base_label="último commit (${base_candidates[*]} não existe no remoto)"
+fi
+
+untracked=()
+while IFS= read -r file; do
+  [ -n "$file" ] && untracked+=("$file")
+done < <(git ls-files --others --exclude-standard -- "${paths[@]+"${paths[@]}"}")
+
+render_diff() {
+  git -c color.diff=always diff "$base_ref" -- "${paths[@]+"${paths[@]}"}"
+  for file in "${untracked[@]+"${untracked[@]}"}"; do
+    git -c color.diff=always diff --no-index -- /dev/null "$file"
+  done
+}
+
+header() {
+  echo "${bold}${cyan}git review${reset}  ${bold}${branch:-HEAD destacado}${reset}  ${dim}comparando com: ${base_label}${reset}"
+  if [ "$mode" = "branch" ] && [ "$base_ref" != "HEAD" ]; then
+    commits=$(git rev-list --count "$base_ref"..HEAD)
+    echo "${dim}${commits} commit(s) na branch${reset}"
+    git log --oneline --no-decorate "$base_ref"..HEAD | sed "s/^/  ${yellow}•${reset} /"
+  fi
+  echo
+  git -c color.diff=always diff --stat=120 "$base_ref" -- "${paths[@]+"${paths[@]}"}" | sed '$d'
+  for file in "${untracked[@]+"${untracked[@]}"}"; do
+    lines=$(wc -l < "$file" 2>/dev/null | tr -d ' ')
+    printf " %s ${green}(novo, %s linhas)${reset}\n" "$file" "${lines:-0}"
+  done
+  read -r files added removed < <(
+    { git diff --numstat "$base_ref" -- "${paths[@]+"${paths[@]}"}"
+      for file in "${untracked[@]+"${untracked[@]}"}"; do
+        printf "%s\t0\t%s\n" "$(wc -l < "$file" 2>/dev/null | tr -d ' ')" "$file"
+      done
+    } | awk -F'\t' '{f++; a+=$1; r+=$2} END {print f+0, a+0, r+0}'
+  )
+  echo
+  echo "${bold}${files} arquivo(s)${reset}  ${green}+${added}${reset}  ${red}-${removed}${reset}  ${dim}(${#untracked[@]} novo(s))${reset}"
+}
+
+if [ "$(git diff --name-only "$base_ref" -- "${paths[@]+"${paths[@]}"}" | wc -l)" -eq 0 ] && [ ${#untracked[@]} -eq 0 ]; then
+  header
+  echo "${dim}nada mudou${reset}"
+  exit 0
+fi
+
+if [ "$stat_only" = 1 ]; then
+  header
+  exit 0
+fi
+
+width=${COLUMNS:-$(tput cols 2>/dev/null || echo 120)}
+layout=()
+[ "$width" -ge 160 ] && layout=(--side-by-side)
+
+lesskey="${XDG_CONFIG_HOME:-$HOME/.config}/git-review/lesskey"
+if [ -f "$lesskey" ]; then
+  export DELTA_PAGER="less -R --lesskey-src=$lesskey"
+fi
+
+{
+  header
+  echo
+  render_diff
+} | delta --line-numbers --navigate --navigate-regex "^(Δ|added:|removed:|renamed:) " "${layout[@]+"${layout[@]}"}" \
+    --file-style "bold yellow ul" --file-decoration-style "yellow box" \
+    --hunk-header-style "file line-number syntax" --hunk-header-decoration-style "blue box" \
+    --syntax-theme "Monokai Extended" --paging always

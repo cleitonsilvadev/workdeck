@@ -1,0 +1,7 @@
+# A config local do usuário nunca entra no repositório.
+# Ela mora em ~/.config/workdeck/, não aqui — estas linhas são só
+# uma rede de segurança para quem copiar os arquivos para dentro do projeto.
+projects.conf
+azure.conf
+*.local
+.DS_Store

@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+# Suas tasks e issues abertas na sprint atual, agrupadas pela história (o work item pai).
+# `painel-tasks --links` acrescenta as URLs.
+set -uo pipefail
+. "$(dirname "${BASH_SOURCE[0]}")/_workdeck-azure"
+_workdeck_load_azure || exit 1
+
+links=${1:-}
+sprints=()
+primeiro_projeto=""
+for entry in "${AZDO_TEAMS[@]}"; do
+  IFS="|" read -r proj team <<< "$entry"
+  [ -z "$primeiro_projeto" ] && primeiro_projeto="$proj"
+  path=$(az boards iteration team list --org "$AZDO_ORG" --project "$proj" --team "$team" \
+    --timeframe current --query "[0].path" -o tsv 2>/dev/null)
+  [ -n "$path" ] && sprints+=("'$path'")
+done
+
+[ ${#sprints[@]} -eq 0 ] && { echo "sprint atual não encontrada"; exit 0; }
+in_sprints=$(IFS=,; echo "${sprints[*]}")
+
+az boards query --org "$AZDO_ORG" --project "$primeiro_projeto" --wiql \
+  "SELECT [System.Id],[System.State],[System.Title],[System.TeamProject],[System.Parent] FROM workitems WHERE [System.IterationPath] IN ($in_sprints) AND [System.AssignedTo] = @Me AND [System.WorkItemType] IN ('Task','Issue') AND [System.State] NOT IN ('Done','Closed','Removed') ORDER BY [System.State], [System.ChangedDate] DESC" \
+  -o json 2>/dev/null |
+ORG="$AZDO_ORG" LINKS="$links" PROJ="$primeiro_projeto" python3 -c '
+import json, os, subprocess, sys
+raw = sys.stdin.read().strip()
+org, links, proj = os.environ["ORG"], os.environ["LINKS"], os.environ["PROJ"]
+items = json.loads(raw) if raw else []
+if not items:
+    print("nenhuma task aberta na sprint")
+    sys.exit()
+
+def url(fields, wid):
+    p = fields["System.TeamProject"].replace(" ", "%20")
+    return f"{org}/{p}/_workitems/edit/{wid}"
+
+# Agrupa pelo pai (a história); quem não tem pai vai para "Sem história", no fim.
+groups = {}
+for w in items:
+    groups.setdefault(w["fields"].get("System.Parent"), []).append(w)
+
+parents = {}
+ids = ",".join(str(p) for p in groups if p)
+if ids:
+    wiql = f"SELECT [System.Id],[System.Title],[System.TeamProject] FROM workitems WHERE [System.Id] IN ({ids})"
+    out = subprocess.run(["az", "boards", "query", "--org", org, "--project", proj,
+        "--wiql", wiql, "-o", "json"], capture_output=True, text=True).stdout.strip()
+    parents = {p["id"]: p["fields"] for p in (json.loads(out) if out else [])}
+
+for i, pid in enumerate(sorted(groups, key=lambda p: (p is None, p or 0))):
+    if i:
+        print()
+    if pid is None:
+        print("Sem história")
+    else:
+        pf = parents.get(pid, {})
+        title = pf.get("System.Title", "")
+        print(f"História #{pid} {title[:80]}")
+        if links and pf:
+            print(f"  {url(pf, pid)}")
+    for w in groups[pid]:
+        f, wid = w["fields"], w["id"]
+        print(f"  {f[\"System.State\"]:<11} #{wid} {f[\"System.Title\"][:70]}")
+        if links:
+            print(f"       {url(f, wid)}")
+'

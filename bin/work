@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+# work — abre (ou volta para) a sessão tmux de trabalho, com uma janela por projeto.
+#
+# Uso: work             abre/volta para a sessão
+#      work <janela>    abre e já vai para a janela com esse nome
+#      work kill        fecha a sessão inteira
+#
+# Os projetos vêm de ~/.config/workdeck/projects.conf — uma linha por janela.
+set -euo pipefail
+
+CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/workdeck/projects.conf"
+SESSION="${WORKDECK_SESSION:-work}"
+
+if [ "${1:-}" = "kill" ]; then
+  if tmux has-session -t "$SESSION" 2>/dev/null; then
+    tmux kill-session -t "$SESSION"
+    echo "sessão $SESSION fechada"
+  else
+    echo "nenhuma sessão $SESSION aberta"
+  fi
+  exit 0
+fi
+
+if [ ! -f "$CONFIG" ]; then
+  echo "Não achei $CONFIG."
+  echo "Copie o exemplo e edite com os seus projetos:"
+  echo "  cp projects.example.conf \"$CONFIG\""
+  exit 1
+fi
+
+windows=()
+while IFS= read -r line; do
+  line="${line%%#*}"                      # tira comentário
+  line="$(echo "$line" | sed 's/[[:space:]]*$//')"
+  [ -z "$line" ] && continue
+  windows+=("$line")
+done < "$CONFIG"
+
+if [ ${#windows[@]} -eq 0 ]; then
+  echo "$CONFIG não tem nenhum projeto. Veja projects.example.conf."
+  exit 1
+fi
+
+if ! tmux has-session -t "$SESSION" 2>/dev/null; then
+  first=1
+  for entry in "${windows[@]}"; do
+    IFS="|" read -r name dir cmd <<< "$entry"
+    dir="${dir/#\~/$HOME}"
+    dir="$(eval echo "$dir")"             # resolve $HOME e afins
+    [ -d "$dir" ] || { echo "pulando $name: $dir não existe"; continue; }
+    if [ "$first" = 1 ]; then
+      tmux new-session -d -s "$SESSION" -n "$name" -c "$dir" ${cmd:+"$cmd"}
+      first=0
+    else
+      tmux new-window -t "$SESSION" -n "$name" -c "$dir" ${cmd:+"$cmd"}
+    fi
+  done
+  if [ "$first" = 1 ]; then
+    echo "nenhum dos projetos de $CONFIG existe no disco; nada a abrir"
+    exit 1
+  fi
+  tmux select-window -t "$SESSION:1"
+fi
+
+[ $# -gt 0 ] && tmux select-window -t "$SESSION:$1"
+
+if [ -n "${TMUX:-}" ]; then
+  tmux switch-client -t "$SESSION"
+else
+  tmux attach -t "$SESSION"
+fi

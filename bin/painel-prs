@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# PRs abertos dos repositórios listados em ~/.config/workdeck/azure.conf.
+# Marca: 🔵 criado por você · 🟡 você é revisor · em branco: dos outros.
+# `painel-prs --links` acrescenta as URLs.
+set -uo pipefail
+. "$(dirname "${BASH_SOURCE[0]}")/_workdeck-azure"
+_workdeck_load_azure || exit 1
+
+links=${1:-}
+for entry in "${AZDO_REPOS[@]}"; do
+  IFS="|" read -r proj repo <<< "$entry"
+  az repos pr list --org "$AZDO_ORG" --project "$proj" --repository "$repo" --status active -o json 2>/dev/null |
+  ME="$AZDO_EMAIL" ORG="$AZDO_ORG" LINKS="$links" python3 -c '
+import json, os, sys
+raw = sys.stdin.read().strip()
+me, org, links = os.environ["ME"], os.environ["ORG"], os.environ["LINKS"]
+for pr in json.loads(raw) if raw else []:
+    author = (pr.get("createdBy") or {}).get("uniqueName", "")
+    reviewers = {(r or {}).get("uniqueName", "") for r in pr.get("reviewers") or []}
+    tag = "🔵" if author == me else "🟡" if me in reviewers else "  "
+    repo = pr["repository"]["name"]
+    pid, title = pr["pullRequestId"], pr.get("title") or ""
+    print(f"{tag} #{pid} {repo[:18]:<18} {title[:60]}")
+    if links:
+        proj = pr["repository"]["project"]["name"].replace(" ", "%20")
+        print(f"     {org}/{proj}/_git/{repo}/pullrequest/{pid}")
+'
+done | { out=$(cat); [ -n "$out" ] && echo "$out" || echo "nenhum PR aberto"; }
