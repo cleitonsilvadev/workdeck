@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from "motion/react"
-import { Apple } from "lucide-react"
+import { Keyboard } from "lucide-react"
 import { shortcuts } from "@/lib/site"
 
 function Key({ children }: { children: string }) {
@@ -16,7 +16,7 @@ function Key({ children }: { children: string }) {
   )
 }
 
-function Group({ title, items }: { title: string; items: readonly { keys: readonly string[]; desc: string }[] }) {
+function Group({ title, items }: { title: string; items: readonly { prefix: boolean; keys: readonly string[]; desc: string }[] }) {
   return (
     <div className="rounded-2xl border border-border bg-ctp-mantle/70 p-2">
       <div className="px-3 pt-2 pb-1 text-xs font-medium tracking-wider text-ctp-overlay1 uppercase">{title}</div>
@@ -32,6 +32,14 @@ function Group({ title, items }: { title: string; items: readonly { keys: readon
           >
             <span className="text-sm text-ctp-subtext1">{s.desc}</span>
             <span className="flex shrink-0 items-center gap-1">
+              {s.prefix && (
+                <>
+                  <Key>Ctrl</Key>
+                  <span className="text-xs text-ctp-overlay0">+</span>
+                  <Key>b</Key>
+                  <span className="px-1 text-xs text-ctp-overlay0">e</span>
+                </>
+              )}
               {s.keys.map((k, i) => (
                 <span key={k} className="flex items-center gap-1">
                   {i > 0 && <span className="text-xs text-ctp-overlay0">+</span>}
@@ -53,11 +61,11 @@ export function ShortcutList() {
         <Group title="Navegar" items={shortcuts.navegar} />
         <div className="flex-1 rounded-2xl border border-dashed border-ctp-surface1 p-5">
           <div className="mb-2 flex items-center gap-2 text-sm font-medium text-ctp-text">
-            <Apple className="size-4 text-ctp-overlay1" />
-            Prefere cmd no Mac?
+            <Keyboard className="size-4 text-ctp-overlay1" />
+            Prefere uma tecla só?
           </div>
           <p className="text-sm leading-relaxed text-ctp-subtext0">
-            No macOS, o cmd nunca chega ao tmux: o sistema intercepta antes. Há adaptadores prontos para kitty, WezTerm e Alacritty que traduzem cmd+1 em Alt+1. Só o kitty é instalado automaticamente:
+            Há atalhos diretos com Alt: Alt+1…9 vai para a janela, Alt+setas troca de painel e Alt+Shift+letra faz as ações. No Mac, a Option precisa agir como Alt, e o work doctor diz onde ligar. Para usar cmd+1, há adaptadores para kitty, WezTerm e Alacritty; só o do kitty é instalado automaticamente:
           </p>
           <code className="mt-3 block font-mono text-xs text-ctp-mauve">./install.sh --terminal kitty</code>
         </div>

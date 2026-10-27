@@ -124,8 +124,8 @@ export default function Home() {
           </div>
         </section>
 
-        <Section eyebrow="cinco comandos" title="Tudo o que você digita" desc="O resto são atalhos de teclado. Nada de alias para decorar.">
-          <Stagger className="mx-auto grid max-w-4xl gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <Section eyebrow="o dia a dia" title="Tudo o que você digita" desc="O resto está no menu: Ctrl+b e h, de dentro do work. Nada de alias para decorar.">
+          <Stagger className="mx-auto grid max-w-5xl gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {commands.map((c) => (
               <StaggerItem key={c.cmd}>
                 <GlowCard className="rounded-xl">
@@ -142,7 +142,7 @@ export default function Home() {
           </Stagger>
         </Section>
 
-        <Section id="recursos" eyebrow="por que" title="Feito para quem trabalha com agentes" desc="O agente escreve código que você precisa ver. Com ele ao lado, o git review roda no pane de baixo sem trocar de contexto.">
+        <Section id="recursos" eyebrow="por que" title="Feito para quem trabalha com agentes" desc="O agente escreve código que você precisa ver. Com ele ao lado, o work review roda no pane de baixo sem trocar de contexto.">
           <Stagger className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {features.map((f) => {
               const Icon = icons[f.icon]
@@ -163,7 +163,7 @@ export default function Home() {
           </Stagger>
         </Section>
 
-        <Section id="atalhos" eyebrow="teclado" title="Atalhos em Alt, em qualquer terminal" desc="Quem interpreta é o tmux, não o terminal. As ações usam Shift porque Alt com letra minúscula já é do readline: Alt+b, Alt+f e Alt+d andam e apagam palavras no shell.">
+        <Section id="atalhos" eyebrow="teclado" title="Ctrl+b e uma tecla, em qualquer terminal" desc="Aperte Ctrl+b, solte e aperte a tecla. Quem interpreta é o tmux, não o terminal, e o mouse também funciona: clique na janela na barra ou arraste a borda do painel.">
           <Reveal>
             <ShortcutList />
           </Reveal>
@@ -203,7 +203,7 @@ export default function Home() {
           <Reveal className="mx-auto mt-6 flex max-w-3xl items-start gap-3 rounded-2xl border border-dashed border-ctp-surface1 p-5 text-sm text-ctp-subtext0">
             <Stethoscope className="mt-0.5 size-4 shrink-0 text-ctp-teal" />
             <p>
-              Antes de abrir uma issue, rode <code className="font-mono text-ctp-text">workdeck-doctor</code>: ele diz se o tmux e o delta estão instalados, se o terminal suporta cores de 24 bits, se há um agente configurado e se o <code className="font-mono text-ctp-text">~/.local/bin</code> está no PATH.
+              Antes de abrir uma issue, rode <code className="font-mono text-ctp-text">work doctor</code>: ele diz se o tmux e o delta estão instalados, se o terminal suporta cores de 24 bits, se há um agente configurado e se o <code className="font-mono text-ctp-text">~/.local/bin</code> está no PATH.
             </p>
           </Reveal>
         </Section>

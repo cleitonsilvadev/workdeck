@@ -14,10 +14,13 @@ export const installCommand = `git clone ${repoUrl}.git && cd workdeck && ./inst
 
 export const commands = [
   { cmd: "work", desc: "Abre a sessão, uma janela por projeto. Ou volta para ela." },
-  { cmd: "ai", desc: "Abre o seu agente de IA num pane ao lado, já na pasta do projeto." },
-  { cmd: "git review", desc: "Mostra o que o agente escreveu, com cor de sintaxe e número de linha." },
-  { cmd: "painel", desc: "Abre o painel de contexto: branches, mudanças soltas, o que você quiser." },
-  { cmd: "workdeck-doctor", desc: "Diz o que funciona no seu ambiente e o que não vai funcionar." },
+  { cmd: "work add ~/code/api", desc: "Acrescenta um projeto. Sem caminho, usa a pasta atual." },
+  { cmd: "ai", desc: "Abre a IA ao lado, para te ajudar no projeto, já na pasta dele. O ai help explica." },
+  { cmd: "work review", desc: "Revisa o que o agente escreveu antes do commit. O mesmo que git review." },
+  { cmd: "work agent claude", desc: "Define qual é o seu agente de IA. Qualquer comando serve." },
+  { cmd: "work painel", desc: "Abre o painel de contexto: branches, mudanças soltas, o que você quiser." },
+  { cmd: "work doctor", desc: "Diz o que funciona no seu ambiente e o que não vai funcionar." },
+  { cmd: "work help", desc: "O menu com as ações, os atalhos e o que falta configurar." },
 ]
 
 export const features = [
@@ -55,21 +58,20 @@ export const features = [
 
 export const shortcuts = {
   navegar: [
-    { keys: ["Alt", "1…9"], desc: "Vai direto para a janela N" },
-    { keys: ["Alt", "←↑↓→"], desc: "Pula entre os painéis" },
-    { keys: ["Alt", "Shift", "← →"], desc: "Janela anterior / próxima" },
+    { prefix: true, keys: ["h"], desc: "Abre o menu com tudo" },
+    { prefix: false, keys: ["Shift", "← →"], desc: "Projeto anterior / próximo" },
+    { prefix: true, keys: ["1…9"], desc: "Vai direto para a janela N" },
+    { prefix: false, keys: ["Shift", "↑ ↓"], desc: "Troca de painel na janela" },
   ],
   agir: [
-    { keys: ["Alt", "Shift", "A"], desc: "Abre o agente ao lado" },
-    { keys: ["Alt", "Shift", "T"], desc: "Nova janela, na pasta atual" },
-    { keys: ["Alt", "Shift", "D"], desc: "Divide lado a lado" },
-    { keys: ["Alt", "Shift", "S"], desc: "Divide em cima/embaixo" },
-    { keys: ["Alt", "Shift", "Z"], desc: "Zoom: o painel ocupa a janela" },
-    { keys: ["Alt", "Shift", "X"], desc: "Fecha o painel" },
-    { keys: ["Alt", "Shift", "R"], desc: "Renomeia a janela" },
-    { keys: ["Alt", "Shift", "E"], desc: "Solta a sessão, que continua viva" },
+    { prefix: true, keys: ["a"], desc: "Abre a IA ao lado" },
+    { prefix: true, keys: ["Enter"], desc: "Divide a tela onde couber" },
+    { prefix: true, keys: ["v"], desc: "Divide ao lado" },
+    { prefix: true, keys: ["-"], desc: "Divide embaixo" },
+    { prefix: true, keys: ["z"], desc: "Zoom no painel, e de novo para voltar" },
+    { prefix: true, keys: ["x"], desc: "Fecha o painel" },
   ],
-}
+} as const
 
 export const themes = [
   {
@@ -126,14 +128,16 @@ export const install = {
   macos: [
     { cmd: `git clone ${repoUrl}.git`, out: "" },
     { cmd: "cd workdeck && ./install.sh", out: "brew instala tmux e git-delta se faltarem" },
-    { cmd: "$EDITOR ~/.config/workdeck/projects.conf", out: "seus projetos, uma linha por janela" },
-    { cmd: "source ~/.zshrc && work", out: "" },
+    { cmd: "source ~/.zshrc", out: "" },
+    { cmd: "work add ~/code/api", out: "um projeto por vez; Tab completa o caminho" },
+    { cmd: "work", out: "" },
   ],
   linux: [
     { cmd: `git clone ${repoUrl}.git`, out: "" },
     { cmd: "cd workdeck && ./install.sh", out: "apt, dnf, pacman, zypper ou apk, o que houver" },
-    { cmd: "$EDITOR ~/.config/workdeck/projects.conf", out: "seus projetos, uma linha por janela" },
-    { cmd: "source ~/.bashrc && work", out: "" },
+    { cmd: "source ~/.bashrc", out: "" },
+    { cmd: "work add ~/code/api", out: "um projeto por vez; Tab completa o caminho" },
+    { cmd: "work", out: "" },
   ],
   windows: [
     { cmd: "wsl --install", out: "no PowerShell, como administrador" },

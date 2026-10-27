@@ -122,13 +122,13 @@ export function TerminalDemo() {
                 )}
                 {s >= 2 && <Prompt text="ai" typing={s === 2} done={s >= 3} caret={s === 2} />}
                 {s >= 3 && !reviewOpen && <Line className="text-ctp-overlay1">agente aberto ao lado →</Line>}
-                {s >= 6 && <Prompt text="git review" typing={s === 6} done={s >= 7} caret={s === 6} />}
+                {s >= 6 && <Prompt text="work review" typing={s === 6} done={s >= 7} caret={s === 6} />}
               </Pane>
               <AnimatePresence>
                 {reviewOpen && (
-                  <Pane key="review" title="git review" active={focus === "review"}>
+                  <Pane key="review" title="review" active={focus === "review"}>
                     <Line>
-                      <span className="font-bold text-ctp-sky">git review</span>
+                      <span className="font-bold text-ctp-sky">work review</span>
                       <span className="font-bold text-ctp-text">  feature/login</span>
                     </Line>
                     {s >= 8 && (
@@ -157,7 +157,7 @@ export function TerminalDemo() {
 
             <AnimatePresence>
               {agentOpen && (
-                <Pane key="agent" title="agente" active={focus === "agent"}>
+                <Pane key="agent" title="IA · claude" active={focus === "agent"}>
                   <Line className="text-ctp-overlay0">o comando que você escolheu</Line>
                   <Line>
                     <span className="text-ctp-peach">› </span>
@@ -184,11 +184,12 @@ export function TerminalDemo() {
                   {i === 1 && <motion.span layoutId="win" className="absolute inset-0 rounded-sm bg-ctp-surface0" />}
                   <span className={cn("relative", i === 1 && "font-bold text-ctp-text")}>
                     {i + 1}:{w}
+                    {i === 1 && agentOpen && <span className="text-ctp-mauve"> ✦</span>}
                   </span>
                 </span>
               ))}
             </div>
-            <span className="hidden text-ctp-overlay0 sm:inline">Alt+1…9 troca de janela</span>
+            <span className="hidden text-ctp-overlay0 sm:inline">Ctrl+b h abre o menu</span>
           </div>
         </div>
       </div>
