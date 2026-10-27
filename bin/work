@@ -156,7 +156,6 @@ sincronizar() {
   done
   if [ -n "$tirados" ]; then
     mv "$tmp" "$CONFIG"
-    tmux display-message -d 5000 "saiu do work:$tirados — para voltar: work add <caminho>" 2>/dev/null || true
     if tmux list-windows -t "$SESSION" -F '#W' | grep -qx painel; then
       tmux respawn-pane -k -t "$SESSION:painel.{top}" 2>/dev/null || true
     fi
