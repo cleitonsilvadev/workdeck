@@ -16,16 +16,38 @@ CONHECIDOS="claude codex copilot aider gemini opencode cursor-agent crush goose 
 
 carrega() { AGENT_CMD=""; AGENT_SPLIT="${AGENT_SPLIT:-h}"; [ -f "$CONFIG" ] && . "$CONFIG"; }
 
+do_workdeck() {
+  case "$(basename "${1%% *}")" in
+    work|work-panel|workdeck-*|git-review|ai|help) return 0 ;;
+  esac
+  return 1
+}
+
+problema() {
+  local nome="${1%% *}"
+  if [ -z "$1" ]; then echo "nenhum agente definido"
+  elif do_workdeck "$1"; then echo "'$1' é um comando do workdeck, não um agente"
+  elif ! type -P "$nome" >/dev/null; then echo "'$nome' não está no PATH"
+  fi
+  return 0
+}
+
 case "${1:-}" in
+  --check)
+    carrega
+    p="$(problema "$AGENT_CMD")"
+    [ -z "$p" ] && exit 0
+    echo "$p"
+    exit 1
+    ;;
   --set)
     cmd="${2:?use: work agent <comando>}"
     nome="${cmd%% *}"
-    case "$(basename "$nome")" in
-      work|work-panel|workdeck-*|git-review|ai|help)
-        echo "'$nome' é um comando do próprio workdeck, não um agente de IA."
-        echo "Use o comando do seu agente, por exemplo: work agent claude"
-        exit 1 ;;
-    esac
+    if do_workdeck "$nome"; then
+      echo "'$nome' é um comando do próprio workdeck, não um agente de IA."
+      echo "Use o comando do seu agente, por exemplo: work agent claude"
+      exit 1
+    fi
     type -P "$nome" >/dev/null || {
       echo "'$nome' não está no PATH. Instale primeiro, ou use outro comando."
       exit 1
@@ -99,13 +121,13 @@ if [ -z "$AGENT_CMD" ]; then
   exit 1
 fi
 
-nome="${AGENT_CMD%% *}"
-if ! command -v "$nome" >/dev/null; then
+p="$(problema "$AGENT_CMD")"
+if [ -n "$p" ]; then
   if [ ! -t 1 ] && [ -n "${TMUX:-}" ]; then
-    tmux display-message -d 6000 "'$nome' não está no PATH — instale ou troque com work agent <comando>"
+    tmux display-message -d 6000 "$p — troque com: work agent <comando>"
     exit 0
   fi
-  echo "'$nome' não está no PATH"
+  echo "$p — troque com: work agent <comando>"
   exit 1
 fi
 

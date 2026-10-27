@@ -63,7 +63,11 @@ item "work escolher" "escolhe de novo os projetos"
 
   AGENT_CMD=""
   [ -f "$CONFIG_DIR/agent.conf" ] && . "$CONFIG_DIR/agent.conf"
-  if [ -n "$AGENT_CMD" ]; then
+  problema_agente=""
+  [ -n "$AGENT_CMD" ] && problema_agente="$(workdeck-agent --check 2>/dev/null)"
+  if [ -n "$problema_agente" ]; then
+    falta "agente de IA: $problema_agente — troque com: work agent <comando>"
+  elif [ -n "$AGENT_CMD" ]; then
     ok "agente de IA: $AGENT_CMD"
   else
     falta "nenhum agente de IA configurado. Para ligar um:"

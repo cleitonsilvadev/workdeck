@@ -115,11 +115,11 @@ CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/workdeck/agent.conf"
 AGENT_CMD=""
 [ -f "$CONFIG" ] && . "$CONFIG"
 if [ -n "${AGENT_CMD:-}" ]; then
-  nome="${AGENT_CMD%% *}"
-  if command -v "$nome" >/dev/null; then
+  p="$(workdeck-agent --check 2>/dev/null)"
+  if [ -z "$p" ]; then
     linha "$ok" "configurado: $AGENT_CMD"
   else
-    linha "$erro" "configurado como '$AGENT_CMD', mas '$nome' não está no PATH"
+    linha "$erro" "$p" "troque com: work agent <comando>"
     problemas=$((problemas+1))
   fi
 else

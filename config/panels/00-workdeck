@@ -7,6 +7,8 @@ if [ -f "$CONFIG_DIR/projects.conf" ]; then
 fi
 AGENT_CMD=""
 [ -f "$CONFIG_DIR/agent.conf" ] && . "$CONFIG_DIR/agent.conf"
+problema_agente=""
+[ -n "$AGENT_CMD" ] && problema_agente="$(workdeck-agent --check 2>/dev/null)"
 
 m=$'\033[48;5;183m'; e=$'\033[48;5;234m'; x=$'\033[0m'
 roxo=$'\033[1;38;5;183m'; dim=$'\033[2m'; amarelo=$'\033[33m'; verde=$'\033[32m'
@@ -28,7 +30,10 @@ if [ "$projetos" -gt 0 ]; then
 else
   linha_projetos="${amarelo}!${x} projetos  nenhum ainda"
 fi
-if [ -n "$AGENT_CMD" ]; then
+if [ -n "$problema_agente" ]; then
+  linha_agente="${amarelo}!${x} agente    $AGENT_CMD não funciona"
+  AGENT_CMD=""
+elif [ -n "$AGENT_CMD" ]; then
   linha_agente="${verde}✓${x} agente    $AGENT_CMD"
 else
   linha_agente="${amarelo}!${x} agente    nenhum ainda"
