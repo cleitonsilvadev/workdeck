@@ -187,7 +187,7 @@ verificar_em_segundo_plano() {
   [ -d "$CODIGO/.git" ] || return 0
   agora=$(date +%s)
   ultima="$(de_cache checado)"
-  if [ -n "$ultima" ] && [ $((agora - ultima)) -lt 86400 ]; then return 0; fi
+  if [ -n "$ultima" ] && [ $((agora - ultima)) -lt 3600 ]; then return 0; fi
   (
     git_quieto fetch -q --tags origin || exit 0
     gravar_cache nova "$(mais_nova $(git -C "$CODIGO" tag -l 'v*'))"
@@ -481,7 +481,8 @@ case "${1:-}" in
   update)
     case "${2:-}" in
       --desligar) mkdir -p "$(dirname "$AVISO_CONF")"; echo "AVISO=0" > "$AVISO_CONF"; echo "o work não vai mais perguntar sobre versões novas; work update continua funcionando."; exit 0 ;;
-      --ligar) rm -f "$AVISO_CONF"; echo "o work volta a avisar sobre versões novas, no máximo uma vez por dia."; exit 0 ;;
+      --ligar) rm -f "$AVISO_CONF"; echo "o work volta a avisar sobre versões novas."; exit 0 ;;
+      --verificar) verificar_em_segundo_plano; exit 0 ;;
     esac
     atualizar 1; exit $? ;;
   sincronizar) sincronizar; exit 0 ;;

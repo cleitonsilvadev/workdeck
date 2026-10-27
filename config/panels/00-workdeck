@@ -8,6 +8,7 @@ fi
 AGENT_CMD=""
 [ -f "$CONFIG_DIR/agent.conf" ] && . "$CONFIG_DIR/agent.conf"
 codigo="${XDG_DATA_HOME:-$HOME/.local/share}/workdeck"
+command -v work >/dev/null && work update --verificar >/dev/null 2>&1
 versao="$(git -C "$codigo" describe --tags --abbrev=0 2>/dev/null || true)"
 nova="$(sed -n 's/^nova=//p' "${XDG_CACHE_HOME:-$HOME/.cache}/workdeck/atualizacao" 2>/dev/null | tail -1)"
 problema_agente=""

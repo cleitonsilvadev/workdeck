@@ -3,6 +3,12 @@
 O `work update` mostra o trecho da versão nova antes de perguntar se quer
 atualizar. Cada versão é uma tag `vX.Y.Z`.
 
+## v1.0.2
+
+- A aba da janela atual fica sem fundo: só o número em destaque.
+- A tela de atualização mostra a versão, o que mudou e as etapas com ✓.
+- A verificação de versão nova roda de hora em hora, e o painel avisa sozinho.
+
 ## v1.0.1
 
 - Instalação numa linha, sem clonar: curl … instalar.sh | bash.
