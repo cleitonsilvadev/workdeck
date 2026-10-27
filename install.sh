@@ -312,7 +312,7 @@ case ":$PATH:" in
   *) say "atenção: $BIN_DIR não está no PATH — o bloco do shell resolve isso" ;;
 esac
 if [ "$ROOT" = "$CODIGO" ]; then
-  :
+  anota codigo "$CODIGO"
 elif git -C "$ROOT" rev-parse >/dev/null 2>&1; then
   origem="$(git -C "$ROOT" remote get-url origin 2>/dev/null || true)"
   run rm -rf "$CODIGO"

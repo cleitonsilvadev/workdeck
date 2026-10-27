@@ -31,6 +31,23 @@ work help             # menu com as ações, os atalhos e o que falta configurar
 
 ## Instalação
 
+Numa linha, sem clonar nada:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/instalar.sh | bash
+```
+
+Ele baixa a versão publicada mais nova para `~/.local/share/workdeck` e roda o
+instalador de lá. As opções passam adiante, como em
+`curl -fsSL … | bash -s -- --theme nord`. Para ler o script antes de rodar:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/instalar.sh -o instalar.sh
+less instalar.sh && bash instalar.sh
+```
+
+Ou pelo clone, para quem quer mexer no código:
+
 ```bash
 git clone https://github.com/<voce>/workdeck.git
 cd workdeck
