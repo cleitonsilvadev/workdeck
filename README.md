@@ -23,7 +23,7 @@ ai                    # abre o agente num pane ao lado
 work review           # revisa o que ele escreveu (o mesmo que git review)
 work painel           # abre o painel de contexto
 work doctor           # diz o que funciona no seu ambiente
-work help             # comandos, atalhos e o que falta configurar
+work help             # menu com as ações, os atalhos e o que falta configurar
 ```
 
 ---
@@ -204,7 +204,7 @@ sessão; sem fechar, a sessão antiga continua com a lista antiga.
 | `work api` | Abre e já vai para a janela `api` |
 | `work escolher` | Escolhe de novo os projetos |
 | `work kill` | Fecha a sessão inteira |
-| `work help` | Comandos, atalhos e o que falta configurar |
+| `work help` | Abre o menu com as ações; `--texto` mostra comandos, atalhos e o que falta configurar |
 | `work doctor` | Diz o que funciona no seu ambiente |
 | `work agent <cmd>` | Define o agente de IA; sem nada, mostra o atual |
 | `work review` | O mesmo que `git review` |
@@ -239,7 +239,7 @@ Funcionam em qualquer terminal, sem configurar nada:
 | Fecha o painel | <kbd>x</kbd> | <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>X</kbd> |
 | Renomeia a janela | <kbd>,</kbd> | <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>R</kbd> |
 | Abre o agente de IA ao lado | <kbd>a</kbd> | <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>A</kbd> |
-| Mostra a ajuda | <kbd>h</kbd> | |
+| Abre o menu: projetos, agente, revisão, painel, diagnóstico | <kbd>h</kbd> | |
 | Solta a sessão (ela continua viva) | <kbd>d</kbd> | <kbd>Alt</kbd>+<kbd>shift</kbd>+<kbd>E</kbd> |
 
 Os atalhos diretos economizam uma tecla. No Linux funcionam de cara; no Mac, a
