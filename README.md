@@ -18,7 +18,7 @@ terminal. macOS e Linux; no Windows, pelo WSL.
 
 ```bash
 work                  # abre a sessão, uma janela por projeto
-ai                    # abre o agente ao lado, na pasta do projeto; ai help explica
+ai                    # abre a IA ao lado, para te ajudar no projeto; ai help explica
 work review           # revisa o que ele escreveu (o mesmo que git review)
 work agent claude     # define qual é o seu agente de IA
 work painel           # abre o painel de contexto
@@ -165,6 +165,11 @@ work add                         # sem caminho, usa a pasta atual
 
 O nome da janela é o nome da pasta. Se a sessão já estiver aberta, a janela
 aparece na hora; se a pasta já estiver no work, nada muda.
+
+Para tirar um projeto, feche a janela dele: `exit` no último painel, ou
+<kbd>Ctrl</kbd>+<kbd>b</kbd> e <kbd>x</kbd>. Ele sai do `projects.conf`, e o
+próximo `work` não abre mais. Para voltar, `work add` de novo. Fechar só um dos
+painéis divididos, ou o agente, não tira nada.
 
 Para escolher vários de uma vez, `work escolher` procura os repositórios git da
 sua pasta pessoal (até 4 níveis, sem `Library`, `node_modules` nem pastas

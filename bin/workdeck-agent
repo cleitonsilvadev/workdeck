@@ -83,7 +83,7 @@ FIM
     carrega
     atual="${AGENT_CMD:-nenhum ainda — defina com: work agent <comando>}"
     cat <<FIM
-ai — abre o seu agente de IA num painel ao lado, na pasta em que você está.
+ai — abre a IA ao lado, na pasta em que você está, para te ajudar no projeto.
 
   Seu agente: $atual
 

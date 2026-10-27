@@ -321,6 +321,15 @@ if [ -f "$CONFIG_DIR/projects.conf" ]; then
 else
   say "projetos: adicione com work add <caminho>"
 fi
+for velho in 10-maquina 00-comece-aqui; do
+  f="$CONFIG_DIR/panels/$velho"
+  [ -f "$f" ] || continue
+  case "$(cksum < "$f")" in
+    "2267948504 298"|"222309757 696"|"3755985038 721")
+      run rm -f "$f"
+      say "painel antigo $velho removido" ;;
+  esac
+done
 for painel in "$ROOT"/config/panels/*; do
   nome="$(basename "$painel")"
   if [ -f "$CONFIG_DIR/panels/$nome" ]; then

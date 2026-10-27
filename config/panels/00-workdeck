@@ -81,7 +81,7 @@ if [ "$projetos" = 0 ] || [ -z "$AGENT_CMD" ]; then
 fi
 
 printf '%sO dia a dia%s\n' "$roxo" "$x"
-passo "ai  ou  Ctrl+b a" "abre o agente ao lado, na pasta do projeto"
+passo "ai  ou  Ctrl+b a" "abre a IA ao lado, para te ajudar no projeto"
 passo "Shift+← / →" "vai para o projeto anterior / próximo"
 passo "Ctrl+b Enter" "divide a tela; v ao lado, - embaixo, = iguala"
 passo "Shift+↑ / ↓" "troca de painel dentro da janela"
