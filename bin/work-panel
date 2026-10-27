@@ -24,7 +24,7 @@ for arg in "$@"; do
   esac
 done
 
-bold=$'\e[1m'; dim=$'\e[2m'; reset=$'\e[0m'
+bold=$'\e[1;38;5;183m'; dim=$'\e[2m'; reset=$'\e[0m'
 
 titulo_de() { # 20-docker → Docker
   basename "$1" | sed 's/^[0-9]*-//; s/[-_]/ /g' | awk '{print toupper(substr($0,1,1)) substr($0,2)}'

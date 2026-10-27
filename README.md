@@ -390,12 +390,12 @@ ordenar; os que começam com `00-` aparecem sem título. Dois vêm prontos:
 | Arquivo | Mostra |
 |---|---|
 | `00-workdeck` | O logo, quantos projetos e qual agente, e o que falta configurar |
-| `20-git` | Em que branch está cada projeto e se há mudança solta |
+| `20-projetos` | Cada projeto, a branch e se há mudança solta (`●`) ou está limpo (`✓`) |
 
 ```
-Git
-  api            main
-  web            feature/login  (6 alterado(s))
+Projetos
+  api            main                 ✓ limpo
+  web            feature/login        ● 6 alterado(s)
 ```
 
 ### Fazendo o seu

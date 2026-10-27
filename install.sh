@@ -321,15 +321,6 @@ if [ -f "$CONFIG_DIR/projects.conf" ]; then
 else
   say "projetos: adicione com work add <caminho>"
 fi
-for velho in 10-maquina 00-comece-aqui; do
-  f="$CONFIG_DIR/panels/$velho"
-  [ -f "$f" ] || continue
-  case "$(cksum < "$f")" in
-    "2267948504 298"|"222309757 696"|"3755985038 721")
-      run rm -f "$f"
-      say "painel antigo $velho removido" ;;
-  esac
-done
 versao_distribuida() {
   local alvo="$1" caminho="$2" atual c
   atual="$(cksum < "$alvo")"
@@ -339,6 +330,13 @@ versao_distribuida() {
   done
   return 1
 }
+for velho in 10-maquina 00-comece-aqui 20-git; do
+  f="$CONFIG_DIR/panels/$velho"
+  if [ -f "$f" ] && versao_distribuida "$f" "config/panels/$velho"; then
+    run rm -f "$f"
+    say "painel antigo $velho removido"
+  fi
+done
 for painel in "$ROOT"/config/panels/*; do
   nome="$(basename "$painel")"
   alvo="$CONFIG_DIR/panels/$nome"

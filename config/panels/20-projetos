@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/workdeck/projects.conf"
+roxo=$'\033[38;5;183m'; verde=$'\033[38;5;151m'; amarelo=$'\033[38;5;223m'; dim=$'\033[2m'; x=$'\033[0m'
+
+[ -f "$CONFIG" ] || { echo "${dim}nenhum projeto ainda${x}"; exit 0; }
+
+achou=0
+while IFS= read -r line; do
+  line="${line%%#*}"; [ -z "${line// }" ] && continue
+  IFS="|" read -r nome dir cmd <<< "$line"
+  [ -n "$cmd" ] && continue
+  achou=1
+  dir="${dir/#\~/$HOME}"; dir="${dir//\$\{HOME\}/$HOME}"; dir="${dir//\$HOME/$HOME}"
+  if [ ! -d "$dir/.git" ]; then
+    printf '%-14s %s%-20s%s %ssem git%s\n' "$nome" "$dim" "-" "$x" "$dim" "$x"
+    continue
+  fi
+  branch=$(git -C "$dir" branch --show-current 2>/dev/null)
+  sujo=$(git -C "$dir" status --porcelain 2>/dev/null | wc -l | tr -d ' ')
+  if [ "$sujo" -gt 0 ]; then
+    estado="${amarelo}● $sujo alterado(s)${x}"
+  else
+    estado="${verde}✓ limpo${x}"
+  fi
+  printf '%-14s %s%-20s%s %s\n' "$nome" "$roxo" "${branch:-?}" "$x" "$estado"
+done < "$CONFIG"
+[ "$achou" = 1 ] || echo "${dim}nenhum projeto ainda${x}"
