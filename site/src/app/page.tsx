@@ -142,7 +142,7 @@ export default function Home() {
           </Stagger>
         </Section>
 
-        <Section id="recursos" eyebrow="por que" title="Feito para quem trabalha com agentes" desc="O agente escreve código que você precisa ver. Com ele ao lado, o work review roda no pane de baixo sem trocar de contexto.">
+        <Section id="recursos" eyebrow="por que" title="Feito para quem trabalha com agentes" desc="O agente escreve código que você precisa ver. Com ele ao lado, o shell fica no outro painel para rodar os testes e o work review sem trocar de contexto.">
           <Stagger className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {features.map((f) => {
               const Icon = icons[f.icon]

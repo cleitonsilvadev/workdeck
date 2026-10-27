@@ -16,7 +16,7 @@ export const commands = [
   { cmd: "work", desc: "Abre a sessão, uma janela por projeto. Ou volta para ela." },
   { cmd: "work add ~/code/api", desc: "Acrescenta um projeto. Sem caminho, usa a pasta atual." },
   { cmd: "ai", desc: "Abre a IA ao lado, para te ajudar no projeto, já na pasta dele. O ai help explica." },
-  { cmd: "work review", desc: "Revisa o que o agente escreveu antes do commit. O mesmo que git review." },
+  { cmd: "work review", desc: "A IA faz um self code review da mudança antes do commit, numa conversa nova ao lado." },
   { cmd: "work agent claude", desc: "Define qual é o seu agente de IA. Qualquer comando serve." },
   { cmd: "work painel", desc: "Abre o painel de contexto: branches, mudanças soltas, o que você quiser." },
   { cmd: "work doctor", desc: "Diz o que funciona no seu ambiente e o que não vai funcionar." },

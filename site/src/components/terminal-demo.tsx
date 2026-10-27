@@ -126,28 +126,26 @@ export function TerminalDemo() {
               </Pane>
               <AnimatePresence>
                 {reviewOpen && (
-                  <Pane key="review" title="review" active={focus === "review"}>
-                    <Line>
-                      <span className="font-bold text-ctp-sky">work review</span>
-                      <span className="font-bold text-ctp-text">  feature/login</span>
+                  <Pane key="review" title="IA · review" active={focus === "review"}>
+                    <Line className="text-ctp-overlay0">conversa nova, só para revisar</Line>
+                    <Line className="text-ctp-subtext0">
+                      lendo a mudança · <span className="text-ctp-green">+13</span> <span className="text-ctp-red">-2</span> em 2 arquivo(s)
                     </Line>
                     {s >= 8 && (
                       <>
-                        <Line className="text-ctp-subtext0" delay={0.05}> src/auth/login.ts   | 9 <span className="text-ctp-green">+++++++</span><span className="text-ctp-red">--</span></Line>
-                        <Line className="text-ctp-subtext0" delay={0.12}> src/auth/email.ts   <span className="text-ctp-green">(novo, 6 linhas)</span></Line>
+                        <Line className="mt-1 text-ctp-yellow" delay={0.05}>● vale corrigir  <span className="text-ctp-subtext0">email.ts:3</span></Line>
+                        <Line className="text-ctp-subtext0" delay={0.12}>  o regex aceita e-mail sem domínio</Line>
                       </>
                     )}
                     {s >= 9 && (
                       <>
-                        <Line className="mt-1 text-ctp-overlay0" delay={0}>  12 │ export function login(form) {"{"}</Line>
-                        <Line className="bg-ctp-red/10 text-ctp-red" delay={0.08}>- 13 │   return auth(form)</Line>
-                        <Line className="bg-ctp-green/10 text-ctp-green" delay={0.16}>+ 13 │   if (!isEmail(form.email)) throw …</Line>
-                        <Line className="bg-ctp-green/10 text-ctp-green" delay={0.24}>+ 14 │   return auth(form)</Line>
+                        <Line className="text-ctp-overlay1" delay={0}>○ opcional  <span className="text-ctp-subtext0">login.ts:13</span></Line>
+                        <Line className="text-ctp-subtext0" delay={0.08}>  falta teste para e-mail inválido</Line>
                       </>
                     )}
                     {s >= 10 && (
                       <Line className="mt-1 text-ctp-text" delay={0}>
-                        <span className="font-bold">2 arquivo(s)</span>  <span className="text-ctp-green">+13</span>  <span className="text-ctp-red">-2</span>
+                        <span className="font-bold">veredito:</span> <span className="text-ctp-green">commit depois do ajuste</span>
                       </Line>
                     )}
                   </Pane>
