@@ -120,7 +120,7 @@ menu() {
       chave="${OPCOES[$i]%%|*}"; rotulo="${OPCOES[$i]#*|}"
       largura=$(printf '%s' "$rotulo" | LC_ALL=C tr -d '\200-\277' | wc -c)
       if [ $i = $cur ]; then
-        printf '  \033[7m › %s%*s %s \033[0m\n' "$rotulo" $((38 - largura)) "" "$chave"
+        printf '  \033[7m› %s%*s %s \033[0m\n' "$rotulo" $((38 - largura)) "" "$chave"
       else
         printf '    %s%*s %s%s%s\n' "$rotulo" $((38 - largura)) "" "$d" "$chave" "$r"
       fi
