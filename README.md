@@ -9,11 +9,11 @@ não troca de aba do terminal: ele manda `Ctrl+b 3` e o tmux troca de janela.
 O ganho é que a sessão sobrevive a fechar o terminal, cair a conexão ou
 reiniciar o app. Você volta com `work` e tudo está onde estava.
 
-Junto vêm um `git review` com diff colorido e um painel opcional que mostra
-suas tasks da sprint, os PRs abertos e o último deploy.
+Junto vêm um `git review` com diff colorido e um painel opcional, onde você
+põe os comandos que quiser ver sem sair do terminal.
 
-Feito para macOS, zsh e Azure DevOps. Os painéis são a única parte amarrada
-ao Azure; o resto serve para qualquer stack.
+Feito para macOS e zsh. Nada aqui é amarrado a uma linguagem ou a um serviço:
+os projetos, os atalhos, os painéis e as cores são todos seus para trocar.
 
 ---
 
@@ -149,44 +149,70 @@ passam por cima das duas.
 
 ---
 
-## Os painéis
+## Painéis
 
-Quatro scripts que só imprimem texto. Valem sozinhos na linha de comando, e o
-`tclock` (opcional) os coloca na tela e os atualiza.
+Um painel é qualquer executável que imprima texto. O `tclock` (opcional) os
+coloca na tela e os atualiza sozinho; fora dele, cada um funciona na linha de
+comando como qualquer comando.
+
+O projeto vem com um só, de propósito — ele serve mais como modelo do que
+como funcionalidade:
 
 | Script | Mostra |
 |---|---|
-| `painel-tasks` | Suas tasks da sprint, agrupadas pela história |
-| `painel-prs` | PRs abertos: 🔵 seus, 🟡 esperando sua revisão |
-| `painel-pipelines` | Última execução de cada pipeline |
-| `painel-sistema` | Carga, swap e disco |
-
-Os três primeiros precisam do Azure DevOps configurado:
+| `painel-sistema` | Carga, swap e disco livre |
 
 ```bash
-brew install azure-cli
-az login
-az extension add --name azure-devops
-cp azure.example.conf ~/.config/workdeck/azure.conf
-$EDITOR ~/.config/workdeck/azure.conf
+$ painel-sistema
+carga 2.14 · swap 1.2G · disco livre 86Gi
 ```
 
-Esse arquivo fica fora do repositório de propósito: ele tem o nome da sua
-organização, dos seus projetos e o seu e-mail. O `painel-sistema` funciona sem
-configuração nenhuma.
+Ele tem seis linhas. Vale abrir `bin/painel-sistema` antes de escrever o seu.
 
-**Para escrever um painel novo:** qualquer executável que imprima texto serve.
-Ponha em `bin/`, rode `./install.sh`, e acrescente ao `config/tclock.toml`:
+### Fazendo o seu
+
+Qualquer coisa que você queira olhar de relance serve: containers rodando,
+build quebrado, fila de deploy, tarefas do dia, o tempo, a cotação do dólar,
+quantos commits você fez hoje. Escreva um executável que imprima texto, ponha
+em `bin/`, rode `./install.sh` de novo e acrescente ao `config/tclock.toml`:
 
 ```toml
 [[clock.widgets]]
-title = "Meu painel"
-group = "meus"
-command = ["meu-painel"]
-refresh_secs = 300
+title = "Containers"
+group = "dev"
+command = ["docker", "ps", "--format", "{{.Names}}  {{.Status}}"]
+refresh_secs = 30
 ```
 
-Widgets do mesmo `group` aparecem juntos; <kbd>g</kbd> troca de grupo.
+Não precisa nem ser um script — `command` aceita qualquer comando com
+argumentos, como no exemplo acima.
+
+Widgets com o mesmo `group` aparecem juntos; a tecla <kbd>g</kbd> alterna entre
+os grupos. `refresh_secs` diz de quanto em quanto tempo redesenhar, e
+`timeout_secs` desiste se o comando travar. Para uma visão maior sob demanda,
+`popup_actions` cria uma tecla:
+
+```toml
+[[clock.widgets.popup_actions]]
+key = "d"
+label = "docker com detalhe"
+command = ["docker", "ps", "-a"]
+```
+
+### Painéis que precisam de credenciais
+
+Se o seu painel fala com uma API — um board, um CI, um serviço interno —, não
+coloque token nem URL de organização dentro do script. Leia de um arquivo em
+`~/.config/workdeck/`, que fica fora do repositório:
+
+```bash
+CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/workdeck/meu-painel.conf"
+[ -f "$CONFIG" ] || { echo "configure primeiro: $CONFIG"; exit 1; }
+. "$CONFIG"
+```
+
+Assim o painel pode ser versionado e compartilhado, e o que é seu continua
+sendo seu. O `.gitignore` já ignora `*.conf` soltos por garantia.
 
 ---
 
@@ -234,7 +260,7 @@ senão o diff fica difícil em tela não-retina.
 
 ```
 ~/.local/bin/                     work, git-review, painel-*
-~/.config/workdeck/               projects.conf, azure.conf   (seus; nunca sobem)
+~/.config/workdeck/               projects.conf e o que seus painéis precisarem
 ~/.config/kitty/kitty.conf        bloco entre os marcadores
 ~/.tmux.conf                      bloco entre os marcadores
 ~/.zshrc                          bloco entre os marcadores
@@ -250,6 +276,36 @@ senão o diff fica difícil em tela não-retina.
 
 Remove os blocos e os scripts. Sua config em `~/.config/workdeck/` fica — para
 apagar também, `rm -rf ~/.config/workdeck`.
+
+## Customizando
+
+Quase tudo aqui é para ser trocado. O resumo:
+
+| Quero mudar | Onde | Depois |
+|---|---|---|
+| Os projetos e a ordem das janelas | `~/.config/workdeck/projects.conf` | `work kill` e `work` |
+| Um atalho do teclado | `config/kitty.conf` | `./install.sh` |
+| Um comportamento do tmux | `config/tmux.conf` | `./install.sh` |
+| As cores | `themes/<nome>.conf` e `.tmux` | `./install.sh --theme <nome>` |
+| O que aparece no painel | `config/tclock.toml` | `tclock run` |
+| A branch base do `git review` | `bin/git-review`, em `base_candidates` | `./install.sh` |
+| O nome da sessão | `export WORKDECK_SESSION=outro` | — |
+| Algo que não existe aqui | escreva em `bin/` | `./install.sh` |
+
+Qualquer executável que você puser em `bin/` vai para o `PATH` no próximo
+`install.sh`. É assim que o `work`, o `git-review` e o `painel-sistema`
+chegam lá — não há nada de especial neles.
+
+Se você for manter sua própria versão, o caminho mais confortável é dar fork,
+mexer no que quiser e rodar o `install.sh` do seu fork. O instalador só
+gerencia o que está entre os marcadores `# >>> workdeck >>>`, então o resto
+dos seus arquivos continua seu.
+
+## Isto é uma config pessoal
+
+O projeto nasceu da config de uma pessoa e é publicado porque pode ser útil a
+outras, não como produto mantido. Use, copie, dê fork e mude o que precisar.
+Não espere suporte, roadmap ou compatibilidade entre versões.
 
 ## Licença
 

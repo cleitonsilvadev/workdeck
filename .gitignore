@@ -2,6 +2,6 @@
 # Ela mora em ~/.config/workdeck/, não aqui — estas linhas são só
 # uma rede de segurança para quem copiar os arquivos para dentro do projeto.
 projects.conf
-azure.conf
+azure.conf          # se você criar um painel que precise de credenciais
 *.local
 .DS_Store

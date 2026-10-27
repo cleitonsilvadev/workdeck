@@ -4,6 +4,7 @@
 #   ./install.sh                  instala com o tema padrão (catppuccin-mocha)
 #   ./install.sh --theme nord     escolhe outro tema de themes/
 #   ./install.sh --no-brew        não instala nada pelo Homebrew
+#   ./install.sh --no-reload      não recarrega o tmux no fim
 #   ./install.sh --dry-run        só mostra o que faria
 #
 # É idempotente: rodar de novo atualiza em vez de duplicar. Tudo o que ele
@@ -16,12 +17,14 @@ CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/workdeck"
 BIN_DIR="$HOME/.local/bin"
 THEME="catppuccin-mocha"
 USE_BREW=1
+RELOAD=1
 DRY=0
 
 while [ $# -gt 0 ]; do
   case "$1" in
     --theme) THEME="${2:?--theme precisa de um nome}"; shift 2 ;;
     --no-brew) USE_BREW=0; shift ;;
+    --no-reload) RELOAD=0; shift ;;
     --dry-run) DRY=1; shift ;;
     -h|--help) sed -n '2,10p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
     *) echo "opção desconhecida: $1"; exit 1 ;;
@@ -90,12 +93,6 @@ else
   run cp "$ROOT/projects.example.conf" "$CONFIG_DIR/projects.conf"
   say "projects.conf criado a partir do exemplo — edite com os seus projetos"
 fi
-if [ -f "$CONFIG_DIR/azure.conf" ]; then
-  say "azure.conf já existe — não toquei nele"
-else
-  say "azure.conf não criado (opcional; só para os painéis do Azure DevOps)"
-  say "para usar:  cp $ROOT/azure.example.conf $CONFIG_DIR/azure.conf"
-fi
 run mkdir -p "${XDG_CONFIG_HOME:-$HOME/.config}/git-review"
 run cp "$ROOT/config/git-review-lesskey" "${XDG_CONFIG_HOME:-$HOME/.config}/git-review/lesskey"
 say "lesskey do git-review"
@@ -128,7 +125,9 @@ write_block "$HOME/.zshrc" "$(cat "$ROOT/config/zshrc-snippet.zsh")"
 say ".zshrc"
 echo
 
-if command -v tmux >/dev/null && tmux info >/dev/null 2>&1; then
+# Recarregar um tmux que já está rodando aplica ESTE $HOME nele. Ao instalar
+# num HOME de teste, use --no-reload para não mexer na sessão de verdade.
+if [ "$RELOAD" = 1 ] && command -v tmux >/dev/null && tmux info >/dev/null 2>&1; then
   run tmux source-file "$HOME/.tmux.conf" && say "tmux recarregado"
 fi
 
