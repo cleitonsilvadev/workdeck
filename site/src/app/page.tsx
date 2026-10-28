@@ -12,6 +12,8 @@ import { ShortcutList } from "@/components/shortcut-list"
 import { TerminalDemo } from "@/components/terminal-demo"
 import { ThemePreview } from "@/components/theme-preview"
 import { commands, features, installCommand, panelRules, panelsUrl, repoUrl, uninstall, version } from "@/lib/site"
+import { getStars } from "@/lib/github"
+import { formatStars, showStars } from "@/lib/stars"
 import { cn } from "@/lib/utils"
 
 const icons = {
@@ -44,7 +46,9 @@ function Section({ id, eyebrow, title, desc, children, className }: { id?: strin
   )
 }
 
-export default function Home() {
+export default async function Home() {
+  const stars = await getStars()
+
   return (
     <>
       <header className="sticky top-0 z-50 border-b border-ctp-surface0/60 bg-ctp-crust/70 backdrop-blur-xl">
@@ -65,9 +69,9 @@ export default function Home() {
             <a href="#temas" className="transition-colors hover:text-ctp-text">Temas</a>
             <a href="#instalar" className="transition-colors hover:text-ctp-text">Instalar</a>
           </nav>
-          <a href={repoUrl} target="_blank" rel="noreferrer" className={cn(buttonVariants({ variant: "outline", size: "sm" }), "gap-2")}>
+          <a href={repoUrl} target="_blank" rel="noreferrer" aria-label={showStars(stars) ? `GitHub, ${stars} estrelas` : "GitHub"} className={cn(buttonVariants({ variant: "outline", size: "sm" }), "gap-2")}>
             <GithubMark className="size-3.5" />
-            GitHub
+            {showStars(stars) ? <span className="font-mono tabular-nums">{formatStars(stars)}</span> : "GitHub"}
           </a>
         </div>
       </header>
