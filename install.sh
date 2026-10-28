@@ -323,7 +323,7 @@ concluir
 etapa 2 "scripts"
 run mkdir -p "$BIN_DIR"
 instalados=0
-for script in "$ROOT"/bin/*; do
+for script in "$ROOT/bin/work"; do
   nome="$(basename "$script")"
   alvo="$BIN_DIR/$nome"
   if [ -f "$alvo" ] && ! iguais "$script" "$alvo" && ! grep -qxF "script|$alvo|" "$MANIFESTO" 2>/dev/null; then
@@ -356,13 +356,13 @@ fi
 if [ -f "$MANIFESTO" ] && [ "$DRY" = 0 ]; then
   while IFS='|' read -r tipo alvo _; do
     [ "$tipo" = script ] || continue
-    [ -e "$ROOT/bin/$(basename "$alvo")" ] && continue
+    [ "$(basename "$alvo")" = work ] && continue
     rm -f "$alvo"
     grep -vxF "script|$alvo|" "$MANIFESTO" > "$MANIFESTO.tmp" && mv "$MANIFESTO.tmp" "$MANIFESTO"
-    say "$(basename "$alvo") removido: não faz mais parte do workdeck"
+    say "$(basename "$alvo") saiu de $(curto "$BIN_DIR"): só o work fica no PATH"
   done < <(grep '^script|' "$MANIFESTO" || true)
 fi
-resumo "$instalados comandos em $(curto "$BIN_DIR")"
+resumo "work em $(curto "$BIN_DIR")"
 concluir
 
 # ---- 3. config do usuário --------------------------------------------------
@@ -539,7 +539,7 @@ agente_atual=""
 [ -f "$CONFIG_DIR/agent.conf" ] && agente_atual="$(. "$CONFIG_DIR/agent.conf"; echo "${AGENT_CMD:-}")"
 
 if [ -n "$AGENT" ]; then
-  run "$BIN_DIR/workdeck-agent" --set "$AGENT" && say "agente: $AGENT"
+  run "$ROOT/bin/workdeck-agent" --set "$AGENT" && say "agente: $AGENT"
   resumo "$AGENT"
 elif [ -n "$agente_atual" ]; then
   say "agente já configurado: $agente_atual"
@@ -567,7 +567,7 @@ else
     printf '  Qual você usa? [0-%s] ' "${#achados[@]}"
     read -r escolha || escolha=0
     if [ "${escolha:-0}" -ge 1 ] 2>/dev/null && [ "$escolha" -le "${#achados[@]}" ]; then
-      run "$BIN_DIR/workdeck-agent" --set "${achados[$((escolha-1))]}" >/dev/null \
+      run "$ROOT/bin/workdeck-agent" --set "${achados[$((escolha-1))]}" >/dev/null \
         && say "agente: ${achados[$((escolha-1))]}"
       resumo "${achados[$((escolha-1))]}"
     else

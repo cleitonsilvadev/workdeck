@@ -287,14 +287,9 @@ O painel é a janela 1 da sessão: a visão geral do seu work em cima, e um
 terminal de 8 linhas embaixo para digitar. Sem nenhum projeto, o `work` abre só com ele,
 mostrando o que falta fazer, e o `work add` digitado ali já cria a janela.
 
-Por baixo, o `work-panel` mostra a saída de vários comandos, atualizando
-sozinho. Não depende de nada além do que já está instalado.
-
-```bash
-work-panel          # atualiza a cada 60s
-work-panel 10       # a cada 10s
-work-panel --once   # imprime uma vez e sai
-```
+Por baixo, o painel mostra a saída de vários comandos e atualiza sozinho a cada
+60 segundos. Para outro intervalo, ponha os segundos no fim da linha dele em
+`projects.conf`, como em `painel|~|work-panel 30`.
 
 Dentro dele, <kbd>q</kbd> sai.
 
@@ -327,7 +322,7 @@ EOF
 chmod +x ~/.config/workdeck/panels/30-docker
 ```
 
-É só isso. Não precisa reinstalar nem reiniciar: o `work-panel` lê o diretório
+É só isso. Não precisa reinstalar nem reiniciar: o painel lê o diretório
 a cada ciclo. Esqueceu o `chmod +x`? Ele avisa.
 
 Os painéis que vêm com o workdeck são atualizados pelo `work update`; um painel
@@ -376,7 +371,7 @@ senão o diff fica difícil em tela não-retina.
 ## O que vai para onde
 
 ```
-~/.local/bin/                     work, work-panel
+~/.local/bin/                     work, o único comando no PATH
 ~/.config/workdeck/projects.conf  seus projetos
 ~/.config/workdeck/panels/        seus painéis
 ~/.tmux.conf                      bloco entre os marcadores
@@ -440,11 +435,10 @@ Quase tudo aqui é para ser trocado. O resumo:
 | As cores | a instalação com `--theme <nome>` | — |
 | O que aparece no painel | `~/.config/workdeck/panels/` | nada, ele relê sozinho |
 | O nome da sessão | `export WORKDECK_SESSION=outro` | — |
-| Algo que não existe aqui | um fork do repositório, com o seu script em `bin/` | `./install.sh` no fork |
+| Algo que não existe aqui | um fork do repositório, com o seu comando no `bin/work` | `./install.sh` no fork |
 
-Qualquer executável em `bin/` vai para o `PATH` na instalação. É assim que o
-`work` e o `work-panel` chegam lá — não há nada de especial
-neles.
+Só o `work` vai para o `PATH`. Os outros scripts de `bin/` são peças internas: o
+`work` os chama de dentro da instalação, em `~/.local/share/workdeck`.
 
 Se você for manter sua própria versão, o caminho mais confortável é dar fork,
 mexer no que quiser e rodar o `install.sh` do seu fork. O instalador só

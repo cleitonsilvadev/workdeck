@@ -7,6 +7,8 @@ CODIGO="${XDG_DATA_HOME:-$HOME/.local/share}/workdeck"
 CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/workdeck/atualizacao"
 AVISO_CONF="${XDG_CONFIG_HOME:-$HOME/.config}/workdeck/atualizacao.conf"
 SESSION="${WORKDECK_SESSION:-work}"
+LIB="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+[ -x "$LIB/workdeck-agent" ] || LIB="$CODIGO/bin"
 
 if [ -n "${TERM:-}" ] && command -v infocmp >/dev/null && ! infocmp "$TERM" >/dev/null 2>&1; then
   for d in /Applications/kitty.app/Contents/Resources/kitty/terminfo "$HOME/Applications/kitty.app/Contents/Resources/kitty/terminfo" "$HOME/.local/kitty.app/share/terminfo" "$HOME/.terminfo"; do
@@ -234,7 +236,7 @@ FIM
       printf '\nInstruções de quem pediu a revisão, que valem mais que as de cima:\n%s' "$extra"
     fi
   } > "$pedido"
-  workdeck-agent --pedido "$pedido" "REVIEW" "$raiz:$branch"
+  "$LIB/workdeck-agent" --pedido "$pedido" "REVIEW" "$raiz:$branch"
 }
 
 com_shell() {
@@ -274,7 +276,7 @@ sincronizar() {
   if [ -n "$tirados" ]; then
     mv "$tmp" "$CONFIG"
     if tmux list-windows -t "$SESSION" -F '#W' | grep -qx painel; then
-      tmux respawn-pane -k -t "$SESSION:painel.{top}" 2>/dev/null || true
+      tmux respawn-pane -k -t "$SESSION:painel.{top}" "work _painel" 2>/dev/null || true
     fi
   else
     rm -f "$tmp"
@@ -309,7 +311,7 @@ adicionar() {
     jan="$(tmux new-window -d -P -F '#{window_id}' -t "$SESSION:" -n "$nome" -c "$d")"
     tmux set -w -t "$jan" @projeto "$d"
     if tmux list-windows -t "$SESSION" -F '#W' | grep -qx painel; then
-      tmux respawn-pane -k -t "$SESSION:painel.{top}" 2>/dev/null || true
+      tmux respawn-pane -k -t "$SESSION:painel.{top}" "work _painel" 2>/dev/null || true
     fi
     echo "a janela $nome já está aberta na sessão $SESSION"
   fi
@@ -327,6 +329,8 @@ case "${1:-}" in
     esac
     atualizar 1; exit $? ;;
   sincronizar) sincronizar; exit 0 ;;
+  _painel) shift; exec "$LIB/work-panel" "$@" ;;
+  _atalhos) exec "$LIB/workdeck-help" ;;
   *)
     echo "não conheço 'work $1'. Os comandos são:"
     echo "  work                abre a sessão, ou volta para ela"
@@ -357,6 +361,7 @@ if ! tmux has-session -t "$SESSION" 2>/dev/null; then
     IFS="|" read -r name dir cmd <<< "$entry"
     dir="$(resolver "$dir")"
     [ -d "$dir" ] || { echo "pulando $name: $dir não existe"; continue; }
+    case "$cmd" in work-panel|"work-panel "*) cmd="work _painel${cmd#work-panel}" ;; esac
     if [ "$first" = 1 ]; then
       tamanho=()
       if [ -t 1 ] && read -r linhas colunas < <(stty size </dev/tty 2>/dev/null) && [ "${colunas:-0}" -gt 0 ]; then
@@ -364,12 +369,12 @@ if ! tmux has-session -t "$SESSION" 2>/dev/null; then
       fi
       jan="$(tmux new-session -d -P -F '#{window_id}' -s "$SESSION" "${tamanho[@]+"${tamanho[@]}"}" -n "$name" -c "$dir" ${cmd:+"$cmd"})"
       [ -n "$cmd" ] || tmux set -w -t "$jan" @projeto "$dir"
-      [ "$cmd" = work-panel ] && com_shell "$SESSION:$name"
+      [ "${cmd%% *}" = work ] && com_shell "$SESSION:$name"
       first=0
     else
       jan="$(tmux new-window -P -F '#{window_id}' -t "$SESSION:" -n "$name" -c "$dir" ${cmd:+"$cmd"})"
       [ -n "$cmd" ] || tmux set -w -t "$jan" @projeto "$dir"
-      [ "$cmd" = work-panel ] && com_shell "$SESSION:$name"
+      [ "${cmd%% *}" = work ] && com_shell "$SESSION:$name"
     fi
   done
   tmux set -t "$SESSION" @workdeck 1
