@@ -21,7 +21,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/workdeck"
 BIN_DIR="$HOME/.local/bin"
 CODIGO="${XDG_DATA_HOME:-$HOME/.local/share}/workdeck"
-THEME="catppuccin-mocha"
+THEME=""
 QUER_ZSH=0
 REINICIAR_SHELL=0
 AGENT=""
@@ -223,11 +223,16 @@ aplicar_kitty() {
   say "kitty.conf — tema, fonte e atalhos"
 }
 
+if [ -z "$THEME" ]; then
+  THEME="$(cat "$CONFIG_DIR/tema" 2>/dev/null || true)"
+  [ -f "$ROOT/themes/${THEME:-_}.conf" ] || THEME="catppuccin-mocha"
+fi
 [ -f "$ROOT/themes/$THEME.conf" ] || {
   echo "tema '$THEME' não existe. Disponíveis:"
   ls "$ROOT/themes"/*.conf | xargs -n1 basename | sed 's/\.conf$//; s/^/  /'
   exit 1
 }
+[ "$DRY" = 1 ] || { mkdir -p "$CONFIG_DIR"; echo "$THEME" > "$CONFIG_DIR/tema"; }
 
 # ---- qual sistema ----------------------------------------------------------
 case "$(uname -s)" in
