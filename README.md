@@ -91,6 +91,7 @@ workdeck no `.zshrc`, sem oh-my-zsh nem zinit.
 - Se você já tem oh-my-zsh, zinit ou esses plugins, ele não pergunta e não mexe.
 - No Linux sem zsh, ele instala o zsh e pergunta antes de trocar o seu shell
   padrão (pede a senha).
+- Quem já tinha o workdeck recebe a pergunta no próximo `work update`.
 - Para decidir depois: `work install --zsh`. O `work uninstall` tira os plugins.
 
 ## O agente de IA

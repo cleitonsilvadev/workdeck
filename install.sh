@@ -116,6 +116,11 @@ fi
 LOG="$(mktemp)"
 ETAPA=""; RESUMO=""; AVISOS=(); GIRO=""
 
+pode_perguntar_novidade() {
+  [ -t 0 ] || return 1
+  [ "$YES" = 0 ] || [ -n "${WORKDECK_ATUALIZANDO:-}" ]
+}
+
 say() {
   if [ "$BONITO" = 1 ]; then printf '%s\n' "$*" >> "$LOG"; else printf '  %s\n' "$*"; fi
 }
@@ -293,7 +298,7 @@ visual_dos_terminais() {
   escolha="$(cat "$VISUAL_ESCOLHA" 2>/dev/null || cat "$CONFIG_DIR/terminal-app" 2>/dev/null || true)"
   [ "$escolha" = nao ] && return 0
   if [ "$escolha" != sim ]; then
-    if [ "$YES" = 1 ] || [ ! -t 0 ]; then
+    if ! pode_perguntar_novidade; then
       say "visual do workdeck nos terminais: rode work install e responda sim"
       return 0
     fi
@@ -588,7 +593,7 @@ opcao_zsh() {
       return 0
     fi
     if [ "$QUER_ZSH" = 0 ]; then
-      [ "$YES" = 1 ] || [ ! -t 0 ] && return 0
+      pode_perguntar_novidade || return 0
       parar
       printf '  Quer o zsh do workdeck? Sugestões enquanto digita, cores nos comandos
 '
