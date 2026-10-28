@@ -3,6 +3,11 @@
 O `work update` mostra o trecho da versão nova antes de perguntar se quer
 atualizar. Cada versão é uma tag `vX.Y.Z`.
 
+## v1.0.1
+
+- O zsh do workdeck vem com "sim" como resposta padrão: Enter instala o oh-my-zsh e o zinit com os plugins.
+- README revisado: flags que faltavam, atalhos com Alt, o que vai para onde e como apontar o CLAUDE.md para o BMAD, os PRDs e o ai-memory.
+
 ## v1.0.0
 
 - `work` abre uma sessão do tmux com uma janela por projeto e o painel do workdeck; a sessão sobrevive a fechar o terminal.
