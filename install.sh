@@ -190,9 +190,25 @@ kitty_instalado() {
     || command -v kitty >/dev/null || [ -x "$HOME/.local/kitty.app/bin/kitty" ]
 }
 
+quer_kitty() {
+  local r escolha
+  escolha="$(cat "$CONFIG_DIR/kitty" 2>/dev/null || true)"
+  [ "$escolha" = sim ] && return 0
+  [ "$escolha" = nao ] && return 1
+  pode_perguntar_novidade || return 0
+  parar
+  printf '  Instalar o kitty, com o tema, a fonte e os atalhos do workdeck? [S/n] '
+  read -r r || r=s
+  girar
+  case "${r:-s}" in s|S|y|Y) escolha=sim ;; *) escolha=nao ;; esac
+  [ "$DRY" = 1 ] || { mkdir -p "$CONFIG_DIR"; echo "$escolha" > "$CONFIG_DIR/kitty"; }
+  [ "$escolha" = sim ]
+}
+
 instalar_kitty() {
   local app destino
   if kitty_instalado; then say "kitty já instalado"; return 0; fi
+  if ! quer_kitty; then say "kitty: você preferiu não instalar"; return 1; fi
   if [ "$DEPS" = 0 ]; then aviso "kitty não instalado (--no-deps): https://sw.kovidgoyal.net/kitty/binary/"; return 1; fi
   [ "$DRY" = 1 ] && { say "[dry-run] instalaria o kitty pelo instalador oficial"; return 0; }
   if ! command -v curl >/dev/null; then aviso "sem curl; instale o kitty: https://sw.kovidgoyal.net/kitty/binary/"; return 1; fi
@@ -670,8 +686,10 @@ fi
 
 if no_kitty; then
   abrir="${bold}feche e abra o kitty${reset}     ${dim}carrega o zsh, o visual e os comandos do workdeck${reset}"
+elif kitty_instalado; then
+  abrir="${bold}abra o kitty${reset}              ${dim}com o tema, a fonte e os atalhos cmd do workdeck${reset}"
 else
-  abrir="${bold}abra o kitty${reset}              ${dim}o workdeck foi feito para ele: tema, fonte e atalhos cmd${reset}"
+  abrir="${bold}feche e abra o terminal${reset}   ${dim}carrega o zsh e os comandos do workdeck${reset}"
 fi
 
 cat <<FIM

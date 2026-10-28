@@ -1,8 +1,9 @@
 # kitty
 
-O workdeck foi feito para o [kitty](https://sw.kovidgoyal.net/kitty/), que roda
-no macOS e no Linux. A instalação baixa o kitty pelo instalador oficial, sem
-sudo, e acrescenta o bloco de `kitty.conf` ao seu `~/.config/kitty/kitty.conf`:
+O workdeck funciona em qualquer terminal, mas fica completo no
+[kitty](https://sw.kovidgoyal.net/kitty/), que roda no macOS e no Linux. A
+instalação pergunta se você quer o kitty; se sim, baixa pelo instalador oficial,
+sem sudo, e acrescenta o bloco de `kitty.conf` ao seu `~/.config/kitty/kitty.conf`:
 
 - **Tema** do workdeck (`--theme`), o mesmo da barra do tmux.
 - **Fonte** JetBrains Mono, com espaçamento de linha um pouco maior.

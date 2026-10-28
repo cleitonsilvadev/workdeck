@@ -13,10 +13,10 @@ Você volta com `work` e tudo está onde estava, agente incluso.
 Aider, Gemini, o que você usar. O projeto não embute nenhum: ele abre o
 comando que você escolher.
 
-**Feito para o [kitty](https://sw.kovidgoyal.net/kitty/)**, no macOS e no Linux.
-A instalação já baixa o kitty e deixa ele com o tema, a fonte e os atalhos `cmd`.
-Os atalhos são do tmux, então o `work` também abre em outro terminal: só o
-visual muda.
+**Funciona em qualquer terminal**, no macOS e no Linux, porque os atalhos são do
+tmux. No [kitty](https://sw.kovidgoyal.net/kitty/) fica completo: tema, fonte e
+atalhos `cmd` no Mac. A instalação pergunta se você quer o kitty e já deixa ele
+pronto.
 
 ```bash
 work                  # abre a sessão, uma janela por projeto
@@ -47,8 +47,8 @@ curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/i
 less instalar.sh && bash instalar.sh
 ```
 
-Depois, abra o kitty (ou feche e abra, se a instalação rodou nele), para ele
-carregar o zsh, o visual e os comandos do workdeck, e rode:
+Depois, feche e abra o terminal (ou abra o kitty, se instalou), para ele carregar
+o zsh, o visual e os comandos do workdeck, e rode:
 
 ```bash
 work
@@ -57,8 +57,9 @@ work
 O `work` abre o painel, e o painel mostra como adicionar os seus projetos.
 
 O instalador detecta o sistema e o gerenciador de pacotes — brew no macOS,
-apt, dnf, pacman, zypper ou apk no Linux — e instala o tmux, se faltar. O kitty vem do instalador oficial dele, sem sudo: em
-`~/Applications` no Mac e em `~/.local/kitty.app` no Linux. Detalhes em
+apt, dnf, pacman, zypper ou apk no Linux — e instala o tmux, se faltar. Se você aceitar o kitty, ele vem do instalador
+oficial, sem sudo: em `~/Applications` no Mac e em `~/.local/kitty.app` no Linux.
+Quem já tem o kitty não vê a pergunta e só recebe o bloco de configuração. Detalhes em
 `terminals/README.md`.
 
 | Flag | O que faz |
@@ -230,7 +231,8 @@ bind -n M-S-G new-window -c "#{pane_current_path}" lazygit
 
 ### O kitty
 
-O workdeck foi feito para o kitty, e a instalação deixa ele pronto: tema, fonte
+O workdeck funciona em qualquer terminal, mas no kitty fica completo, e a
+instalação deixa ele pronto se você aceitar: tema, fonte
 JetBrains Mono, a Option do Mac como Alt e, no Mac, atalhos em `cmd`
 (`cmd+1…9` vai para a janela, `cmd+d` divide ao lado, `cmd+h` abre o menu). A
 lista completa está em `terminals/README.md`.

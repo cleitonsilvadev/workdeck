@@ -3,6 +3,11 @@
 O `work update` mostra o trecho da versão nova antes de perguntar se quer
 atualizar. Cada versão é uma tag `vX.Y.Z`.
 
+## v1.0.5
+
+- A instalação pergunta antes de instalar o kitty (sim é o padrão) e guarda a resposta. Quem já tem o kitty não vê a pergunta.
+- O README deixa claro que o workdeck funciona em qualquer terminal e que o kitty é o que deixa ele completo.
+
 ## v1.0.4
 
 - Só o `work` fica no PATH. O painel, a lista de atalhos e o pedido de review passam a ser peças internas, chamadas por ele; a atualização tira `work-panel`, `workdeck-agent` e `workdeck-help` de `~/.local/bin`.
