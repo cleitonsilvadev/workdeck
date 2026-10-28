@@ -3,7 +3,6 @@
 #
 #   ./install.sh                      instala com o tema padrão
 #   ./install.sh --theme nord         escolhe um tema de themes/
-#   ./install.sh --terminal kitty     instala também os atalhos cmd do kitty
 #   ./install.sh --agent claude       define o seu agente de IA
 #   ./install.sh --zsh                instala o oh-my-zsh e o zinit sem perguntar
 #   ./install.sh --with ai-memory     ativa integrações opcionais (vírgula separa)
@@ -23,8 +22,6 @@ CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/workdeck"
 BIN_DIR="$HOME/.local/bin"
 CODIGO="${XDG_DATA_HOME:-$HOME/.local/share}/workdeck"
 THEME="catppuccin-mocha"
-TERMINAL=""
-AVISO_OPTION=""
 QUER_ZSH=0
 REINICIAR_SHELL=0
 AGENT=""
@@ -37,7 +34,6 @@ DRY=0
 while [ $# -gt 0 ]; do
   case "$1" in
     --theme) THEME="${2:?--theme precisa de um nome}"; shift 2 ;;
-    --terminal) TERMINAL="${2:?--terminal precisa de um nome}"; shift 2 ;;
     --agent) AGENT="${2:?--agent precisa de um comando}"; shift 2 ;;
     --with) WITH="${2:?--with precisa de um nome}"; shift 2 ;;
     --yes|-y) YES=1; shift ;;
@@ -187,43 +183,35 @@ ao_sair() {
 trap ao_sair EXIT
 [ "$BONITO" = 1 ] && exec 2>>"$LOG"
 
-terminal_atual() {
-  if [ -n "${KITTY_WINDOW_ID:-}" ]; then echo kitty
-  elif [ -n "${WEZTERM_PANE:-}" ]; then echo WezTerm
-  elif [ -n "${ALACRITTY_WINDOW_ID:-}" ] || [ "${TERM:-}" = alacritty ]; then echo Alacritty
-  elif [ -n "${GHOSTTY_RESOURCES_DIR:-}" ]; then echo Ghostty
-  else echo "${TERM_PROGRAM:-}"; fi
-}
-
-option_ligado_no_terminal_app() {
-  local perfil tmp v
-  perfil="$(defaults read com.apple.Terminal "Default Window Settings" 2>/dev/null || echo Basic)"
-  tmp="$(mktemp)"
-  defaults export com.apple.Terminal "$tmp" 2>/dev/null
-  v="$(/usr/libexec/PlistBuddy -c "Print ':Window Settings:$perfil:useOptionAsMetaKey'" "$tmp" 2>/dev/null)"
-  rm -f "$tmp"
-  [ "$v" = true ]
-}
-
-VISUAL_ESCOLHA="$CONFIG_DIR/visual"
-GNOME_BASE="/org/gnome/terminal/legacy/profiles:/"
-GNOME_ID="5e1f9a2c-7d3b-4c6a-9b8e-0a1d2c3b4e5f"
-
-cor() { awk -v k="$1" '$1 == k {print $2}' "$ROOT/themes/$THEME.conf"; }
-cor_16bits() { local h="${1#\#}"; printf '%d, %d, %d' $((16#${h:0:2} * 257)) $((16#${h:2:2} * 257)) $((16#${h:4:2} * 257)); }
+no_kitty() { [ -n "${KITTY_WINDOW_ID:-}" ] || [ "${TERM:-}" = xterm-kitty ]; }
 
 kitty_instalado() {
-  [ -d /Applications/kitty.app ] || command -v kitty >/dev/null || [ -x "$HOME/.local/kitty.app/bin/kitty" ]
+  [ -d /Applications/kitty.app ] || [ -d "$HOME/Applications/kitty.app" ] \
+    || command -v kitty >/dev/null || [ -x "$HOME/.local/kitty.app/bin/kitty" ]
 }
 
-terminais_com_visual() {
-  if [ "$SO" = macOS ]; then
-    command -v osascript >/dev/null && echo "Terminal.app"
-  elif command -v gnome-terminal >/dev/null && command -v dconf >/dev/null; then
-    echo "GNOME Terminal"
+instalar_kitty() {
+  local app destino
+  if kitty_instalado; then say "kitty já instalado"; return 0; fi
+  if [ "$DEPS" = 0 ]; then aviso "kitty não instalado (--no-deps): https://sw.kovidgoyal.net/kitty/binary/"; return 1; fi
+  [ "$DRY" = 1 ] && { say "[dry-run] instalaria o kitty pelo instalador oficial"; return 0; }
+  if ! command -v curl >/dev/null; then aviso "sem curl; instale o kitty: https://sw.kovidgoyal.net/kitty/binary/"; return 1; fi
+  if [ "$SO" = macOS ]; then destino="$HOME/Applications"; else destino="$HOME/.local"; fi
+  mkdir -p "$destino"
+  if ! curl -fsSL https://sw.kovidgoyal.net/kitty/installer.sh | sh /dev/stdin dest="$destino" launch=n >> "$LOG" 2>&1; then
+    aviso "não consegui instalar o kitty; instale por https://sw.kovidgoyal.net/kitty/binary/ e rode work install"
+    return 1
   fi
-  kitty_instalado && echo "kitty"
-  return 0
+  app="$destino/kitty.app"
+  if [ "$SO" != macOS ]; then
+    mkdir -p "$BIN_DIR" "$HOME/.local/share/applications"
+    ln -sf "$app/bin/kitty" "$app/bin/kitten" "$BIN_DIR/"
+    cp "$app/share/applications/kitty.desktop" "$app/share/applications/kitty-open.desktop" "$HOME/.local/share/applications/"
+    sed -i "s|Icon=kitty|Icon=$app/share/icons/hicolor/256x256/apps/kitty.png|g; s|Exec=kitty|Exec=$app/bin/kitty|g" \
+      "$HOME/.local/share/applications"/kitty*.desktop
+  fi
+  anota kitty "$app"
+  say "kitty instalado em $(curto "$app")"
 }
 
 aplicar_kitty() {
@@ -232,113 +220,6 @@ aplicar_kitty() {
   [ "$SO" = macOS ] || bloco="$(printf '%s\n' "$bloco" | grep -v '^map cmd\|^macos_')"
   write_block "$HOME/.config/kitty/kitty.conf" "$(printf '%s\n' "$bloco"; cat "$ROOT/themes/$THEME.conf"; echo '# <<< workdeck <<<')"
   say "kitty.conf — tema, fonte e atalhos"
-}
-
-aplicar_terminal_app() {
-  local antes
-  if ! pgrep -x Terminal >/dev/null; then
-    say "Terminal.app fechado; abra ele e rode work install para aplicar o visual nele"
-    return 1
-  fi
-  [ "$DRY" = 1 ] && { say "[dry-run] aplicaria a fonte e as cores no Terminal.app"; return 0; }
-  if ! antes="$(osascript -e 'tell application "Terminal" to get {name, font name, font size, background color, normal text color} of default settings' 2>&1)"; then
-    case "$antes" in
-      *-1743*|*"Not authorized"*|*"não autorizado"*)
-        aviso "o macOS não deixou mudar o Terminal.app: libere em Ajustes do Sistema → Privacidade e Segurança → Automação → Terminal, e rode work install" ;;
-      *)
-        aviso "não consegui falar com o Terminal.app ($antes); escolha a fonte em Settings → Profiles → Text" ;;
-    esac
-    return 1
-  fi
-  antes="$(printf '%s' "$antes" | tr -d ' ')"
-  grep -qF "terminal-app|" "$MANIFESTO" 2>/dev/null || anota terminal-app "$antes"
-  if osascript >> "$LOG" 2>&1 <<FIM
-tell application "Terminal"
-  set s to default settings
-  set background color of s to {$(cor_16bits "$(cor background)")}
-  set normal text color of s to {$(cor_16bits "$(cor foreground)")}
-  try
-    set font name of s to "JetBrainsMono-Regular"
-  end try
-end tell
-FIM
-  then
-    say "Terminal.app: fonte e cores do workdeck no perfil ${antes%%,*}"
-  else
-    aviso "não consegui mudar o perfil do Terminal.app; escolha a fonte em Settings → Profiles → Text"
-    return 1
-  fi
-}
-
-aplicar_gnome() {
-  local lista padrao paleta i k
-  [ "$DRY" = 1 ] && { say "[dry-run] criaria o perfil workdeck no GNOME Terminal"; return 0; }
-  lista="$(dconf read "${GNOME_BASE}list" 2>/dev/null || true)"
-  padrao="$(dconf read "${GNOME_BASE}default" 2>/dev/null || true)"
-  grep -qF "gnome|" "$MANIFESTO" 2>/dev/null || anota gnome "${padrao:-vazio}"
-  paleta="["
-  for i in $(seq 0 15); do paleta="$paleta'$(cor "color$i")'"; [ "$i" -lt 15 ] && paleta="$paleta, "; done
-  paleta="$paleta]"
-  k="${GNOME_BASE}:$GNOME_ID/"
-  dconf write "${k}visible-name" "'workdeck'"
-  dconf write "${k}use-theme-colors" "false"
-  dconf write "${k}background-color" "'$(cor background)'"
-  dconf write "${k}foreground-color" "'$(cor foreground)'"
-  dconf write "${k}palette" "$paleta"
-  dconf write "${k}use-system-font" "false"
-  dconf write "${k}font" "'JetBrains Mono 11'"
-  dconf write "${k}cell-height-scale" "1.1"
-  case "$lista" in
-    *"$GNOME_ID"*) ;;
-    ""|"@as []") dconf write "${GNOME_BASE}list" "['b1dcc9dd-5262-4d8d-a863-c897e6d979b9', '$GNOME_ID']" ;;
-    *) dconf write "${GNOME_BASE}list" "${lista%]}, '$GNOME_ID']" ;;
-  esac
-  dconf write "${GNOME_BASE}default" "'$GNOME_ID'"
-  say "GNOME Terminal: perfil workdeck criado e marcado como padrão"
-}
-
-visual_dos_terminais() {
-  local achados escolha r aplicados="" t
-  achados="$(terminais_com_visual)"
-  [ -n "$achados" ] || return 0
-  escolha="$(cat "$VISUAL_ESCOLHA" 2>/dev/null || cat "$CONFIG_DIR/terminal-app" 2>/dev/null || true)"
-  [ "$escolha" = nao ] && return 0
-  if [ "$escolha" != sim ]; then
-    if ! pode_perguntar_novidade; then
-      say "visual do workdeck nos terminais: rode work install e responda sim"
-      return 0
-    fi
-    parar
-    printf '  Aplicar o visual do workdeck (tema, fonte e cores) nos seus terminais?\n'
-    printf '  Achei: %s   [S/n] ' "$(printf '%s\n' "$achados" | paste -sd, - | sed 's/,/, /g')"
-    read -r r || r=n
-    girar
-    case "${r:-s}" in s|S|y|Y) escolha=sim ;; *) escolha=nao ;; esac
-    [ "$DRY" = 1 ] || { mkdir -p "$CONFIG_DIR"; echo "$escolha" > "$VISUAL_ESCOLHA"; rm -f "$CONFIG_DIR/terminal-app"; }
-    [ "$escolha" = sim ] || { say "terminais sem mudanças"; return 0; }
-    REINICIAR_SHELL=1
-  fi
-  while IFS= read -r t; do
-    case "$t" in
-      "Terminal.app") aplicar_terminal_app && aplicados="$aplicados, Terminal.app" ;;
-      kitty) aplicar_kitty && aplicados="$aplicados, kitty" ;;
-      "GNOME Terminal") aplicar_gnome && aplicados="$aplicados, GNOME Terminal" ;;
-    esac
-  done <<< "$achados"
-  [ -n "$aplicados" ] && resumo "Ctrl+b, mouse e Alt · visual em ${aplicados#, }"
-  return 0
-}
-
-como_ligar_option() {
-  case "$1" in
-    Apple_Terminal) echo 'Terminal → Ajustes → Perfis → Teclado → marque "Usar Option como tecla Meta"' ;;
-    iTerm.app) echo 'iTerm2 → Settings → Profiles → Keys → General → "Left Option key": Esc+' ;;
-    kitty) echo 'no kitty.conf, acrescente: macos_option_as_alt left' ;;
-    Ghostty) echo 'na config do Ghostty, acrescente: macos-option-as-alt = left' ;;
-    Alacritty) echo 'no alacritty.toml, em [window]: option_as_alt = "OnlyLeft"' ;;
-    WezTerm) ;;
-    *) echo 'nas preferências do seu terminal, faça a tecla Option funcionar como Alt (Meta)' ;;
-  esac
 }
 
 [ -f "$ROOT/themes/$THEME.conf" ] || {
@@ -525,44 +406,19 @@ say "lesskey do git-review"
 resumo "$(curto "$CONFIG_DIR")"
 concluir
 
-# ---- 4. tmux e terminal ----------------------------------------------------
-etapa 4 "tmux"
+# ---- 4. tmux e kitty -------------------------------------------------------
+etapa 4 "tmux e kitty"
 write_block "$HOME/.tmux.conf" \
   "$(sed '$d' "$ROOT/config/tmux.conf" | sed '/^# O tema entra aqui/d'; cat "$ROOT/themes/$THEME.tmux"; echo '# <<< workdeck <<<')"
 say "tmux.conf — Ctrl+b, mouse e atalhos em Alt"
 resumo "Ctrl+b, mouse e atalhos em Alt"
 
-case "$TERMINAL" in
-  "")
-    visual_dos_terminais
-    if [ "$SO" = macOS ]; then
-      term="$(terminal_atual)"
-      if [ "$term" = Apple_Terminal ] && option_ligado_no_terminal_app; then
-        say "Terminal.app: Option já funciona como Alt"
-      else
-        AVISO_OPTION="$(como_ligar_option "$term")"
-        if [ -n "$AVISO_OPTION" ]; then
-          say "dica: para os atalhos de uma tecla (Alt+2), veja o fim"
-        fi
-      fi
-    else
-      say "os atalhos em Alt já funcionam neste terminal"
-    fi
-    ;;
-  kitty)
-    aplicar_kitty
-    resumo "Ctrl+b, mouse e Alt · kitty com tema e cmd (reabra o kitty)"
-    ;;
-  wezterm|alacritty|ghostty)
-    say "o adaptador do $TERMINAL é um trecho para colar, não instalo automático:"
-    say "  $ROOT/terminals/$TERMINAL.*"
-    say "o instalador não edita Lua nem TOML de terceiros — veja terminals/README.md"
-    resumo "Ctrl+b, mouse e Alt · cole terminals/$TERMINAL.* para tema e cmd"
-    ;;
-  *)
-    aviso "não tenho adaptador para '$TERMINAL'. Disponíveis: kitty, ghostty, wezterm, alacritty"
-    ;;
-esac
+if instalar_kitty; then
+  aplicar_kitty
+  resumo "Ctrl+b, mouse e atalhos em Alt · kitty com tema e fonte"
+else
+  resumo "Ctrl+b, mouse e atalhos em Alt · sem o kitty"
+fi
 concluir
 
 # ---- 5. shell --------------------------------------------------------------
@@ -796,7 +652,7 @@ fi
 rm -f "$ZSH_ESCOLHA.anterior"
 if [ -n "${WORKDECK_ATUALIZANDO:-}" ]; then
   if [ "$REINICIAR_SHELL" = 1 ]; then
-    printf '\n  %s●%s Feche e abra o terminal para carregar o zsh e o visual novos.\n' "$amarelo" "$reset"
+    printf '\n  %s●%s Feche e abra o kitty para carregar o zsh e o visual novos.\n' "$amarelo" "$reset"
   fi
   exit 0
 fi
@@ -807,10 +663,16 @@ else
   echo "Pronto."
 fi
 
+if no_kitty; then
+  abrir="${bold}feche e abra o kitty${reset}     ${dim}carrega o zsh, o visual e os comandos do workdeck${reset}"
+else
+  abrir="${bold}abra o kitty${reset}              ${dim}o workdeck foi feito para ele: tema, fonte e atalhos cmd${reset}"
+fi
+
 cat <<FIM
 
   Agora:
-       ${bold}feche e abra o terminal${reset}   ${dim}carrega o zsh, o visual e os comandos do workdeck${reset}
+       $abrir
        work                      ${dim}abre o painel, que mostra como adicionar os projetos${reset}
 
   Para navegar: Shift+← / Shift+→ troca de janela, Shift+↑ / Shift+↓ troca de
@@ -818,20 +680,3 @@ cat <<FIM
   também funciona.
   Ajuda a qualquer hora: work help, ou Ctrl+b e h dentro do work.
 FIM
-
-if [ "$SO" = macOS ] && [ "$(terminal_atual)" = Apple_Terminal ] && [ "$(cat "$VISUAL_ESCOLHA" 2>/dev/null)" = nao ]; then
-  cat <<FIM
-
-  ${dim}Dica: para os terminais ficarem com a fonte e as cores do workdeck, rode
-  work install e responda sim.${reset}
-FIM
-fi
-
-if [ -n "$AVISO_OPTION" ]; then
-  cat <<FIM
-
-  ${dim}Dica, opcional: para atalhos de uma tecla só (Alt+2 em vez de Ctrl+b 2),
-  a tecla Option do Mac precisa funcionar como Alt:${reset}
-       $AVISO_OPTION
-FIM
-fi

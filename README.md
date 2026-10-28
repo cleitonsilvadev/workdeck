@@ -13,8 +13,10 @@ Você volta com `work` e tudo está onde estava, agente incluso.
 Aider, Gemini, o que você usar. O projeto não embute nenhum: ele abre o
 comando que você escolher.
 
-**Funciona em qualquer terminal**, porque os atalhos são do tmux e não do
-terminal. Roda em macOS e Linux.
+**Feito para o [kitty](https://sw.kovidgoyal.net/kitty/)**, no macOS e no Linux.
+A instalação já baixa o kitty e deixa ele com o tema, a fonte e os atalhos `cmd`.
+Os atalhos são do tmux, então o `work` também abre em outro terminal: só o
+visual muda.
 
 ```bash
 work                  # abre a sessão, uma janela por projeto
@@ -46,8 +48,8 @@ curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/i
 less instalar.sh && bash instalar.sh
 ```
 
-Depois, feche e abra o terminal, para ele carregar o zsh, o visual e os comandos
-do workdeck, e rode:
+Depois, abra o kitty (ou feche e abra, se a instalação rodou nele), para ele
+carregar o zsh, o visual e os comandos do workdeck, e rode:
 
 ```bash
 work
@@ -57,12 +59,14 @@ O `work` abre o painel, e o painel mostra como adicionar os seus projetos.
 
 O instalador detecta o sistema e o gerenciador de pacotes — brew no macOS,
 apt, dnf, pacman, zypper ou apk no Linux — e instala o que faltar (`tmux` e
-`git-delta`).
+`git-delta`). O kitty vem do instalador oficial dele, sem sudo: em
+`~/Applications` no Mac e em `~/.local/kitty.app` no Linux. Detalhes em
+`terminals/README.md`.
 
 | Flag | O que faz |
 |---|---|
 | `--theme <nome>` | Escolhe um tema de `themes/` (padrão: `catppuccin-mocha`) |
-| `--terminal kitty` | Instala também os atalhos `cmd` do kitty |
+| `--with <nome>` | Liga integrações sem perguntar: `bmad`, `spec-kit`, `ai-memory` |
 | `--zsh` | Instala o oh-my-zsh e o zinit sem perguntar (veja abaixo) |
 | `--no-deps` | Não instala nada pelo gerenciador de pacotes |
 | `--no-reload` | Não recarrega o tmux no fim (útil ao instalar num HOME de teste) |
@@ -260,7 +264,7 @@ Para usar outro nome de sessão: `export WORKDECK_SESSION=outro`.
 
 ## Atalhos
 
-O dia a dia, em qualquer terminal e sem configurar nada:
+O dia a dia, sem configurar nada:
 
 | Para | Teclas |
 |---|---|
@@ -290,8 +294,8 @@ Há atalhos diretos com Alt, que economizam uma tecla: <kbd>Alt</kbd>+<kbd>1</kb
 vai para a janela, <kbd>Alt</kbd>+setas troca de painel e
 <kbd>Alt</kbd>+<kbd>shift</kbd>+letra faz as ações (<kbd>D</kbd> divide ao lado,
 <kbd>S</kbd> embaixo, <kbd>Z</kbd> zoom, <kbd>X</kbd> fecha, <kbd>A</kbd> abre a
-IA). No Linux funcionam de cara; no Mac, a tecla Option precisa funcionar como
-Alt: veja [A tecla Option, no macOS](#a-tecla-option-no-macos).
+IA). No kitty do workdeck funcionam de cara, inclusive no Mac, onde a Option
+já age como Alt.
 
 As ações usam Shift porque `Alt`+letra minúscula é do readline (andar e apagar
 palavras na linha de comando).
@@ -306,61 +310,21 @@ bind -n M-S-G new-window -c "#{pane_current_path}" lazygit
 
 </details>
 
-### Terminais
+### O kitty
 
-Qualquer terminal serve, porque os atalhos são do tmux. Se você ainda não tem
-um preferido, estes são os mais usados em cada sistema:
+O workdeck foi feito para o kitty, e a instalação deixa ele pronto: tema, fonte
+JetBrains Mono, a Option do Mac como Alt e, no Mac, atalhos em `cmd`
+(`cmd+1…9` vai para a janela, `cmd+d` divide ao lado, `cmd+h` abre o menu). A
+lista completa está em `terminals/README.md`.
 
-| Sistema | Terminal | |
-|---|---|---|
-| macOS | Terminal.app | já vem instalado |
-| | [iTerm2](https://iterm2.com) | o mais popular do Mac |
-| | [kitty](https://sw.kovidgoyal.net/kitty/) | rápido, configurado por arquivo de texto |
-| | [WezTerm](https://wezterm.org) | multiplataforma, configurado em Lua |
-| | [Ghostty](https://ghostty.org) | recente, nativo |
-| Linux | GNOME Terminal | padrão no GNOME |
-| | Konsole | padrão no KDE |
-| | [Alacritty](https://alacritty.org) | mínimo, acelerado por GPU |
-| | [kitty](https://sw.kovidgoyal.net/kitty/) · [WezTerm](https://wezterm.org) · [Ghostty](https://ghostty.org) | os mesmos do Mac |
-
-No Linux, `Alt` chega ao tmux e os atalhos funcionam sem configurar nada. No
-Mac, veja a seção abaixo.
-
-**O visual nos terminais.** Na instalação, o workdeck pergunta uma vez se deve
-aplicar o tema, a fonte e as cores nos terminais que encontrar: Terminal.app e
-kitty no Mac, GNOME Terminal e kitty no Linux. Assim a borda em volta da tela
-fica da mesma cor do fundo. O `work uninstall` desfaz. Para mudar de ideia
-depois, `work install`.
-
-### A tecla Option, no macOS
-
-Opcional: só para os atalhos diretos. No Mac, a tecla Option (⌥) escreve
-caracteres especiais por padrão: <kbd>Option</kbd>+<kbd>2</kbd> vira `™` em vez
-de trocar de janela. Para ela agir como Alt, é um ajuste feito uma vez, e o
-instalador e o `workdeck-doctor` dizem onde fica:
-
-| Terminal | Onde ligar |
-|---|---|
-| Terminal.app | Ajustes → Perfis → Teclado → marque "Usar Option como tecla Meta" |
-| iTerm2 | Settings → Profiles → Keys → General → "Left Option key": Esc+ |
-| kitty | no `kitty.conf`: `macos_option_as_alt left` |
-| Ghostty | na config: `macos-option-as-alt = left` |
-| Alacritty | no `alacritty.toml`, em `[window]`: `option_as_alt = "OnlyLeft"` |
-| WezTerm | nada, já vem assim |
-
-### Atalhos em `cmd`, no macOS
-
-No Mac, `cmd` nunca chega ao tmux: o sistema intercepta antes. Se você quer
-`cmd+1` em vez de `Alt+1`, o terminal precisa traduzir. Há adaptadores prontos
-em `terminals/` para kitty, Ghostty, WezTerm e Alacritty, com o tema e a fonte
-do workdeck — veja `terminals/README.md`.
-Só o kitty é instalado automaticamente:
+Em outro terminal o `work` abre do mesmo jeito, porque os atalhos são do tmux:
+`Ctrl+b`, `Shift`+setas e o mouse funcionam em qualquer um. Ele só avisa, uma vez
+por dia, que o visual e os atalhos `cmd` são do kitty. Por SSH ele não avisa.
 
 ```bash
-work install --terminal kitty
+work kitty                 # diz se você está no kitty
+work kitty --nao-avisar    # desliga o aviso; --avisar liga de novo
 ```
-
-Nada disso é necessário. É conforto, e só no Mac.
 
 ---
 
@@ -382,6 +346,12 @@ trechos lentos, o que dá para cortar e arquivos fora do escopo. Cada achado vem
 com a gravidade (corrigir antes do commit, vale corrigir, opcional), o que o
 código faz, o que dá errado, como corrigir e o que acontece se você não
 corrigir; no fim, um veredito. Ela não altera nada: só revisa.
+
+Se você disse na instalação que usa BMAD ou Spec Kit, o `work review` procura
+antes um agente de review do próprio projeto e pede para a IA usar ele: o
+`bmad-code-review` (ou o `bmad-review`) do BMAD, ou um skill, comando, agente ou
+prompt com "review" no nome nas pastas da IA (`.claude/`, `.cursor/`,
+`.github/`…). Sem nenhum, vale a revisão do workdeck descrita acima.
 
 Com `claude`, `codex` e `gemini`, o pedido já entra na conversa. Com outra IA, ele
 vai para a área de transferência e para `~/.cache/workdeck/pedido-de-review.md`,
@@ -518,7 +488,7 @@ senão o diff fica difícil em tela não-retina.
 ~/.tmux.conf                      bloco entre os marcadores
 ~/.zshrc ou ~/.bashrc             bloco entre os marcadores
 ~/.config/git-review/lesskey      navegação dentro do diff
-~/.config/kitty/kitty.conf        só com --terminal kitty
+~/.config/kitty/kitty.conf        bloco entre os marcadores
 ```
 
 ---
@@ -575,7 +545,7 @@ Quase tudo aqui é para ser trocado. O resumo:
 |---|---|---|
 | Os projetos e a ordem das janelas | `~/.config/workdeck/projects.conf` | `work kill` e `work` |
 | Um atalho do teclado | o seu `~/.tmux.conf`, depois do bloco do workdeck | `Ctrl+b r` |
-| Os atalhos `cmd` e o visual do kitty | `work install --terminal kitty` | reabra o kitty |
+| Os atalhos `cmd` e o visual do kitty | o seu `kitty.conf`, fora do bloco do workdeck | reabra o kitty |
 | As cores | `work install --theme <nome>` | — |
 | O que aparece no painel | `~/.config/workdeck/panels/` | nada, ele relê sozinho |
 | O nome da sessão | `export WORKDECK_SESSION=outro` | — |

@@ -52,60 +52,34 @@ fi
 
 # ---- terminal --------------------------------------------------------------
 secao "Terminal"
-TERMINAL="desconhecido"
-if [ -n "${KITTY_WINDOW_ID:-}" ]; then TERMINAL="kitty"
-elif [ -n "${WEZTERM_PANE:-}" ]; then TERMINAL="WezTerm"
-elif [ -n "${ALACRITTY_WINDOW_ID:-}" ] || [ "${TERM:-}" = "alacritty" ]; then TERMINAL="Alacritty"
-elif [ -n "${GHOSTTY_RESOURCES_DIR:-}" ]; then TERMINAL="Ghostty"
-elif [ -n "${TERM_PROGRAM:-}" ]; then TERMINAL="$TERM_PROGRAM"
-elif [ -n "${KONSOLE_VERSION:-}" ]; then TERMINAL="Konsole"
-elif [ -n "${VTE_VERSION:-}" ]; then TERMINAL="GNOME Terminal ou outro VTE"
+no_kitty=0
+if [ -n "${TMUX:-}" ]; then
+  [ "$(tmux display -p '#{client_termname}' 2>/dev/null)" = xterm-kitty ] && no_kitty=1
+elif [ -n "${KITTY_WINDOW_ID:-}" ] || [ "${TERM:-}" = xterm-kitty ]; then
+  no_kitty=1
 fi
-linha "$ok" "$TERMINAL" "TERM=${TERM:-vazio}"
+if [ "$no_kitty" = 1 ]; then
+  linha "$ok" "kitty"
+else
+  linha "$aviso" "não é o kitty" "o work funciona, mas o tema, a fonte e os atalhos cmd só valem no kitty"
+fi
+if [ -d /Applications/kitty.app ] || [ -d "$HOME/Applications/kitty.app" ] \
+   || command -v kitty >/dev/null || [ -x "$HOME/.local/kitty.app/bin/kitty" ]; then
+  linha "$ok" "kitty instalado"
+else
+  linha "$aviso" "kitty não instalado" "rode work install"
+fi
+if grep -q '^# >>> workdeck >>>$' "${XDG_CONFIG_HOME:-$HOME/.config}/kitty/kitty.conf" 2>/dev/null; then
+  linha "$ok" "kitty.conf com o tema, a fonte e os atalhos do workdeck"
+else
+  linha "$aviso" "kitty.conf sem o bloco do workdeck" "rode work install"
+fi
 
-# cores de 24 bits: os temas dependem disso
-if [ "${COLORTERM:-}" = "truecolor" ] || [ "${COLORTERM:-}" = "24bit" ]; then
+if [ "${COLORTERM:-}" = "truecolor" ] || [ "${COLORTERM:-}" = "24bit" ] || [ "$no_kitty" = 1 ]; then
   linha "$ok" "cores de 24 bits"
 else
   linha "$aviso" "não consigo confirmar cores de 24 bits" \
     "COLORTERM não está definido; os temas podem sair aproximados"
-fi
-
-if [ "$SO" = "macOS" ]; then
-  option_ok=0
-  if [ "$TERMINAL" = Apple_Terminal ]; then
-    perfil="$(defaults read com.apple.Terminal "Default Window Settings" 2>/dev/null || echo Basic)"
-    tmp="$(mktemp)"
-    defaults export com.apple.Terminal "$tmp" 2>/dev/null
-    [ "$(/usr/libexec/PlistBuddy -c "Print ':Window Settings:$perfil:useOptionAsMetaKey'" "$tmp" 2>/dev/null)" = true ] && option_ok=1
-    rm -f "$tmp"
-  fi
-  case "$TERMINAL" in
-    WezTerm) option_ok=1 ;;
-  esac
-  if [ "$option_ok" = 1 ]; then
-    linha "$ok" "Option funciona como Alt"
-  else
-    case "$TERMINAL" in
-      Apple_Terminal) como='Terminal → Ajustes → Perfis → Teclado → marque "Usar Option como tecla Meta"' ;;
-      iTerm.app) como='iTerm2 → Settings → Profiles → Keys → General → "Left Option key": Esc+' ;;
-      kitty) como='no kitty.conf, acrescente: macos_option_as_alt left' ;;
-      Ghostty) como='na config do Ghostty, acrescente: macos-option-as-alt = left' ;;
-      Alacritty) como='no alacritty.toml, em [window]: option_as_alt = "OnlyLeft"' ;;
-      *) como='nas preferências do terminal, faça a tecla Option funcionar como Alt (Meta)' ;;
-    esac
-    linha "$ok" "Ctrl+b e o mouse funcionam" "opcional, para Alt+2 em vez de Ctrl+b 2: $como"
-  fi
-  case "$TERMINAL" in
-    kitty|WezTerm|Alacritty|iTerm.app)
-      linha "$ok" "dá para usar cmd em vez de Alt" "veja terminals/ — é opcional" ;;
-  esac
-else
-  case "$TERMINAL" in
-    "GNOME Terminal ou outro VTE"|Konsole)
-      linha "$ok" "Alt chega ao tmux" "este terminal não envia texto por atalho, mas aqui não precisa" ;;
-    *) linha "$ok" "Alt chega ao tmux" ;;
-  esac
 fi
 
 # ---- agente de IA ----------------------------------------------------------

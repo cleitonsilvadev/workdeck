@@ -92,6 +92,10 @@ if [ "$projetos" = 0 ] || [ -z "$AGENT_CMD" ]; then
   echo
 fi
 
+if [ -n "${TMUX:-}" ] && [ "$(tmux display -p '#{client_termname}' 2>/dev/null)" != xterm-kitty ]; then
+  printf '%sFora do kitty%s: o work funciona, mas o tema, a fonte e os atalhos cmd só valem lá.\n\n' "$roxo" "$x"
+fi
+
 printf '%sO dia a dia%s\n' "$roxo" "$x"
 passo "Ctrl+b h" "o menu: projetos, IA, revisar, dividir a tela e mais"
 passo "ai  ou  Ctrl+b a" "abre a IA ao lado, para te ajudar no projeto"

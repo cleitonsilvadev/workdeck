@@ -99,6 +99,9 @@ FIM
         fi
         rm -f "$CONFIG_DIR/visual"
         ;;
+      kitty)
+        say "o kitty continua em ${alvo#$HOME/}; para remover também: rm -rf $alvo"
+        ;;
       zsh)
         run rm -rf "$alvo"
         rm -f "$CONFIG_DIR/zsh"
