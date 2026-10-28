@@ -24,14 +24,14 @@ function Jump({ timeline }: { timeline: number[] }) {
   )
 }
 
-describe("linha do tempo dos terminais animados", () => {
+describe("animated terminal timeline", () => {
   beforeEach(() => vi.useFakeTimers())
   afterEach(() => {
     vi.useRealTimers()
     reduced.value = false
   })
 
-  test("avança um passo a cada intervalo e recomeça no fim", () => {
+  test("advances one step per interval and restarts at the end", () => {
     render(<Steps timeline={[100, 200]} />)
     expect(screen.getByRole("status").textContent).toBe("0")
     act(() => vi.advanceTimersByTime(100))
@@ -42,7 +42,7 @@ describe("linha do tempo dos terminais animados", () => {
     expect(screen.getByRole("status").textContent).toBe("0")
   })
 
-  test("com movimento reduzido, vai direto para o fim e para lá", () => {
+  test("with reduced motion, jumps to the end and stays there", () => {
     reduced.value = true
     render(<Steps timeline={[100, 200, 300]} />)
     expect(screen.getByRole("status").textContent).toBe("0")
@@ -52,7 +52,7 @@ describe("linha do tempo dos terminais animados", () => {
     expect(screen.getByRole("status").textContent).toBe("3")
   })
 
-  test("pular leva a um passo e continua dali", () => {
+  test("jumping goes to a step and continues from there", () => {
     render(<Jump timeline={[100, 100, 100, 100]} />)
     act(() => screen.getByRole("button").click())
     expect(screen.getByRole("status").textContent).toBe("2")

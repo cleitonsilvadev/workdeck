@@ -259,7 +259,7 @@ export default async function Home() {
           <Reveal className="mx-auto max-w-3xl">
             <InstallTabs />
             <p className="mt-4 text-center text-sm text-ctp-subtext0">
-              No fim, abra o kitty, ou feche e abra, se a instalação rodou nele, para ele carregar o <code className="font-mono text-ctp-subtext1">work</code>. Quer ler o script antes? Baixe com <code className="font-mono text-ctp-subtext1">-o instalar.sh</code> em vez de <code className="font-mono text-ctp-subtext1">| bash</code>.
+              No fim, abra o kitty, ou feche e abra, se a instalação rodou nele, para ele carregar o <code className="font-mono text-ctp-subtext1">work</code>. Quer ler o script antes? Baixe com <code className="font-mono text-ctp-subtext1">-o get.sh</code> em vez de <code className="font-mono text-ctp-subtext1">| bash</code>.
             </p>
           </Reveal>
           <Reveal className="mx-auto mt-10 max-w-3xl">

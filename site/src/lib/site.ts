@@ -2,7 +2,7 @@ export const version = "v1.1.2"
 
 export const repoUrl = "https://github.com/thiagofeliperibeiro/workdeck"
 
-export const installCommand = "curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/instalar.sh | bash"
+export const installCommand = "curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/get.sh | bash"
 
 export const cycle = [
   { label: "work add ~/api", code: true, when: "uma vez", desc: "work abre a sessão no painel; work add põe o projeto nela, numa janela em segundo plano." },
@@ -83,14 +83,14 @@ export const panelRules = [
 export const panelsUrl = `${repoUrl}/blob/main/docs/panels.pt-BR.md`
 
 export const shortcuts = {
-  navegar: [
+  navigate: [
     { prefix: true, keys: ["h"], desc: "Abre o menu com tudo" },
     { prefix: false, keys: ["Shift", "← →"], desc: "Projeto anterior / próximo" },
     { prefix: true, keys: ["1…9"], desc: "Vai direto para a janela N" },
     { prefix: false, keys: ["Shift", "↑ ↓"], desc: "Troca de painel na janela" },
     { prefix: true, keys: ["d"], desc: "Sai e deixa a sessão rodando" },
   ],
-  agir: [
+  act: [
     { prefix: true, keys: ["Enter"], desc: "Divide a tela onde couber" },
     { prefix: true, keys: ["v"], desc: "Divide ao lado" },
     { prefix: true, keys: ["-"], desc: "Divide embaixo" },

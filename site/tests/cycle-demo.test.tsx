@@ -3,7 +3,7 @@ import { act, render, screen } from "@testing-library/react"
 import { CycleDemo } from "@/components/cycle-demo"
 import { cycle } from "@/lib/site"
 
-describe("ciclo de trabalho animado", () => {
+describe("animated workflow", () => {
   beforeEach(() => vi.useFakeTimers())
   afterEach(() => vi.useRealTimers())
 
@@ -15,14 +15,14 @@ describe("ciclo de trabalho animado", () => {
     return cycle.map((c) => screen.getByRole("button", { name: new RegExp(c.label.replace(/[~/]/g, "\\$&")) }))
   }
 
-  test("começa fora do workdeck, digitando work no kitty", () => {
+  test("starts outside workdeck, typing work in kitty", () => {
     render(<CycleDemo />)
     expect(screen.getByText("kitty")).toBeTruthy()
     expect(chapters()[0].getAttribute("aria-current")).toBe("step")
     expect(screen.getByText(cycle[0].desc)).toBeTruthy()
   })
 
-  test("o work add avisa que a janela abriu em segundo plano, e o Shift+→ leva até ela", () => {
+  test("work add reports the window opened in the background, and Shift+→ goes to it", () => {
     render(<CycleDemo />)
     advance(1100, 1400, 1700)
     expect(screen.getByText("workdeck — tmux")).toBeTruthy()
@@ -34,7 +34,7 @@ describe("ciclo de trabalho animado", () => {
     expect(chapters()[1].getAttribute("aria-current")).toBe("step")
   })
 
-  test("clicar num capítulo pula para ele e troca a legenda", async () => {
+  test("clicking a chapter jumps to it and changes the caption", async () => {
     vi.useRealTimers()
     render(<CycleDemo />)
     act(() => chapters()[3].click())

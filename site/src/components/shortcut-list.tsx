@@ -58,7 +58,7 @@ export function ShortcutList() {
   return (
     <div className="grid gap-4 lg:grid-cols-2">
       <div className="flex flex-col gap-4">
-        <Group title="Navegar" items={shortcuts.navegar} />
+        <Group title="Navegar" items={shortcuts.navigate} />
         <div className="flex-1 rounded-2xl border border-dashed border-ctp-surface1 p-5">
           <div className="mb-2 flex items-center gap-2 text-sm font-medium text-ctp-text">
             <Keyboard className="size-4 text-ctp-overlay1" />
@@ -70,7 +70,7 @@ export function ShortcutList() {
           <code className="mt-3 block font-mono text-xs text-ctp-mauve">cmd+1…9 · cmd+d · cmd+h</code>
         </div>
       </div>
-      <Group title="Agir" items={shortcuts.agir} />
+      <Group title="Agir" items={shortcuts.act} />
     </div>
   )
 }
