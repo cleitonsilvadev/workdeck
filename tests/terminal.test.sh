@@ -8,6 +8,16 @@ warp_themes_dir() {
 
 kitty_conf() { echo "$HOME/.config/kitty/kitty.conf"; }
 
+assert_kitty_shortcuts() {
+  assert "the block was written to kitty.conf" grep -q '^# >>> workdeck >>>$' "$(kitty_conf)"
+  if [ "$(uname -s)" = Darwin ]; then
+    assert "the cmd shortcuts" grep -q '^map cmd+1 ' "$(kitty_conf)"
+    assert "Option as Alt" grep -q '^macos_option_as_alt' "$(kitty_conf)"
+    return 0
+  fi
+  assert "no cmd shortcuts outside a Mac" test -z "$(grep '^map cmd\|^macos_' "$(kitty_conf)")"
+}
+
 test_terminal_kitty_installed_gets_the_block() {
   mkdir -p "$HOME/Applications/kitty.app"
   install_workdeck --terminal kitty >/dev/null || fail "the install exited with an error"
@@ -86,15 +96,14 @@ test_visual_on_kitty_puts_theme_and_font_in_the_block() {
   assert "the theme colors" grep -q '^background ' "$(kitty_conf)"
   assert "the font" grep -q '^font_family .*JetBrains Mono' "$(kitty_conf)"
   assert "the padding" grep -q '^window_padding_width 8$' "$(kitty_conf)"
-  assert "the shortcuts" grep -q '^map cmd+1 ' "$(kitty_conf)"
+  assert_kitty_shortcuts
   assert_equal "$(cat "$CONFIG/visual")" yes "saved choice"
 }
 
 test_no_visual_on_kitty_writes_only_the_shortcuts() {
   mkdir -p "$HOME/Applications/kitty.app"
   install_workdeck --terminal kitty --no-visual >/dev/null || fail "the install exited with an error"
-  assert "the shortcuts" grep -q '^map cmd+1 ' "$(kitty_conf)"
-  assert "Option as Alt" grep -q '^macos_option_as_alt' "$(kitty_conf)"
+  assert_kitty_shortcuts
   assert "no colors" test -z "$(grep '^background \|^color0 ' "$(kitty_conf)")"
   assert "no font" test -z "$(grep '^font_family' "$(kitty_conf)")"
   assert "no padding" test -z "$(grep '^window_padding_width' "$(kitty_conf)")"
@@ -119,7 +128,7 @@ test_requested_visual_replaces_the_block_without_duplicating() {
 test_visual_without_a_question_is_no_and_saves_nothing() {
   mkdir -p "$HOME/Applications/kitty.app"
   install_workdeck --terminal kitty >/dev/null || fail "the install exited with an error"
-  assert "the shortcuts" grep -q '^map cmd+1 ' "$(kitty_conf)"
+  assert_kitty_shortcuts
   assert "no colors" test -z "$(grep '^background ' "$(kitty_conf)")"
   assert "nothing was saved without a choice" test ! -e "$CONFIG/visual"
 }
