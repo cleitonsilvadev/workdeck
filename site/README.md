@@ -2,22 +2,24 @@
 
 # workdeck-site
 
-**The landing page for [workdeck](https://github.com/thiagofeliperibeiro/workdeck).**
+**The landing page for [workdeck](https://github.com/workdeckdev/workdeck), a framework for working with AI coding agents in the terminal, built on tmux.**
 
-A single page with an animated terminal showing workdeck in use: the workflow
-from `work add` to `work review`, the customizable panel, the shortcuts and the
-themes.
+A single page, in English and Portuguese, with animated terminals showing
+workdeck in use: the workflow from `work add` to `work review`, the terminals,
+the shortcuts and the customizable panel.
 
 **English** · [Português](README.pt-BR.md)
 
-[![CI](https://github.com/thiagofeliperibeiro/workdeck-site/actions/workflows/ci.yml/badge.svg)](https://github.com/thiagofeliperibeiro/workdeck-site/actions/workflows/ci.yml)
+[![CI](https://github.com/workdeckdev/workdeck-site/actions/workflows/ci.yml/badge.svg)](https://github.com/workdeckdev/workdeck-site/actions/workflows/ci.yml)
 ![Next.js](https://img.shields.io/badge/Next.js-16-555?logo=nextdotjs)
 
 </div>
 
 ---
 
-> The site content is in Brazilian Portuguese, like the workdeck interface.
+> The site is available in English (`/en`, the default) and Brazilian
+> Portuguese (`/pt-BR`). `/` redirects by the browser language, and the
+> EN · PT switcher in the header remembers the choice in a cookie.
 
 ## Running
 
@@ -36,7 +38,8 @@ npm run dev        # http://localhost:3000
 
 ## Stack
 
-- [Next.js](https://nextjs.org) with the App Router, static page
+- [Next.js](https://nextjs.org) with the App Router, one static page per language under `src/app/[lang]/`, following the Next.js internationalization guide
+- `@formatjs/intl-localematcher` and `negotiator` to pick the language from the browser, in `src/proxy.ts`
 - [shadcn/ui](https://ui.shadcn.com) and [Magic UI](https://magicui.design) components in `src/components/ui/`
 - [Motion](https://motion.dev) for the terminal animations
 - [Catppuccin Mocha](https://catppuccin.com) through `@catppuccin/tailwindcss`, the same palette as the default workdeck theme
@@ -45,24 +48,38 @@ npm run dev        # http://localhost:3000
 ## Layout
 
 ```
-src/app/page.tsx                  the page, section by section
-src/lib/site.ts                   all the content: commands, workflow, shortcuts, themes, install
+src/app/[lang]/page.tsx           the page, section by section
+src/app/[lang]/layout.tsx         the root layout, the page title and description per language
+src/proxy.ts                      redirects / to /en or /pt-BR by cookie or browser language
+src/lib/i18n.ts                   the languages, the default (en) and the cookie name
+src/lib/dictionaries/             all the text, one file per language: en.ts and pt-BR.ts
+src/lib/site.ts                   what does not change by language: version, repository and install command
 src/lib/github.ts                 fetches the repository stars from the GitHub API, cached for hours
 src/lib/stars.ts                  when to show the stars (10 or more) and how to format them (+23K)
 src/components/terminal-parts.tsx the pieces of the animated terminals: window, panes, prompt, tmux bar, timeline
 src/components/terminal-demo.tsx  the hero terminal: agent beside the code and the review
 src/components/cycle-demo.tsx     the workflow, with clickable chapters
 src/components/panel-demo.tsx     the panel gaining a new block
+src/components/terminal-table.tsx the terminals table: what works everywhere and the extras of each
+src/components/language-switcher.tsx the EN · PT switcher
 src/components/ui/                components installed with the shadcn and Magic UI CLIs
 tests/                            the tests
 ```
 
 ## Changing the content
 
-Almost everything the page says lives in `src/lib/site.ts`. When workdeck
+Everything the page says lives in `src/lib/dictionaries/`, one file per
+language. Change both files in the same commit, with the same structure: a
+test fails when one language has an entry the other lacks. When workdeck
 changes a command, a shortcut or a message, that is the place to update it,
 and the source of truth is the README and the guides in `docs/` of the
-[workdeck repository](https://github.com/thiagofeliperibeiro/workdeck).
+[workdeck repository](https://github.com/workdeckdev/workdeck).
+
+The workdeck interface is in Brazilian Portuguese, so the animated terminals
+keep what workdeck prints (the panel, the command messages and the review) in
+Portuguese in both languages; only the conversation with the agent and the
+captions around it are translated. The English page says so below the
+heading.
 
 The animated terminals mimic the real workdeck: the command messages, the tmux
 bar (`❯_ work`, the `1 painel` and `2 api` tabs, and the `✦` where the AI is
@@ -82,8 +99,8 @@ npx vitest run
 
 The tests live in `tests/` and cover:
 
-- **The content** (`site.test.ts`): the six workdeck commands, the four workflow steps, the install command pointing to the repository, the version in `vX.Y.Z` format, the theme colors and the lists used as React keys having no duplicates.
-- **The page** (`page.test.tsx`): the heading, each menu link pointing to an existing section, every command on screen, the version, GitHub and the install command, and the stars on the GitHub link.
+- **The content** (`site.test.ts`): both languages having the same structure and, in each one, the six workdeck commands, the four workflow steps, the install command pointing to the repository, the version in `vX.Y.Z` format, one value per terminal in each table row and the lists used as React keys having no duplicates.
+- **The page** (`page.test.tsx`): the heading, each menu link pointing to an existing section, every command on screen, the version, GitHub and the install command, the stars on the GitHub link, the English page with the Portuguese interface notice, the language switcher marking the current language and an unknown language returning not found.
 - **The stars** (`github.test.ts`): the GitHub API request, `null` when it fails and the `+23K` format.
 - **The animation timeline** (`timeline.test.tsx`): advancing step by step, restarting at the end, jumping to a step and going straight to the end with reduced motion.
 - **The animated workflow** (`cycle-demo.test.tsx`): starting outside workdeck, `work add` opening the window in the background, `Shift+→` going to it and the clickable chapters.

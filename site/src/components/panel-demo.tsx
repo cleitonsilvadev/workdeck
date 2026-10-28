@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from "motion/react"
 import { Line, Pane, Prompt, StatusBar, TerminalWindow, useTimeline } from "@/components/terminal-parts"
+import type { Dictionary } from "@/lib/dictionaries"
 import { version } from "@/lib/site"
 import { cn } from "@/lib/utils"
 
@@ -47,7 +48,7 @@ function Title({ children }: { children: string }) {
   return <div className="font-bold text-ctp-mauve">{children}</div>
 }
 
-export function PanelDemo() {
+export function PanelDemo({ demo }: { demo: Dictionary["demo"] }) {
   const s = useTimeline(timeline)
   const saved = s >= 5
   const shown = s >= 6
@@ -112,7 +113,7 @@ export function PanelDemo() {
             {s >= 2 && <Line><span className="text-ctp-overlay0">heredoc&gt; </span>docker ps --format &apos;{"{{.Names}}  {{.Status}}"}&apos;</Line>}
             {s >= 3 && <Line><span className="text-ctp-overlay0">heredoc&gt; </span>PAINEL</Line>}
             {s >= 4 && <Prompt path="~" text={`chmod +x ${file}`} typing={s === 4} done={saved} caret={s === 4} speed={32} />}
-            {saved && <Line className="text-ctp-overlay1">o painel relê a pasta a cada ciclo ↑</Line>}
+            {saved && <Line className="text-ctp-overlay1">{demo.panelReload}</Line>}
           </Pane>
         </div>
 

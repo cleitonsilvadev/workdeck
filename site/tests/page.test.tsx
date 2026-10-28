@@ -1,7 +1,8 @@
 import { describe, expect, test, vi } from "vitest"
 import { render, screen, within } from "@testing-library/react"
-import Home from "@/app/page"
-import { commands, installCommand, repoUrl, version } from "@/lib/site"
+import Home from "@/app/[lang]/page"
+import { getDictionary } from "@/lib/dictionaries"
+import { installCommand, repoUrl, version } from "@/lib/site"
 
 vi.mock("next/font/google", () => ({ Geist: () => ({ variable: "" }), JetBrains_Mono: () => ({ variable: "" }) }))
 
@@ -9,10 +10,19 @@ const github = vi.hoisted(() => ({ stars: 23456 as number | null }))
 
 vi.mock("@/lib/github", () => ({ getStars: async () => github.stars }))
 
+vi.mock("next/navigation", async (original) => ({
+  ...(await original<typeof import("next/navigation")>()),
+  useRouter: () => ({ push: vi.fn() }),
+}))
+
+function page(lang = "pt-BR") {
+  return Home({ params: Promise.resolve({ lang }) } as PageProps<"/[lang]">)
+}
+
 describe("home page", () => {
   test("the GitHub link in the header shows the stars", async () => {
     github.stars = 23456
-    render(await Home())
+    render(await page())
     const link = within(screen.getByRole("banner")).getByRole("link", { name: "GitHub, 23456 estrelas" })
     expect(link.getAttribute("href")).toBe(repoUrl)
     expect(link.textContent).toBe("+23K")
@@ -20,25 +30,25 @@ describe("home page", () => {
 
   test.each([null, 0, 9])("with %s stars, the link shows only GitHub", async (stars) => {
     github.stars = stars
-    render(await Home())
+    render(await page())
     expect(within(screen.getByRole("banner")).getByRole("link", { name: "GitHub" }).textContent).toBe("GitHub")
     github.stars = 23456
   })
 
   test("from 10 stars on, the number appears", async () => {
     github.stars = 10
-    render(await Home())
+    render(await page())
     expect(within(screen.getByRole("banner")).getByRole("link", { name: "GitHub, 10 estrelas" }).textContent).toBe("10")
     github.stars = 23456
   })
 
   test("has the main heading", async () => {
-    render(await Home())
+    render(await page())
     expect(screen.getByRole("heading", { level: 1 }).textContent).toContain("agente de IA")
   })
 
   test("each menu link points to an existing section", async () => {
-    const { container } = render(await Home())
+    const { container } = render(await page())
     const nav = screen.getByRole("navigation")
     const links = within(nav).getAllByRole("link")
     expect(links.length).toBeGreaterThan(0)
@@ -49,15 +59,33 @@ describe("home page", () => {
   })
 
   test("shows every command", async () => {
-    render(await Home())
-    for (const c of commands) expect(screen.getAllByText(c.cmd).length).toBeGreaterThan(0)
+    render(await page())
+    for (const c of getDictionary("pt-BR").commands) expect(screen.getAllByText(c.cmd).length).toBeGreaterThan(0)
   })
 
   test("shows the version, GitHub and the install command", async () => {
-    render(await Home())
+    render(await page())
     expect(screen.getByText(new RegExp(`${version} · open source`))).toBeTruthy()
     expect(document.querySelectorAll(`a[href="${repoUrl}"]`).length).toBeGreaterThan(0)
     expect(screen.getAllByText(installCommand).length).toBeGreaterThan(0)
     expect(screen.queryByText(/em breve/)).toBeNull()
+  })
+
+  test("in English, the heading, the menu and the Portuguese interface notice are in English", async () => {
+    render(await page("en"))
+    expect(screen.getByRole("heading", { level: 1 }).textContent).toContain("AI agent")
+    expect(within(screen.getByRole("navigation")).getByRole("link", { name: "How it works" })).toBeTruthy()
+    expect(screen.getByText(/interface .* is in Brazilian Portuguese/)).toBeTruthy()
+  })
+
+  test("the language switcher marks the current language", async () => {
+    render(await page("en"))
+    const group = screen.getByRole("group", { name: "Language" })
+    expect(within(group).getByRole("button", { name: "EN" }).getAttribute("aria-pressed")).toBe("true")
+    expect(within(group).getByRole("button", { name: "PT" }).getAttribute("aria-pressed")).toBe("false")
+  })
+
+  test("an unknown language is not found", async () => {
+    await expect(page("fr")).rejects.toThrow()
   })
 })

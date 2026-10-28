@@ -5,7 +5,9 @@ import { AnimatePresence, motion } from "motion/react"
 import { Check, Copy } from "lucide-react"
 import { cn } from "@/lib/utils"
 
-export function CopyButton({ text, className }: { text: string; className?: string }) {
+export type CopyLabels = { copy: string; copied: string }
+
+export function CopyButton({ text, labels, className }: { text: string; labels: CopyLabels; className?: string }) {
   const [copied, setCopied] = useState(false)
 
   async function copy() {
@@ -22,7 +24,7 @@ export function CopyButton({ text, className }: { text: string; className?: stri
     <button
       type="button"
       onClick={copy}
-      aria-label={copied ? "Copiado" : "Copiar comando"}
+      aria-label={copied ? labels.copied : labels.copy}
       className={cn(
         "relative inline-flex size-8 shrink-0 items-center justify-center rounded-md text-ctp-overlay1 transition-colors hover:bg-ctp-surface0 hover:text-ctp-text focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
         className
@@ -43,7 +45,7 @@ export function CopyButton({ text, className }: { text: string; className?: stri
   )
 }
 
-export function CommandLine({ command, className }: { command: string; className?: string }) {
+export function CommandLine({ command, labels, className }: { command: string; labels: CopyLabels; className?: string }) {
   return (
     <div
       className={cn(
@@ -53,7 +55,7 @@ export function CommandLine({ command, className }: { command: string; className
     >
       <span className="select-none text-ctp-mauve">$</span>
       <code className="min-w-0 flex-1 truncate text-ctp-text">{command}</code>
-      <CopyButton text={command} />
+      <CopyButton text={command} labels={labels} />
     </div>
   )
 }

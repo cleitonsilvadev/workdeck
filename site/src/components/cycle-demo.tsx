@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { AnimatePresence, motion } from "motion/react"
 import { Line, Pane, Prompt, StatusBar, TerminalWindow, useSteps } from "@/components/terminal-parts"
-import { cycle } from "@/lib/site"
+import type { Dictionary } from "@/lib/dictionaries"
 import { cn } from "@/lib/utils"
 
 const timeline = [1100, 1400, 1700, 1600, 1100, 1300, 1200, 900, 1000, 1700, 1000, 1200, 900, 1000, 1000, 3600]
@@ -17,7 +17,7 @@ function sceneDuration(scene: number) {
   return timeline.slice(scenes[scene], scenes[scene + 1]).reduce((a, b) => a + b, 0)
 }
 
-export function CycleDemo() {
+export function CycleDemo({ cycle, demo }: { cycle: Dictionary["cycle"]; demo: Dictionary["demo"] }) {
   const [s, setStep] = useSteps(timeline)
   const [runs, setRuns] = useState(0)
   const scene = s >= timeline.length ? cycle.length - 1 : sceneOf(s)
@@ -74,49 +74,49 @@ export function CycleDemo() {
         })}
       </div>
 
-      <TerminalWindow title={inSession ? "workdeck — tmux" : "kitty"}>
+      <TerminalWindow title={inSession ? "workdeck — tmux" : demo.yourTerminal}>
         <div className="grid h-[460px] grid-rows-[1fr_auto] font-mono text-[10.5px] leading-relaxed sm:h-[400px] sm:text-xs">
           <motion.div layout className={cn("grid min-h-0 gap-1.5 p-1.5", agentOpen ? "grid-cols-1 grid-rows-[1fr_auto] sm:grid-cols-2 sm:grid-rows-1" : "grid-cols-1")}>
             <AnimatePresence>
               {agentOpen && (
                 <motion.div key="ia" layout className={cn("grid min-h-0 gap-1.5", reviewOpen ? "grid-rows-[auto_1fr]" : "grid-rows-1")}>
-                  <Pane title="IA · claude" active={focus === "agent"}>
+                  <Pane title={demo.agentPane} active={focus === "agent"}>
                     {s >= 8 && (
                       <Line>
                         <span className="text-ctp-peach">› </span>
-                        <span className="text-ctp-text">valida o e-mail no login</span>
+                        <span className="text-ctp-text">{demo.prompt}</span>
                       </Line>
                     )}
                     {s >= 9 && (
                       <>
-                        <Line className="text-ctp-subtext0" delay={0.1}>  lendo src/auth/login.ts</Line>
-                        <Line className="text-ctp-subtext0" delay={0.6}>  criando src/auth/email.ts</Line>
-                        <Line className="text-ctp-subtext0" delay={1.1}>  editando src/auth/login.ts</Line>
+                        <Line className="text-ctp-subtext0" delay={0.1}>  {demo.reading} src/auth/login.ts</Line>
+                        <Line className="text-ctp-subtext0" delay={0.6}>  {demo.creating} src/auth/email.ts</Line>
+                        <Line className="text-ctp-subtext0" delay={1.1}>  {demo.editing} src/auth/login.ts</Line>
                       </>
                     )}
-                    {s >= 10 && <Line className="text-ctp-green">  ✓ pronto. revise antes de commitar.</Line>}
+                    {s >= 10 && <Line className="text-ctp-green">  {demo.done}</Line>}
                   </Pane>
                   <AnimatePresence>
                     {reviewOpen && (
-                      <Pane key="review" title="IA · review" active={focus === "review"}>
+                      <Pane key="review" title={demo.reviewPane} active={focus === "review"}>
                         <Line className="text-ctp-subtext0">
                           lendo a mudança · <span className="text-ctp-green">+13</span> <span className="text-ctp-red">-2</span> em 2 arquivo(s)
                         </Line>
                         {s >= 13 && (
                           <>
-                            <Line className="mt-1 text-ctp-yellow">● vale corrigir  <span className="text-ctp-subtext0">email.ts:3</span></Line>
-                            <Line className="text-ctp-subtext0" delay={0.08}>  o regex aceita e-mail sem domínio</Line>
+                            <Line className="mt-1 text-ctp-text"><span className="text-ctp-red">●</span> email.ts:3 <span className="text-ctp-subtext0">— o regex aceita e-mail sem domínio</span></Line>
+                            <Line className="text-ctp-subtext0" delay={0.08}>  → exija um ponto depois do @</Line>
                           </>
                         )}
                         {s >= 14 && (
                           <>
-                            <Line className="text-ctp-overlay1">○ opcional  <span className="text-ctp-subtext0">login.ts:13</span></Line>
-                            <Line className="text-ctp-subtext0" delay={0.08}>  falta teste para e-mail inválido</Line>
+                            <Line className="text-ctp-text"><span className="text-ctp-peach">●</span> login.ts:13 <span className="text-ctp-subtext0">— falta teste para e-mail inválido</span></Line>
+                            <Line className="text-ctp-subtext0" delay={0.08}>  → acrescente um caso sem domínio</Line>
                           </>
                         )}
                         {s >= 15 && (
                           <Line className="mt-1 text-ctp-text">
-                            <span className="font-bold">veredito:</span> <span className="text-ctp-green">ajuste o regex e siga</span>
+                            <span className="text-ctp-red">●</span> <span className="font-bold">corrija os vermelhos antes do commit</span>
                           </Line>
                         )}
                       </Pane>
@@ -151,7 +151,7 @@ export function CycleDemo() {
                   )}
                   {switching && (
                     <Line className="mt-2 text-ctp-overlay1">
-                      <kbd className="rounded border border-ctp-surface1 bg-ctp-surface0 px-1 text-ctp-text">Shift</kbd> + <kbd className="rounded border border-ctp-surface1 bg-ctp-surface0 px-1 text-ctp-text">→</kbd> vai para a janela api
+                      <kbd className="rounded border border-ctp-surface1 bg-ctp-surface0 px-1 text-ctp-text">Shift</kbd> + <kbd className="rounded border border-ctp-surface1 bg-ctp-surface0 px-1 text-ctp-text">→</kbd> {demo.switchHint}
                     </Line>
                   )}
                 </>
@@ -165,7 +165,7 @@ export function CycleDemo() {
                     </>
                   )}
                   {s >= 11 && <Prompt path={path} text="work review" typing={s === 11} done={reviewOpen} caret={s === 11} />}
-                  {reviewOpen && <Line className="text-ctp-overlay1">← review embaixo do agente</Line>}
+                  {reviewOpen && <Line className="text-ctp-overlay1">{demo.reviewBelow}</Line>}
                 </>
               )}
             </Pane>

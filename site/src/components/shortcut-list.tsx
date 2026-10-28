@@ -2,7 +2,7 @@
 
 import { motion } from "motion/react"
 import { Keyboard } from "lucide-react"
-import { shortcuts } from "@/lib/site"
+import type { Dictionary } from "@/lib/dictionaries"
 
 function Key({ children }: { children: string }) {
   return (
@@ -16,7 +16,7 @@ function Key({ children }: { children: string }) {
   )
 }
 
-function Group({ title, items }: { title: string; items: readonly { prefix: boolean; keys: readonly string[]; desc: string }[] }) {
+function Group({ title, items, then }: { title: string; items: readonly { prefix: boolean; keys: readonly string[]; desc: string }[]; then: string }) {
   return (
     <div className="rounded-2xl border border-border bg-ctp-mantle/70 p-2">
       <div className="px-3 pt-2 pb-1 text-xs font-medium tracking-wider text-ctp-overlay1 uppercase">{title}</div>
@@ -37,7 +37,7 @@ function Group({ title, items }: { title: string; items: readonly { prefix: bool
                   <Key>Ctrl</Key>
                   <span className="text-xs text-ctp-overlay0">+</span>
                   <Key>b</Key>
-                  <span className="px-1 text-xs text-ctp-overlay0">e</span>
+                  <span className="px-1 text-xs text-ctp-overlay0">{then}</span>
                 </>
               )}
               {s.keys.map((k, i) => (
@@ -54,23 +54,23 @@ function Group({ title, items }: { title: string; items: readonly { prefix: bool
   )
 }
 
-export function ShortcutList() {
+export function ShortcutList({ shortcuts }: { shortcuts: Dictionary["shortcuts"] }) {
   return (
     <div className="grid gap-4 lg:grid-cols-2">
       <div className="flex flex-col gap-4">
-        <Group title="Navegar" items={shortcuts.navigate} />
+        <Group title={shortcuts.navigateTitle} items={shortcuts.navigate} then={shortcuts.then} />
         <div className="flex-1 rounded-2xl border border-dashed border-ctp-surface1 p-5">
           <div className="mb-2 flex items-center gap-2 text-sm font-medium text-ctp-text">
             <Keyboard className="size-4 text-ctp-overlay1" />
-            Prefere uma tecla só?
+            {shortcuts.altTitle}
           </div>
           <p className="text-sm leading-relaxed text-ctp-subtext0">
-            Há atalhos diretos com Alt: Alt+1…9 vai para a janela, Alt+setas troca de painel e Alt+Shift+letra faz as ações. No kitty do workdeck funcionam de cara, inclusive no Mac, onde a Option já age como Alt. No Mac, o kitty também traz atalhos em cmd:
+            {shortcuts.altText}
           </p>
           <code className="mt-3 block font-mono text-xs text-ctp-mauve">cmd+1…9 · cmd+d · cmd+h</code>
         </div>
       </div>
-      <Group title="Agir" items={shortcuts.act} />
+      <Group title={shortcuts.actTitle} items={shortcuts.act} then={shortcuts.then} />
     </div>
   )
 }

@@ -1,15 +1,15 @@
 "use client"
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { CopyButton } from "@/components/copy-button"
-import { install } from "@/lib/site"
+import { CopyButton, type CopyLabels } from "@/components/copy-button"
+import type { Dictionary } from "@/lib/dictionaries"
 
 const systems = [
   { id: "macos", label: "macOS" },
   { id: "linux", label: "Linux" },
 ] as const
 
-export function InstallTabs() {
+export function InstallTabs({ install, labels }: { install: Dictionary["install"]; labels: CopyLabels }) {
   return (
     <Tabs defaultValue="macos" className="w-full">
       <TabsList className="mx-auto mb-4 bg-ctp-mantle">
@@ -33,7 +33,7 @@ export function InstallTabs() {
                     </div>
                     {step.out && <div className="truncate text-xs text-ctp-overlay1"># {step.out}</div>}
                   </div>
-                  <CopyButton text={step.cmd} />
+                  <CopyButton text={step.cmd} labels={labels} />
                 </li>
               ))}
             </ol>
