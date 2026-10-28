@@ -3,6 +3,10 @@
 O `work update` mostra o trecho da versão nova antes de perguntar se quer
 atualizar. Cada versão é uma tag `vX.Y.Z`.
 
+## v1.1.1
+
+- Sai do desinstalador o código que desfazia o perfil do Terminal.app e do GNOME Terminal, que nenhuma versão atual configura. O workdeck é só terminal e CLI.
+
 ## v1.1.0
 
 - Testes automáticos em `tests/` (instalação, tema, painéis, sessão e desinstalação) e lint com shellcheck, rodando no CI do GitHub no Ubuntu e no macOS.

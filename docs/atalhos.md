@@ -45,7 +45,7 @@ JetBrains Mono, a Option do Mac como Alt e, no Mac, atalhos em `cmd`
 (`cmd+1…9` vai para a janela, `cmd+d` divide ao lado, `cmd+h` abre o menu). A
 lista completa está em [terminals/README.md](../terminals/README.md).
 
-Em outro terminal (por SSH, no terminal do editor) o `work` abre do mesmo
+Em outro terminal, ou por SSH, o `work` abre do mesmo
 jeito, porque os atalhos são do tmux, e o painel avisa que você está fora do
 kitty. O visual e os atalhos `cmd`, porém, só são garantidos no kitty.
 

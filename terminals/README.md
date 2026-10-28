@@ -20,6 +20,6 @@ Se você já tem o kitty, a instalação usa o seu e só acrescenta o bloco. O q
 você escreveu fora dos marcadores `# >>> workdeck >>>` não muda, e o
 desinstalador tira só o bloco. O kitty continua instalado.
 
-**Outro terminal** (por SSH, no terminal do editor) também abre o `work`, porque
+**Outro terminal**, ou uma conexão por SSH, também abre o `work`, porque
 os atalhos são do tmux, e o painel avisa que você está fora do kitty. O visual e
 os atalhos `cmd` só são garantidos no kitty.
