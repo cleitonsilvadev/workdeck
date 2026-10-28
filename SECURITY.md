@@ -3,7 +3,7 @@
 ## Reporting a vulnerability
 
 If you find a security issue, **do not open a public issue**. Use GitHub's
-[private vulnerability reporting](https://github.com/workdeckdev/workdeck/security/advisories/new),
+[private vulnerability reporting](https://github.com/thiagofeliperibeiro/workdeck/security/advisories/new),
 with steps to reproduce and the impact you see.
 
 You will get a response as soon as possible, and the fix ships in a new
@@ -14,7 +14,7 @@ release, with the issue described in `CHANGELOG.md` once it is published.
 The recommended installation is `curl … | bash`. To read the script first:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/workdeckdev/workdeck/main/get.sh -o get.sh
+curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/get.sh -o get.sh
 less get.sh && bash get.sh
 ```
 

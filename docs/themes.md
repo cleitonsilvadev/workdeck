@@ -14,7 +14,7 @@ Warp too.
 ## Switching
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/workdeckdev/workdeck/main/get.sh | bash -s -- --theme nord
+curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/get.sh | bash -s -- --theme nord
 ```
 
 The choice is saved in `~/.config/workdeck/theme`, and `work update` keeps the

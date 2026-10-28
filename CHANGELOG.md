@@ -3,6 +3,10 @@
 O `work update` mostra o trecho da versão nova antes de perguntar se quer
 atualizar. Cada versão é uma tag `vX.Y.Z`.
 
+## v1.4.1
+
+- O repositório voltou para `github.com/thiagofeliperibeiro/workdeck`. O comando de instalação, o link do guia de painéis e os docs apontam para lá de novo. Quem instalou pelo endereço anterior continua recebendo as atualizações normalmente.
+
 ## v1.4.0
 
 - A instalação pergunta qual terminal você usa (kitty, Warp ou outro), confere se ele está instalado e configura os extras dele. **O workdeck não instala mais o kitty:** se ele faltar, a instalação diz onde baixar. Uma segunda pergunta oferece o tema e a fonte JetBrains Mono no kitty ou no Warp. As flags `--terminal kitty|warp|other` e `--visual` / `--no-visual` respondem sem perguntar, e as respostas ficam em `~/.config/workdeck/`.

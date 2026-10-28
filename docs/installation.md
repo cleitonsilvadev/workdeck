@@ -3,7 +3,7 @@
 # Installation
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/workdeckdev/workdeck/main/get.sh | bash
+curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/get.sh | bash
 ```
 
 `get.sh` downloads the latest published version to `~/.local/share/workdeck`

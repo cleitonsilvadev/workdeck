@@ -16,7 +16,7 @@ closing the terminal.
 [Features](#features) ·
 [Documentation](#documentation)
 
-[![CI](https://github.com/workdeckdev/workdeck/actions/workflows/ci.yml/badge.svg)](https://github.com/workdeckdev/workdeck/actions/workflows/ci.yml)
+[![CI](https://github.com/thiagofeliperibeiro/workdeck/actions/workflows/ci.yml/badge.svg)](https://github.com/thiagofeliperibeiro/workdeck/actions/workflows/ci.yml)
 ![macOS](https://img.shields.io/badge/macOS-supported-555?logo=apple)
 ![Linux](https://img.shields.io/badge/Linux-supported-555?logo=linux&logoColor=white)
 ![MIT License](https://img.shields.io/badge/license-MIT-555)
@@ -75,7 +75,7 @@ work add ~/api  →  project window  →  agent beside it  →  work review  →
 ## Installation
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/workdeckdev/workdeck/main/get.sh | bash
+curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/get.sh | bash
 ```
 
 Runs on macOS and Linux (including WSL). The installer detects the system,
@@ -89,7 +89,7 @@ writes to your files stays between `# >>> workdeck >>>` markers.
 <summary>Read the script before running it, or pass options</summary>
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/workdeckdev/workdeck/main/get.sh -o get.sh
+curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/get.sh -o get.sh
 less get.sh && bash get.sh
 ```
 
