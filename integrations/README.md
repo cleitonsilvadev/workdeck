@@ -1,7 +1,9 @@
 # Integrações
 
 Nada aqui é instalado por padrão. Cada integração é uma peça de terceiros que
-você pode querer ou não, e o `install.sh` só mexe nelas quando você pede:
+você pode querer ou não. Na primeira instalação, o `install.sh` lista as que
+existem aqui e pergunta quais você usa; depois disso, só mexe nelas quando você
+pede:
 
 ```bash
 ./install.sh --with ai-memory          # uma

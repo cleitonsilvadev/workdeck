@@ -3,8 +3,7 @@
 
 descrever() {
   echo "ai-memory"
-  echo "Dá ao seu agente memória entre sessões: decisões, convenções e"
-  echo "contexto do projeto ficam guardados e são recuperados depois."
+  echo "Memória entre sessões para o seu agente: decisões, convenções e contexto."
   echo "Projeto de terceiros, instalado pelo gerenciador do seu agente."
 }
 

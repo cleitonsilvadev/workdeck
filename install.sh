@@ -720,9 +720,43 @@ concluir
 
 # ---- 7. integrações opcionais ----------------------------------------------
 etapa 7 "integrações"
+INTEGRACOES_ESCOLHA="$CONFIG_DIR/integracoes"
+ESCOLHIDAS=0
+if [ -z "$WITH" ] && [ ! -f "$INTEGRACOES_ESCOLHA" ] && pode_perguntar_novidade; then
+  disponiveis=()
+  for f in "$ROOT"/integrations/*.sh; do
+    [ "$(basename "$f")" = exemplo.sh ] || disponiveis+=("$(basename "$f" .sh)")
+  done
+  if [ ${#disponiveis[@]} -gt 0 ]; then
+    parar
+    echo
+    echo "  Você usa algum destes com a IA? O workdeck mostra como ligar cada um."
+    i=1
+    for n in "${disponiveis[@]}"; do
+      printf '    %s) %-10s %s%s%s\n' "$i" "$n" "$dim" "$(. "$ROOT/integrations/$n.sh"; descrever | sed -n 2p)" "$reset"
+      i=$((i+1))
+    done
+    echo
+    printf '  Quais? Números separados por espaço, Enter para nenhum: '
+    read -r escolha || escolha=""
+    for e in ${escolha//,/ }; do
+      if [ "$e" -ge 1 ] 2>/dev/null && [ "$e" -le "${#disponiveis[@]}" ]; then
+        case ",$WITH," in *",${disponiveis[$((e-1))]},"*) ;; *) WITH="${WITH:+$WITH,}${disponiveis[$((e-1))]}" ;; esac
+      fi
+    done
+    [ "$DRY" = 1 ] || { mkdir -p "$CONFIG_DIR"; echo "${WITH:-nenhuma}" > "$INTEGRACOES_ESCOLHA"; }
+    ESCOLHIDAS=1
+    girar
+  fi
+fi
 if [ -z "$WITH" ]; then
-  say "nenhuma pedida (--with <nome>); veja --list-integrations"
-  resumo "nenhuma (--with <nome>)"
+  if [ -f "$INTEGRACOES_ESCOLHA" ] && [ "$(cat "$INTEGRACOES_ESCOLHA")" != nenhuma ]; then
+    say "escolhidas antes: $(cat "$INTEGRACOES_ESCOLHA"); para ver de novo: work install --with <nome>"
+    resumo "$(cat "$INTEGRACOES_ESCOLHA")"
+  else
+    say "nenhuma; para ligar depois: work install --with <nome> (veja --list-integrations)"
+    resumo "nenhuma (--with <nome>)"
+  fi
 else
   parar
   resumo "$WITH"
@@ -743,7 +777,7 @@ else
       echo
       descrever | sed 's/^/    /'
       echo
-      if [ "$YES" = 0 ] && [ -t 0 ]; then
+      if [ "$YES" = 0 ] && [ "$ESCOLHIDAS" = 0 ] && [ -t 0 ]; then
         printf '  Instalar %s? [s/N] ' "$titulo"
         read -r r || r=n
         case "$r" in s|S|y|Y) ;; *) say "pulada"; exit 0 ;; esac
