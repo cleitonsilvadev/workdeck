@@ -437,8 +437,10 @@ etapa 5 "shell"
 ZSH_ESCOLHA="$CONFIG_DIR/zsh"
 ZSH_PLUGINS="${XDG_DATA_HOME:-$HOME/.local/share}/workdeck-zsh"
 
+# Só conta o que o .zshrc carrega fora do bloco do workdeck: uma pasta do
+# oh-my-zsh ou do zinit que nada carrega (sobra de outra instalação) não é
+# configuração do usuário, e o workdeck reaproveita a pasta.
 ja_tem_zsh_turbinado() {
-  [ -d "$HOME/.oh-my-zsh" ] || [ -d "${XDG_DATA_HOME:-$HOME/.local/share}/zinit" ] || [ -d "$HOME/.zinit" ] && return 0
   [ -f "$HOME/.zshrc" ] && awk '/^# >>> workdeck >>>$/{s=1} !s{print} /^# <<< workdeck <<<$/{s=0}' "$HOME/.zshrc" \
     | grep -qE 'zsh-autosuggestions|fast-syntax-highlighting|zsh-syntax-highlighting|zinit|oh-my-zsh|starship|powerlevel10k|p10k|spaceship|pure' && return 0
   return 1
