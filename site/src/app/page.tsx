@@ -1,4 +1,4 @@
-import { ArrowRight, Bot, History, KeyRound, LayoutPanelLeft, Palette, Terminal, Undo2 } from "lucide-react"
+import { ArrowRight, Bot, History, KeyRound, LayoutPanelLeft, Palette, Terminal, Undo2, X } from "lucide-react"
 import { AnimatedGridPattern } from "@/components/ui/animated-grid-pattern"
 import { AnimatedShinyText } from "@/components/ui/animated-shiny-text"
 import { buttonVariants } from "@/components/ui/button"
@@ -11,7 +11,7 @@ import { Reveal, Stagger, StaggerItem } from "@/components/reveal"
 import { ShortcutList } from "@/components/shortcut-list"
 import { TerminalDemo } from "@/components/terminal-demo"
 import { ThemePreview } from "@/components/theme-preview"
-import { commands, features, installCommand, panelRules, panelsUrl, repoUrl, uninstall, version } from "@/lib/site"
+import { commands, features, installCommand, layers, notThis, panelRules, panelsUrl, principles, repoUrl, uninstall, version } from "@/lib/site"
 import { getStars } from "@/lib/github"
 import { formatStars, showStars } from "@/lib/stars"
 import { cn } from "@/lib/utils"
@@ -62,6 +62,7 @@ export default async function Home() {
             </span>
           </a>
           <nav className="hidden items-center gap-6 text-sm text-ctp-subtext0 md:flex">
+            <a href="#o-que-e" className="transition-colors hover:text-ctp-text">O que é</a>
             <a href="#como-funciona" className="transition-colors hover:text-ctp-text">Como funciona</a>
             <a href="#recursos" className="transition-colors hover:text-ctp-text">Recursos</a>
             <a href="#atalhos" className="transition-colors hover:text-ctp-text">Atalhos</a>
@@ -115,6 +116,56 @@ export default async function Home() {
             </Reveal>
           </div>
         </section>
+
+        <Section id="o-que-e" eyebrow="o que é" title="Um fluxo de trabalho sobre o tmux" desc="O workdeck organiza o trabalho com agentes de IA de CLI. O tmux cuida das sessões, das janelas e dos painéis; o workdeck monta os projetos, o agente, o review e o contexto em cima dele.">
+          <div className="grid gap-10 lg:grid-cols-[1fr_1.1fr]">
+            <Reveal className="min-w-0">
+              <ol className="flex flex-col gap-3">
+                {layers.map((l, i) => (
+                  <li
+                    key={l.name}
+                    className={cn(
+                      "flex items-baseline gap-4 rounded-2xl border px-5 py-4",
+                      i === 0 ? "border-ctp-mauve/60 bg-ctp-mauve/10" : "border-ctp-surface0 bg-ctp-mantle/70",
+                    )}
+                  >
+                    <span className={cn("w-20 shrink-0 font-mono text-sm", i === 0 ? "text-ctp-mauve" : "text-ctp-text")}>{l.name}</span>
+                    <span className="text-sm text-ctp-subtext0">{l.desc}</span>
+                  </li>
+                ))}
+              </ol>
+              <ul className="mt-8 grid gap-4 sm:grid-cols-2">
+                {notThis.map((n) => (
+                  <li key={n.title} className="flex items-start gap-3 text-sm">
+                    <X className="mt-0.5 size-4 shrink-0 text-ctp-red" />
+                    <div>
+                      <p className="font-medium text-ctp-text">{n.title}</p>
+                      <p className="mt-1 text-ctp-subtext0">{n.desc}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </Reveal>
+            <Reveal delay={0.1} className="min-w-0">
+              <GlowCard>
+                <div className="p-6">
+                  <h3 className="mb-5 font-medium text-ctp-text">O que entra no workdeck</h3>
+                  <ol className="flex flex-col gap-5">
+                    {principles.map((p, i) => (
+                      <li key={p.title} className="flex items-start gap-4 text-sm">
+                        <span className="grid size-7 shrink-0 place-items-center rounded-full border border-ctp-surface1 font-mono text-xs text-ctp-mauve">{i + 1}</span>
+                        <div>
+                          <p className="font-medium text-ctp-text">{p.title}</p>
+                          <p className="mt-1 text-ctp-subtext0">{p.desc}</p>
+                        </div>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              </GlowCard>
+            </Reveal>
+          </div>
+        </Section>
 
         <Section id="como-funciona" eyebrow="como funciona" title="Do projeto ao review" desc="Cada projeto é uma janela, o agente fica ao lado do seu shell e o review abre embaixo dele quando você pede.">
           <Reveal>

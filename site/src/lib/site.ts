@@ -11,6 +11,26 @@ export const cycle = [
   { label: "work review", code: true, when: "self code review", desc: "Self code review: a IA revisa como quem vai ser chamado se aquilo quebrar, aponta o que corrigir com a gravidade e não mexe em nada." },
 ] as const
 
+export const layers = [
+  { name: "workdeck", desc: "projetos, agente ao lado, work review e painel" },
+  { name: "tmux", desc: "sessões, janelas, painéis e atalhos" },
+  { name: "terminal", desc: "o que você já usa para abrir o tmux" },
+] as const
+
+export const notThis = [
+  { title: "Não é um terminal", desc: "Roda dentro do terminal que você abrir." },
+  { title: "Não é um fork do tmux", desc: "Usa o tmux do sistema, do brew, do apt ou o que você tiver." },
+  { title: "Não é um editor", desc: "O código é editado pelo agente e pelo shell, no terminal." },
+  { title: "Não é um agente de IA", desc: "Abre o agente de CLI que você escolher." },
+] as const
+
+export const principles = [
+  { title: "Serve ao fluxo", desc: "Tudo existe para ir do projeto ao agente e do agente ao review." },
+  { title: "Só config e script", desc: "Nada muda o tmux por dentro. O que ele não faz por config fica de fora." },
+  { title: "Qualquer terminal", desc: "O que é de um terminal só, como os atalhos cmd do kitty, é extra." },
+  { title: "Reversível", desc: "A instalação acrescenta blocos, e o work uninstall tira o que entrou." },
+] as const
+
 export const commands = [
   { cmd: "work", desc: "Abre a sessão, uma janela por projeto. Ou volta para ela." },
   { cmd: "work add ~/projeto", desc: "Acrescenta um projeto. Sem caminho, usa a pasta atual; Tab completa o caminho." },
