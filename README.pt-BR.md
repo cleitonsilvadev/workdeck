@@ -35,7 +35,8 @@ projeto com o seu próprio caos. O workdeck organiza isso num só lugar.
 - **Um painel com o que importa.** Branch e mudanças de cada projeto, e o que mais você quiser ver.
 - **Review antes do commit.** `work review` pede à sua IA uma revisão da mudança, num painel separado da conversa que escreveu o código.
 - **Nada se perde.** Fechou o terminal ou caiu a conexão? `work` e tudo está onde estava, agente incluso.
-- **Pronto em um comando, reversível em outro.** Instala tmux, kitty, fonte, tema e zsh; `work uninstall` desfaz tudo.
+- **Qualquer terminal.** O workdeck roda sobre o tmux, a única dependência. kitty, Warp, iTerm2 ou o terminal que vem no sistema: o `work` funciona igual em todos.
+- **Pronto em um comando, reversível em outro.** Instala o tmux, se faltar, e deixa kitty, fonte, tema e zsh como extras; `work uninstall` desfaz tudo.
 
 ## Como funciona
 
@@ -43,7 +44,7 @@ Cada projeto é uma janela. Dentro dela, o agente fica ao lado do seu shell, e o
 review abre embaixo do agente quando você pede:
 
 ```
-┌─ kitty ──────────────────────────────────────────────────────┐
+┌─ seu terminal ───────────────────────────────────────────────┐
 │                               │                              │
 │  seu agente de IA             │  seu shell                   │
 │  (claude, codex…)             │  git, testes, servidor       │
@@ -74,8 +75,8 @@ curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/g
 ```
 
 Funciona no macOS e no Linux (inclusive WSL). O instalador detecta o sistema,
-instala o que faltar — tmux, [kitty](https://sw.kovidgoyal.net/kitty/), a fonte
-JetBrains Mono — e configura tudo. Nada é sobrescrito: o que ele escreve nos
+instala o tmux, se faltar, deixa o [kitty](https://sw.kovidgoyal.net/kitty/) e a
+fonte JetBrains Mono como extras e configura tudo. Nada é sobrescrito: o que ele escreve nos
 seus arquivos fica entre marcadores `# >>> workdeck >>>`.
 
 <details>
@@ -93,8 +94,8 @@ completa está em [docs/installation.pt-BR.md](docs/installation.pt-BR.md).
 
 ## Primeiros passos
 
-**1. Abra o kitty** (ou feche e abra, se a instalação rodou nele) para carregar
-o shell e o visual novos.
+**1. Abra uma janela nova do terminal** (ou feche e abra o terminal, se a
+instalação rodou nele) para carregar o comando `work` e o shell novo.
 
 **2. Abra o workdeck:**
 
@@ -201,7 +202,7 @@ inclusive os que vêm prontos.
 
 ### Temas
 
-Três temas, aplicados ao kitty e ao tmux juntos: `catppuccin-mocha` (padrão),
+Três temas, aplicados ao tmux e, quando ele está configurado, ao kitty: `catppuccin-mocha` (padrão),
 `nord` e `min-dark`. Para trocar, rode a instalação com `--theme nord`; a
 escolha fica salva para as próximas atualizações.
 [Criar o seu tema →](docs/themes.pt-BR.md)
@@ -228,7 +229,7 @@ exato de antes da instalação. [Detalhes →](docs/installation.pt-BR.md#desins
 |---|---|
 | [Instalação](docs/installation.pt-BR.md) | Opções do instalador, o zsh, onde fica cada arquivo, desinstalar |
 | [Projetos](docs/projects.pt-BR.md) | Adicionar, tirar e reordenar; o `projects.conf` |
-| [Atalhos](docs/shortcuts.pt-BR.md) | Todos os atalhos, o kitty e como criar os seus |
+| [Atalhos](docs/shortcuts.pt-BR.md) | Todos os atalhos, os extras do terminal e como criar os seus |
 | [Review](docs/review.pt-BR.md) | Como o `work review` funciona e como personalizar |
 | [Painéis](docs/panels.pt-BR.md) | Os painéis que vêm prontos e como fazer os seus |
 | [Temas](docs/themes.pt-BR.md) | Os temas e como criar um |

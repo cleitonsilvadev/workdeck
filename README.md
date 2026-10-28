@@ -39,7 +39,8 @@ project with its own mess. workdeck puts all of it in one place.
 - **A panel with what matters.** The branch and changes of each project, plus anything else you want to see.
 - **Review before you commit.** `work review` asks your AI to review the change, in a pane separate from the conversation that wrote the code.
 - **Nothing gets lost.** Closed the terminal or lost the connection? Run `work` and everything is where you left it, agent included.
-- **Set up with one command, undone with another.** Installs tmux, kitty, a font, a theme and zsh; `work uninstall` reverts all of it.
+- **Any terminal.** workdeck runs on tmux, its only dependency. kitty, Warp, iTerm2 or the terminal your system ships with: `work` works the same in all of them.
+- **Set up with one command, undone with another.** Installs tmux if it is missing and sets up kitty, a font, a theme and zsh as extras; `work uninstall` reverts all of it.
 
 ## How it works
 
@@ -47,7 +48,7 @@ Each project is a window. Inside it, the agent sits next to your shell, and the
 review opens below the agent when you ask for it:
 
 ```
-┌─ kitty ──────────────────────────────────────────────────────┐
+┌─ your terminal ──────────────────────────────────────────────┐
 │                               │                              │
 │  your AI agent                │  your shell                  │
 │  (claude, codex…)             │  git, tests, server          │
@@ -78,8 +79,8 @@ curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/g
 ```
 
 Runs on macOS and Linux (including WSL). The installer detects the system,
-installs what is missing (tmux, [kitty](https://sw.kovidgoyal.net/kitty/), the
-JetBrains Mono font) and configures everything. Nothing is overwritten: what it
+installs tmux if it is missing, sets up [kitty](https://sw.kovidgoyal.net/kitty/)
+and the JetBrains Mono font as extras, and configures everything. Nothing is overwritten: what it
 writes to your files stays between `# >>> workdeck >>>` markers.
 
 <details>
@@ -97,8 +98,8 @@ is in [docs/installation.md](docs/installation.md).
 
 ## Getting started
 
-**1. Open kitty** (or close and reopen it, if the installer ran inside it) to
-load the new shell and look.
+**1. Open a new terminal window** (or close and reopen the terminal, if the
+installer ran inside it) to load the `work` command and the new shell.
 
 **2. Start workdeck:**
 
@@ -207,7 +208,7 @@ including the built-in ones.
 
 ### Themes
 
-Three themes, applied to kitty and tmux together: `catppuccin-mocha` (default),
+Three themes, applied to tmux and, when it is set up, to kitty: `catppuccin-mocha` (default),
 `nord` and `min-dark`. To switch, run the installer with `--theme nord`; the
 choice is kept across updates.
 [Create your own theme →](docs/themes.md)
@@ -234,7 +235,7 @@ before the installation. [Details →](docs/installation.md#uninstalling)
 |---|---|
 | [Installation](docs/installation.md) | Installer options, the zsh setup, where each file lives, uninstalling |
 | [Projects](docs/projects.md) | Adding, removing and reordering; `projects.conf` |
-| [Shortcuts](docs/shortcuts.md) | Every shortcut, kitty and how to create your own |
+| [Shortcuts](docs/shortcuts.md) | Every shortcut, the terminal extras and how to create your own |
 | [Review](docs/review.md) | How `work review` works and how to customize it |
 | [Panels](docs/panels.md) | The built-in panels and how to write your own |
 | [Themes](docs/themes.md) | The themes and how to create one |
