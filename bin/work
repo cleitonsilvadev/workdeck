@@ -252,9 +252,9 @@ menu() {
     fi
   done < <(tmux list-windows -t "$sessao" -F '#{window_id}|#{window_index}|#{window_active}|#{window_name}')
   args+=(""
-    "Adicionar um projeto…" + "command-prompt -p 'caminho do projeto:' \"run-shell \\\"work add '%%'\\\"\""
+    "Adicionar um projeto…" + "command-prompt -p 'caminho do projeto (Esc cancela):' \"run-shell \\\"work add '%%'\\\"\""
     "Self code review da mudança" r "run-shell -c '#{pane_current_path}' 'work review'"
-    "Atualizar o workdeck" u "display-popup -E -w 90 -h 30 \"bash -c 'work update; read -rsn1'\""
+    "Atualizar o workdeck" u "display-popup -E -w 90 -h 30 \"bash -c 'work update; printf \\\"  \\\\033[2maperte qualquer tecla para fechar\\\\033[0m\\\"; read -rsn1'\""
     ""
     "Dividir a tela" v "if-shell -F '#{e|>:#{pane_width},#{e|*:#{pane_height},2}}' \"split-window -h -c '#{pane_current_path}'\" \"split-window -v -c '#{pane_current_path}'\""
     "Zoom no painel (de novo volta)" z "resize-pane -Z"
@@ -270,10 +270,11 @@ menu() {
     atalhos+=("cmd+1…9       o mesmo, sem o Ctrl+b")
   fi
   altura="$(tmux display -p -c "$cliente" '#{client_height}')"
-  if [ "$altura" -ge $((linhas + ${#atalhos[@]} + 3)) ]; then
+  if [ "$altura" -ge $((linhas + ${#atalhos[@]} + 5)) ]; then
     args+=("")
     for a in "${atalhos[@]}"; do args+=("-$a" "" ""); done
   fi
+  [ "$altura" -ge $((linhas + 4)) ] && args+=("" "-q ou Esc fecha o menu" "" "")
   tmux display-menu -c "$cliente" -t "$pane" -x C -y C -T "#[align=centre] workdeck " "${args[@]}"
 }
 

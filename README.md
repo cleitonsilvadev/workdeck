@@ -28,8 +28,8 @@ work kill             # fecha a sessão inteira
 Dentro do work, <kbd>Ctrl</kbd>+<kbd>b</kbd> e <kbd>h</kbd> abre o menu: os seus
 projetos, cada um com o número da janela (apertar <kbd>2</kbd> vai direto para o
 segundo), as ações (adicionar projeto, review, atualizar, dividir a tela) e, no
-fim, os atalhos do dia a dia. Numa janela baixa, os atalhos ficam de fora para o
-menu caber.
+fim, os atalhos do dia a dia. <kbd>q</kbd> ou <kbd>Esc</kbd> fecha o menu. Numa
+janela baixa, os atalhos ficam de fora para o menu caber.
 
 ---
 

@@ -3,6 +3,10 @@
 O `work update` mostra o trecho da versão nova antes de perguntar se quer
 atualizar. Cada versão é uma tag `vX.Y.Z`.
 
+## v1.0.12
+
+- O menu (Ctrl+b h) avisa no rodapé que q ou Esc fecha. O "Atualizar o workdeck" mostra no fim que qualquer tecla fecha, e o "Adicionar um projeto" lembra que Esc cancela.
+
 ## v1.0.11
 
 - O tema escolhido com `--theme` fica salvo e o `work update` não volta mais para o catppuccin-mocha.
