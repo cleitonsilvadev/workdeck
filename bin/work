@@ -6,7 +6,7 @@ LIB="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 [ -x "$LIB/workdeck-agent" ] || LIB="${XDG_DATA_HOME:-$HOME/.local/share}/workdeck/bin"
 if [ ! -f "$LIB/../lib/common.sh" ]; then
   echo "o código do workdeck não está em ${LIB%/bin}."
-  echo "instale de novo: curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/get.sh | bash"
+  echo "instale de novo: curl -fsSL https://raw.githubusercontent.com/workdeckdev/workdeck/main/get.sh | bash"
   exit 1
 fi
 . "$LIB/../lib/common.sh"

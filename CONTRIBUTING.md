@@ -6,7 +6,7 @@ open an issue first to discuss the idea.
 ## Setup
 
 ```bash
-git clone https://github.com/thiagofeliperibeiro/workdeck.git
+git clone https://github.com/workdeckdev/workdeck.git
 cd workdeck
 ./install.sh
 ```

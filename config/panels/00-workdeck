@@ -89,5 +89,5 @@ for f in "$CONFIG_DIR"/panels/*; do
 done
 if [ "$custom" = 0 ]; then
   printf '%sPara pôr o seu no painel: um executável em ~/.config/workdeck/panels/%s\n' "$dim" "$x"
-  printf '%s  guia: github.com/thiagofeliperibeiro/workdeck/blob/main/docs/panels.pt-BR.md%s\n' "$dim" "$x"
+  printf '%s  guia: github.com/workdeckdev/workdeck/blob/main/docs/panels.pt-BR.md%s\n' "$dim" "$x"
 fi

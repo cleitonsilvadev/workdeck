@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # workdeck one-line install, without cloning the repository by hand:
 #
-#   curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/get.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/workdeckdev/workdeck/main/get.sh | bash
 #
 # Clones workdeck into ~/.local/share/workdeck at the latest published version
 # and runs install.sh from there. Options are passed through: ... | bash -s -- --theme nord
 set -euo pipefail
 
-REPO="${WORKDECK_REPO:-https://github.com/thiagofeliperibeiro/workdeck.git}"
+REPO="${WORKDECK_REPO:-https://github.com/workdeckdev/workdeck.git}"
 CODE="${XDG_DATA_HOME:-$HOME/.local/share}/workdeck"
 
 case "$(uname -s)" in

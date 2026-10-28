@@ -29,7 +29,7 @@ IA usando, mesmo quando ela já estava instalada. A resposta fica guardada.
 Para ligar depois:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/get.sh | bash -s -- --with bmad,ai-memory
+curl -fsSL https://raw.githubusercontent.com/workdeckdev/workdeck/main/get.sh | bash -s -- --with bmad,ai-memory
 ```
 
 ## Deixar a IA usando

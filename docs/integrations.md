@@ -30,7 +30,7 @@ answer is saved.
 To enable one later:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/get.sh | bash -s -- --with bmad,ai-memory
+curl -fsSL https://raw.githubusercontent.com/workdeckdev/workdeck/main/get.sh | bash -s -- --with bmad,ai-memory
 ```
 
 ## Getting the AI to use them

@@ -15,7 +15,7 @@ e um code review antes de cada commit — numa sessão que não se perde.
 [Recursos](#recursos) ·
 [Documentação](#documentação)
 
-[![CI](https://github.com/thiagofeliperibeiro/workdeck/actions/workflows/ci.yml/badge.svg)](https://github.com/thiagofeliperibeiro/workdeck/actions/workflows/ci.yml)
+[![CI](https://github.com/workdeckdev/workdeck/actions/workflows/ci.yml/badge.svg)](https://github.com/workdeckdev/workdeck/actions/workflows/ci.yml)
 ![macOS](https://img.shields.io/badge/macOS-suportado-555?logo=apple)
 ![Linux](https://img.shields.io/badge/Linux-suportado-555?logo=linux&logoColor=white)
 ![Licença MIT](https://img.shields.io/badge/licen%C3%A7a-MIT-555)
@@ -71,7 +71,7 @@ work add ~/api  →  janela do projeto  →  agente ao lado  →  work review  �
 ## Instalação
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/get.sh | bash
+curl -fsSL https://raw.githubusercontent.com/workdeckdev/workdeck/main/get.sh | bash
 ```
 
 Funciona no macOS e no Linux (inclusive WSL). O instalador detecta o sistema,
@@ -83,7 +83,7 @@ seus arquivos fica entre marcadores `# >>> workdeck >>>`.
 <summary>Ler o script antes de rodar, ou passar opções</summary>
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/get.sh -o get.sh
+curl -fsSL https://raw.githubusercontent.com/workdeckdev/workdeck/main/get.sh -o get.sh
 less get.sh && bash get.sh
 ```
 
