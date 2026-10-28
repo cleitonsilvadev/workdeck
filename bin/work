@@ -238,10 +238,7 @@ atualizar() {
   git -C "$CODIGO" checkout -q "$nova"
   WORKDECK_ATUALIZANDO=1 bash "$CODIGO/install.sh" --yes --no-deps
   printf '\n  %s✓ workdeck atualizado para %s%s\n\n' "$v" "$nova" "$x"
-  if [ -f "$(dirname "$CONFIG")/.shell-novo" ]; then
-    rm -f "$(dirname "$CONFIG")/.shell-novo"
-    SHELL_NOVO=1
-  fi
+
 }
 
 oferecer_atualizacao() {
@@ -491,13 +488,7 @@ case "${1:-}" in
       --ligar) rm -f "$AVISO_CONF"; echo "o work volta a avisar sobre versões novas."; exit 0 ;;
       --verificar) verificar_em_segundo_plano; exit 0 ;;
     esac
-    SHELL_NOVO=0
-    atualizar 1 || exit $?
-    if [ "$SHELL_NOVO" = 1 ] && [ -t 0 ] && [ -t 1 ]; then
-      echo "  abrindo um shell novo, já com o zsh do workdeck"
-      exec "$(command -v zsh || echo "${SHELL:-/bin/zsh}")" -l
-    fi
-    exit 0 ;;
+    atualizar 1; exit $? ;;
   sincronizar) sincronizar; exit 0 ;;
   help|-h|--help) exec workdeck-help ;;
   doctor) shift; exec workdeck-doctor "$@" ;;

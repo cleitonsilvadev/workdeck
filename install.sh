@@ -26,6 +26,7 @@ THEME="catppuccin-mocha"
 TERMINAL=""
 AVISO_OPTION=""
 QUER_ZSH=0
+REINICIAR_SHELL=0
 AGENT=""
 WITH=""
 YES=0
@@ -252,7 +253,6 @@ tell application "Terminal"
   set normal text color of s to {$(cor_16bits "$(cor foreground)")}
   try
     set font name of s to "JetBrainsMono-Regular"
-    set font size of s to 12
   end try
 end tell
 FIM
@@ -280,7 +280,7 @@ aplicar_gnome() {
   dconf write "${k}foreground-color" "'$(cor foreground)'"
   dconf write "${k}palette" "$paleta"
   dconf write "${k}use-system-font" "false"
-  dconf write "${k}font" "'JetBrains Mono 12'"
+  dconf write "${k}font" "'JetBrains Mono 11'"
   dconf write "${k}cell-height-scale" "1.1"
   case "$lista" in
     *"$GNOME_ID"*) ;;
@@ -310,6 +310,7 @@ visual_dos_terminais() {
     case "${r:-s}" in s|S|y|Y) escolha=sim ;; *) escolha=nao ;; esac
     [ "$DRY" = 1 ] || { mkdir -p "$CONFIG_DIR"; echo "$escolha" > "$VISUAL_ESCOLHA"; rm -f "$CONFIG_DIR/terminal-app"; }
     [ "$escolha" = sim ] || { say "terminais sem mudanças"; return 0; }
+    REINICIAR_SHELL=1
   fi
   while IFS= read -r t; do
     case "$t" in
@@ -644,7 +645,6 @@ opcao_zsh() {
   fi
 }
 ZSH_RESUMO=""
-REINICIAR_SHELL=0
 sudo=""; [ "$(id -u)" != 0 ] && sudo="sudo"
 opcao_zsh
 
@@ -754,13 +754,12 @@ if [ "$RELOAD" = 1 ] && command -v tmux >/dev/null && tmux info >/dev/null 2>&1;
 fi
 
 rm -f "$ZSH_ESCOLHA.anterior"
-if [ "$REINICIAR_SHELL" = 1 ] && [ -n "${WORKDECK_ATUALIZANDO:-}" ]; then
-  : > "$CONFIG_DIR/.shell-novo"
-elif [ "$REINICIAR_SHELL" = 1 ] && [ -z "${WORKDECK_SHELL_NOVO:-}" ]; then
-  printf '\n  %s●%s O zsh do workdeck só vale num shell novo. Feche e abra o terminal, ou\n' "$amarelo" "$reset"
-  printf '    rode %sexec zsh -l%s. Dentro do work, os painéis novos já vêm com ele.\n' "$bold" "$reset"
+if [ -n "${WORKDECK_ATUALIZANDO:-}" ]; then
+  if [ "$REINICIAR_SHELL" = 1 ]; then
+    printf '\n  %s●%s Feche e abra o terminal para carregar o zsh e o visual novos.\n' "$amarelo" "$reset"
+  fi
+  exit 0
 fi
-[ -n "${WORKDECK_ATUALIZANDO:-}" ] && exit 0
 
 if [ "$BONITO" = 1 ]; then
   printf '\n  %s✓ pronto em %ss%s\n' "$verde" "$SECONDS" "$reset"
@@ -768,16 +767,11 @@ else
   echo "Pronto."
 fi
 
-if [ -n "${WORKDECK_SHELL_NOVO:-}" ]; then
-  passo_shell=""
-else
-  passo_shell="       source ${rc:-seu arquivo de shell}     ${dim}ou abra um terminal novo${reset}
-"
-fi
 cat <<FIM
 
   Agora:
-${passo_shell}       work                ${dim}abre o painel, que mostra como adicionar os projetos${reset}
+       ${bold}feche e abra o terminal${reset}   ${dim}carrega o zsh, o visual e os comandos do workdeck${reset}
+       work                      ${dim}abre o painel, que mostra como adicionar os projetos${reset}
 
   Para navegar: Shift+← / Shift+→ troca de janela, Shift+↑ / Shift+↓ troca de
   painel, e Ctrl+b e depois 1…9 vai direto para uma janela. Clicar na barra

@@ -3,6 +3,11 @@
 O `work update` mostra o trecho da versão nova antes de perguntar se quer
 atualizar. Cada versão é uma tag `vX.Y.Z`.
 
+## v1.0.14
+
+- No fim da instalação e da atualização, um aviso claro: feche e abra o terminal para carregar o zsh e o visual.
+- O Terminal.app mantém o tamanho de fonte de cada um; o workdeck troca só a fonte e as cores.
+
 ## v1.0.13
 
 - O zsh do workdeck agora é o oh-my-zsh com o tema robbyrussell e o zinit com sugestões, cores e mais Tab, instalado por padrão.
