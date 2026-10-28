@@ -1,7 +1,7 @@
 import { describe, expect, test, vi } from "vitest"
 import { render, screen, within } from "@testing-library/react"
 import Home from "@/app/page"
-import { commands, repoUrl } from "@/lib/site"
+import { commands, installCommand, repoUrl, version } from "@/lib/site"
 
 vi.mock("next/font/google", () => ({ Geist: () => ({ variable: "" }), JetBrains_Mono: () => ({ variable: "" }) }))
 
@@ -27,9 +27,11 @@ describe("página inicial", () => {
     for (const c of commands) expect(screen.getAllByText(c.cmd).length).toBeGreaterThan(0)
   })
 
-  test("enquanto não lança, mostra em breve e esconde o GitHub", () => {
+  test("mostra a versão, o GitHub e o comando de instalação", () => {
     render(<Home />)
-    expect(screen.getAllByText(/em breve/).length).toBeGreaterThan(0)
-    expect(document.querySelector(`a[href="${repoUrl}"]`)).toBeNull()
+    expect(screen.getByText(new RegExp(`${version} · open source`))).toBeTruthy()
+    expect(document.querySelectorAll(`a[href="${repoUrl}"]`).length).toBeGreaterThan(0)
+    expect(screen.getAllByText(installCommand).length).toBeGreaterThan(0)
+    expect(screen.queryByText(/em breve/)).toBeNull()
   })
 })

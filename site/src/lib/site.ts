@@ -1,14 +1,4 @@
-export const released = false
-
-export const version = "v1.1.0"
-
-export const comingSoonPhrases = [
-  "repositório público, licença mit",
-  "polindo o readme antes de abrir",
-  "feat: abrir o código para todos",
-  "git push origin main",
-  "private → public",
-] as const
+export const version = "v1.1.2"
 
 export const repoUrl = "https://github.com/thiagofeliperibeiro/workdeck"
 

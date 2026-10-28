@@ -2,7 +2,6 @@ import { ArrowRight, Bot, History, KeyRound, LayoutPanelLeft, Palette, Terminal,
 import { AnimatedGridPattern } from "@/components/ui/animated-grid-pattern"
 import { AnimatedShinyText } from "@/components/ui/animated-shiny-text"
 import { buttonVariants } from "@/components/ui/button"
-import { ComingSoon } from "@/components/coming-soon"
 import { CommandLine } from "@/components/copy-button"
 import { CycleDemo } from "@/components/cycle-demo"
 import { GlowCard } from "@/components/glow-card"
@@ -12,7 +11,7 @@ import { Reveal, Stagger, StaggerItem } from "@/components/reveal"
 import { ShortcutList } from "@/components/shortcut-list"
 import { TerminalDemo } from "@/components/terminal-demo"
 import { ThemePreview } from "@/components/theme-preview"
-import { commands, features, installCommand, panelRules, panelsUrl, released, repoUrl, uninstall, version } from "@/lib/site"
+import { commands, features, installCommand, panelRules, panelsUrl, repoUrl, uninstall, version } from "@/lib/site"
 import { cn } from "@/lib/utils"
 
 const icons = {
@@ -66,14 +65,10 @@ export default function Home() {
             <a href="#temas" className="transition-colors hover:text-ctp-text">Temas</a>
             <a href="#instalar" className="transition-colors hover:text-ctp-text">Instalar</a>
           </nav>
-          {released ? (
-            <a href={repoUrl} target="_blank" rel="noreferrer" className={cn(buttonVariants({ variant: "outline", size: "sm" }), "gap-2")}>
-              <GithubMark className="size-3.5" />
-              GitHub
-            </a>
-          ) : (
-            <span className="rounded-full border border-ctp-surface0 px-3 py-1 font-mono text-xs text-ctp-subtext0">em breve</span>
-          )}
+          <a href={repoUrl} target="_blank" rel="noreferrer" className={cn(buttonVariants({ variant: "outline", size: "sm" }), "gap-2")}>
+            <GithubMark className="size-3.5" />
+            GitHub
+          </a>
         </div>
       </header>
 
@@ -87,20 +82,12 @@ export default function Home() {
           />
           <div className="relative mx-auto grid max-w-6xl grid-cols-1 items-center gap-14 px-4 pt-20 pb-24 sm:px-6 lg:grid-cols-[1fr_1.15fr] lg:pt-28">
             <Reveal className="min-w-0">
-              {released ? (
-                <a href={repoUrl} target="_blank" rel="noreferrer" className="group mb-6 inline-flex items-center rounded-full border border-ctp-surface0 bg-ctp-mantle/80 px-3 py-1 text-xs">
-                  <AnimatedShinyText className="mx-0 inline-flex items-center gap-1.5 text-ctp-subtext0 dark:via-ctp-text/90">
-                    {version} · open source · MIT · macOS e Linux
-                    <ArrowRight className="size-3 transition-transform group-hover:translate-x-0.5" />
-                  </AnimatedShinyText>
-                </a>
-              ) : (
-                <span className="mb-6 inline-flex items-center rounded-full border border-ctp-surface0 bg-ctp-mantle/80 px-3 py-1 text-xs">
-                  <AnimatedShinyText className="mx-0 inline-flex items-center gap-1.5 text-ctp-subtext0 dark:via-ctp-text/90">
-                    em breve · macOS e Linux
-                  </AnimatedShinyText>
-                </span>
-              )}
+              <a href={repoUrl} target="_blank" rel="noreferrer" className="group mb-6 inline-flex items-center rounded-full border border-ctp-surface0 bg-ctp-mantle/80 px-3 py-1 text-xs">
+                <AnimatedShinyText className="mx-0 inline-flex items-center gap-1.5 text-ctp-subtext0 dark:via-ctp-text/90">
+                  {version} · open source · MIT · macOS e Linux
+                  <ArrowRight className="size-3 transition-transform group-hover:translate-x-0.5" />
+                </AnimatedShinyText>
+              </a>
               <h1 className="text-4xl leading-[1.05] font-semibold tracking-tight text-balance text-ctp-text sm:text-6xl">
                 O terminal onde você e o <span className="text-gradient">agente de IA</span> trabalham lado a lado.
               </h1>
@@ -112,14 +99,12 @@ export default function Home() {
                   Instalar
                   <ArrowRight className="size-4" />
                 </a>
-                {released && (
-                  <a href={repoUrl} target="_blank" rel="noreferrer" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "h-11 gap-2 px-5 text-sm")}>
-                    <GithubMark className="size-4" />
-                    Ver no GitHub
-                  </a>
-                )}
+                <a href={repoUrl} target="_blank" rel="noreferrer" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "h-11 gap-2 px-5 text-sm")}>
+                  <GithubMark className="size-4" />
+                  Ver no GitHub
+                </a>
               </div>
-              {released ? <CommandLine command={installCommand} className="mt-8 max-w-xl" /> : <ComingSoon className="mt-8 max-w-xl" />}
+              <CommandLine command={installCommand} className="mt-8 max-w-xl" />
             </Reveal>
             <Reveal delay={0.15} className="min-w-0">
               <TerminalDemo />
@@ -201,12 +186,10 @@ export default function Home() {
                   Painel que fala com uma API? Deixe o token fora do script, num arquivo em <code className="font-mono text-ctp-text">~/.config/workdeck/</code>. Assim o painel pode ser compartilhado e as credenciais continuam só suas.
                 </p>
               </div>
-              {released && (
-                <a href={panelsUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 text-sm text-ctp-mauve transition-colors hover:text-ctp-text">
-                  Mais sobre painéis
-                  <ArrowRight className="size-3.5" />
-                </a>
-              )}
+              <a href={panelsUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 text-sm text-ctp-mauve transition-colors hover:text-ctp-text">
+                Mais sobre painéis
+                <ArrowRight className="size-3.5" />
+              </a>
             </Reveal>
           </div>
         </Section>
@@ -219,16 +202,10 @@ export default function Home() {
 
         <Section id="instalar" eyebrow="instalar" title="Um script, e ele desfaz o que fez" desc="Uma linha, sem clonar nada. Funciona no macOS e no Linux, inclusive no WSL. O instalador detecta o sistema e o gerenciador de pacotes e instala o tmux, se faltar, e o kitty, já com tema e fonte. Depois, o work update avisa e traz as versões novas.">
           <Reveal className="mx-auto max-w-3xl">
-            {released ? (
-              <>
-                <InstallTabs />
-                <p className="mt-4 text-center text-sm text-ctp-subtext0">
-                  No fim, abra o kitty, ou feche e abra, se a instalação rodou nele, para ele carregar o <code className="font-mono text-ctp-subtext1">work</code>. Quer ler o script antes? Baixe com <code className="font-mono text-ctp-subtext1">-o instalar.sh</code> em vez de <code className="font-mono text-ctp-subtext1">| bash</code>.
-                </p>
-              </>
-            ) : (
-              <ComingSoon />
-            )}
+            <InstallTabs />
+            <p className="mt-4 text-center text-sm text-ctp-subtext0">
+              No fim, abra o kitty, ou feche e abra, se a instalação rodou nele, para ele carregar o <code className="font-mono text-ctp-subtext1">work</code>. Quer ler o script antes? Baixe com <code className="font-mono text-ctp-subtext1">-o instalar.sh</code> em vez de <code className="font-mono text-ctp-subtext1">| bash</code>.
+            </p>
           </Reveal>
           <Reveal className="mx-auto mt-10 max-w-3xl">
             <GlowCard>
@@ -267,7 +244,7 @@ export default function Home() {
               <p className="mx-auto mt-4 max-w-xl text-pretty text-ctp-subtext0">
                 Ele não traz os seus projetos, os seus painéis nem o seu tema: traz a estrutura para você montar os seus. Use, copie, dê fork, mude o que precisar.
               </p>
-              {released ? <CommandLine command={installCommand} className="mx-auto mt-8 max-w-xl text-left" /> : <ComingSoon className="mx-auto mt-8 max-w-xl text-left" />}
+              <CommandLine command={installCommand} className="mx-auto mt-8 max-w-xl text-left" />
             </div>
           </Reveal>
         </section>
@@ -276,12 +253,10 @@ export default function Home() {
       <footer className="border-t border-ctp-surface0/60">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 py-8 text-sm text-ctp-overlay1 sm:flex-row sm:px-6">
           <span className="font-mono">workdeck · licença MIT</span>
-          {released && (
-            <a href={repoUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 transition-colors hover:text-ctp-text">
-              <GithubMark className="size-4" />
-              código no GitHub
-            </a>
-          )}
+          <a href={repoUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 transition-colors hover:text-ctp-text">
+            <GithubMark className="size-4" />
+            código no GitHub
+          </a>
         </div>
       </footer>
     </>

@@ -61,12 +61,10 @@ Os terminais animados imitam o workdeck de verdade: as mensagens dos comandos,
 a barra do tmux (`❯_ work`, as abas `1 painel`, `2 api` e o `✦` onde a IA está
 aberta) e o painel. Se o workdeck mudar o que imprime, ajuste a animação junto.
 
-### Lançamento
+### Versão
 
-| Em `src/lib/site.ts` | Para |
-|---|---|
-| `released` | `false` mostra "em breve" no lugar do comando de instalação e esconde os links do GitHub; `true` lança |
-| `version` | A versão mostrada no selo do topo e no painel animado; atualize a cada release do workdeck |
+`version`, em `src/lib/site.ts`, é a versão mostrada no selo do topo e no painel
+animado. Atualize a cada release do workdeck.
 
 ## Testes
 
@@ -77,7 +75,7 @@ npx vitest run
 Os testes ficam em `tests/` e cobrem:
 
 - **O conteúdo** (`site.test.ts`): os seis comandos do workdeck, os quatro passos do ciclo, o comando de instalação apontando para o repositório, a versão no formato `vX.Y.Z`, as cores dos temas e as listas que viram chave do React sem repetir.
-- **A página** (`page.test.tsx`, `page-released.test.tsx`): o título, cada link do menu levando a uma seção que existe, todos os comandos na tela, e o que aparece antes e depois do lançamento.
+- **A página** (`page.test.tsx`): o título, cada link do menu levando a uma seção que existe, todos os comandos na tela, e a versão, o GitHub e o comando de instalação.
 - **A linha do tempo das animações** (`timeline.test.tsx`): avançar passo a passo, recomeçar no fim, pular para um passo e ir direto para o fim com movimento reduzido.
 - **O ciclo animado** (`cycle-demo.test.tsx`): começar fora do workdeck, o `work add` abrindo a janela em segundo plano, o `Shift+→` levando até ela e os capítulos clicáveis.
 
