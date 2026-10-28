@@ -7,6 +7,7 @@
 Uma janela por projeto, o agente ao lado, um painel com o estado de tudo
 e um code review antes de cada commit — numa sessão que não se perde.
 
+[Como funciona](#como-funciona) ·
 [Instalação](#instalação) ·
 [Primeiros passos](#primeiros-passos) ·
 [Recursos](#recursos) ·
@@ -32,6 +33,36 @@ projeto com o seu próprio caos. O workdeck organiza isso num só lugar.
 - **Review antes do commit.** `work review` pede à sua IA uma revisão da mudança, num painel separado da conversa que escreveu o código.
 - **Nada se perde.** Fechou o terminal ou caiu a conexão? `work` e tudo está onde estava, agente incluso.
 - **Pronto em um comando, reversível em outro.** Instala tmux, kitty, fonte, tema e zsh; `work uninstall` desfaz tudo.
+
+## Como funciona
+
+Cada projeto é uma janela. Dentro dela, o agente fica ao lado do seu shell, e o
+review abre embaixo do agente quando você pede:
+
+```
+┌─ kitty ──────────────────────────────────────────────────────┐
+│                               │                              │
+│  seu agente de IA             │  seu shell                   │
+│  (claude, codex…)             │  git, testes, servidor       │
+│                               │                              │
+├───────────────────────────────┤                              │
+│  work review                  │                              │
+│  a IA revisa a mudança        │                              │
+│                               │                              │
+├──────────────────────────────────────────────────────────────┤
+│ 1 painel  2 api  3 web  4 mobile                 Shift+← →   │
+└──────────────────────────────────────────────────────────────┘
+```
+
+A barra de baixo lista os projetos. A janela 1 é o painel, com a branch e as
+mudanças de todos eles.
+
+O ciclo de trabalho:
+
+```
+work add ~/api  →  janela do projeto  →  agente ao lado  →  work review  →  commit
+   uma vez           sempre aberta        escreve o código    revisa antes      você
+```
 
 ## Instalação
 

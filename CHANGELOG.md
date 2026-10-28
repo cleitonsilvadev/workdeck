@@ -3,6 +3,10 @@
 O `work update` mostra o trecho da versão nova antes de perguntar se quer
 atualizar. Cada versão é uma tag `vX.Y.Z`.
 
+## v1.0.5
+
+- README ganha "Como funciona": um desenho da tela (agente, shell, review e a barra de projetos) e o ciclo de trabalho, de `work add` ao commit.
+
 ## v1.0.4
 
 - README novo, mais curto e direto: o que é, instalação, primeiros passos e recursos. Os detalhes foram para guias em `docs/` (instalação, projetos, atalhos, review, painéis, temas, integrações e customização).
