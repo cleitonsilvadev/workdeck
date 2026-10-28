@@ -6,7 +6,7 @@ atualizar. Cada versão é uma tag `vX.Y.Z`.
 ## v1.0.0
 
 - `work` abre uma sessão do tmux com uma janela por projeto e o painel do workdeck; a sessão sobrevive a fechar o terminal.
-- Só quatro comandos: `work`, `work add`, `work review` e `work update`. O menu (Ctrl+b h) lista os projetos e as ações, e mostra os atalhos do dia a dia.
+- Cinco comandos: `work`, `work add`, `work review`, `work update` e `work kill`. O menu (Ctrl+b h) lista os projetos e as ações, e mostra os atalhos do dia a dia.
 - `work review` pede à IA aberta na janela um self code review antes do commit, usando o agente de review e os PRDs que o CLAUDE.md ou o AGENTS.md apontam.
 - Instalação numa linha, com o kitty (tema, fonte JetBrains Mono e atalhos `cmd` no Mac) e o zsh do workdeck: oh-my-zsh com robbyrussell e zinit com três plugins.
 - Integrações opcionais (BMAD, Spec Kit, ai-memory), com como instalar e como deixar a IA usando cada uma.

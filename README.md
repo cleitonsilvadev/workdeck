@@ -3,11 +3,12 @@
 Um workflow de terminal para trabalhar com agentes de IA.
 
 Uma sessão do tmux, uma janela por projeto, o agente num pane ao lado, e o que
-você precisa olhar enquanto ele trabalha: o diff do que ele escreveu, o estado
-dos seus repositórios, o que mais você quiser.
+você precisa olhar enquanto ele trabalha: o estado dos seus repositórios, um
+self code review antes do commit, o que mais você quiser.
 
-A sessão sobrevive a fechar o terminal, cair a conexão ou reiniciar a máquina.
-Você volta com `work` e tudo está onde estava, agente incluso.
+A sessão sobrevive a fechar o terminal ou cair a conexão. Você volta com `work`
+e tudo está onde estava, agente incluso. Reiniciar a máquina fecha a sessão: o
+`work` abre as janelas dos projetos de novo, e o agente você abre outra vez.
 
 **Funciona com qualquer agente de CLI** — Claude Code, Codex, Copilot CLI,
 Aider, Gemini, o que você usar. O projeto não embute nenhum: ele abre o
@@ -60,16 +61,19 @@ work
 O `work` abre o painel, e o painel mostra como adicionar os seus projetos.
 
 O instalador detecta o sistema e o gerenciador de pacotes — brew no macOS,
-apt, dnf, pacman, zypper ou apk no Linux — e instala o tmux, se faltar. O kitty vem do instalador oficial, sem sudo: em
-`~/Applications` no Mac e em `~/.local/kitty.app` no Linux. Quem já tem o kitty
-só recebe o bloco de configuração. Detalhes em
-`terminals/README.md`.
+apt, dnf, pacman, zypper ou apk no Linux — e instala o tmux, se faltar. O kitty
+vem do instalador oficial, sem sudo: em `~/Applications` no Mac e em
+`~/.local/kitty.app` no Linux. Quem já tem o kitty só recebe o bloco de
+configuração. Detalhes em `terminals/README.md`.
 
 | Flag | O que faz |
 |---|---|
 | `--theme <nome>` | Escolhe um tema de `themes/` (padrão: `catppuccin-mocha`) |
+| `--agent <comando>` | Define o seu agente de IA sem perguntar (`claude`, `codex`…) |
 | `--with <nome>` | Liga integrações sem perguntar: `bmad`, `spec-kit`, `ai-memory` |
+| `--list-integrations` | Mostra as integrações disponíveis e sai |
 | `--zsh` | Instala o oh-my-zsh e o zinit sem perguntar (veja abaixo) |
+| `--yes` | Não pergunta nada; usa os padrões |
 | `--no-deps` | Não instala nada pelo gerenciador de pacotes |
 | `--no-reload` | Não recarrega o tmux no fim (útil ao instalar num HOME de teste) |
 | `--dry-run` | Mostra o que faria, sem escrever nada |
@@ -95,8 +99,9 @@ sugestões enquanto digita (zsh-autosuggestions), cores nos comandos
 (zsh-completions). Tudo é carregado pelo bloco do workdeck no `.zshrc`; o resto
 do seu arquivo fica como está.
 
-- Se você já tem oh-my-zsh, zinit, Starship ou Powerlevel10k, ele não pergunta e
-  não mexe.
+- Se o seu `.zshrc` já carrega oh-my-zsh, zinit, Starship ou Powerlevel10k, ele
+  não pergunta e não mexe. Uma pasta do oh-my-zsh ou do zinit que o `.zshrc` não
+  carrega (sobra de outra instalação) não conta: ele reaproveita a pasta.
 - No Linux sem zsh, ele instala o zsh e pergunta antes de trocar o seu shell
   padrão (pede a senha).
 - Prefere outro tema do oh-my-zsh? Ponha `export WORKDECK_ZSH_THEME=agnoster`
@@ -120,8 +125,15 @@ pode querer ou não: o framework que guia a IA (BMAD, Spec Kit) e a memória ent
 sessões (ai-memory).
 
 Na primeira instalação, o instalador lista as integrações e pergunta quais você
-usa; para cada uma escolhida, mostra de quem é e como ligar. Ele guarda a
-resposta e não pergunta de novo. Para ligar depois, rode a instalação com
+usa. Para cada uma escolhida, mostra de quem é, como instalar e como deixar a
+IA usando, mesmo quando ela já estava instalada. Ele guarda a resposta e não
+pergunta de novo.
+
+A IA só usa o que as instruções dela apontam. Deixe o `CLAUDE.md` (ou o
+`AGENTS.md`) do projeto dizendo onde fica o framework, inclusive quando ele mora
+fora do projeto (num repositório do time, por exemplo), onde ficam os PRDs e os
+padrões, e qual agente usar no review. A memória do ai-memory completa essas
+instruções com o histórico, mas não as substitui. Para ligar depois, rode a instalação com
 `--with bmad` (vírgula separa várias). Para escrever a sua, veja
 `integrations/README.md`.
 
@@ -215,8 +227,8 @@ fora da lista mostra "tecla sem uso no workdeck — Ctrl+b h abre o menu".
 Há atalhos diretos com Alt, que economizam uma tecla: <kbd>Alt</kbd>+<kbd>1</kbd>…<kbd>9</kbd>
 vai para a janela, <kbd>Alt</kbd>+setas troca de painel e
 <kbd>Alt</kbd>+<kbd>shift</kbd>+letra faz as ações (<kbd>D</kbd> divide ao lado,
-<kbd>S</kbd> embaixo, <kbd>Z</kbd> zoom, <kbd>X</kbd> fecha, <kbd>A</kbd> abre a
-IA). No kitty do workdeck funcionam de cara, inclusive no Mac, onde a Option
+<kbd>S</kbd> embaixo, <kbd>Z</kbd> zoom, <kbd>X</kbd> fecha, <kbd>T</kbd> abre uma
+janela, <kbd>R</kbd> renomeia a janela, <kbd>E</kbd> sai da sessão sem fechar). No kitty do workdeck funcionam de cara, inclusive no Mac, onde a Option
 já age como Alt.
 
 As ações usam Shift porque `Alt`+letra minúscula é do readline (andar e apagar
@@ -377,11 +389,16 @@ senão o diff fica difícil em tela não-retina.
 
 ```
 ~/.local/bin/                     work, o único comando no PATH
+~/.local/share/workdeck/          o código do workdeck, na versão instalada
 ~/.config/workdeck/projects.conf  seus projetos
 ~/.config/workdeck/panels/        seus painéis
+~/.config/workdeck/               suas escolhas: agente, tema, zsh, integrações
 ~/.tmux.conf                      bloco entre os marcadores
 ~/.zshrc ou ~/.bashrc             bloco entre os marcadores
 ~/.config/kitty/kitty.conf        bloco entre os marcadores
+~/.oh-my-zsh, ~/.local/share/zinit  o zsh do workdeck, se você aceitou
+~/Applications/kitty.app (Mac)    o kitty, se ainda não estava instalado
+~/.local/kitty.app (Linux)
 ```
 
 ---

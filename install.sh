@@ -476,10 +476,10 @@ opcao_zsh() {
       parar
       printf '  Quer o zsh do workdeck? Sugestões enquanto digita, cores nos comandos
 '
-      printf '  e mais completar com Tab. [s/N] '
-      read -r r || r=n
+      printf '  e mais completar com Tab. [S/n] '
+      read -r r || r=s
       girar
-      case "$r" in s|S|y|Y) ;; *) [ "$DRY" = 1 ] || { mkdir -p "$CONFIG_DIR"; echo nao > "$ZSH_ESCOLHA"; }; return 0 ;; esac
+      case "$r" in ""|s|S|y|Y) ;; *) [ "$DRY" = 1 ] || { mkdir -p "$CONFIG_DIR"; echo nao > "$ZSH_ESCOLHA"; }; return 0 ;; esac
     fi
   fi
   [ "$DRY" = 1 ] && { say "[dry-run] instalaria o zsh do workdeck"; return 0; }
