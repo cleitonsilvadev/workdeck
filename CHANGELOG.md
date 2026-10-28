@@ -3,6 +3,10 @@
 O `work update` mostra o trecho da versão nova antes de perguntar se quer
 atualizar. Cada versão é uma tag `vX.Y.Z`.
 
+## v1.0.17
+
+- A barra volta ao estilo anterior: ❯_ work em bloco e as janelas como 1 painel, com o número em destaque.
+
 ## v1.0.16
 
 - O terminal fica igual ao do site: workdeck em roxo na barra, janelas como 1:api, a atual com fundo, e Ctrl+b h abre o menu à direita.
