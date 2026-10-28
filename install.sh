@@ -5,7 +5,7 @@
 #   ./install.sh --theme nord         escolhe um tema de themes/
 #   ./install.sh --terminal kitty     instala também os atalhos cmd do kitty
 #   ./install.sh --agent claude       define o seu agente de IA
-#   ./install.sh --zsh                instala o zsh do workdeck sem perguntar
+#   ./install.sh --zsh                instala o oh-my-zsh e o zinit sem perguntar
 #   ./install.sh --with ai-memory     ativa integrações opcionais (vírgula separa)
 #   ./install.sh --list-integrations  mostra as integrações disponíveis e sai
 #   ./install.sh --yes                não pergunta nada; usa os padrões
@@ -570,17 +570,20 @@ ja_tem_zsh_turbinado() {
   return 1
 }
 
-baixar_plugins_zsh() {
-  local repo nome
-  mkdir -p "$ZSH_PLUGINS"
-  for repo in zsh-users/zsh-autosuggestions zdharma-continuum/fast-syntax-highlighting zsh-users/zsh-completions; do
-    nome="${repo#*/}"
-    if [ -d "$ZSH_PLUGINS/$nome/.git" ]; then
-      git -C "$ZSH_PLUGINS/$nome" pull -q --ff-only >> "$LOG" 2>&1 || true
-    else
-      git clone -q --depth 1 "https://github.com/$repo.git" "$ZSH_PLUGINS/$nome" >> "$LOG" 2>&1 || return 1
-    fi
-  done
+ZINIT_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/zinit/zinit.git"
+
+instalar_omz_zinit() {
+  if [ ! -d "$HOME/.oh-my-zsh" ]; then
+    git clone -q --depth 1 https://github.com/ohmyzsh/ohmyzsh.git "$HOME/.oh-my-zsh" >> "$LOG" 2>&1 || return 1
+    anota omz "$HOME/.oh-my-zsh"
+  fi
+  if [ ! -f "$ZINIT_DIR/zinit.zsh" ]; then
+    mkdir -p "$(dirname "$ZINIT_DIR")"
+    git clone -q --depth 1 https://github.com/zdharma-continuum/zinit.git "$ZINIT_DIR" >> "$LOG" 2>&1 || return 1
+    anota zinit "$(dirname "$ZINIT_DIR")"
+  fi
+  [ -d "$ZSH_PLUGINS" ] && rm -rf "$ZSH_PLUGINS"
+  return 0
 }
 
 opcao_zsh() {
@@ -593,8 +596,7 @@ opcao_zsh() {
       say "zsh: você já tem plugins (oh-my-zsh, zinit ou outros); não mexi"
       return 0
     fi
-    if [ "$QUER_ZSH" = 0 ]; then
-      pode_perguntar_novidade || return 0
+    if [ "$QUER_ZSH" = 0 ] && pode_perguntar_novidade; then
       parar
       printf '  Quer o zsh do workdeck? Sugestões enquanto digita, cores nos comandos
 '
@@ -633,13 +635,12 @@ opcao_zsh() {
         girar ;;
     esac
   fi
-  if baixar_plugins_zsh; then
+  if instalar_omz_zinit; then
     mkdir -p "$CONFIG_DIR"; echo sim > "$ZSH_ESCOLHA"
-    grep -qF "zsh|$ZSH_PLUGINS|" "$MANIFESTO" 2>/dev/null || anota zsh "$ZSH_PLUGINS"
-    ZSH_RESUMO="zsh do workdeck: sugestões, cores e Tab"
+    ZSH_RESUMO="oh-my-zsh (robbyrussell) e zinit"
     [ "$(cat "$ZSH_ESCOLHA.anterior" 2>/dev/null)" = sim ] || REINICIAR_SHELL=1
   else
-    aviso "não consegui baixar os plugins do zsh; rode work install --zsh mais tarde"
+    aviso "não consegui baixar o oh-my-zsh ou o zinit; rode work install --zsh mais tarde"
   fi
 }
 ZSH_RESUMO=""
@@ -655,6 +656,9 @@ case "$(basename "${SHELL:-/bin/bash}")" in
 esac
 if [ -n "$rc" ]; then
   write_block "$rc" "$(cat "$ROOT/config/shell-snippet.sh")"
+  if [ "$(cat "$ZSH_ESCOLHA" 2>/dev/null)" = sim ] && [ "$DRY" = 0 ] && command -v zsh >/dev/null; then
+    zsh -i -c exit </dev/null >> "$LOG" 2>&1 || true
+  fi
   say "$(basename "$rc")"
   resumo "$(curto "$rc")${ZSH_RESUMO:+ · $ZSH_RESUMO}"
 else

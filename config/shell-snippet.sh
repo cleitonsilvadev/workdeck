@@ -24,25 +24,20 @@ painel() {
     tmux select-window -t "$sessao:painel" && tmux attach -t "$sessao"
   fi
 }
-_wd_zsh="${XDG_DATA_HOME:-$HOME/.local/share}/workdeck-zsh"
-if [ -n "${ZSH_VERSION:-}" ] && [ -d "$_wd_zsh" ] && grep -qx sim "${XDG_CONFIG_HOME:-$HOME/.config}/workdeck/zsh" 2>/dev/null; then
-  fpath=("$_wd_zsh/zsh-completions/src" $fpath)
-  autoload -Uz compinit && compinit -i
-  [ -f "$_wd_zsh/zsh-autosuggestions/zsh-autosuggestions.zsh" ] && . "$_wd_zsh/zsh-autosuggestions/zsh-autosuggestions.zsh"
-  [ -f "$_wd_zsh/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh" ] && . "$_wd_zsh/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh"
-  setopt prompt_subst
-  _wd_git() {
-    local b
-    b="$(git symbolic-ref --short HEAD 2>/dev/null || git rev-parse --short HEAD 2>/dev/null)" || return 0
-    if [ -n "$(git status --porcelain --ignore-submodules=dirty 2>/dev/null | head -1)" ]; then
-      print -n " %F{blue}git:(%F{red}$b%F{blue}) %F{yellow}✗%f"
-    else
-      print -n " %F{blue}git:(%F{red}$b%F{blue})%f"
-    fi
-  }
-  PROMPT='%(?:%B%F{green}➜ :%B%F{red}➜ )%b %F{cyan}%c%f$(_wd_git) '
+if [ -n "${ZSH_VERSION:-}" ] && grep -qx sim "${XDG_CONFIG_HOME:-$HOME/.config}/workdeck/zsh" 2>/dev/null; then
+  if [ -f "${XDG_DATA_HOME:-$HOME/.local/share}/zinit/zinit.git/zinit.zsh" ]; then
+    . "${XDG_DATA_HOME:-$HOME/.local/share}/zinit/zinit.git/zinit.zsh"
+    zinit light zsh-users/zsh-completions
+    zinit light zsh-users/zsh-autosuggestions
+    zinit light zdharma-continuum/fast-syntax-highlighting
+  fi
+  if [ -f "$HOME/.oh-my-zsh/oh-my-zsh.sh" ]; then
+    export ZSH="$HOME/.oh-my-zsh"
+    ZSH_THEME="robbyrussell"
+    plugins=(git)
+    . "$ZSH/oh-my-zsh.sh"
+  fi
 fi
-unset _wd_zsh
 
 _work_janelas() {
   local f="${XDG_CONFIG_HOME:-$HOME/.config}/workdeck/projects.conf"

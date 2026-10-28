@@ -102,7 +102,11 @@ FIM
       zsh)
         run rm -rf "$alvo"
         rm -f "$CONFIG_DIR/zsh"
-        say "zsh do workdeck removido"
+        ;;
+      omz|zinit)
+        run rm -rf "$alvo"
+        rm -f "$CONFIG_DIR/zsh"
+        say "removido ${alvo#$HOME/}"
         ;;
       fonte)
         if [ "$ALL" = 1 ]; then

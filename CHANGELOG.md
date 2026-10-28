@@ -3,6 +3,11 @@
 O `work update` mostra o trecho da versão nova antes de perguntar se quer
 atualizar. Cada versão é uma tag `vX.Y.Z`.
 
+## v1.0.13
+
+- O zsh do workdeck agora é o oh-my-zsh com o tema robbyrussell e o zinit com sugestões, cores e mais Tab, instalado por padrão.
+- Quem já tem oh-my-zsh, zinit, Starship ou Powerlevel10k continua como está.
+
 ## v1.0.12
 
 - O zsh do workdeck ganha um prompt no estilo do oh-my-zsh: ➜, a pasta e o git:(branch).
