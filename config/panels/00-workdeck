@@ -80,4 +80,4 @@ if [ -n "${TMUX:-}" ] && [ "$(tmux display -p '#{client_termname}' 2>/dev/null)"
   printf '%sFora do kitty%s: o work funciona, mas o tema, a fonte e os atalhos cmd só valem lá.\n\n' "$roxo" "$x"
 fi
 
-printf '%sCtrl+b h abre o menu · Ctrl+b ? mostra os comandos e os atalhos%s\n' "$dim" "$x"
+printf '%sCtrl+b h abre o menu: projetos, review, dividir a tela%s\n' "$dim" "$x"

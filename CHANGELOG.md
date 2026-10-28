@@ -3,6 +3,11 @@
 O `work update` mostra o trecho da versão nova antes de perguntar se quer
 atualizar. Cada versão é uma tag `vX.Y.Z`.
 
+## v1.0.7
+
+- O menu (Ctrl+b h) lista os seus projetos, cada um com o número da janela como tecla, e ganha "Atualizar o workdeck". Sai o "Ir para um projeto".
+- Sai o Ctrl+b ? e a lista de atalhos: o menu é a única ajuda.
+
 ## v1.0.6
 
 - O painel mostra só o workdeck e os projetos; os comandos e os atalhos ficam no Ctrl+b ?, e uma linha lembra onde estão.

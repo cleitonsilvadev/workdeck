@@ -25,8 +25,9 @@ work review           # a IA faz um self code review da mudança, num painel emb
 work update           # atualiza o workdeck
 ```
 
-Dentro do work, <kbd>Ctrl</kbd>+<kbd>b</kbd> e <kbd>h</kbd> abre o menu com
-tudo, e <kbd>Ctrl</kbd>+<kbd>b</kbd> e <kbd>?</kbd> lista os atalhos.
+Dentro do work, <kbd>Ctrl</kbd>+<kbd>b</kbd> e <kbd>h</kbd> abre o menu: os seus
+projetos, cada um com o número da janela (apertar <kbd>2</kbd> vai direto para o
+segundo), e as ações (adicionar projeto, review, atualizar, dividir a tela).
 
 ---
 
@@ -203,8 +204,7 @@ solte, e depois a tecla. O mouse também funciona: clique na janela na barra de
 baixo, ou num painel, e arraste a borda para mudar o tamanho.
 
 Só as teclas do workdeck funcionam depois do <kbd>Ctrl</kbd>+<kbd>b</kbd>; uma
-fora da lista mostra "tecla sem uso no workdeck — Ctrl+b h abre o menu". A lista
-completa está em <kbd>Ctrl</kbd>+<kbd>b</kbd> e <kbd>?</kbd>.
+fora da lista mostra "tecla sem uso no workdeck — Ctrl+b h abre o menu".
 
 <details>
 <summary>Atalhos de uma tecla com Alt, e como mudar os atalhos</summary>

@@ -239,6 +239,28 @@ FIM
   "$LIB/workdeck-agent" --pedido "$pedido" "REVIEW" "$raiz:$branch"
 }
 
+menu() {
+  local cliente="$1" pane="$2" sessao id idx nome ativa marca args=()
+  sessao="$(tmux display -p -c "$cliente" '#{session_name}')"
+  while IFS='|' read -r id idx ativa nome; do
+    marca="  "; [ "$ativa" = 1 ] && marca="● "
+    if [ "$idx" -le 9 ]; then
+      args+=("$marca${nome//#/##}" "$idx" "select-window -t $id")
+    else
+      args+=("$marca${nome//#/##}" "" "select-window -t $id")
+    fi
+  done < <(tmux list-windows -t "$sessao" -F '#{window_id}|#{window_index}|#{window_active}|#{window_name}')
+  args+=(""
+    "Adicionar um projeto…" + "command-prompt -p 'caminho do projeto:' \"run-shell \\\"work add '%%'\\\"\""
+    "Self code review da mudança" r "run-shell -c '#{pane_current_path}' 'work review'"
+    "Atualizar o workdeck" u "display-popup -E -w 90 -h 30 \"bash -c 'work update; read -rsn1'\""
+    ""
+    "Dividir a tela" v "if-shell -F '#{e|>:#{pane_width},#{e|*:#{pane_height},2}}' \"split-window -h -c '#{pane_current_path}'\" \"split-window -v -c '#{pane_current_path}'\""
+    "Zoom no painel (de novo volta)" z "resize-pane -Z"
+    "Fechar este painel" x "kill-pane")
+  tmux display-menu -c "$cliente" -t "$pane" -x C -y C -T "#[align=centre] workdeck " "${args[@]}"
+}
+
 com_shell() {
   tmux set -p -t "$1" @papel "PAINEL"
   tmux split-window -v -l 8 -t "$1" -c "$HOME"
@@ -330,7 +352,7 @@ case "${1:-}" in
     atualizar 1; exit $? ;;
   sincronizar) sincronizar; exit 0 ;;
   _painel) shift; exec "$LIB/work-panel" "$@" ;;
-  _atalhos) exec "$LIB/workdeck-help" ;;
+  _menu) shift; menu "$@"; exit 0 ;;
   *)
     echo "não conheço 'work $1'. Os comandos são:"
     echo "  work                abre a sessão, ou volta para ela"
