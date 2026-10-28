@@ -1,3 +1,5 @@
+[English](customizing.md) · **Português**
+
 # Customizando
 
 Quase tudo no workdeck é para ser trocado.
@@ -9,7 +11,7 @@ Quase tudo no workdeck é para ser trocado.
 | Os atalhos `cmd` e o visual do kitty | o seu `kitty.conf`, fora do bloco do workdeck | reabra o kitty |
 | As cores | a instalação com `--theme <nome>` | — |
 | O que aparece no painel | `~/.config/workdeck/panels/` | nada, ele relê sozinho |
-| O que todo review pede | `~/.config/workdeck/review.md` ou `.workdeck/review.md` | — |
+| O que todo review pede | `~/.config/workdeck/review.pt-BR.md` ou `.workdeck/review.pt-BR.md` | — |
 | O tema do oh-my-zsh | `export WORKDECK_ZSH_THEME=<tema>` no `.zshrc` | reabra o terminal |
 | O nome da sessão | `export WORKDECK_SESSION=outro` | — |
 | Algo que não existe aqui | um fork, com o seu comando no `bin/work` | `./install.sh` no fork |

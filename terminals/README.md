@@ -1,25 +1,28 @@
+**English** · [Português](README.pt-BR.md)
+
 # kitty
 
-O workdeck requer o [kitty](https://sw.kovidgoyal.net/kitty/), que roda no macOS e
-no Linux. A instalação baixa o kitty pelo instalador oficial, sem sudo, e
-acrescenta o bloco de `kitty.conf` ao seu `~/.config/kitty/kitty.conf`:
+workdeck requires [kitty](https://sw.kovidgoyal.net/kitty/), which runs on
+macOS and Linux. The installer downloads kitty with the official installer,
+without sudo, and adds the `kitty.conf` block to your
+`~/.config/kitty/kitty.conf`:
 
-- **Tema** do workdeck (`--theme`), o mesmo da barra do tmux.
-- **Fonte** JetBrains Mono, com espaçamento de linha um pouco maior.
-- **Option como Alt** no Mac, para os atalhos diretos com Alt.
-- **cmd** no Mac: `cmd+h` abre o menu, `cmd+enter` divide a tela, `cmd+1…9`
-  vai para a janela, `cmd+d` / `cmd+shift+d` divide ao lado / embaixo,
-  `cmd+shift+enter` dá zoom, `cmd+shift+w` fecha o painel.
+- **Theme** from workdeck (`--theme`), the same as the tmux status bar.
+- **Font** JetBrains Mono, with slightly larger line spacing.
+- **Option as Alt** on a Mac, for the direct Alt shortcuts.
+- **cmd** on a Mac: `cmd+h` opens the menu, `cmd+enter` splits the screen,
+  `cmd+1…9` goes to a window, `cmd+d` / `cmd+shift+d` splits side by side /
+  stacked, `cmd+shift+enter` zooms, `cmd+shift+w` closes the pane.
 
-| Sistema | Onde o kitty fica |
+| System | Where kitty goes |
 |---|---|
 | macOS | `~/Applications/kitty.app` |
-| Linux | `~/.local/kitty.app`, com `kitty` em `~/.local/bin` e o atalho no menu de aplicativos |
+| Linux | `~/.local/kitty.app`, with `kitty` in `~/.local/bin` and a launcher in the applications menu |
 
-Se você já tem o kitty, a instalação usa o seu e só acrescenta o bloco. O que
-você escreveu fora dos marcadores `# >>> workdeck >>>` não muda, e o
-desinstalador tira só o bloco. O kitty continua instalado.
+If you already have kitty, the installer uses yours and only adds the block.
+What you wrote outside the `# >>> workdeck >>>` markers does not change, and the
+uninstaller removes only the block. kitty itself stays installed.
 
-**Outro terminal**, ou uma conexão por SSH, também abre o `work`, porque
-os atalhos são do tmux, e o painel avisa que você está fora do kitty. O visual e
-os atalhos `cmd` só são garantidos no kitty.
+**Another terminal**, or an SSH connection, also opens `work`, because the
+shortcuts belong to tmux, and the panel tells you that you are outside kitty.
+The look and the `cmd` shortcuts are only guaranteed in kitty.

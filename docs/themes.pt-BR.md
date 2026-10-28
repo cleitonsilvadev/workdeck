@@ -1,3 +1,5 @@
+[English](themes.md) · **Português**
+
 # Temas
 
 Cada tema pinta o kitty e o tmux juntos.
@@ -11,10 +13,10 @@ Cada tema pinta o kitty e o tmux juntos.
 ## Trocar
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/instalar.sh | bash -s -- --theme nord
+curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/get.sh | bash -s -- --theme nord
 ```
 
-A escolha fica salva em `~/.config/workdeck/tema`, e o `work update` mantém o
+A escolha fica salva em `~/.config/workdeck/theme`, e o `work update` mantém o
 tema escolhido.
 
 ## Criar um tema
@@ -26,7 +28,7 @@ Crie dois arquivos em `themes/`:
 - `<nome>.tmux` com as do tmux (barra, janela ativa, bordas de painel).
 
 O instalador cola cada um no lugar certo. Como os temas ficam no código, um
-tema próprio pede um fork (veja [Customizando](customizando.md)).
+tema próprio pede um fork (veja [Customizando](customizing.pt-BR.md)).
 
 Vale olhar o contraste antes de fechar um tema. Em fundo escuro, texto acima de
 11:1 cansa em sessão longa, e nada abaixo de 4,5:1 deve carregar informação.

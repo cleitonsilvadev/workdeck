@@ -1,42 +1,41 @@
-# Segurança
+# Security
 
-## Como relatar
+## Reporting a vulnerability
 
-Se você encontrou uma falha de segurança, **não abra uma issue pública**. Use o
-[relato privado de vulnerabilidade](https://github.com/thiagofeliperibeiro/workdeck/security/advisories/new)
-do GitHub, com os passos para reproduzir e o impacto que você enxerga.
+If you find a security issue, **do not open a public issue**. Use GitHub's
+[private vulnerability reporting](https://github.com/thiagofeliperibeiro/workdeck/security/advisories/new),
+with steps to reproduce and the impact you see.
 
-A resposta vem assim que possível, e a correção sai numa versão nova, com a
-falha descrita no `CHANGELOG.md` depois de publicada.
+You will get a response as soon as possible, and the fix ships in a new
+release, with the issue described in `CHANGELOG.md` once it is published.
 
-## O que o instalador faz
+## What the installer does
 
-A instalação recomendada é `curl … | bash`. Para ler o script antes:
+The recommended installation is `curl … | bash`. To read the script first:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/instalar.sh -o instalar.sh
-less instalar.sh && bash instalar.sh
+curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/get.sh -o get.sh
+less get.sh && bash get.sh
 ```
 
-- **Onde escreve:** só dentro do seu HOME, e nos seus arquivos
-  (`.zshrc`, `.tmux.conf`, `kitty.conf`) apenas entre os marcadores
-  `# >>> workdeck >>>`.
-- **Antes de escrever:** guarda uma cópia de cada arquivo em
-  `~/.config/workdeck/.backups/` e anota tudo num manifesto, que o
-  `uninstall.sh` usa para desfazer.
-- **Quando pede senha:** só para instalar o tmux pelo gerenciador de pacotes
-  do Linux (`sudo`) e, se você aceitar, para trocar o shell padrão (`chsh`). O
-  kitty e a fonte são instalados sem sudo.
-- **O que baixa:** o próprio workdeck do GitHub, o kitty pelo instalador
-  oficial, a fonte JetBrains Mono das releases oficiais e, se você aceitar, o
-  oh-my-zsh e o zinit dos repositórios deles.
-- **O que não faz:** não envia dados para lugar nenhum, não guarda tokens e não
-  roda nada em segundo plano além da checagem de versão nova, uma vez por dia,
-  com `git fetch`.
+- **Where it writes:** only inside your HOME, and in your files (`.zshrc`,
+  `.tmux.conf`, `kitty.conf`) only between the `# >>> workdeck >>>` markers.
+- **Before writing:** it saves a copy of each file in
+  `~/.config/workdeck/.backups/` and records everything in a manifest, which
+  `uninstall.sh` uses to undo it.
+- **When it asks for a password:** only to install tmux through the Linux
+  package manager (`sudo`) and, if you accept, to change your default shell
+  (`chsh`). kitty and the font are installed without sudo.
+- **What it downloads:** workdeck itself from GitHub, kitty with its official
+  installer, the JetBrains Mono font from the official releases and, if you
+  accept, oh-my-zsh and zinit from their repositories.
+- **What it does not do:** it sends no data anywhere, stores no tokens and runs
+  nothing in the background except the new-version check, once a day, with
+  `git fetch`.
 
-## Painéis e integrações
+## Panels and integrations
 
-Painéis são programas seus, rodados a cada ciclo do painel. Não ponha tokens
-neles: leia de um arquivo em `~/.config/workdeck/` (veja
-[docs/paineis.md](docs/paineis.md)). As integrações (BMAD, Spec Kit, ai-memory)
-são de terceiros; o workdeck só mostra como instalá-las.
+Panels are your own programs, run on every panel cycle. Do not put tokens in
+them: read them from a file in `~/.config/workdeck/` (see
+[docs/panels.md](docs/panels.md)). The integrations (BMAD, Spec Kit, ai-memory)
+are third-party tools; workdeck only shows how to install them.

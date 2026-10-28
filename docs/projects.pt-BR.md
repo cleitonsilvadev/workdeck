@@ -1,3 +1,5 @@
+[English](projects.md) · **Português**
+
 # Projetos
 
 Cada projeto é uma janela da sessão do tmux. O `work` abre todas de uma vez, e

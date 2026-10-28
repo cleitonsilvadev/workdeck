@@ -1,10 +1,12 @@
+[English](installation.md) · **Português**
+
 # Instalação
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/instalar.sh | bash
+curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/get.sh | bash
 ```
 
-O `instalar.sh` baixa a versão publicada mais nova para `~/.local/share/workdeck`
+O `get.sh` baixa a versão publicada mais nova para `~/.local/share/workdeck`
 e roda o `install.sh` de lá. Não é preciso clonar o repositório.
 
 ## O que o instalador faz
@@ -14,7 +16,7 @@ e roda o `install.sh` de lá. Não é preciso clonar o repositório.
 2. Instala o [kitty](https://sw.kovidgoyal.net/kitty/) pelo instalador oficial,
    sem sudo: em `~/Applications` no Mac e em `~/.local/kitty.app` no Linux.
    Quem já tem o kitty só recebe o bloco de configuração. Detalhes em
-   [terminals/README.md](../terminals/README.md).
+   [terminals/README.pt-BR.md](../terminals/README.pt-BR.md).
 3. Coloca o comando `work` em `~/.local/bin`.
 4. Escreve os blocos de configuração no `.tmux.conf`, no `kitty.conf` e no
    `.zshrc` (ou `.bashrc`).

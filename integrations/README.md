@@ -1,55 +1,61 @@
-# Integrações
+**English** · [Português](README.pt-BR.md)
 
-Nada aqui é instalado por padrão. Cada integração é uma peça de terceiros que
-você pode querer ou não. Na primeira instalação, o `install.sh` lista as que
-existem aqui e pergunta quais você usa; depois disso, só mexe nelas quando você
-pede:
+# Integrations
+
+Nothing here is installed by default. Each integration is a third-party tool
+you may or may not want. On the first installation, `install.sh` lists the ones
+available here and asks which you use; after that, it only touches them when
+you ask:
 
 ```bash
-./install.sh --with ai-memory          # uma
-./install.sh --with ai-memory,mcp-git  # várias
-./install.sh --list-integrations       # ver o que existe
+./install.sh --with ai-memory          # one
+./install.sh --with ai-memory,mcp-git  # several
+./install.sh --list-integrations       # see what is available
 ```
 
-Cada arquivo `<nome>.sh` aqui é um script com três funções: `descrever`,
-`verificar` e `instalar`. O instalador chama as duas primeiras antes de
-perguntar qualquer coisa, e a terceira só depois de você confirmar.
+Each `<name>.sh` file here is a script with three functions: `describe`,
+`is_installed` and `setup`. The installer calls the first two before asking
+anything, and the third only after you confirm.
 
-Uma quarta, `usar`, é opcional: explica como deixar a integração funcionando
-com a IA (o que pôr no `CLAUDE.md`, por exemplo). O instalador a mostra depois
-de `instalar` e também quando a integração já estava instalada.
+A fourth one, `usage`, is optional: it explains how to get the AI working with
+the integration (what to put in `CLAUDE.md`, for example). The installer shows
+it after `setup` and also when the integration was already installed.
 
-## Escrevendo uma
+The text these functions print is shown in the terminal, so it is written in
+Brazilian Portuguese, like the rest of the workdeck interface.
 
-Copie `exemplo.sh` e preencha:
+## Writing one
+
+Copy `example.sh` and fill it in:
 
 ```bash
-descrever() {
-  echo "Nome curto"
-  echo "Uma ou duas linhas sobre o que faz e de quem é."
-  echo "https://link-do-projeto"
+describe() {
+  echo "Short name"
+  echo "One or two lines about what it does and who maintains it."
+  echo "https://project-link"
 }
 
-verificar() {           # 0 = já está instalado
-  command -v minha-ferramenta >/dev/null
+is_installed() {        # 0 = already installed
+  command -v my-tool >/dev/null
 }
 
-instalar() {            # o que fazer; pode pedir confirmação do usuário
-  echo "rodando o instalador oficial…"
+setup() {               # what to do; may ask the user to confirm
+  echo "running the official installer…"
   # ...
 }
 
-usar() {                # opcional: como usar depois de instalada
-  echo "aponte para ela no CLAUDE.md do projeto"
+usage() {               # optional: how to use it once installed
+  echo "point to it in the project's CLAUDE.md"
 }
 ```
 
-Mantenha `instalar()` honesta: se a integração baixa algo da internet, diga de
-onde. Se precisa de uma chave de API, diga antes, não depois.
+Keep `setup()` honest: if the integration downloads something from the
+internet, say from where. If it needs an API key, say so up front, not
+afterwards.
 
-## Por que separado
+## Why separate
 
-O workdeck é um workflow, não um gerenciador de pacotes. Estas integrações
-existem porque aparecem muito em fluxo de trabalho com agentes de IA — não
-porque o projeto as endossa, as mantém ou as auditou. Leia o que cada uma faz
-antes de rodar.
+workdeck is a workflow, not a package manager. These integrations exist because
+they come up often when working with AI agents, not because the project
+endorses, maintains or has audited them. Read what each one does before running
+it.

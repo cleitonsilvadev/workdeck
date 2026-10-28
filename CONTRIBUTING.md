@@ -1,9 +1,9 @@
-# Contribuindo
+# Contributing
 
-Sugestões, bugs e pull requests são bem-vindos. Para algo grande, abra uma issue
-antes para conversar sobre a ideia.
+Suggestions, bug reports and pull requests are welcome. For anything large,
+open an issue first to discuss the idea.
 
-## Ambiente
+## Setup
 
 ```bash
 git clone https://github.com/thiagofeliperibeiro/workdeck.git
@@ -11,63 +11,86 @@ cd workdeck
 ./install.sh
 ```
 
-Rodar o `install.sh` de dentro do clone instala o que está nele, inclusive
-commits que ainda não viraram versão: ele copia o clone para
-`~/.local/share/workdeck`, que é de onde o `work` roda. Depois de mudar algo,
-faça commit e rode o `./install.sh` de novo para usar a mudança.
+Running `install.sh` from inside the clone installs what is in it, including
+commits that are not part of a release yet: it copies the clone to
+`~/.local/share/workdeck`, which is where `work` runs from. After changing
+something, commit it and run `./install.sh` again to use the change.
 
-## Estrutura
+## Layout
 
 ```
-install.sh            o instalador, uma função por etapa e o main no fim
-uninstall.sh          o desinstalador, guiado pelo manifesto da instalação
-instalar.sh           a instalação numa linha (curl | bash)
-lib/comum.sh          caminhos e funções usados por todos os scripts
-bin/work              o único comando no PATH
-bin/work-panel        o painel
-bin/workdeck-agent    abre o agente de IA e o review num painel
-config/               tmux.conf, o bloco do shell e os painéis que vêm prontos
-themes/               as cores do kitty e do tmux de cada tema
-terminals/            a configuração do kitty
-integrations/         BMAD, Spec Kit, ai-memory e o exemplo para criar outras
-docs/                 os guias
-tests/                os testes e o lint
+install.sh            the installer, one function per step and main at the end
+uninstall.sh          the uninstaller, driven by the installation manifest
+get.sh                the one-line install (curl | bash)
+instalar.sh           forwards to get.sh, so the old install URL keeps working
+lib/common.sh         paths and helpers shared by every script
+bin/work              the only command on the PATH
+bin/work-panel        the panel
+bin/workdeck-agent    starts the AI agent and the review in a pane
+config/               tmux.conf, the shell block and the built-in panels
+themes/               the kitty and tmux colors of each theme
+terminals/            the kitty configuration
+integrations/         BMAD, Spec Kit, ai-memory and the template for new ones
+docs/                 the guides, in English and Portuguese
+tests/                the tests and the linter
 ```
 
-## Testes
+## Language
+
+| What | Language |
+|---|---|
+| Code: identifiers, file names, tests, CI, comments | English |
+| What the user sees in the terminal: messages, prompts, `--help`, panel titles, `CHANGELOG.md` | Brazilian Portuguese |
+| README and guides | Both: `<name>.md` in English and `<name>.pt-BR.md` in Portuguese, kept in sync |
+| Commit messages | English |
+
+Built-in panels keep Portuguese file names (`20-projetos`), because the file
+name is the title shown on screen. When a file under `~/.config/workdeck/` is
+renamed, `migrate_legacy_config` in `lib/common.sh` converts the old name on the
+next install or update.
+
+## Tests
 
 ```bash
-./tests/run.sh          # todos
-./tests/run.sh tema     # só os que têm "tema" no nome
-./tests/lint.sh         # shellcheck em todos os scripts
+./tests/run.sh          # all of them
+./tests/run.sh theme    # only those with "theme" in the name
+./tests/lint.sh         # shellcheck on every script
 ```
 
-Os testes precisam do `tmux` e do `git`, e o lint do `shellcheck`. Nada toca a
-sua máquina: cada teste roda num HOME descartável, com o tmux num servidor
-isolado, e testa a árvore de trabalho atual, inclusive o que ainda não foi
-commitado.
+The tests need `tmux` and `git`, and the linter needs `shellcheck`. Nothing
+touches your machine: each test runs in a throwaway HOME, with tmux on an
+isolated server, and tests the current working tree, including uncommitted
+changes.
 
-Cada arquivo `tests/*.test.sh` tem funções `teste_*`. As funções de apoio
-(`instalar`, `afirmar`, `afirmar_contem`, `esperar`, `abrir_work_num_terminal`…)
-estão em `tests/lib.sh`. Corrigiu um bug? Escreva o teste que teria pegado.
+Each `tests/*.test.sh` file contains `test_*` functions. The helpers
+(`install_workdeck`, `assert`, `assert_contains`, `wait_for`,
+`open_work_in_terminal`…) are in `tests/lib.sh`. Fixed a bug? Write the test
+that would have caught it.
 
-O CI roda o lint e os testes no Ubuntu e no macOS a cada push e pull request.
-No macOS os testes usam o `/bin/bash` do sistema, a versão 3.2, então evite
-recursos de bash 4 ou mais novo, como `mapfile`, `declare -A` e `${var,,}`.
+CI runs the linter and the tests on Ubuntu and macOS on every push and pull
+request. On macOS the tests use the system `/bin/bash`, version 3.2, so avoid
+bash 4+ features such as `mapfile`, `declare -A` and `${var,,}`.
 
-## Ao testar à mão
+## Testing by hand
 
-Nunca instale numa conta real para testar. Use um HOME descartável e o
-`--no-reload`, senão o instalador recarrega o tmux da sessão que está aberta:
+Never install into a real account to test. Use a throwaway HOME and
+`--no-reload`, otherwise the installer reloads the tmux of the session you have
+open:
 
 ```bash
 HOME="$(mktemp -d)" ./install.sh --yes --no-deps --no-reload
 ```
 
-## Estilo
+## Style
 
-- Mensagens, documentação e nomes em português, sem primeira pessoa.
-- Scripts em bash, com `set -euo pipefail` e funções pequenas.
-- Tudo o que o instalador escreve fica entre os marcadores `# >>> workdeck >>>`
-  e tem como ser desfeito pelo `uninstall.sh`.
-- Uma mudança que o usuário percebe ganha uma linha no `CHANGELOG.md`.
+- Bash scripts with `set -euo pipefail` and small functions.
+- Everything the installer writes stays between the `# >>> workdeck >>>`
+  markers and can be undone by `uninstall.sh`.
+- A change users will notice gets a line in `CHANGELOG.md`.
+
+## Commits
+
+- Imperative subject line in English, up to 72 characters, no trailing period:
+  `Add sprint panel example`, `Fix integration prompt parsing`.
+- Optional body after a blank line, explaining what changed and why.
+- One logical change per commit.

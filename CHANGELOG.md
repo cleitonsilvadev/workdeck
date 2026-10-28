@@ -3,6 +3,13 @@
 O `work update` mostra o trecho da versão nova antes de perguntar se quer
 atualizar. Cada versão é uma tag `vX.Y.Z`.
 
+## v1.3.0
+
+- README e guias em inglês e em português: `README.md` e `docs/<guia>.md` em inglês, `README.pt-BR.md` e `docs/<guia>.pt-BR.md` em português. O que aparece no terminal continua em português.
+- O código passou para o inglês (nomes de arquivos, funções e testes). A sua config é convertida sozinha nesta atualização: `tema` vira `theme`, `integracoes` vira `integrations` e `atualizacao.conf` vira `update.conf`, sem perder nenhuma escolha.
+- A instalação numa linha agora é `get.sh`. O endereço antigo, com `instalar.sh`, continua funcionando.
+- Se você abriu o `work` antes de atualizar, rode `work kill` e `work` para a sessão usar a versão nova.
+
 ## v1.2.0
 
 - O `work review` responde direto, uma bolinha por achado: 🔴 bug para corrigir antes do commit, 🟠 atenção que pode ficar para depois, 🟢 ok. Cada achado vem com arquivo:linha, o problema e a correção em uma frase cada, e no fim um veredito. Explicação longa só se você pedir.

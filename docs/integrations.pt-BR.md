@@ -1,3 +1,5 @@
+[English](integrations.md) · **Português**
+
 # Agente e integrações
 
 ## O agente de IA
@@ -27,7 +29,7 @@ IA usando, mesmo quando ela já estava instalada. A resposta fica guardada.
 Para ligar depois:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/instalar.sh | bash -s -- --with bmad,ai-memory
+curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/get.sh | bash -s -- --with bmad,ai-memory
 ```
 
 ## Deixar a IA usando
@@ -43,4 +45,4 @@ substitui.
 
 O workdeck é um workflow, não um gerenciador de pacotes: estas integrações
 estão aqui porque são comuns, não porque o projeto as mantém ou auditou. Para
-escrever a sua, veja [integrations/README.md](../integrations/README.md).
+escrever a sua, veja [integrations/README.pt-BR.md](../integrations/README.pt-BR.md).

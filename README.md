@@ -2,187 +2,195 @@
 
 # workdeck
 
-**Um terminal organizado para trabalhar com agentes de IA.**
+**An organized terminal for working with AI agents.**
 
-Uma janela por projeto, o agente ao lado, um painel com o estado de tudo
-e um code review antes de cada commit — numa sessão que não se perde.
+One window per project, your agent beside the code, a panel with the state of
+everything, and a code review before every commit, in a session that survives
+closing the terminal.
 
-[Como funciona](#como-funciona) ·
-[Instalação](#instalação) ·
-[Primeiros passos](#primeiros-passos) ·
-[Recursos](#recursos) ·
-[Documentação](#documentação)
+**English** · [Português](README.pt-BR.md)
+
+[How it works](#how-it-works) ·
+[Installation](#installation) ·
+[Getting started](#getting-started) ·
+[Features](#features) ·
+[Documentation](#documentation)
 
 [![CI](https://github.com/thiagofeliperibeiro/workdeck/actions/workflows/ci.yml/badge.svg)](https://github.com/thiagofeliperibeiro/workdeck/actions/workflows/ci.yml)
-![macOS](https://img.shields.io/badge/macOS-suportado-555?logo=apple)
-![Linux](https://img.shields.io/badge/Linux-suportado-555?logo=linux&logoColor=white)
-![Licença MIT](https://img.shields.io/badge/licen%C3%A7a-MIT-555)
+![macOS](https://img.shields.io/badge/macOS-supported-555?logo=apple)
+![Linux](https://img.shields.io/badge/Linux-supported-555?logo=linux&logoColor=white)
+![MIT License](https://img.shields.io/badge/license-MIT-555)
 
 </div>
 
 ---
 
-## Por que o workdeck
+> The workdeck interface (CLI messages, prompts and panels) is in Brazilian
+> Portuguese. The documentation is available in English and Portuguese.
 
-Trabalhar com um agente de IA no terminal costuma virar uma pilha de abas: o
-agente num lugar, o git em outro, o servidor rodando em algum canto, e cada
-projeto com o seu próprio caos. O workdeck organiza isso num só lugar.
+## Why workdeck
 
-- **Uma janela por projeto.** `work` abre todos de uma vez; <kbd>Shift</kbd>+<kbd>←</kbd> <kbd>→</kbd> troca entre eles.
-- **O agente ao lado do código.** Funciona com qualquer agente de CLI — Claude Code, Codex, Copilot CLI, Aider, Gemini. Nenhum vem embutido.
-- **Um painel com o que importa.** Branch e mudanças de cada projeto, e o que mais você quiser ver.
-- **Review antes do commit.** `work review` pede à sua IA uma revisão da mudança, num painel separado da conversa que escreveu o código.
-- **Nada se perde.** Fechou o terminal ou caiu a conexão? `work` e tudo está onde estava, agente incluso.
-- **Pronto em um comando, reversível em outro.** Instala tmux, kitty, fonte, tema e zsh; `work uninstall` desfaz tudo.
+Working with an AI agent in the terminal usually turns into a pile of tabs: the
+agent in one place, git in another, a server running somewhere, and every
+project with its own mess. workdeck puts all of it in one place.
 
-## Como funciona
+- **One window per project.** `work` opens all of them at once; <kbd>Shift</kbd>+<kbd>←</kbd> <kbd>→</kbd> switches between them.
+- **Your agent next to the code.** Works with any CLI agent: Claude Code, Codex, Copilot CLI, Aider, Gemini. None is bundled.
+- **A panel with what matters.** The branch and changes of each project, plus anything else you want to see.
+- **Review before you commit.** `work review` asks your AI to review the change, in a pane separate from the conversation that wrote the code.
+- **Nothing gets lost.** Closed the terminal or lost the connection? Run `work` and everything is where you left it, agent included.
+- **Set up with one command, undone with another.** Installs tmux, kitty, a font, a theme and zsh; `work uninstall` reverts all of it.
 
-Cada projeto é uma janela. Dentro dela, o agente fica ao lado do seu shell, e o
-review abre embaixo do agente quando você pede:
+## How it works
+
+Each project is a window. Inside it, the agent sits next to your shell, and the
+review opens below the agent when you ask for it:
 
 ```
 ┌─ kitty ──────────────────────────────────────────────────────┐
 │                               │                              │
-│  seu agente de IA             │  seu shell                   │
-│  (claude, codex…)             │  git, testes, servidor       │
+│  your AI agent                │  your shell                  │
+│  (claude, codex…)             │  git, tests, server          │
 │                               │                              │
 ├───────────────────────────────┤                              │
 │  work review                  │                              │
-│  a IA revisa a mudança        │                              │
+│  the AI reviews the change    │                              │
 │                               │                              │
 ├──────────────────────────────────────────────────────────────┤
 │ 1 painel  2 api  3 web  4 mobile                 Shift+← →   │
 └──────────────────────────────────────────────────────────────┘
 ```
 
-A barra de baixo lista os projetos. A janela 1 é o painel, com a branch e as
-mudanças de todos eles.
+The bottom bar lists the projects. Window 1 is the panel, with the branch and
+changes of all of them.
 
-O ciclo de trabalho:
+The workflow:
 
 ```
-work add ~/api  →  janela do projeto  →  agente ao lado  →  work review  →  commit
-   uma vez           sempre aberta        escreve o código    revisa antes      você
+work add ~/api  →  project window  →  agent beside it  →  work review  →  commit
+   once              always open        writes the code     reviews first     you
 ```
 
-## Instalação
+## Installation
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/instalar.sh | bash
+curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/get.sh | bash
 ```
 
-Funciona no macOS e no Linux (inclusive WSL). O instalador detecta o sistema,
-instala o que faltar — tmux, [kitty](https://sw.kovidgoyal.net/kitty/), a fonte
-JetBrains Mono — e configura tudo. Nada é sobrescrito: o que ele escreve nos
-seus arquivos fica entre marcadores `# >>> workdeck >>>`.
+Runs on macOS and Linux (including WSL). The installer detects the system,
+installs what is missing (tmux, [kitty](https://sw.kovidgoyal.net/kitty/), the
+JetBrains Mono font) and configures everything. Nothing is overwritten: what it
+writes to your files stays between `# >>> workdeck >>>` markers.
 
 <details>
-<summary>Ler o script antes de rodar, ou passar opções</summary>
+<summary>Read the script before running it, or pass options</summary>
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/instalar.sh -o instalar.sh
-less instalar.sh && bash instalar.sh
+curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/get.sh -o get.sh
+less get.sh && bash get.sh
 ```
 
-As opções vão no fim: `curl -fsSL … | bash -s -- --theme nord`. A lista
-completa está em [docs/instalacao.md](docs/instalacao.md).
+Options go at the end: `curl -fsSL … | bash -s -- --theme nord`. The full list
+is in [docs/installation.md](docs/installation.md).
 
 </details>
 
-## Primeiros passos
+## Getting started
 
-**1. Abra o kitty** (ou feche e abra, se a instalação rodou nele) para carregar
-o shell e o visual novos.
+**1. Open kitty** (or close and reopen it, if the installer ran inside it) to
+load the new shell and look.
 
-**2. Abra o workdeck:**
+**2. Start workdeck:**
 
 ```bash
 work
 ```
 
-Na primeira vez, ele abre só o painel, mostrando o que falta configurar.
+The first time, it opens only the panel, showing what is left to set up.
 
-**3. Adicione os seus projetos:**
+**3. Add your projects:**
 
 ```bash
-work add ~/code/api        # Tab completa o caminho
-work add                   # sem caminho, usa a pasta atual
+work add ~/code/api        # Tab completes the path
+work add                   # without a path, uses the current folder
 ```
 
-Cada projeto vira uma janela. Abra o seu agente numa delas (`claude`, `codex`…)
-e trabalhe como sempre.
+Each project becomes a window. Start your agent in one of them (`claude`,
+`codex`…) and work as usual.
 
-**4. Antes do commit, peça uma revisão:**
+**4. Before committing, ask for a review:**
 
 ```bash
 work review
 ```
 
-> **Ficou perdido?** <kbd>Ctrl</kbd>+<kbd>b</kbd> e depois <kbd>h</kbd> abre o
-> menu com os projetos, as ações e os atalhos. <kbd>q</kbd> ou <kbd>Esc</kbd> fecha.
+> **Lost?** <kbd>Ctrl</kbd>+<kbd>b</kbd> then <kbd>h</kbd> opens the menu with
+> the projects, actions and shortcuts. <kbd>q</kbd> or <kbd>Esc</kbd> closes it.
 
-## Recursos
+## Features
 
-### Comandos
+### Commands
 
-| Comando | O que faz |
+| Command | What it does |
 |---|---|
-| `work` | Abre a sessão, ou volta para ela |
-| `work add [caminho]` | Acrescenta um projeto como janela |
-| `work review [staged\|branch]` | A IA revisa a mudança antes do commit |
-| `work update` | Mostra o que mudou na versão nova e atualiza |
-| `work kill` | Fecha a sessão inteira |
-| `work uninstall` | Desinstala tudo o que o workdeck instalou |
+| `work` | Opens the session, or returns to it |
+| `work add [path]` | Adds a project as a window |
+| `work review [staged\|branch]` | Your AI reviews the change before the commit |
+| `work update` | Shows what changed in the new version and updates |
+| `work kill` | Closes the whole session |
+| `work uninstall` | Removes everything workdeck installed |
 
-### Atalhos
+### Shortcuts
 
-| Para | Teclas |
+| To | Keys |
 |---|---|
-| **Abrir o menu** | <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>h</kbd> |
-| Projeto anterior / próximo | <kbd>Shift</kbd>+<kbd>←</kbd> / <kbd>→</kbd> |
-| Painel anterior / próximo | <kbd>Shift</kbd>+<kbd>↑</kbd> / <kbd>↓</kbd> |
-| Ir direto para a janela N | <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>1</kbd>…<kbd>9</kbd> (no Mac: <kbd>cmd</kbd>+<kbd>1</kbd>…<kbd>9</kbd>) |
-| Dividir a tela | <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>Enter</kbd> |
-| Zoom no painel | <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>z</kbd> |
-| Fechar o painel | <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>x</kbd> |
-| Sair e deixar tudo rodando | <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>d</kbd> |
+| **Open the menu** | <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>h</kbd> |
+| Previous / next project | <kbd>Shift</kbd>+<kbd>←</kbd> / <kbd>→</kbd> |
+| Previous / next pane | <kbd>Shift</kbd>+<kbd>↑</kbd> / <kbd>↓</kbd> |
+| Go to window N | <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>1</kbd>…<kbd>9</kbd> (on a Mac: <kbd>cmd</kbd>+<kbd>1</kbd>…<kbd>9</kbd>) |
+| Split the screen | <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>Enter</kbd> |
+| Zoom the pane | <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>z</kbd> |
+| Close the pane | <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>x</kbd> |
+| Detach and leave everything running | <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>d</kbd> |
 
-<kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>h</kbd> quer dizer: aperte
-<kbd>Ctrl</kbd>+<kbd>b</kbd>, solte, e aperte <kbd>h</kbd>. O mouse também
-funciona. Todos os atalhos, inclusive os de uma tecla com Alt, estão em
-[docs/atalhos.md](docs/atalhos.md).
+<kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>h</kbd> means: press
+<kbd>Ctrl</kbd>+<kbd>b</kbd>, release, then press <kbd>h</kbd>. The mouse works
+too. Every shortcut, including the single-key Alt ones, is in
+[docs/shortcuts.md](docs/shortcuts.md).
 
 ### Self code review
 
-`work review` manda a mudança para a sua IA revisar antes do commit, e a
-resposta vem direta, uma bolinha por achado:
+`work review` sends the change to your AI for review before the commit, and
+the answer comes back short, one colored dot per finding:
 
 ```
-🔴 src/api/pedidos.ts:42 — o token vai inteiro para o log
-   → logar só o id do usuário
-🟠 src/lista.tsx:18 — uma consulta por item dentro do map
-   → buscar todos de uma vez antes do map
+🔴 src/api/orders.ts:42 — the full token is written to the log
+   → log only the user id
+🟠 src/list.tsx:18 — one query per item inside the map
+   → fetch everything once before the map
 
-🔴 corrija os vermelhos antes do commit
+🔴 fix the red items before committing
 ```
 
-🔴 é bug, para corrigir antes do commit; 🟠 é atenção, pode ficar para depois;
-🟢 está ok. A IA só revisa, não altera nada.
+🔴 is a bug, to fix before the commit; 🟠 needs attention and can wait; 🟢 is
+fine. The AI only reviews; it does not change anything. The review itself is
+written in Portuguese.
 
-O review usa o agente e os padrões que as instruções do projeto apontam
-(`CLAUDE.md`, `AGENTS.md`, skills). Com o Claude Code, cada branch mantém uma
-única conversa de review, que lembra o que já foi apontado.
-[Como funciona e como personalizar →](docs/review.md)
+The review uses the agent and standards your project instructions point to
+(`CLAUDE.md`, `AGENTS.md`, skills). With Claude Code, each branch keeps a
+single review conversation that remembers what was already pointed out.
+[How it works and how to customize it →](docs/review.md)
 
-### Painel personalizável
+### Customizable panel
 
-A janela 1 é o painel: a visão geral do seu work em cima e um terminal embaixo.
-Ele vem com o estado dos projetos, e você põe ali o que quiser acompanhar:
-containers, PRs abertos, o build do CI, as tarefas do dia.
+Window 1 is the panel: an overview of your work at the top and a terminal at
+the bottom. It ships with the state of your projects, and you add whatever you
+want to keep an eye on: containers, open pull requests, the CI build, today's
+tasks.
 
-Cada bloco do painel é um programa em `~/.config/workdeck/panels/`. O painel
-roda todos em ordem alfabética, mostra o que cada um imprime e repete a cada
-60 segundos. Para acrescentar um:
+Each block in the panel is a program in `~/.config/workdeck/panels/`. The panel
+runs them in alphabetical order, shows what each one prints and repeats every
+60 seconds. To add one:
 
 ```bash
 cat > ~/.config/workdeck/panels/30-docker <<'EOF'
@@ -192,58 +200,58 @@ EOF
 chmod +x ~/.config/workdeck/panels/30-docker
 ```
 
-No próximo ciclo, os seus containers aparecem com o título "Docker". Qualquer
-linguagem serve, desde que imprima texto; `chmod -x` desliga um painel,
-inclusive os que vêm prontos.
-[Passo a passo, regras e ideias →](docs/paineis.md)
+On the next cycle, your containers show up under the title "Docker". Any
+language works as long as it prints text; `chmod -x` turns a panel off,
+including the built-in ones.
+[Step by step, rules and ideas →](docs/panels.md)
 
-### Temas
+### Themes
 
-Três temas, aplicados ao kitty e ao tmux juntos: `catppuccin-mocha` (padrão),
-`nord` e `min-dark`. Para trocar, rode a instalação com `--theme nord`; a
-escolha fica salva para as próximas atualizações.
-[Criar o seu tema →](docs/temas.md)
+Three themes, applied to kitty and tmux together: `catppuccin-mocha` (default),
+`nord` and `min-dark`. To switch, run the installer with `--theme nord`; the
+choice is kept across updates.
+[Create your own theme →](docs/themes.md)
 
-## Atualizar e desinstalar
+## Updating and uninstalling
 
 ```bash
-work update          # mostra o que mudou e pergunta antes de atualizar
-work uninstall       # mostra o que vai sair e pergunta antes de apagar
+work update          # shows what changed and asks before updating
+work uninstall       # shows what will be removed and asks before deleting
 ```
 
-O workdeck confere sozinho se há versão nova, no máximo uma vez por dia e sem
-nunca esperar pela internet. Só contam versões publicadas; o que muda em cada
-uma está no [CHANGELOG](CHANGELOG.md). Atualizar mantém os seus projetos,
-painéis e escolhas.
+workdeck checks for new versions on its own, at most once a day and without
+ever waiting on the network. Only published versions count; what changes in
+each one is in the [CHANGELOG](CHANGELOG.md) (in Portuguese, since `work update`
+shows it in the terminal). Updating keeps your projects, panels and choices.
 
-O desinstalador só remove o que o workdeck instalou. Um kitty ou um oh-my-zsh
-que você já tinha continua lá, e dá para devolver os seus arquivos ao estado
-exato de antes da instalação. [Detalhes →](docs/instalacao.md#desinstalar)
+The uninstaller removes only what workdeck installed. A kitty or oh-my-zsh you
+already had stays, and your files can be restored to exactly how they were
+before the installation. [Details →](docs/installation.md#uninstalling)
 
-## Documentação
+## Documentation
 
-| Guia | Conteúdo |
+| Guide | Contents |
 |---|---|
-| [Instalação](docs/instalacao.md) | Opções do instalador, o zsh, onde fica cada arquivo, desinstalar |
-| [Projetos](docs/projetos.md) | Adicionar, tirar e reordenar; o `projects.conf` |
-| [Atalhos](docs/atalhos.md) | Todos os atalhos, o kitty e como criar os seus |
-| [Review](docs/review.md) | Como o `work review` funciona e como personalizar |
-| [Painéis](docs/paineis.md) | Os painéis que vêm prontos e como fazer os seus |
-| [Temas](docs/temas.md) | Os temas e como criar um |
-| [Agente e integrações](docs/integracoes.md) | O agente de IA, BMAD, Spec Kit e ai-memory |
-| [Customizando](docs/customizando.md) | O que dá para mudar e onde |
-| [Contribuindo](CONTRIBUTING.md) | Estrutura do código, testes e como enviar mudanças |
-| [Segurança](SECURITY.md) | O que o instalador faz e como relatar uma falha |
+| [Installation](docs/installation.md) | Installer options, the zsh setup, where each file lives, uninstalling |
+| [Projects](docs/projects.md) | Adding, removing and reordering; `projects.conf` |
+| [Shortcuts](docs/shortcuts.md) | Every shortcut, kitty and how to create your own |
+| [Review](docs/review.md) | How `work review` works and how to customize it |
+| [Panels](docs/panels.md) | The built-in panels and how to write your own |
+| [Themes](docs/themes.md) | The themes and how to create one |
+| [Agent and integrations](docs/integrations.md) | The AI agent, BMAD, Spec Kit and ai-memory |
+| [Customizing](docs/customizing.md) | What you can change and where |
+| [Contributing](CONTRIBUTING.md) | Code layout, tests and how to send changes |
+| [Security](SECURITY.md) | What the installer does and how to report a vulnerability |
 
-## Filosofia
+## Philosophy
 
-O workdeck é um ponto de partida. Ele traz a estrutura — sessão, janelas,
-painel, review — e deixa o resto com você: os seus projetos, os seus painéis, o
-seu agente. Tudo fica em arquivos de texto simples, e tudo o que ele escreve
-pode ser desfeito.
+workdeck is a starting point. It provides the structure (session, windows,
+panel, review) and leaves the rest to you: your projects, your panels, your
+agent. Everything lives in plain text files, and everything it writes can be
+undone.
 
-Use, copie, faça um fork e mude o que precisar.
+Use it, copy it, fork it and change whatever you need.
 
-## Licença
+## License
 
 [MIT](LICENSE)

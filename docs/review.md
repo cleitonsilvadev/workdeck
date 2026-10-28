@@ -1,17 +1,20 @@
+**English** · [Português](review.pt-BR.md)
+
 # Self code review
 
-Um review antes do commit: a sua IA lê a mudança e o código em volta e revisa
-como a pessoa sênior que vai ser chamada se aquilo quebrar.
+A review before the commit: your AI reads the change and the code around it and
+reviews it like the senior engineer who gets called when it breaks.
 
 ```bash
-work review            # o que ainda não foi commitado
-work review staged     # só o que está no stage (git add)
-work review branch     # tudo o que a branch mudou em relação à principal
+work review            # what is not committed yet
+work review staged     # only what is staged (git add)
+work review branch     # everything the branch changed compared to the main branch
 ```
 
-## O que ela devolve
+## What it returns
 
-Uma lista curta, uma bolinha por achado, sem explicação longa:
+A short list, one colored dot per finding, without long explanations. The
+review is written in Portuguese, like the rest of the workdeck interface:
 
 ```
 Usei: roteiro padrão
@@ -25,56 +28,58 @@ Usei: roteiro padrão
 🔴 corrija os vermelhos antes do commit
 ```
 
-| | Quer dizer | O que fazer |
+| | Means | What to do |
 |---|---|---|
-| 🔴 | Bug: quebra, perde dado, abre falha de segurança ou não faz o que a mudança promete | Corrigir antes do commit |
-| 🟠 | Atenção: funciona, mas é arriscado, lento, sem teste ou sobra | Vale corrigir; pode ficar para depois |
-| 🟢 | Ok: o que foi conferido e está certo | Nada |
+| 🔴 | Bug: breaks something, loses data, opens a security hole or does not do what the change promises | Fix it before the commit |
+| 🟠 | Attention: works, but is risky, slow, untested or unnecessary | Worth fixing; can wait |
+| 🟢 | Fine: what was checked and is correct | Nothing |
 
-A última linha é o veredito: 🟢 pode commitar, 🟠 pode commitar e deixar os
-laranjas para depois, ou 🔴 corrigir os vermelhos antes. Para entender um
-achado em detalhe, pergunte na própria conversa do review, depois de corrigir.
+The last line is the verdict: 🟢 ready to commit, 🟠 ready to commit with the
+orange items left for later, or 🔴 fix the red items first. To understand a
+finding in detail, ask in the review conversation itself, after fixing it.
 
-Ela procura bugs e casos de borda, falhas de segurança (segredos, entrada sem
-validação, injeção), código arriscado sem teste, lentidão com dados reais,
-código morto ou de depuração e arquivos fora do escopo. Não altera nada: só
-revisa.
+It looks for bugs and edge cases, security issues (secrets, unvalidated input,
+injection), risky untested code, slowness with real data, dead or debug code,
+and files outside the scope of the change. It does not change anything: it only
+reviews.
 
-## Onde ele roda
+## Where it runs
 
-O review abre num painel embaixo do chat da sua IA (ou do painel em que você
-está), separado da conversa que escreveu o código. Rodar de novo manda o pedido
-para o mesmo painel.
+The review opens in a pane below your AI chat (or below the pane you are in),
+separate from the conversation that wrote the code. Running it again sends the
+request to the same pane.
 
-Com o `claude`, cada branch tem uma sessão de review só: o `work review` retoma
-a mesma conversa (`claude --resume`) em vez de criar uma por vez, e o `/resume`
-não enche de reviews. Na conversa retomada, o que foi resolvido aparece como
-`🟢 corrigido`, e o que continua aberto fica na lista.
+With `claude`, each branch has a single review session: `work review` resumes
+the same conversation (`claude --resume`) instead of starting a new one each
+time, so `/resume` does not fill up with reviews. In the resumed conversation,
+what was resolved shows up as `🟢 corrigido` (fixed), and what is still open
+stays on the list.
 
-Com `claude`, `codex` e `gemini`, o pedido entra direto na conversa. Com outra
-IA, ele vai para a área de transferência e para
-`~/.cache/workdeck/pedido-de-review.md`, para colar.
+With `claude`, `codex` and `gemini`, the request goes straight into the
+conversation. With another AI, it goes to the clipboard and to
+`~/.cache/workdeck/review-request.md`, for you to paste.
 
-Qual IA é usada: a que estiver aberta num painel da janela. Se não houver
-nenhuma, a escolhida na instalação, guardada em `~/.config/workdeck/agent.conf`.
+Which AI is used: the one open in a pane of the window. If there is none, the
+one chosen during installation, stored in `~/.config/workdeck/agent.conf`.
 
-## O seu fluxo de review
+## Your own review flow
 
-O pedido manda a IA usar o agente de review e os PRDs ou stories que as
-instruções dela apontam (`CLAUDE.md`, `AGENTS.md`, skills) — como o review do
-[BMAD](https://github.com/bmad-code-org/BMAD-METHOD) ou uma skill própria — e
-dizer na primeira linha qual usou. Sem nada configurado, ela faz o review
-padrão descrito acima.
+The request tells the AI to use the review agent and the PRDs or stories its
+instructions point to (`CLAUDE.md`, `AGENTS.md`, skills), such as the
+[BMAD](https://github.com/bmad-code-org/BMAD-METHOD) review or a skill of your
+own, and to say on the first line which one it used. With nothing configured, it
+runs the default review described above.
 
-## Personalizar
+## Customizing
 
-Para acrescentar algo a todo review, como a branch base ou a skill preferida,
-escreva em:
+To add something to every review, such as the base branch or a preferred skill,
+write it in:
 
-- `~/.config/workdeck/review.md` — vale para todos os projetos;
-- `.workdeck/review.md` dentro do projeto — vale só nele.
+- `~/.config/workdeck/review.md`, for all projects;
+- `.workdeck/review.md` inside the project, for that project only.
 
-O texto vai no fim do pedido e tem prioridade sobre as instruções padrão.
+The text goes at the end of the request and takes precedence over the default
+instructions.
 
-A ideia vem do passo de revisão do
+The idea comes from the review step in
 [ponytail](https://github.com/dietrichgebert/ponytail).

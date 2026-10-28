@@ -1,3 +1,5 @@
+[English](panels.md) · **Português**
+
 # Painéis
 
 O painel é a janela 1 da sessão: a visão geral do seu work em cima e um
@@ -26,15 +28,15 @@ Um painel com os commits que você fez hoje em cada projeto:
 depois dos dois que vêm prontos.
 
 ```bash
-cat > ~/.config/workdeck/panels/30-commits-de-hoje <<'PAINEL'
+cat > ~/.config/workdeck/panels/30-commits-de-hoje <<'PANEL'
 #!/usr/bin/env bash
-while IFS='|' read -r nome caminho _; do
-  caminho="${caminho/#\~/$HOME}"; caminho="${caminho/#\$HOME/$HOME}"
-  [ -d "$caminho/.git" ] || continue
-  n=$(git -C "$caminho" log --oneline --since=midnight --author="$(git config user.email)" | wc -l | tr -d ' ')
-  [ "$n" -gt 0 ] && echo "$nome  $n commit(s)"
+while IFS='|' read -r name path _; do
+  path="${path/#\~/$HOME}"; path="${path/#\$HOME/$HOME}"
+  [ -d "$path/.git" ] || continue
+  n=$(git -C "$path" log --oneline --since=midnight --author="$(git config user.email)" | wc -l | tr -d ' ')
+  [ "$n" -gt 0 ] && echo "$name  $n commit(s)"
 done < ~/.config/workdeck/projects.conf
-PAINEL
+PANEL
 ```
 
 **2. Torne executável.** Sem isso, ele não aparece: um arquivo sem permissão

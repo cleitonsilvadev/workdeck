@@ -1,3 +1,5 @@
+[English](shortcuts.md) · **Português**
+
 # Atalhos
 
 ## O dia a dia
@@ -43,7 +45,7 @@ age como Alt. As ações usam Shift porque `Alt`+letra minúscula é do readline
 O kitty é o terminal do workdeck, e a instalação deixa ele pronto: tema, fonte
 JetBrains Mono, a Option do Mac como Alt e, no Mac, atalhos em `cmd`
 (`cmd+1…9` vai para a janela, `cmd+d` divide ao lado, `cmd+h` abre o menu). A
-lista completa está em [terminals/README.md](../terminals/README.md).
+lista completa está em [terminals/README.pt-BR.md](../terminals/README.pt-BR.md).
 
 Em outro terminal, ou por SSH, o `work` abre do mesmo
 jeito, porque os atalhos são do tmux, e o painel avisa que você está fora do
