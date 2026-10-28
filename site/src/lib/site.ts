@@ -60,7 +60,7 @@ export const panelRules = [
   { code: "chmod -x", desc: "Só aparece o que é executável. Tirar o +x desliga um painel, até os que vêm prontos, e o work update respeita." },
 ] as const
 
-export const panelsUrl = `${repoUrl}/blob/main/docs/paineis.md`
+export const panelsUrl = `${repoUrl}/blob/main/docs/panels.pt-BR.md`
 
 export const shortcuts = {
   navegar: [
