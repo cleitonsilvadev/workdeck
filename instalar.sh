@@ -45,6 +45,9 @@ if [ -n "$versao" ]; then
 fi
 
 if (exec </dev/tty) 2>/dev/null; then
-  exec bash "$CODIGO/install.sh" "$@" </dev/tty
+  WORKDECK_SHELL_NOVO=1 bash "$CODIGO/install.sh" "$@" </dev/tty
+  echo
+  echo "  abrindo um shell novo, já com o workdeck; digite work"
+  exec "${SHELL:-/bin/bash}" -l </dev/tty
 fi
 exec bash "$CODIGO/install.sh" "$@"

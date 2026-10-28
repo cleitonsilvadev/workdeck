@@ -46,13 +46,15 @@ curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/i
 less instalar.sh && bash instalar.sh
 ```
 
-Depois:
+Depois, é só:
 
 ```bash
-source ~/.zshrc             # ou ~/.bashrc
-work add ~/code/api         # um projeto por vez; Tab completa o caminho
 work
 ```
+
+No fim, o instalador abre um shell novo no mesmo terminal, que já conhece os
+comandos do workdeck. O `work` abre o painel, e o painel mostra como adicionar
+os seus projetos.
 
 O instalador detecta o sistema e o gerenciador de pacotes — brew no macOS,
 apt, dnf, pacman, zypper ou apk no Linux — e instala o que faltar (`tmux` e

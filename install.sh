@@ -561,16 +561,20 @@ else
   echo "Pronto."
 fi
 
+if [ -n "${WORKDECK_SHELL_NOVO:-}" ]; then
+  passo_shell=""
+else
+  passo_shell="       source ${rc:-seu arquivo de shell}     ${dim}ou abra um terminal novo${reset}
+"
+fi
 cat <<FIM
 
   Agora:
-       source ${rc:-seu arquivo de shell}
-       work add ~/caminho/do/projeto     ${dim}um por vez; Tab completa o caminho${reset}
-       work
+${passo_shell}       work                ${dim}abre o painel, que mostra como adicionar os projetos${reset}
 
   Para navegar: Shift+← / Shift+→ troca de janela, Shift+↑ / Shift+↓ troca de
   painel, e Ctrl+b e depois 1…9 vai direto para uma janela. Clicar na barra
-  também funciona. Para mudar os projetos: work escolher
+  também funciona.
   Ajuda a qualquer hora: work help, ou Ctrl+b e h dentro do work.
 FIM
 

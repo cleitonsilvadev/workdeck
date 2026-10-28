@@ -3,6 +3,10 @@
 O `work update` mostra o trecho da versão nova antes de perguntar se quer
 atualizar. Cada versão é uma tag `vX.Y.Z`.
 
+## v1.0.5
+
+- A instalação numa linha termina num shell novo: é só digitar work, sem source.
+
 ## v1.0.4
 
 - A instalação baixa a fonte JetBrains Mono para a sua pasta de fontes, sem brew.
