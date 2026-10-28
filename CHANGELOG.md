@@ -3,6 +3,10 @@
 O `work update` mostra o trecho da versão nova antes de perguntar se quer
 atualizar. Cada versão é uma tag `vX.Y.Z`.
 
+## v1.0.15
+
+- O terminal do painel volta para 8 linhas também ao entrar numa sessão que já existia.
+
 ## v1.0.14
 
 - No fim da instalação e da atualização, um aviso claro: feche e abra o terminal para carregar o zsh e o visual.
