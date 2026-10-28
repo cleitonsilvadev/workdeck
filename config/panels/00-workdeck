@@ -80,16 +80,4 @@ if [ -n "${TMUX:-}" ] && [ "$(tmux display -p '#{client_termname}' 2>/dev/null)"
   printf '%sFora do kitty%s: o work funciona, mas o tema, a fonte e os atalhos cmd só valem lá.\n\n' "$roxo" "$x"
 fi
 
-printf '%sComandos%s\n' "$roxo" "$x"
-passo "work" "abre a sessão, ou volta para ela"
-passo "work add ~/projeto" "acrescenta um projeto; Tab completa o caminho"
-passo "work review" "a IA revisa a mudança antes do commit, num painel embaixo"
-passo "work update" "atualiza o workdeck"
-echo
-
-printf '%sO dia a dia%s\n' "$roxo" "$x"
-passo "Ctrl+b h" "o menu: projetos, revisar, dividir a tela e mais"
-passo "Shift+← / →" "vai para o projeto anterior / próximo"
-passo "Ctrl+b Enter" "divide a tela; v ao lado, - embaixo, = iguala"
-passo "Shift+↑ / ↓" "troca de painel dentro da janela"
-passo "Ctrl+b z · Ctrl+b x" "zoom no painel · fecha o painel"
+printf '%sCtrl+b h abre o menu · Ctrl+b ? mostra os comandos e os atalhos%s\n' "$dim" "$x"

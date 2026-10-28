@@ -3,6 +3,10 @@
 O `work update` mostra o trecho da versão nova antes de perguntar se quer
 atualizar. Cada versão é uma tag `vX.Y.Z`.
 
+## v1.0.6
+
+- O painel mostra só o workdeck e os projetos; os comandos e os atalhos ficam no Ctrl+b ?, e uma linha lembra onde estão.
+
 ## v1.0.5
 
 - A instalação pergunta antes de instalar o kitty (sim é o padrão) e guarda a resposta. Quem já tem o kitty não vê a pergunta.
