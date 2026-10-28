@@ -2,7 +2,7 @@
 
 # workdeck-site
 
-**O site de apresentação do [workdeck](https://github.com/workdeckdev/workdeck), um framework para trabalhar com agentes de IA no terminal, construído sobre o tmux.**
+**O site de apresentação do [workdeck](https://github.com/thiagofeliperibeiro/workdeck), um framework para trabalhar com agentes de IA no terminal, construído sobre o tmux.**
 
 Uma página só, em inglês e português, com terminais animados mostrando o
 workdeck em uso: o ciclo do `work add` ao `work review`, os terminais, os
@@ -10,7 +10,7 @@ atalhos e o painel personalizável.
 
 [English](README.md) · **Português**
 
-[![CI](https://github.com/workdeckdev/workdeck-site/actions/workflows/ci.yml/badge.svg)](https://github.com/workdeckdev/workdeck-site/actions/workflows/ci.yml)
+[![CI](https://github.com/thiagofeliperibeiro/workdeck-site/actions/workflows/ci.yml/badge.svg)](https://github.com/thiagofeliperibeiro/workdeck-site/actions/workflows/ci.yml)
 ![Next.js](https://img.shields.io/badge/Next.js-16-555?logo=nextdotjs)
 
 </div>
@@ -73,7 +73,7 @@ idioma. Mude os dois no mesmo commit, com a mesma estrutura: um teste falha
 quando um idioma tem uma entrada que o outro não tem. Quando o workdeck mudar
 um comando, um atalho ou um texto, o lugar de ajustar é ali, e a fonte da
 verdade é o README e os guias em `docs/` do
-[repositório do workdeck](https://github.com/workdeckdev/workdeck).
+[repositório do workdeck](https://github.com/thiagofeliperibeiro/workdeck).
 
 A interface do workdeck é em português, então os terminais animados mantêm em
 português, nos dois idiomas, o que o workdeck imprime (o painel, as mensagens

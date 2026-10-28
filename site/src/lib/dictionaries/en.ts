@@ -60,18 +60,19 @@ export const en: Dictionary = {
     no: "no",
     columns: [
       { name: "kitty", hint: "set up by the installer" },
-      { name: "Any other", hint: "Warp, iTerm2, Ghostty, WezTerm, the system one" },
+      { name: "Warp", hint: "set up by the installer" },
+      { name: "Any other", hint: "iTerm2, Ghostty, WezTerm, the system one" },
     ],
     rows: [
-      { label: "work, tmux and the panel", values: [true, true] },
-      { label: "Theme colors in tmux", values: [true, true] },
-      { label: "Shift, Ctrl+b and mouse shortcuts", values: [true, true] },
-      { label: "Alt shortcuts on a Mac", values: ["ready", "set Option as Meta"] },
-      { label: "cmd shortcuts", values: [true, false] },
-      { label: "Theme colors in the terminal", values: ["automatic", "in the terminal settings"] },
-      { label: "JetBrains Mono font", values: ["automatic", "in the terminal settings"] },
-      { label: "Padding and line height", values: ["automatic", false] },
-      { label: "Uninstall", values: ["removes the kitty.conf block", "nothing to undo"] },
+      { label: "work, tmux and the panel", values: [true, true, true] },
+      { label: "Theme colors in tmux", values: [true, true, true] },
+      { label: "Shift, Ctrl+b and mouse shortcuts", values: [true, true, true] },
+      { label: "Alt shortcuts on a Mac", values: ["ready", "turn on Left Option key is Meta", "set Option as Meta"] },
+      { label: "cmd shortcuts", values: [true, false, false] },
+      { label: "Theme colors in the terminal", values: ["if you accept", "copied; you pick it in Settings", "in the terminal settings"] },
+      { label: "JetBrains Mono font", values: ["if you accept", "downloaded; you pick it in Settings", "in the terminal settings"] },
+      { label: "Padding and line height", values: ["if you accept", false, false] },
+      { label: "Uninstall", values: ["removes the kitty.conf block", "removes the copied theme", "nothing to undo"] },
     ],
   },
   shortcutsSection: {
@@ -85,7 +86,7 @@ export const en: Dictionary = {
     then: "then",
     altTitle: "Prefer a single key?",
     altText:
-      "There are direct Alt shortcuts: Alt+1…9 goes to a window, Alt+arrows switches panes and Alt+Shift+letter runs the actions. They work in any terminal. On a Mac, set Option as Meta in the terminal settings; the workdeck kitty setup does this for you, along with cmd shortcuts:",
+      "There are direct Alt shortcuts: Alt+1…9 goes to a window, Alt+arrows switches panes and Alt+Shift+letter runs the actions. They work in any terminal. On a Mac, set Option as Meta in the terminal settings; with kitty the installer does this for you, along with cmd shortcuts, and in Warp the option is Left Option key is Meta. In kitty:",
     navigate: [
       { prefix: true, keys: ["h"], desc: "Opens the menu with everything" },
       { prefix: false, keys: ["Shift", "← →"], desc: "Previous / next project" },
@@ -119,23 +120,23 @@ export const en: Dictionary = {
   installSection: {
     eyebrow: "install",
     title: "One script, and it undoes what it did",
-    desc: "One line, nothing to clone. Runs on macOS and Linux, including WSL. The installer detects the system and the package manager, installs tmux, the only dependency, if it is missing, and sets up kitty with a theme and font as an extra. After that, work update tells you about new versions and brings them in.",
+    desc: "One line, nothing to clone. Runs on macOS and Linux, including WSL. The installer detects the system and the package manager, installs tmux, the only dependency, if it is missing. Then it asks which terminal you use and offers its extras: for kitty and Warp, the workdeck theme and font. It does not install a terminal. After that, work update tells you about new versions and brings them in.",
     after: ["When it finishes, open a new terminal window, or close and reopen the terminal if the installer ran inside it, to load ", "work", ". Want to read the script first? Download it with ", "-o get.sh", " instead of ", "| bash", "."],
     uninstallTitle: "Uninstalling gives everything back",
     uninstallText: ["Before touching a file for the first time, the installer keeps a copy and records what it did in a manifest. Your ", ".tmux.conf", " and ", ".zshrc", " come back byte for byte. To remove less, run ", "uninstall.sh", " directly, from ", "~/.local/share/workdeck", ", with ", "bash", "."],
   },
   install: {
     macos: [
-      { cmd: installCommand, out: "installs tmux with brew if it is missing, plus kitty, the font and the theme as extras" },
+      { cmd: installCommand, out: "installs tmux with brew if it is missing and asks which terminal you use" },
       { cmd: "work", out: "opens the panel, which shows how to add your projects" },
     ],
     linux: [
-      { cmd: installCommand, out: "tmux with apt, dnf, pacman, zypper or apk if it is missing, plus kitty as an extra" },
+      { cmd: installCommand, out: "tmux with apt, dnf, pacman, zypper or apk if it is missing, and asks which terminal you use" },
       { cmd: "work", out: "opens the panel, which shows how to add your projects" },
     ],
   },
   uninstall: [
-    { cmd: "work uninstall", desc: "Uninstalls everything: blocks, code, zsh, font, the kitty it brought and config. What you already had stays." },
+    { cmd: "work uninstall", desc: "Uninstalls everything: blocks, code, zsh, font, the Warp theme and config. What you already had stays." },
     { cmd: "work uninstall --dry-run", desc: "Shows what it would do, without deleting anything." },
     { cmd: "uninstall.sh", desc: "Removes only the blocks and the scripts. Your config stays." },
     { cmd: "uninstall.sh --restore", desc: "Restores your files to how they were before the installation." },

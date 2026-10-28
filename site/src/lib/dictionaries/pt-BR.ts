@@ -59,18 +59,19 @@ export const ptBR = {
     no: "não",
     columns: [
       { name: "kitty", hint: "configurado pela instalação" },
-      { name: "Qualquer outro", hint: "Warp, iTerm2, Ghostty, WezTerm, o do sistema" },
+      { name: "Warp", hint: "configurado pela instalação" },
+      { name: "Qualquer outro", hint: "iTerm2, Ghostty, WezTerm, o do sistema" },
     ],
     rows: [
-      { label: "work, tmux e painel", values: [true, true] },
-      { label: "Cores do tema no tmux", values: [true, true] },
-      { label: "Atalhos Shift, Ctrl+b e mouse", values: [true, true] },
-      { label: "Atalhos Alt no Mac", values: ["prontos", "ligar a Option como Meta"] },
-      { label: "Atalhos cmd", values: [true, false] },
-      { label: "Cores do tema no terminal", values: ["automático", "nas configurações do terminal"] },
-      { label: "Fonte JetBrains Mono", values: ["automático", "nas configurações do terminal"] },
-      { label: "Margem e altura de linha", values: ["automático", false] },
-      { label: "Desinstalar", values: ["tira o bloco do kitty.conf", "nada a desfazer"] },
+      { label: "work, tmux e painel", values: [true, true, true] },
+      { label: "Cores do tema no tmux", values: [true, true, true] },
+      { label: "Atalhos Shift, Ctrl+b e mouse", values: [true, true, true] },
+      { label: "Atalhos Alt no Mac", values: ["prontos", "ligar Left Option key is Meta", "ligar a Option como Meta"] },
+      { label: "Atalhos cmd", values: [true, false, false] },
+      { label: "Cores do tema no terminal", values: ["se você aceitar", "copiado; você escolhe em Settings", "nas configurações do terminal"] },
+      { label: "Fonte JetBrains Mono", values: ["se você aceitar", "baixada; você escolhe em Settings", "nas configurações do terminal"] },
+      { label: "Margem e altura de linha", values: ["se você aceitar", false, false] },
+      { label: "Desinstalar", values: ["tira o bloco do kitty.conf", "tira o tema copiado", "nada a desfazer"] },
     ] as { label: string; values: (string | boolean)[] }[],
   },
   shortcutsSection: {
@@ -84,7 +85,7 @@ export const ptBR = {
     then: "e",
     altTitle: "Prefere uma tecla só?",
     altText:
-      "Há atalhos diretos com Alt: Alt+1…9 vai para a janela, Alt+setas troca de painel e Alt+Shift+letra faz as ações. Funcionam em qualquer terminal. No Mac, ligue a Option como Meta nas configurações do terminal; no kitty do workdeck, isso já vem pronto, junto com atalhos em cmd:",
+      "Há atalhos diretos com Alt: Alt+1…9 vai para a janela, Alt+setas troca de painel e Alt+Shift+letra faz as ações. Funcionam em qualquer terminal. No Mac, ligue a Option como Meta nas configurações do terminal; no kitty, a instalação faz isso por você, junto com atalhos em cmd, e no Warp a opção é Left Option key is Meta. No kitty:",
     navigate: [
       { prefix: true, keys: ["h"], desc: "Abre o menu com tudo" },
       { prefix: false, keys: ["Shift", "← →"], desc: "Projeto anterior / próximo" },
@@ -118,23 +119,23 @@ export const ptBR = {
   installSection: {
     eyebrow: "instalar",
     title: "Um script, e ele desfaz o que fez",
-    desc: "Uma linha, sem clonar nada. Funciona no macOS e no Linux, inclusive no WSL. O instalador detecta o sistema e o gerenciador de pacotes e instala o tmux, a única dependência, se faltar, e o kitty, com tema e fonte, como extra. Depois, o work update avisa e traz as versões novas.",
+    desc: "Uma linha, sem clonar nada. Funciona no macOS e no Linux, inclusive no WSL. O instalador detecta o sistema e o gerenciador de pacotes e instala o tmux, a única dependência, se faltar. Em seguida, pergunta qual terminal você usa e oferece os extras dele: no kitty e no Warp, o tema e a fonte do workdeck. Terminal ele não instala. Depois, o work update avisa e traz as versões novas.",
     after: ["No fim, abra uma janela nova do terminal, ou feche e abra o terminal, se a instalação rodou nele, para carregar o ", "work", ". Quer ler o script antes? Baixe com ", "-o get.sh", " em vez de ", "| bash", "."],
     uninstallTitle: "Desinstalar devolve tudo",
     uninstallText: ["Antes de tocar num arquivo pela primeira vez, o instalador guarda uma cópia e anota o que fez num manifesto. Seu ", ".tmux.conf", " e seu ", ".zshrc", " voltam byte a byte. Para tirar menos, use o ", "uninstall.sh", " direto, em ", "~/.local/share/workdeck", ", com ", "bash", "."],
   },
   install: {
     macos: [
-      { cmd: installCommand, out: "instala o tmux pelo brew, se faltar, e o kitty, a fonte e o tema como extras" },
+      { cmd: installCommand, out: "instala o tmux pelo brew, se faltar, e pergunta qual terminal você usa" },
       { cmd: "work", out: "abre o painel, que mostra como adicionar os seus projetos" },
     ],
     linux: [
-      { cmd: installCommand, out: "tmux por apt, dnf, pacman, zypper ou apk, se faltar, e o kitty como extra" },
+      { cmd: installCommand, out: "tmux por apt, dnf, pacman, zypper ou apk, se faltar, e pergunta qual terminal você usa" },
       { cmd: "work", out: "abre o painel, que mostra como adicionar os seus projetos" },
     ],
   },
   uninstall: [
-    { cmd: "work uninstall", desc: "Desinstala tudo: blocos, código, zsh, fonte, o kitty que ele trouxe e config. O que você já tinha fica." },
+    { cmd: "work uninstall", desc: "Desinstala tudo: blocos, código, zsh, fonte, o tema do Warp e config. O que você já tinha fica." },
     { cmd: "work uninstall --dry-run", desc: "Mostra o que faria, sem apagar nada." },
     { cmd: "uninstall.sh", desc: "Tira só os blocos e os scripts. Sua config fica." },
     { cmd: "uninstall.sh --restore", desc: "Devolve os arquivos ao estado de antes da instalação." },

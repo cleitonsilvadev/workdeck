@@ -1,8 +1,8 @@
 export const version = "v1.1.2"
 
-export const repoUrl = "https://github.com/workdeckdev/workdeck"
+export const repoUrl = "https://github.com/thiagofeliperibeiro/workdeck"
 
-export const installCommand = "curl -fsSL https://raw.githubusercontent.com/workdeckdev/workdeck/main/get.sh | bash"
+export const installCommand = "curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/get.sh | bash"
 
 export const testimonials = [
   {

@@ -2,7 +2,7 @@
 
 # workdeck-site
 
-**The landing page for [workdeck](https://github.com/workdeckdev/workdeck), a framework for working with AI coding agents in the terminal, built on tmux.**
+**The landing page for [workdeck](https://github.com/thiagofeliperibeiro/workdeck), a framework for working with AI coding agents in the terminal, built on tmux.**
 
 A single page, in English and Portuguese, with animated terminals showing
 workdeck in use: the workflow from `work add` to `work review`, the terminals,
@@ -10,7 +10,7 @@ the shortcuts and the customizable panel.
 
 **English** · [Português](README.pt-BR.md)
 
-[![CI](https://github.com/workdeckdev/workdeck-site/actions/workflows/ci.yml/badge.svg)](https://github.com/workdeckdev/workdeck-site/actions/workflows/ci.yml)
+[![CI](https://github.com/thiagofeliperibeiro/workdeck-site/actions/workflows/ci.yml/badge.svg)](https://github.com/thiagofeliperibeiro/workdeck-site/actions/workflows/ci.yml)
 ![Next.js](https://img.shields.io/badge/Next.js-16-555?logo=nextdotjs)
 
 </div>
@@ -73,7 +73,7 @@ language. Change both files in the same commit, with the same structure: a
 test fails when one language has an entry the other lacks. When workdeck
 changes a command, a shortcut or a message, that is the place to update it,
 and the source of truth is the README and the guides in `docs/` of the
-[workdeck repository](https://github.com/workdeckdev/workdeck).
+[workdeck repository](https://github.com/thiagofeliperibeiro/workdeck).
 
 The workdeck interface is in Brazilian Portuguese, so the animated terminals
 keep what workdeck prints (the panel, the command messages and the review) in
