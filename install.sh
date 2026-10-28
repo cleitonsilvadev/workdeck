@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# workdeck — instalador. macOS e Linux; no Windows, use WSL.
+# workdeck — instalador. macOS e Linux.
 #
 #   ./install.sh                      instala com o tema padrão
 #   ./install.sh --theme nord         escolhe um tema de themes/
@@ -344,20 +344,7 @@ case "$(uname -s)" in
     GERENCIADOR="${GERENCIADOR:-}"
     ;;
   MINGW*|MSYS*|CYGWIN*)
-    cat <<'FIM'
-Este é o Windows nativo, onde o tmux não roda.
-
-Use o WSL:
-
-  wsl --install                      no PowerShell, como administrador
-  wsl                                entra no Linux
-  git clone <este repositório>
-  cd workdeck && ./install.sh
-
-Dentro do WSL tudo funciona igual ao Linux. O seu terminal do Windows
-(Windows Terminal, por exemplo) continua sendo o terminal; quem gerencia
-as janelas é o tmux, lá dentro.
-FIM
+    echo "O workdeck roda em macOS e Linux."
     exit 1
     ;;
   *) SO="$(uname -s)"; GERENCIADOR="" ;;

@@ -14,7 +14,7 @@ Aider, Gemini, o que você usar. O projeto não embute nenhum: ele abre o
 comando que você escolher.
 
 **Funciona em qualquer terminal**, porque os atalhos são do tmux e não do
-terminal. macOS e Linux; no Windows, pelo WSL.
+terminal. Roda em macOS e Linux.
 
 ```bash
 work                  # abre a sessão, uma janela por projeto
@@ -58,7 +58,7 @@ os seus projetos.
 
 O instalador detecta o sistema e o gerenciador de pacotes — brew no macOS,
 apt, dnf, pacman, zypper ou apk no Linux — e instala o que faltar (`tmux` e
-`git-delta`). No Windows nativo ele para e mostra o caminho do WSL.
+`git-delta`).
 
 | Flag | O que faz |
 |---|---|
@@ -76,18 +76,6 @@ Se já existir um script seu com o mesmo nome em `~/.local/bin`, o instalador n�
 o substitui e avisa. O `work uninstall` só remove o que não foi alterado desde a
 instalação. Para rodar a instalação de novo com outras opções, use
 `work install`, por exemplo `work install --theme nord`.
-
-### Windows
-
-O tmux não roda no Windows nativo, e é ele que faz o projeto funcionar. O
-caminho é o WSL:
-
-```powershell
-wsl --install          # PowerShell, como administrador
-```
-
-Depois, dentro do WSL, é a instalação normal de Linux. Seu terminal do Windows
-continua sendo o terminal — quem gerencia as janelas é o tmux, lá dentro.
 
 ---
 
@@ -313,11 +301,9 @@ um preferido, estes são os mais usados em cada sistema:
 | | Konsole | padrão no KDE |
 | | [Alacritty](https://alacritty.org) | mínimo, acelerado por GPU |
 | | [kitty](https://sw.kovidgoyal.net/kitty/) · [WezTerm](https://wezterm.org) · [Ghostty](https://ghostty.org) | os mesmos do Mac |
-| Windows | [Windows Terminal](https://learn.microsoft.com/windows/terminal/) | o padrão atual, com suporte a WSL |
-| | [WezTerm](https://wezterm.org) | se você quer a mesma config nos três sistemas |
 
-No Linux e no Windows, `Alt` chega ao tmux e os atalhos funcionam sem
-configurar nada. No Mac, veja a seção abaixo.
+No Linux, `Alt` chega ao tmux e os atalhos funcionam sem configurar nada. No
+Mac, veja a seção abaixo.
 
 **O visual nos terminais.** Na instalação, o workdeck pergunta uma vez se deve
 aplicar o tema, a fonte e as cores nos terminais que encontrar: Terminal.app e

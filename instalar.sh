@@ -12,7 +12,7 @@ CODIGO="${XDG_DATA_HOME:-$HOME/.local/share}/workdeck"
 
 case "$(uname -s)" in
   MINGW*|MSYS*|CYGWIN*)
-    echo "No Windows, o workdeck roda dentro do WSL. Abra o WSL (wsl no PowerShell) e rode este comando lá."
+    echo "O workdeck roda em macOS e Linux."
     exit 1 ;;
 esac
 

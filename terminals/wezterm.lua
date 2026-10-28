@@ -1,7 +1,7 @@
 -- workdeck no WezTerm: tema, fonte e atalhos cmd traduzidos para o tmux.
 -- Cole dentro da sua config, em ~/.wezterm.lua, ou use como ponto de partida.
 -- \x02 é o Ctrl+b; o caractere depois dele é a tecla do workdeck.
--- No Linux e no Windows, tire a parte de keys: lá o tmux já recebe tudo.
+-- No Linux, tire a parte de keys: lá o tmux já recebe tudo.
 
 local wezterm = require 'wezterm'
 local act = wezterm.action

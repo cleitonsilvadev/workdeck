@@ -3,6 +3,10 @@
 O `work update` mostra o trecho da versão nova antes de perguntar se quer
 atualizar. Cada versão é uma tag `vX.Y.Z`.
 
+## v1.0.8
+
+- O workdeck passa a ser só para macOS e Linux; sai a documentação do Windows.
+
 ## v1.0.7
 
 - Uma pergunta só aplica o visual nos terminais encontrados: Terminal.app e kitty no Mac, GNOME Terminal e kitty no Linux.

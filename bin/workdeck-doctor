@@ -29,7 +29,7 @@ case "$(uname -s)" in
   *) SO="$(uname -s)" ;;
 esac
 if [ "$SO" = "Windows nativo" ]; then
-  linha "$erro" "Windows nativo" "o tmux não roda aqui; use o WSL"
+  linha "$erro" "Windows" "o workdeck roda em macOS e Linux"
   problemas=$((problemas+1))
 else
   linha "$ok" "$SO"
@@ -56,7 +56,6 @@ TERMINAL="desconhecido"
 if [ -n "${KITTY_WINDOW_ID:-}" ]; then TERMINAL="kitty"
 elif [ -n "${WEZTERM_PANE:-}" ]; then TERMINAL="WezTerm"
 elif [ -n "${ALACRITTY_WINDOW_ID:-}" ] || [ "${TERM:-}" = "alacritty" ]; then TERMINAL="Alacritty"
-elif [ -n "${WT_SESSION:-}" ]; then TERMINAL="Windows Terminal"
 elif [ -n "${GHOSTTY_RESOURCES_DIR:-}" ]; then TERMINAL="Ghostty"
 elif [ -n "${TERM_PROGRAM:-}" ]; then TERMINAL="$TERM_PROGRAM"
 elif [ -n "${KONSOLE_VERSION:-}" ]; then TERMINAL="Konsole"
