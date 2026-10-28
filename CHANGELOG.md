@@ -3,6 +3,10 @@
 O `work update` mostra o trecho da versão nova antes de perguntar se quer
 atualizar. Cada versão é uma tag `vX.Y.Z`.
 
+## v1.0.19
+
+- Quando o macOS bloqueia a mudança no Terminal.app, a instalação diz onde liberar a permissão.
+
 ## v1.0.18
 
 - Menos configuração: o zsh carrega na mesma ordem de um setup comum (oh-my-zsh e depois o zinit), com o tema robbyrussell.

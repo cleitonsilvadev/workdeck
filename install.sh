@@ -241,10 +241,16 @@ aplicar_terminal_app() {
     return 1
   fi
   [ "$DRY" = 1 ] && { say "[dry-run] aplicaria a fonte e as cores no Terminal.app"; return 0; }
-  antes="$(osascript -e 'tell application "Terminal" to get {name, font name, font size, background color, normal text color} of default settings' 2>/dev/null | tr -d ' ')" || {
-    aviso "não consegui falar com o Terminal.app; escolha a fonte em Settings → Profiles → Text"
+  if ! antes="$(osascript -e 'tell application "Terminal" to get {name, font name, font size, background color, normal text color} of default settings' 2>&1)"; then
+    case "$antes" in
+      *-1743*|*"Not authorized"*|*"não autorizado"*)
+        aviso "o macOS não deixou mudar o Terminal.app: libere em Ajustes do Sistema → Privacidade e Segurança → Automação → Terminal, e rode work install" ;;
+      *)
+        aviso "não consegui falar com o Terminal.app ($antes); escolha a fonte em Settings → Profiles → Text" ;;
+    esac
     return 1
-  }
+  fi
+  antes="$(printf '%s' "$antes" | tr -d ' ')"
   grep -qF "terminal-app|" "$MANIFESTO" 2>/dev/null || anota terminal-app "$antes"
   if osascript >> "$LOG" 2>&1 <<FIM
 tell application "Terminal"
