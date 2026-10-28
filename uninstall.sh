@@ -4,7 +4,8 @@
 #   ./uninstall.sh            remove os blocos e os scripts; mantém sua config
 #   ./uninstall.sh --restore  além disso, devolve os arquivos ao estado de antes
 #                             da instalação, usando as cópias guardadas
-#   ./uninstall.sh --all      remove tudo, inclusive ~/.config/workdeck
+#   ./uninstall.sh --all      remove tudo, inclusive ~/.config/workdeck, a fonte
+#                             e o kitty que a instalação trouxe (é o work uninstall)
 #   ./uninstall.sh --dry-run  mostra o que faria
 #
 # Em qualquer modo ele só mexe no que instalou: arquivo alterado por você
@@ -24,7 +25,7 @@ for arg in "$@"; do
     --restore) RESTORE=1 ;;
     --all) ALL=1 ;;
     --dry-run) DRY=1 ;;
-    -h|--help) sed -n '2,11p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    -h|--help) sed -n '2,12p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
     *) echo "opção desconhecida: $arg"; exit 1 ;;
   esac
 done
@@ -100,7 +101,12 @@ FIM
         rm -f "$CONFIG_DIR/visual"
         ;;
       kitty)
-        say "o kitty continua em ${alvo#$HOME/}; para remover também: rm -rf $alvo"
+        if [ "$ALL" = 1 ]; then
+          run rm -rf "$alvo"
+          say "removido ${alvo#$HOME/}"
+        else
+          say "o kitty continua em ${alvo#$HOME/}; para remover também: rm -rf $alvo"
+        fi
         ;;
       zsh)
         run rm -rf "$alvo"
@@ -155,6 +161,11 @@ else
       say "deixei ${alvo#$HOME/}: foi alterado depois da instalação"
     fi
   done
+  # Sem manifesto não dá para saber o resto, mas o código instalado é sempre este.
+  if [ "$ALL" = 1 ] && [ "$ROOT" = "${XDG_DATA_HOME:-$HOME/.local/share}/workdeck" ]; then
+    APAGAR_CODIGO="$ROOT"
+    run rm -rf "${XDG_CACHE_HOME:-$HOME/.cache}/workdeck"
+  fi
 fi
 
 echo

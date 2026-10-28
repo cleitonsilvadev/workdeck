@@ -24,6 +24,7 @@ work add ~/projeto    # acrescenta um projeto; Tab completa o caminho
 work review           # a IA faz um self code review da mudança, num painel embaixo
 work update           # atualiza o workdeck
 work kill             # fecha a sessão inteira
+work uninstall        # desinstala tudo o que o workdeck instalou
 ```
 
 Dentro do work, <kbd>Ctrl</kbd>+<kbd>b</kbd> e <kbd>h</kbd> abre o menu: os seus
@@ -193,6 +194,7 @@ sessão; sem fechar, a sessão antiga continua com a lista antiga.
 | `work review [staged\|branch]` | A IA faz um self code review da mudança antes do commit |
 | `work update` | Atualiza o workdeck |
 | `work kill` | Fecha a sessão inteira |
+| `work uninstall` | Desinstala tudo o que o workdeck instalou (pergunta antes) |
 
 Para usar outro nome de sessão: `export WORKDECK_SESSION=outro`.
 
@@ -428,10 +430,21 @@ instalação; seus projetos, painéis e a escolha do agente ficam como estão.
 ## Desinstalar
 
 ```bash
+work uninstall              # desinstala tudo; mostra o que vai sair e pergunta antes
+work uninstall --dry-run    # mostra o que faria, sem apagar
+```
+
+O `work uninstall` desinstala tudo o que o workdeck instalou: os blocos no
+`.zshrc`, no `.tmux.conf` e no `kitty.conf`, o comando `work`, o código, o zsh
+do workdeck (oh-my-zsh e zinit), a fonte, o kitty e a sua config em
+`~/.config/workdeck`. O que já existia antes da instalação fica: um kitty ou um
+oh-my-zsh que você já tinha não sai.
+
+Para tirar menos, use o desinstalador direto:
+
+```bash
 bash ~/.local/share/workdeck/uninstall.sh             # tira os blocos e os scripts; sua config fica
 bash ~/.local/share/workdeck/uninstall.sh --restore   # devolve os arquivos ao estado de antes
-bash ~/.local/share/workdeck/uninstall.sh --all       # remove tudo, inclusive ~/.config/workdeck e o código
-bash ~/.local/share/workdeck/uninstall.sh --dry-run   # mostra o que faria
 ```
 
 O instalador guarda uma cópia de cada arquivo antes de tocar nele pela primeira

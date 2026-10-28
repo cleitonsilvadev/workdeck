@@ -3,6 +3,11 @@
 O `work update` mostra o trecho da versão nova antes de perguntar se quer
 atualizar. Cada versão é uma tag `vX.Y.Z`.
 
+## v1.0.2
+
+- Volta o `work uninstall`, que desinstala tudo o que o workdeck instalou: mostra o que vai sair, pergunta antes e aceita `--dry-run`. O kitty e a fonte que a instalação trouxe saem junto.
+- Sem o manifesto da instalação, desinstalar tudo também apaga o código em `~/.local/share/workdeck`.
+
 ## v1.0.1
 
 - O zsh do workdeck vem com "sim" como resposta padrão: Enter instala o oh-my-zsh e o zinit com os plugins.

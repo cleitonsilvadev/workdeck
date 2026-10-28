@@ -375,6 +375,25 @@ case "${1:-}" in
       echo "nenhuma sessão $SESSION aberta"
     fi
     exit 0 ;;
+  uninstall)
+    shift
+    [ -f "$CODIGO/uninstall.sh" ] || { echo "não achei o desinstalador em $(curto "$CODIGO")"; exit 1; }
+    case " $* " in *" --dry-run "*) exec bash "$CODIGO/uninstall.sh" --all "$@" ;; esac
+    echo "O work uninstall desinstala tudo o que o workdeck instalou:"
+    echo "  - os blocos do workdeck no .zshrc, no .tmux.conf e no kitty.conf"
+    echo "  - o comando work e o código em $(curto "$CODIGO")"
+    echo "  - o zsh do workdeck (oh-my-zsh e zinit), a fonte e o kitty, se foi ele que instalou"
+    echo "  - a sua config em $(curto "$(dirname "$CONFIG")"): projetos, painéis e escolhas"
+    echo
+    echo "O que já era seu antes da instalação fica. Para ver sem apagar: work uninstall --dry-run"
+    echo "Para tirar só os blocos e manter a config: bash $(curto "$CODIGO")/uninstall.sh"
+    echo
+    if [ -t 0 ]; then
+      printf 'Desinstalar tudo? [s/N] '
+      read -r r || r=n
+      case "$r" in s|S|y|Y) ;; *) echo "nada feito"; exit 0 ;; esac
+    fi
+    exec bash "$CODIGO/uninstall.sh" --all "$@" ;;
   sincronizar) sincronizar; exit 0 ;;
   _painel) shift; exec "$LIB/work-panel" "$@" ;;
   _menu) shift; menu "$@"; exit 0 ;;
@@ -385,6 +404,7 @@ case "${1:-}" in
     echo "  work review         a IA revisa a mudança antes do commit"
     echo "  work update         atualiza o workdeck"
     echo "  work kill           fecha a sessão inteira"
+    echo "  work uninstall      desinstala tudo o que o workdeck instalou"
     exit 1 ;;
 esac
 
