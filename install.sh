@@ -261,10 +261,9 @@ fi
 etapa 1 "dependências"
 falta=()
 command -v tmux >/dev/null || falta+=(tmux)
-command -v delta >/dev/null || falta+=(git-delta)
 
 if [ ${#falta[@]} -eq 0 ]; then
-  say "tmux e git-delta já instalados"
+  say "tmux já instalado"
 elif [ "$DEPS" = 0 ]; then
   aviso "faltando: ${falta[*]} — instale por conta (--no-deps)"
 else
@@ -275,7 +274,6 @@ else
   fi
   [ "$GERENCIADOR" = apt-get ] && { run $sudo apt-get update -qq || true; }
   for pacote in "${falta[@]}"; do
-    [ "$GERENCIADOR" = apk ] && [ "$pacote" = git-delta ] && pacote=delta
     case "$GERENCIADOR" in
       brew)    instalar=(brew install "$pacote") ;;
       apt-get) instalar=($sudo apt-get install -y "$pacote") ;;
@@ -285,9 +283,7 @@ else
       apk)     instalar=($sudo apk add "$pacote") ;;
       *)       aviso "não reconheci o gerenciador de pacotes; instale: ${falta[*]}"; break ;;
     esac
-    # O delta não existe em todo repositório (Debian 12, por exemplo). Sem ele
-    # só o git review deixa de funcionar, então a instalação segue.
-    run "${instalar[@]}" || aviso "não consegui instalar $pacote pelo $GERENCIADOR; veja https://github.com/dandavison/delta"
+    run "${instalar[@]}" || aviso "não consegui instalar $pacote pelo $GERENCIADOR"
   done
 fi
 if [ "$SO" = macOS ]; then PASTA_FONTES="$HOME/Library/Fonts"; else PASTA_FONTES="${XDG_DATA_HOME:-$HOME/.local/share}/fonts"; fi
@@ -320,7 +316,6 @@ fi
 
 versoes=""
 command -v tmux >/dev/null && versoes="tmux $(tmux -V | awk '{print $2}')"
-command -v delta >/dev/null && versoes="${versoes:+$versoes · }delta $(delta --version | awk '{print $2}')"
 resumo "${versoes}${fonte:+ · $fonte}"
 concluir
 
@@ -409,9 +404,10 @@ for painel in "$ROOT"/config/panels/*; do
     say "painel $nome foi editado por você — não toquei nele"
   fi
 done
-run mkdir -p "${XDG_CONFIG_HOME:-$HOME/.config}/git-review"
-run cp "$ROOT/config/git-review-lesskey" "${XDG_CONFIG_HOME:-$HOME/.config}/git-review/lesskey"
-say "lesskey do git-review"
+if [ -d "${XDG_CONFIG_HOME:-$HOME/.config}/git-review" ]; then
+  run rm -rf "${XDG_CONFIG_HOME:-$HOME/.config}/git-review"
+  say "configuração antiga do git-review removida"
+fi
 resumo "$(curto "$CONFIG_DIR")"
 concluir
 

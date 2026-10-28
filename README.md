@@ -57,8 +57,7 @@ work
 O `work` abre o painel, e o painel mostra como adicionar os seus projetos.
 
 O instalador detecta o sistema e o gerenciador de pacotes — brew no macOS,
-apt, dnf, pacman, zypper ou apk no Linux — e instala o que faltar (`tmux` e
-`git-delta`). O kitty vem do instalador oficial dele, sem sudo: em
+apt, dnf, pacman, zypper ou apk no Linux — e instala o tmux, se faltar. O kitty vem do instalador oficial dele, sem sudo: em
 `~/Applications` no Mac e em `~/.local/kitty.app` no Linux. Detalhes em
 `terminals/README.md`.
 
@@ -282,34 +281,6 @@ vai para a área de transferência e para `~/.cache/workdeck/pedido-de-review.md
 para você colar. A ideia vem do passo de revisão do
 [ponytail](https://github.com/dietrichgebert/ponytail).
 
-## `git review`
-
-Só o diff, sem IA, para quem quer olhar a mudança por conta própria.
-
-O git expõe qualquer executável `git-algo` do PATH como `git algo`, então o
-comando funciona sem alias nenhum.
-
-`git review` mostra o que ainda não foi commitado, incluindo arquivos novos.
-
-Dentro do diff: <kbd>espaço</kbd> pula para o próximo arquivo, <kbd>b</kbd>
-volta, setas rolam, <kbd>q</kbd> sai. Acima de 160 colunas ele abre lado a lado
-sozinho.
-
-### Configurando
-
-Para mudar o layout ou o tema:
-
-```bash
-cp config/git-review.example.conf ~/.config/workdeck/git-review.conf
-```
-
-| Variável | Padrão |
-|---|---|
-| `SIDE_BY_SIDE_MIN_COLS` | `160` |
-| `DELTA_SYNTAX_THEME` | vazio (o delta decide, e respeita `BAT_THEME`) |
-
----
-
 ## Painéis
 
 O painel é a janela 1 da sessão: a visão geral do seu work em cima, e um
@@ -405,12 +376,11 @@ senão o diff fica difícil em tela não-retina.
 ## O que vai para onde
 
 ```
-~/.local/bin/                     work, work-panel, git-review
+~/.local/bin/                     work, work-panel
 ~/.config/workdeck/projects.conf  seus projetos
 ~/.config/workdeck/panels/        seus painéis
 ~/.tmux.conf                      bloco entre os marcadores
 ~/.zshrc ou ~/.bashrc             bloco entre os marcadores
-~/.config/git-review/lesskey      navegação dentro do diff
 ~/.config/kitty/kitty.conf        bloco entre os marcadores
 ```
 
@@ -473,7 +443,7 @@ Quase tudo aqui é para ser trocado. O resumo:
 | Algo que não existe aqui | um fork do repositório, com o seu script em `bin/` | `./install.sh` no fork |
 
 Qualquer executável em `bin/` vai para o `PATH` na instalação. É assim que o
-`work`, o `git-review` e o `work-panel` chegam lá — não há nada de especial
+`work` e o `work-panel` chegam lá — não há nada de especial
 neles.
 
 Se você for manter sua própria versão, o caminho mais confortável é dar fork,

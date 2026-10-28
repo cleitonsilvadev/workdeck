@@ -9,7 +9,7 @@ carrega() { AGENT_CMD=""; [ -f "$CONFIG" ] && . "$CONFIG"; }
 
 do_workdeck() {
   case "$(basename "${1%% *}")" in
-    work|work-panel|workdeck-*|git-review|help) return 0 ;;
+    work|work-panel|workdeck-*|help) return 0 ;;
   esac
   return 1
 }

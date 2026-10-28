@@ -3,6 +3,10 @@
 O `work update` mostra o trecho da versão nova antes de perguntar se quer
 atualizar. Cada versão é uma tag `vX.Y.Z`.
 
+## v1.0.3
+
+- Sai o `git review`, e com ele o `git-delta` da lista de dependências; a atualização apaga o script e a configuração dele. O `git-delta` que já estiver instalado fica.
+
 ## v1.0.2
 
 - Só quatro comandos: `work`, `work add`, `work review` e `work update`. Saem `escolher`, `painel`, `kill`, `doctor`, `help`, `versao`, `install`, `uninstall`, `agent` e `kitty`, e a atualização apaga o `workdeck-doctor` antigo.
