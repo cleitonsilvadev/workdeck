@@ -2,7 +2,7 @@
 
 # workdeck
 
-**An organized terminal for working with AI agents.**
+**A framework for working with AI coding agents in the terminal, built on tmux.**
 
 One window per project, your agent beside the code, a panel with the state of
 everything, and a code review before every commit, in a session that survives

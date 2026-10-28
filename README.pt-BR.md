@@ -2,7 +2,7 @@
 
 # workdeck
 
-**Um terminal organizado para trabalhar com agentes de IA.**
+**Um framework para trabalhar com agentes de IA no terminal, construído sobre o tmux.**
 
 Uma janela por projeto, o agente ao lado, um painel com o estado de tudo
 e um code review antes de cada commit — numa sessão que não se perde.
