@@ -32,15 +32,13 @@ curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/i
 
 ## Deixar a IA usando
 
-A IA só usa o que as instruções dela apontam. Deixe o `CLAUDE.md` (ou o
-`AGENTS.md`) do projeto dizendo:
+Cada integração diz, ao ser ligada, como a IA passa a usá-la. O BMAD, por
+exemplo, é instalado no projeto com `npx bmad-method install` e já deixa os
+comandos dele (`bmad-help`, `bmad-build`) prontos na sua IA.
 
-- onde fica o framework, inclusive quando ele mora fora do projeto, num
-  repositório do time, por exemplo;
-- onde ficam os PRDs e os padrões;
-- qual agente usar no review.
-
-A memória do ai-memory completa essas instruções com o histórico, mas não as
+O que a integração não sabe sozinha, diga no `CLAUDE.md` (ou no `AGENTS.md`) do
+projeto: onde ficam os PRDs e os padrões, e qual agente usar no review. A
+memória do ai-memory completa essas instruções com o histórico, mas não as
 substitui.
 
 O workdeck é um workflow, não um gerenciador de pacotes: estas integrações

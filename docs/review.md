@@ -41,11 +41,10 @@ nenhuma, a escolhida na instalação, guardada em `~/.config/workdeck/agent.conf
 ## O seu fluxo de review
 
 O pedido manda a IA usar o agente de review e os PRDs ou stories que as
-instruções dela apontam (`CLAUDE.md`, `AGENTS.md`, skills) — como um
-`bmad-code-review` ou uma skill própria de review de PR — e dizer na primeira
-linha qual usou. Se o framework fica fora do projeto, num repositório do time,
-por exemplo, diga onde nas instruções da IA: assim ele vale também quando a
-revisão é pedida direto, sem o workdeck.
+instruções dela apontam (`CLAUDE.md`, `AGENTS.md`, skills) — como o review do
+[BMAD](https://github.com/bmad-code-org/BMAD-METHOD) ou uma skill própria — e
+dizer na primeira linha qual usou. Sem nada configurado, ela faz o review
+padrão descrito acima.
 
 ## Personalizar
 

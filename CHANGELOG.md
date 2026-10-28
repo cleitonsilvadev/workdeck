@@ -3,6 +3,10 @@
 O `work update` mostra o trecho da versão nova antes de perguntar se quer
 atualizar. Cada versão é uma tag `vX.Y.Z`.
 
+## v1.1.2
+
+- A integração do BMAD segue o padrão oficial do BMAD Method: `npx bmad-method install` no projeto, com Node.js 20.12+ e Python 3.10+, e depois `bmad-help` e `bmad-build` na sua IA.
+
 ## v1.1.1
 
 - Sai do desinstalador o código que desfazia o perfil do Terminal.app e do GNOME Terminal, que nenhuma versão atual configura. O workdeck é só terminal e CLI.

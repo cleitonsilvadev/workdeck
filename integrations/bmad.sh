@@ -12,33 +12,24 @@ verificar() {
 
 instalar() {
   cat <<'FIM'
-O BMAD pode ficar dentro de cada projeto ou numa pasta só, fora deles.
-A instalação precisa do Node.js.
+Precisa do Node.js 20.12+ e do Python 3.10+.
 
-  Dentro do projeto
-    1. Vá para a pasta do projeto (Shift+→ no work).
-    2. Rode: npx bmad-method install
-    3. Escolha os módulos e a sua IA quando ele perguntar.
-    Ele cria a pasta do BMAD no projeto e os comandos dentro do seu agente.
+  1. Vá para a pasta do projeto (Shift+→ no work).
+  2. Rode: npx bmad-method install
+  3. Escolha os módulos e a sua IA quando ele perguntar.
 
-  Fora do projeto (um repositório do time, uma pasta sua)
-    Instale ou clone o BMAD uma vez, na pasta onde ele vai ficar, e aponte
-    para ela a partir de cada projeto. Todos os projetos usam a mesma cópia,
-    e o repositório do projeto não carrega o BMAD.
+O instalador do BMAD deixa os comandos dele prontos dentro da sua IA.
 FIM
 }
 
 usar() {
   cat <<'FIM'
-Nos dois casos, a IA só usa o que as instruções dela apontam. Deixe o
-CLAUDE.md (ou o AGENTS.md) do projeto dizendo:
+Abra a sua IA na pasta do projeto e:
 
-  - onde fica o BMAD, com o caminho completo se ele estiver fora do projeto;
-  - onde ficam os PRDs, as stories e os padrões do time;
-  - qual agente usar para revisar o código (o work review procura por ele).
+  - bmad-help   diz o que fazer a seguir, a qualquer momento;
+  - bmad-build  começa uma mudança, a partir do que você descrever.
 
-O que vale para todos os projetos vai no ~/.claude/CLAUDE.md; o que é de um
-projeto só fica no CLAUDE.md dele. Instruções curtas e com caminhos certos
-funcionam melhor que um texto longo.
+Para o work review usar o review do BMAD, diga isso no CLAUDE.md (ou no
+AGENTS.md) do projeto. Documentação: https://github.com/bmad-code-org/BMAD-METHOD
 FIM
 }
