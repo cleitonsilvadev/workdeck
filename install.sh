@@ -186,8 +186,14 @@ trap ao_sair EXIT
 no_kitty() { [ -n "${KITTY_WINDOW_ID:-}" ] || [ "${TERM:-}" = xterm-kitty ]; }
 
 kitty_instalado() {
+  local k
   [ -d /Applications/kitty.app ] || [ -d "$HOME/Applications/kitty.app" ] \
-    || command -v kitty >/dev/null || [ -x "$HOME/.local/kitty.app/bin/kitty" ]
+    || [ -x "$HOME/.local/kitty.app/bin/kitty" ] && return 0
+  k="$(command -v kitty 2>/dev/null)" || return 1
+  case "$k" in
+    "$HOME"/*) return 0 ;;
+    /Users/*|/home/*) return 1 ;;
+  esac
 }
 
 instalar_kitty() {

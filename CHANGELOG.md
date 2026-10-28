@@ -3,6 +3,10 @@
 O `work update` mostra o trecho da versão nova antes de perguntar se quer
 atualizar. Cada versão é uma tag `vX.Y.Z`.
 
+## v1.0.3
+
+- A instalação não conta mais o kitty que está na pasta de outro usuário do Mac, como o de uma conta apagada, e instala o kitty na sua.
+
 ## v1.0.2
 
 - Volta o `work uninstall`, que desinstala tudo o que o workdeck instalou: mostra o que vai sair, pergunta antes e aceita `--dry-run`. O kitty e a fonte que a instalação trouxe saem junto.
