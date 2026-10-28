@@ -22,20 +22,24 @@ falta() { printf '    %s!%s %s\n' "$a" "$r" "$1"; }
 texto() {
   titulo "Comandos"
   item "work" "abre a sessão, ou volta para ela"
-  item "ai" "abre a IA ao lado, para te ajudar no projeto; ai help explica"
-  item "work <janela>" "abre e vai direto para a janela"
   item "work add <caminho>" "acrescenta o projeto como janela; sem caminho, a pasta atual"
-item "work escolher" "escolhe de novo os projetos"
-  item "work kill" "fecha a sessão inteira"
-  item "work review" "a IA faz um self code review da mudança; staged ou branch"
+  item "work review" "a IA revisa a mudança num painel embaixo; staged ou branch"
+  item "work update" "atualiza para a versão mais nova"
+
+  titulo "Outros"
+  item "work <janela>" "abre e vai direto para a janela"
+  item "work review --editar" "o que mais pedir em todo review; projeto: só neste"
+  item "work agent <cmd>" "define a IA do review; sem nada, mostra a atual"
+  item "work escolher" "escolhe de novo os projetos"
   item "work painel" "abre o painel de contexto"
-  item "work agent <cmd>" "define o agente de IA; sem nada, mostra o atual"
   item "work doctor" "diz o que funciona no seu ambiente"
-  item "work update" "atualiza para a versão mais nova; work versao mostra a atual"
+  item "work kitty" "diz se você está no kitty; --nao-avisar desliga o aviso"
+  item "work kill" "fecha a sessão inteira"
+  item "work versao" "mostra a versão instalada"
   item "work help" "o menu; work help --texto mostra esta lista"
 
   titulo "Navegar"
-  item "Ctrl+b e h" "o menu, dentro do work: projetos, IA, revisar, dividir"
+  item "Ctrl+b e h" "o menu, dentro do work: projetos, revisar, dividir"
   item "Shift+← / Shift+→" "janela anterior / próxima"
   item "Shift+↑ / Shift+↓" "painel anterior / próximo"
   item "clique na barra" "troca de janela; clique num painel para focar"
@@ -47,7 +51,6 @@ item "work escolher" "escolhe de novo os projetos"
   item "Ctrl+b e =" "iguala o tamanho dos painéis"
   item "Ctrl+b e z" "zoom no painel"
   item "Ctrl+b e x" "fecha o painel"
-  item "Ctrl+b e a" "abre a IA ao lado"
   item "Ctrl+b e d" "solta a sessão; ela continua viva"
   printf '    %sCtrl+b quer dizer: aperte Ctrl+b, solte, e depois a tecla.%s\n' "$d" "$r"
 
@@ -74,7 +77,6 @@ item "work escolher" "escolhe de novo os projetos"
     falta "nenhum agente de IA configurado. Para ligar um:"
     printf '        1. instale o agente que quiser, pelo método dele (claude, codex, aider, gemini…)\n'
     printf '        2. work agent <comando>\n'
-    printf '        3. ai, ou Ctrl+b e a\n'
   fi
 
   if command -v tmux >/dev/null && tmux has-session -t "$SESSION" 2>/dev/null; then
@@ -87,7 +89,6 @@ item "work escolher" "escolhe de novo os projetos"
 
 OPCOES=(
   "w|abrir o work"
-  "a|abrir a IA ao lado"
   "e|escolher os projetos"
   "g|definir o agente de IA"
   "r|self code review da mudança"
@@ -103,7 +104,6 @@ executar() {
   case "$1" in
     w) exec work ;;
     e) exec work escolher ;;
-    a) exec workdeck-agent ;;
     g)
       workdeck-agent --list
       echo

@@ -2,10 +2,6 @@
 # Serve para bash e zsh.
 export PATH="$HOME/.local/bin:$PATH"
 
-# ai → abre o agente de IA num pane ao lado, na pasta em que você está.
-# Configure qual com: workdeck-agent --set <comando>
-ai() { workdeck-agent "$@"; }
-
 # painel → abre (ou redesenha) o painel numa janela da sessão e vai até ela.
 painel() {
   local sessao="${WORKDECK_SESSION:-work}"
@@ -46,7 +42,7 @@ _work_janelas() {
 if [ -n "${ZSH_VERSION:-}" ]; then
   _work() {
     if (( CURRENT == 2 )); then
-      compadd add escolher kill help doctor agent review painel $(_work_janelas)
+      compadd add review update escolher kill help doctor agent painel kitty $(_work_janelas)
     elif [[ ${words[2]} == add ]]; then
       _directories
     fi
@@ -56,7 +52,7 @@ elif [ -n "${BASH_VERSION:-}" ]; then
   _work() {
     local cur="${COMP_WORDS[COMP_CWORD]}"
     if [ "$COMP_CWORD" = 1 ]; then
-      COMPREPLY=($(compgen -W "add escolher kill help doctor agent review painel $(_work_janelas)" -- "$cur"))
+      COMPREPLY=($(compgen -W "add review update escolher kill help doctor agent painel kitty $(_work_janelas)" -- "$cur"))
     elif [ "${COMP_WORDS[1]}" = add ]; then
       COMPREPLY=($(compgen -d -- "$cur"))
     fi

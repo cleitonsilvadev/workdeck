@@ -3,6 +3,12 @@
 O `work update` mostra o trecho da versão nova antes de perguntar se quer
 atualizar. Cada versão é uma tag `vX.Y.Z`.
 
+## v1.0.1
+
+- `work review` abre num painel embaixo do chat e reaproveita: o mesmo painel enquanto ele estiver aberto, e uma sessão do claude por branch, em vez de um chat novo a cada review.
+- O pedido de review manda a IA usar o agente de review e os PRDs que as instruções dela apontam (CLAUDE.md, AGENTS.md, skills); `work review --editar` acrescenta o que você quiser.
+- Sai o `ai`: abra a sua IA como sempre. Os comandos principais ficam `work`, `work add`, `work review` e `work update`.
+
 ## v1.0.0
 
 - `work` abre uma sessão do tmux com uma janela por projeto e o painel com o que fazer no dia; a sessão sobrevive a fechar o terminal.

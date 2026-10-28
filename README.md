@@ -20,14 +20,13 @@ visual muda.
 
 ```bash
 work                  # abre a sessão, uma janela por projeto
-Ctrl+b h              # dentro do work: o menu com tudo (projetos, IA, revisar, dividir)
-ai                    # abre a IA ao lado, para te ajudar no projeto; ai help explica
-work review           # a IA faz um self code review da mudança antes do commit
-work agent claude     # define qual é o seu agente de IA
-work painel           # abre o painel de contexto
-work doctor           # diz o que funciona no seu ambiente
-work help             # menu com as ações, os atalhos e o que falta configurar
+work add ~/projeto    # acrescenta um projeto; Tab completa o caminho
+work review           # a IA faz um self code review da mudança, num painel embaixo
+work update           # atualiza o workdeck
 ```
+
+Dentro do work, <kbd>Ctrl</kbd>+<kbd>b</kbd> e <kbd>h</kbd> abre o menu com
+tudo, e `work help` lista os outros comandos.
 
 ---
 
@@ -104,22 +103,15 @@ do seu arquivo fica como está.
 
 ## O agente de IA
 
-O workdeck não traz nenhum agente. Ele abre o comando que você indicar, num
-pane ao lado do seu shell, já na pasta do projeto.
+O workdeck não traz nem abre nenhum agente: você abre o seu como sempre, no
+painel que quiser (`claude`, `codex`…). O `work agent` só diz qual IA o
+`work review` usa.
 
 ```bash
 work agent --list               # procura agentes conhecidos no PATH
 work agent claude               # define o seu
 work agent                      # mostra o atual
-ai                              # abre num pane ao lado
 ```
-
-<kbd>Ctrl</kbd>+<kbd>b</kbd> e depois <kbd>a</kbd> faz o mesmo sem tirar as
-mãos do teclado.
-
-**Sem agente na instalação?** Não precisa instalar de novo. Instale o agente que
-quiser pelo método dele, rode `work agent <comando>` e abra com `ai`.
-O `work help` mostra se falta esse passo.
 
 O comando pode ter argumentos:
 
@@ -128,17 +120,9 @@ work agent "aider --no-auto-commits"
 ```
 
 Na instalação, se você não passar `--agent`, ele procura no seu PATH e pergunta
-qual usar. `--yes` pula a pergunta.
-
-O instalador conhece `claude`, `codex`, `copilot`, `aider`, `gemini`,
-`opencode`, `cursor-agent`, `crush`, `goose` e `q` — mas isso é só para
-oferecer uma lista. Qualquer comando serve.
-
-### Por que um pane, e não uma janela
-
-O agente escreve código que você precisa ver. Com ele ao lado, o shell fica no
-outro painel para rodar os testes e o `work review` sem trocar de contexto, e o
-painel fica a um clique na barra. É o ponto do projeto.
+qual usar. `--yes` pula a pergunta. O instalador conhece `claude`, `codex`,
+`copilot`, `aider`, `gemini`, `opencode`, `cursor-agent`, `crush`, `goose` e
+`q`, mas isso é só para oferecer uma lista. Qualquer comando serve.
 
 ---
 
@@ -268,8 +252,7 @@ O dia a dia, sem configurar nada:
 
 | Para | Teclas |
 |---|---|
-| **Abrir o menu com tudo** (projetos, IA, revisar, dividir…) | <kbd>Ctrl</kbd>+<kbd>b</kbd> e <kbd>h</kbd> |
-| Abrir a IA ao lado, para te ajudar no projeto | `ai`, ou <kbd>Ctrl</kbd>+<kbd>b</kbd> e <kbd>a</kbd> |
+| **Abrir o menu com tudo** (projetos, revisar, dividir…) | <kbd>Ctrl</kbd>+<kbd>b</kbd> e <kbd>h</kbd> |
 | Ir para o projeto anterior / próximo | <kbd>Shift</kbd>+<kbd>←</kbd> / <kbd>→</kbd> |
 | Ir direto para a janela N | <kbd>Ctrl</kbd>+<kbd>b</kbd> e <kbd>1</kbd>…<kbd>9</kbd> |
 | Dividir a tela (ao lado ou embaixo, onde couber) | <kbd>Ctrl</kbd>+<kbd>b</kbd> e <kbd>Enter</kbd> |
@@ -339,19 +322,32 @@ work review staged     # só o que está no stage (git add)
 work review branch     # tudo o que a branch mudou em relação à principal
 ```
 
-Se a janela já tem a IA aberta (`ai` ou um review anterior), o pedido entra
-nessa conversa, sem abrir outra; só quando não há nenhuma ela abre ao lado. Ela
-procura bugs, falhas de segurança e segredos, código arriscado sem teste,
+O review abre num painel embaixo do chat da sua IA (ou do painel em que você
+está), separado da conversa que escreveu o código. Rodar de novo manda o pedido
+para o mesmo painel. Com o `claude`, cada branch tem uma sessão de review só: o
+`work review` retoma a mesma conversa (`claude --resume`), em vez de criar uma
+por vez, e o `/resume` não enche de "self code review". Na conversa retomada, a
+IA diz o que da revisão anterior foi corrigido e o que continua.
+
+A IA procura bugs, falhas de segurança e segredos, código arriscado sem teste,
 trechos lentos, o que dá para cortar e arquivos fora do escopo. Cada achado vem
 com a gravidade (corrigir antes do commit, vale corrigir, opcional), o que o
 código faz, o que dá errado, como corrigir e o que acontece se você não
 corrigir; no fim, um veredito. Ela não altera nada: só revisa.
 
-Se você disse na instalação que usa BMAD ou Spec Kit, o `work review` procura
-antes um agente de review do próprio projeto e pede para a IA usar ele: o
-`bmad-code-review` (ou o `bmad-review`) do BMAD, ou um skill, comando, agente ou
-prompt com "review" no nome nas pastas da IA (`.claude/`, `.cursor/`,
-`.github/`…). Sem nenhum, vale a revisão do workdeck descrita acima.
+**O seu fluxo de review.** O pedido manda a IA usar o agente de review e os PRDs
+ou stories que as instruções dela apontam (`CLAUDE.md`, `AGENTS.md`, skills),
+como um `bmad-code-review` ou uma skill sua de review de PR, e dizer na
+primeira linha qual usou. Se o seu framework fica fora do projeto, num
+repositório do time, por exemplo, diga onde nas instruções da IA: assim ele
+vale também quando você pede uma revisão direto, sem o workdeck.
+
+Para acrescentar algo a todo review, como a branch base ou a skill preferida:
+
+```bash
+work review --editar            # vale para todos os projetos
+work review --editar projeto    # só para este, em .workdeck/review.md
+```
 
 Com `claude`, `codex` e `gemini`, o pedido já entra na conversa. Com outra IA, ele
 vai para a área de transferência e para `~/.cache/workdeck/pedido-de-review.md`,

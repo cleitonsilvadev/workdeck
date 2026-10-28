@@ -1,24 +1,15 @@
 #!/usr/bin/env bash
-# workdeck-agent — abre o seu agente de IA num pane ao lado, ou configura qual é.
-#
-#   workdeck-agent              abre o agente num pane ao lado
-#   workdeck-agent --here       roda o agente no pane atual
-#   workdeck-agent --set <cmd>  define qual comando é o seu agente
-#   workdeck-agent --show       mostra o configurado
-#   workdeck-agent --list       procura agentes conhecidos no PATH
-#
-# O comando pode ter argumentos: workdeck-agent --set "aider --no-auto-commits"
 set -uo pipefail
 
 CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/workdeck"
 CONFIG="$CONFIG_DIR/agent.conf"
 CONHECIDOS="claude codex copilot aider gemini opencode cursor-agent crush goose q"
 
-carrega() { AGENT_CMD=""; AGENT_SPLIT="${AGENT_SPLIT:-h}"; [ -f "$CONFIG" ] && . "$CONFIG"; }
+carrega() { AGENT_CMD=""; [ -f "$CONFIG" ] && . "$CONFIG"; }
 
 do_workdeck() {
   case "$(basename "${1%% *}")" in
-    work|work-panel|workdeck-*|git-review|ai|help) return 0 ;;
+    work|work-panel|workdeck-*|git-review|help) return 0 ;;
   esac
   return 1
 }
@@ -32,6 +23,82 @@ problema() {
   return 0
 }
 
+uuid_de() {
+  local h
+  h="$(printf '%s' "$1" | git hash-object --stdin)"
+  printf '%s-%s-4%s-8%s-%s\n' "${h:0:8}" "${h:8:4}" "${h:13:3}" "${h:17:3}" "${h:20:12}"
+}
+
+panes() { tmux list-panes ${TMUX_PANE:+-t "$TMUX_PANE"} -F "$1"; }
+
+pane_do_agente() {
+  local id tty papel
+  while IFS='|' read -r id tty papel; do
+    case "$papel" in REVIEW*) continue ;; esac
+    if ps -o comm= -t "${tty#/dev/}" 2>/dev/null | awk -F/ '{print $NF}' | grep -qx "$1"; then
+      echo "$id"
+      return 0
+    fi
+  done < <(panes '#{pane_id}|#{pane_tty}|#{@papel}')
+  return 0
+}
+
+pedido() {
+  local arquivo="$1" titulo="$2" chave="$3" nome cmd id aberto chave_aberta alvo painel texto
+  carrega
+  local p
+  p="$(problema "$AGENT_CMD")"
+  if [ -n "$p" ]; then
+    echo "$p — defina a sua IA com: work agent <comando>"
+    return 1
+  fi
+  nome="$(basename "${AGENT_CMD%% *}")"
+
+  if [ -n "${TMUX:-}" ]; then
+    read -r aberto chave_aberta < <(panes '#{pane_id}|#{@papel}|#{@chave}' |
+      awk -F'|' -v t="$titulo" '$2 == t || index($2, t " ") == 1 {print $1, $3; exit}')
+    if [ -n "${aberto:-}" ] && [ "${chave_aberta:-}" = "$chave" ]; then
+      tmux load-buffer -b workdeck-pedido "$arquivo"
+      tmux paste-buffer -p -d -b workdeck-pedido -t "$aberto"
+      sleep 0.5
+      tmux send-keys -t "$aberto" Enter
+      tmux select-pane -t "$aberto"
+      return 0
+    fi
+    [ -n "${aberto:-}" ] && tmux kill-pane -t "$aberto"
+  fi
+
+  texto="\"\$(cat '$arquivo')\""
+  case "$nome" in
+    claude)
+      if [ -n "$chave" ]; then
+        id="$(uuid_de "$chave")"
+        cmd="if find \"\${CLAUDE_CONFIG_DIR:-\$HOME/.claude}/projects\" -maxdepth 2 -name '$id.jsonl' 2>/dev/null | grep -q .; then exec $AGENT_CMD --resume $id $texto; else exec $AGENT_CMD --session-id $id $texto; fi"
+      else
+        cmd="$AGENT_CMD $texto"
+      fi ;;
+    codex) cmd="$AGENT_CMD $texto" ;;
+    gemini) cmd="$AGENT_CMD -i $texto" ;;
+    *)
+      cmd="$AGENT_CMD"
+      if command -v pbcopy >/dev/null; then pbcopy < "$arquivo"
+      elif command -v wl-copy >/dev/null; then wl-copy < "$arquivo"
+      elif command -v xclip >/dev/null; then xclip -selection clipboard < "$arquivo"
+      fi
+      echo "o pedido está na área de transferência e em $arquivo: cole na IA que vai abrir." ;;
+  esac
+
+  if [ -z "${TMUX:-}" ]; then
+    exec bash -c "$cmd"
+  fi
+  alvo="$(pane_do_agente "$nome")"
+  alvo="${alvo:-${TMUX_PANE:-}}"
+  painel="$(tmux split-window -v -l 40% ${alvo:+-t "$alvo"} ${CLAUDE_CONFIG_DIR:+-e "CLAUDE_CONFIG_DIR=$CLAUDE_CONFIG_DIR"} -P -F '#{pane_id}' -c "$PWD" "$cmd")"
+  tmux set -p -t "$painel" @papel "$titulo · $nome"
+  tmux set -p -t "$painel" @chave "$chave"
+  tmux set -w -t "$painel" @ia 1
+}
+
 case "${1:-}" in
   --check)
     carrega
@@ -41,45 +108,8 @@ case "${1:-}" in
     exit 1
     ;;
   --pedido)
-    arquivo="${2:?use: workdeck-agent --pedido <arquivo> [título]}"
-    titulo="${3:-AGENTE}"
-    carrega
-    p="$(problema "$AGENT_CMD")"
-    if [ -n "$p" ]; then
-      echo "$p — defina a sua IA com: work agent <comando>"
-      exit 1
-    fi
-    if [ -n "${TMUX:-}" ]; then
-      aberto="$(tmux list-panes ${TMUX_PANE:+-t "$TMUX_PANE"} -F '#{pane_id} #{@papel}' |
-        awk -v t="$titulo" '$2 == t {print $1; exit} $2 ~ /^(AGENTE|REVIEW)$/ && !a {a = $1} END {if (a) print a}' | head -1)"
-      if [ -n "$aberto" ]; then
-        tmux load-buffer -b workdeck-pedido "$arquivo"
-        tmux paste-buffer -p -d -b workdeck-pedido -t "$aberto"
-        sleep 0.5
-        tmux send-keys -t "$aberto" Enter
-        tmux select-pane -t "$aberto"
-        exit 0
-      fi
-    fi
-    nome="$(basename "${AGENT_CMD%% *}")"
-    case "$nome" in
-      claude|codex) cmd="$AGENT_CMD \"\$(cat '$arquivo')\"" ;;
-      gemini) cmd="$AGENT_CMD -i \"\$(cat '$arquivo')\"" ;;
-      *)
-        cmd="$AGENT_CMD"
-        if command -v pbcopy >/dev/null; then pbcopy < "$arquivo"
-        elif command -v wl-copy >/dev/null; then wl-copy < "$arquivo"
-        elif command -v xclip >/dev/null; then xclip -selection clipboard < "$arquivo"
-        fi
-        echo "o pedido está na área de transferência e em $arquivo: cole na IA que vai abrir." ;;
-    esac
-    if [ -n "${TMUX:-}" ]; then
-      painel="$(tmux split-window -h -P -F '#{pane_id}' -c "$PWD" "$cmd")"
-      tmux set -p -t "$painel" @papel "$titulo · $nome"
-      tmux set -w -t "$painel" @ia 1
-      exit 0
-    fi
-    exec bash -c "$cmd"
+    pedido "${2:?use: workdeck-agent --pedido <arquivo> [título] [chave]}" "${3:-REVIEW}" "${4:-}"
+    exit $?
     ;;
   --set)
     cmd="${2:?use: work agent <comando>}"
@@ -94,12 +124,7 @@ case "${1:-}" in
       exit 1
     }
     mkdir -p "$CONFIG_DIR"
-    cat > "$CONFIG" <<FIM
-# Qual agente de IA o workdeck abre. Pode ter argumentos.
-AGENT_CMD="$cmd"
-# Como dividir o pane: h lado a lado, v em cima/embaixo.
-AGENT_SPLIT="${AGENT_SPLIT:-h}"
-FIM
+    printf 'AGENT_CMD="%s"\n' "$cmd" > "$CONFIG"
     echo "agente definido: $cmd"
     exit 0
     ;;
@@ -120,67 +145,15 @@ FIM
     echo "  work agent <comando>"
     exit 0
     ;;
-  -h|--help|help)
-    carrega
-    atual="${AGENT_CMD:-nenhum ainda — defina com: work agent <comando>}"
-    cat <<FIM
-ai — abre a IA ao lado, na pasta em que você está, para te ajudar no projeto.
-
-  Seu agente: $atual
-
-  Onde você está          O que acontece
-  dentro do work          divide a janela e abre o agente à direita, na mesma pasta
-  fora do tmux            roda o agente ali mesmo, no terminal atual
-  sem agente definido     explica como definir e lista os que achou no PATH
-
-  Exemplo: no projeto api, digite ai. O agente abre ao lado já em ~/code/api, e
-  do outro lado fica o shell; antes do commit, work review pede uma revisão.
-
-  ai  ou  Ctrl+b a        abre o agente
-  work agent claude       define qual é o seu agente (precisa estar instalado)
-  work agent              mostra o atual
-  work agent --list       procura agentes conhecidos no PATH
-  ai --here               abre no painel atual, sem dividir
-
-  O ai não repassa texto: ai corrige o login só abre o agente; escreva lá dentro.
-  Para abrir embaixo em vez de ao lado, troque AGENT_SPLIT="h" por "v" em
-  ${CONFIG/#$HOME/~}
-FIM
-    exit 0
-    ;;
 esac
 
 carrega
-if [ -z "$AGENT_CMD" ] && [ ! -t 1 ] && [ -n "${TMUX:-}" ]; then
-  tmux display-message -d 6000 "nenhum agente de IA configurado — rode: work agent <comando>"
-  exit 0
-fi
-if [ -z "$AGENT_CMD" ]; then
-  echo "Nenhum agente configurado."
-  echo
-  "$0" --list
-  exit 1
-fi
+cat <<FIM
+work agent — qual IA o work review usa.
 
-p="$(problema "$AGENT_CMD")"
-if [ -n "$p" ]; then
-  if [ ! -t 1 ] && [ -n "${TMUX:-}" ]; then
-    tmux display-message -d 6000 "$p — troque com: work agent <comando>"
-    exit 0
-  fi
-  echo "$p — troque com: work agent <comando>"
-  exit 1
-fi
+  Sua IA: ${AGENT_CMD:-nenhuma ainda}
 
-if [ "${1:-}" = "--here" ] || [ -z "${TMUX:-}" ]; then
-  if [ -n "${TMUX:-}" ]; then
-    tmux set -p @papel "AGENTE · ${AGENT_CMD%% *}"
-    tmux set -w @ia 1
-  fi
-  exec $AGENT_CMD
-fi
-
-flag="-h"; [ "${AGENT_SPLIT:-h}" = "v" ] && flag="-v"
-painel="$(tmux split-window "$flag" -P -F '#{pane_id}' -c "#{pane_current_path}" "$AGENT_CMD")"
-tmux set -p -t "$painel" @papel "AGENTE · ${AGENT_CMD%% *}"
-tmux set -w -t "$painel" @ia 1
+  work agent claude       define (precisa estar instalada)
+  work agent              mostra a atual
+  work agent --list       procura agentes conhecidos no PATH
+FIM

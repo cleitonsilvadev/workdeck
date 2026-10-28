@@ -14,7 +14,7 @@
 #      work help        comandos, atalhos e o que falta configurar
 #      work doctor      diz o que funciona no seu ambiente
 #      work agent [cmd] mostra o agente de IA, ou define qual é
-#      work review      a IA faz um self code review da mudança (staged, branch)
+#      work review      a IA faz um self code review da mudança (staged, branch, --editar)
 #      work kitty       diz se você está no kitty; --nao-avisar / --avisar
 #      work painel      abre o painel de contexto
 #
@@ -282,27 +282,26 @@ oferecer_atualizacao() {
   fi
 }
 
-agente_de_review() {
-  local escolhidas raiz pastas n f
-  escolhidas=",$(cat "$(dirname "$CONFIG")/integracoes" 2>/dev/null || true),"
-  case "$escolhidas" in *,bmad,*|*,spec-kit,*) ;; *) return 0 ;; esac
-  raiz="$(git rev-parse --show-toplevel)"
-  pastas=()
-  while IFS= read -r f; do pastas+=("$f"); done < <(find "$raiz" -mindepth 1 -maxdepth 1 -type d -name '.*' ! -name .git)
-  [ ${#pastas[@]} -gt 0 ] || return 0
-  if [ "$escolhidas" != "${escolhidas/,bmad,/}" ]; then
-    for n in bmad-code-review bmad-review; do
-      f="$(find "${pastas[@]}" -maxdepth 4 -type f \( -path "*/$n/SKILL.md" -o -name "$n.md" \) 2>/dev/null | head -1)"
-      [ -n "$f" ] && { echo "BMAD|${f#"$raiz"/}"; return 0; }
-    done
+editar_review() {
+  local arquivo
+  if [ "${1:-}" = projeto ]; then
+    git rev-parse --is-inside-work-tree >/dev/null 2>&1 || { echo "$(curto "$PWD") não é um repositório git."; return 1; }
+    arquivo="$(git rev-parse --show-toplevel)/.workdeck/review.md"
+  else
+    arquivo="$(dirname "$CONFIG")/review.md"
   fi
-  f="$(find "${pastas[@]}" -maxdepth 4 -type f \( -ipath '*/skills/*review*/SKILL.md' -o -ipath '*/commands/*review*.md' -o -ipath '*/agents/*review*.md' -o -ipath '*/prompts/*review*.md' \) ! -ipath '*test-review*' 2>/dev/null | sort | head -1)"
-  [ -n "$f" ] && echo "projeto|${f#"$raiz"/}"
-  return 0
+  mkdir -p "$(dirname "$arquivo")"
+  [ -f "$arquivo" ] || : > "$arquivo"
+  echo "O que você escrever em $(curto "$arquivo") vai junto em todo work review$([ "${1:-}" = projeto ] && echo " deste projeto")."
+  echo "Por exemplo: use a skill pr-self-review; a branch base é dev."
+  "${EDITOR:-vi}" "$arquivo"
 }
 
 revisar() {
-  local alvo="${1:-uncommitted}" base descricao comandos pedido agente origem
+  local alvo="${1:-uncommitted}" base descricao comandos pedido raiz branch extra f
+  case "$alvo" in
+    --editar) shift; editar_review "${1:-}"; return $? ;;
+  esac
   if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
     echo "$(curto "$PWD") não é um repositório git, então não há o que revisar."
     echo "Vá para a janela de um projeto (Shift+→) e rode de novo."
@@ -322,35 +321,34 @@ revisar() {
       descricao="tudo o que esta branch mudou em relação a $base"
       comandos="git diff $base...HEAD, mais o que ainda não foi commitado (git diff HEAD)" ;;
     *)
-      echo "não conheço '$alvo'. Use: work review, work review staged ou work review branch"
+      echo "não conheço '$alvo'. Use: work review, work review staged, work review branch ou work review --editar"
       return 1 ;;
   esac
+  raiz="$(git rev-parse --show-toplevel)"
+  branch="$(git branch --show-current 2>/dev/null)"
+  branch="${branch:-$(git rev-parse --short HEAD)}"
+  extra=""
+  for f in "$(dirname "$CONFIG")/review.md" "$raiz/.workdeck/review.md"; do
+    [ -s "$f" ] && extra="$extra$(cat "$f")"$'\n'
+  done
   pedido="${XDG_CACHE_HOME:-$HOME/.cache}/workdeck/pedido-de-review.md"
   mkdir -p "$(dirname "$pedido")"
-  agente="$(agente_de_review)"
-  if [ -n "$agente" ]; then
-    origem="${agente%%|*}"; agente="${agente#*|}"
-    echo "usando o agente de review do $origem: $agente"
-    cat > "$pedido" <<FIM
-Faça um self code review desta mudança, antes do commit, com o agente de review
-do $origem que já está neste projeto: $agente. Leia esse arquivo e siga o
-processo dele.
-
-O que revisar: $descricao. Para ver a mudança, rode: $comandos.
-
-Não altere código e não faça commit: só revise. Responda em português.
-FIM
-    workdeck-agent --pedido "$pedido" "REVIEW"
-    return $?
-  fi
-  cat > "$pedido" <<FIM
+  {
+    cat <<FIM
 Faça um self code review desta mudança, antes do commit. Revise como a pessoa
 sênior que vai ser chamada se isso quebrar em produção: cética, concreta, sem
 elogio.
 
-O que revisar: $descricao. Para ver a mudança, rode: $comandos.
+O que revisar: $descricao, na branch $branch. Para ver a mudança, rode: $comandos.
 Leia também o código que a mudança toca (quem chama, quem é chamado, os testes),
 não só as linhas do diff.
+
+Antes de começar, veja se as suas instruções (CLAUDE.md, AGENTS.md, skills ou
+comandos instalados) apontam um agente ou skill de review, ou PRDs e stories
+ligados a esta mudança; o nome da branch costuma ter o número da tarefa. Se
+apontarem, siga esse agente e confira a mudança contra os critérios do PRD ou da
+story. O que vem abaixo vale para o que ele não cobrir. Diga na primeira linha
+qual agente e quais documentos você usou, ou que não achou nenhum.
 
 Procure, nesta ordem:
 1. Bugs: lógica errada, casos de borda, valor vazio ou nulo, erro não tratado.
@@ -376,9 +374,16 @@ diga isso numa linha. Termine com um veredito: "pode commitar", "commitar depois
 de corrigir os itens marcados como Corrigir antes do commit" ou "rever a
 abordagem".
 
+Se esta conversa já tem uma revisão anterior desta branch, diga também quais
+problemas dela foram corrigidos e quais continuam.
+
 Não altere nenhum arquivo e não faça commit: só revise. Responda em português.
 FIM
-  workdeck-agent --pedido "$pedido" "REVIEW"
+    if [ -n "$extra" ]; then
+      printf '\nInstruções de quem pediu a revisão, que valem mais que as de cima:\n%s' "$extra"
+    fi
+  } > "$pedido"
+  workdeck-agent --pedido "$pedido" "REVIEW" "$raiz:$branch"
 }
 
 com_shell() {
@@ -562,7 +567,7 @@ case "${1:-}" in
   sincronizar) sincronizar; exit 0 ;;
   help|-h|--help) exec workdeck-help ;;
   doctor) shift; exec workdeck-doctor "$@" ;;
-  review) shift; revisar "${1:-}"; exit $? ;;
+  review) shift; revisar "$@"; exit $? ;;
   agent)
     shift
     case "${1:-}" in
