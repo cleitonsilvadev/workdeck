@@ -99,6 +99,11 @@ FIM
         fi
         rm -f "$CONFIG_DIR/visual"
         ;;
+      zsh)
+        run rm -rf "$alvo"
+        rm -f "$CONFIG_DIR/zsh"
+        say "zsh do workdeck removido"
+        ;;
       fonte)
         if [ "$ALL" = 1 ]; then
           run rm -f "$alvo"/JetBrainsMono*.ttf

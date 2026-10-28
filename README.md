@@ -64,6 +64,7 @@ apt, dnf, pacman, zypper ou apk no Linux — e instala o que faltar (`tmux` e
 |---|---|
 | `--theme <nome>` | Escolhe um tema de `themes/` (padrão: `catppuccin-mocha`) |
 | `--terminal kitty` | Instala também os atalhos `cmd` do kitty |
+| `--zsh` | Instala o zsh do workdeck sem perguntar (veja abaixo) |
 | `--no-deps` | Não instala nada pelo gerenciador de pacotes |
 | `--no-reload` | Não recarrega o tmux no fim (útil ao instalar num HOME de teste) |
 | `--dry-run` | Mostra o que faria, sem escrever nada |
@@ -78,6 +79,19 @@ instalação. Para rodar a instalação de novo com outras opções, use
 `work install`, por exemplo `work install --theme nord`.
 
 ---
+
+### O zsh do workdeck, opcional
+
+A instalação pergunta, com "não" como resposta padrão, se você quer o zsh do
+workdeck: sugestões enquanto digita (zsh-autosuggestions), cores nos comandos
+(fast-syntax-highlighting) e mais coisa para completar com Tab
+(zsh-completions). São só esses três plugins, carregados pelo bloco do
+workdeck no `.zshrc`, sem oh-my-zsh nem zinit.
+
+- Se você já tem oh-my-zsh, zinit ou esses plugins, ele não pergunta e não mexe.
+- No Linux sem zsh, ele instala o zsh e pergunta antes de trocar o seu shell
+  padrão (pede a senha).
+- Para decidir depois: `work install --zsh`. O `work uninstall` tira os plugins.
 
 ## O agente de IA
 

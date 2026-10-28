@@ -5,6 +5,7 @@
 #   ./install.sh --theme nord         escolhe um tema de themes/
 #   ./install.sh --terminal kitty     instala também os atalhos cmd do kitty
 #   ./install.sh --agent claude       define o seu agente de IA
+#   ./install.sh --zsh                instala o zsh do workdeck sem perguntar
 #   ./install.sh --with ai-memory     ativa integrações opcionais (vírgula separa)
 #   ./install.sh --list-integrations  mostra as integrações disponíveis e sai
 #   ./install.sh --yes                não pergunta nada; usa os padrões
@@ -24,6 +25,7 @@ CODIGO="${XDG_DATA_HOME:-$HOME/.local/share}/workdeck"
 THEME="catppuccin-mocha"
 TERMINAL=""
 AVISO_OPTION=""
+QUER_ZSH=0
 AGENT=""
 WITH=""
 YES=0
@@ -47,9 +49,10 @@ while [ $# -gt 0 ]; do
       done
       exit 0 ;;
     --no-deps) DEPS=0; shift ;;
+    --zsh) QUER_ZSH=1; shift ;;
     --no-reload) RELOAD=0; shift ;;
     --dry-run) DRY=1; shift ;;
-    -h|--help) sed -n '2,13p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    -h|--help) sed -n '2,14p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
     *) echo "opção desconhecida: $1"; exit 1 ;;
   esac
 done
@@ -552,6 +555,90 @@ concluir
 
 # ---- 5. shell --------------------------------------------------------------
 etapa 5 "shell"
+ZSH_ESCOLHA="$CONFIG_DIR/zsh"
+ZSH_PLUGINS="${XDG_DATA_HOME:-$HOME/.local/share}/workdeck-zsh"
+
+ja_tem_zsh_turbinado() {
+  [ -d "$HOME/.oh-my-zsh" ] || [ -d "${XDG_DATA_HOME:-$HOME/.local/share}/zinit" ] || [ -d "$HOME/.zinit" ] && return 0
+  [ -f "$HOME/.zshrc" ] && awk '/^# >>> workdeck >>>$/{s=1} !s{print} /^# <<< workdeck <<<$/{s=0}' "$HOME/.zshrc" \
+    | grep -qE 'zsh-autosuggestions|fast-syntax-highlighting|zsh-syntax-highlighting|zinit|oh-my-zsh' && return 0
+  return 1
+}
+
+baixar_plugins_zsh() {
+  local repo nome
+  mkdir -p "$ZSH_PLUGINS"
+  for repo in zsh-users/zsh-autosuggestions zdharma-continuum/fast-syntax-highlighting zsh-users/zsh-completions; do
+    nome="${repo#*/}"
+    if [ -d "$ZSH_PLUGINS/$nome/.git" ]; then
+      git -C "$ZSH_PLUGINS/$nome" pull -q --ff-only >> "$LOG" 2>&1 || true
+    else
+      git clone -q --depth 1 "https://github.com/$repo.git" "$ZSH_PLUGINS/$nome" >> "$LOG" 2>&1 || return 1
+    fi
+  done
+}
+
+opcao_zsh() {
+  local escolha r zsh_bin
+  escolha="$(cat "$ZSH_ESCOLHA" 2>/dev/null || true)"
+  [ "$escolha" = nao ] && [ "$QUER_ZSH" = 0 ] && return 0
+  if [ "$escolha" != sim ]; then
+    if ja_tem_zsh_turbinado; then
+      say "zsh: você já tem plugins (oh-my-zsh, zinit ou outros); não mexi"
+      return 0
+    fi
+    if [ "$QUER_ZSH" = 0 ]; then
+      [ "$YES" = 1 ] || [ ! -t 0 ] && return 0
+      parar
+      printf '  Quer o zsh do workdeck? Sugestões enquanto digita, cores nos comandos
+'
+      printf '  e mais completar com Tab. [s/N] '
+      read -r r || r=n
+      girar
+      case "$r" in s|S|y|Y) ;; *) [ "$DRY" = 1 ] || { mkdir -p "$CONFIG_DIR"; echo nao > "$ZSH_ESCOLHA"; }; return 0 ;; esac
+    fi
+  fi
+  [ "$DRY" = 1 ] && { say "[dry-run] instalaria o zsh do workdeck"; return 0; }
+  if ! command -v zsh >/dev/null; then
+    if [ "$SO" != macOS ] && [ "$DEPS" = 1 ] && [ -n "${GERENCIADOR:-}" ]; then
+      parar
+      case "$GERENCIADOR" in
+        apt-get) $sudo apt-get install -y zsh ;;
+        dnf) $sudo dnf install -y zsh ;;
+        pacman) $sudo pacman -S --needed --noconfirm zsh ;;
+        zypper) $sudo zypper install -y zsh ;;
+        apk) $sudo apk add zsh ;;
+      esac >> "$LOG" 2>&1 || true
+      girar
+    fi
+    command -v zsh >/dev/null || { aviso "não consegui instalar o zsh; instale pelo gerenciador e rode work install --zsh"; return 0; }
+  fi
+  zsh_bin="$(command -v zsh)"
+  if [ "$(basename "${SHELL:-}")" != zsh ]; then
+    parar
+    printf '  Usar o zsh como o seu shell padrão? Pede a sua senha. [S/n] '
+    read -r r </dev/tty 2>/dev/null || r=n
+    girar
+    case "${r:-s}" in
+      s|S|y|Y)
+        parar
+        grep -qx "$zsh_bin" /etc/shells 2>/dev/null || echo "$zsh_bin" | $sudo tee -a /etc/shells >/dev/null
+        if chsh -s "$zsh_bin" </dev/tty; then SHELL="$zsh_bin"; else aviso "não troquei o shell padrão; dá para fazer depois com: chsh -s $zsh_bin"; fi
+        girar ;;
+    esac
+  fi
+  if baixar_plugins_zsh; then
+    mkdir -p "$CONFIG_DIR"; echo sim > "$ZSH_ESCOLHA"
+    grep -qF "zsh|$ZSH_PLUGINS|" "$MANIFESTO" 2>/dev/null || anota zsh "$ZSH_PLUGINS"
+    ZSH_RESUMO="zsh do workdeck: sugestões, cores e Tab"
+  else
+    aviso "não consegui baixar os plugins do zsh; rode work install --zsh mais tarde"
+  fi
+}
+ZSH_RESUMO=""
+sudo=""; [ "$(id -u)" != 0 ] && sudo="sudo"
+opcao_zsh
+
 rc=""
 case "$(basename "${SHELL:-/bin/bash}")" in
   zsh)  rc="$HOME/.zshrc" ;;
@@ -561,7 +648,7 @@ esac
 if [ -n "$rc" ]; then
   write_block "$rc" "$(cat "$ROOT/config/shell-snippet.sh")"
   say "$(basename "$rc")"
-  resumo "$(curto "$rc")"
+  resumo "$(curto "$rc")${ZSH_RESUMO:+ · $ZSH_RESUMO}"
 else
   aviso "shell '$SHELL' não reconhecido — adicione à mão: source $ROOT/config/shell-snippet.sh"
 fi

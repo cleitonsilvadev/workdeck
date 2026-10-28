@@ -24,6 +24,15 @@ painel() {
     tmux select-window -t "$sessao:painel" && tmux attach -t "$sessao"
   fi
 }
+_wd_zsh="${XDG_DATA_HOME:-$HOME/.local/share}/workdeck-zsh"
+if [ -n "${ZSH_VERSION:-}" ] && [ -d "$_wd_zsh" ] && grep -qx sim "${XDG_CONFIG_HOME:-$HOME/.config}/workdeck/zsh" 2>/dev/null; then
+  fpath=("$_wd_zsh/zsh-completions/src" $fpath)
+  autoload -Uz compinit && compinit -i
+  [ -f "$_wd_zsh/zsh-autosuggestions/zsh-autosuggestions.zsh" ] && . "$_wd_zsh/zsh-autosuggestions/zsh-autosuggestions.zsh"
+  [ -f "$_wd_zsh/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh" ] && . "$_wd_zsh/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh"
+fi
+unset _wd_zsh
+
 _work_janelas() {
   local f="${XDG_CONFIG_HOME:-$HOME/.config}/workdeck/projects.conf"
   [ -f "$f" ] && grep -v '^[[:space:]]*#' "$f" | cut -d'|' -f1
