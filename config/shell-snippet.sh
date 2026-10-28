@@ -25,22 +25,17 @@ painel() {
   fi
 }
 if [ -n "${ZSH_VERSION:-}" ] && grep -qx sim "${XDG_CONFIG_HOME:-$HOME/.config}/workdeck/zsh" 2>/dev/null; then
-  if [ -f "${XDG_DATA_HOME:-$HOME/.local/share}/zinit/zinit.git/zinit.zsh" ]; then
-    . "${XDG_DATA_HOME:-$HOME/.local/share}/zinit/zinit.git/zinit.zsh"
-    zinit light zsh-users/zsh-completions
-    zinit light zsh-users/zsh-autosuggestions
-    zinit light zdharma-continuum/fast-syntax-highlighting
-  fi
   if [ -f "$HOME/.oh-my-zsh/oh-my-zsh.sh" ]; then
     export ZSH="$HOME/.oh-my-zsh"
-    ZSH_THEME="${WORKDECK_ZSH_THEME:-workdeck}"
-    if [ "$ZSH_THEME" = workdeck ] && [ -f "${XDG_DATA_HOME:-$HOME/.local/share}/workdeck/config/zsh/themes/workdeck.zsh-theme" ]; then
-      ZSH_CUSTOM="${XDG_DATA_HOME:-$HOME/.local/share}/workdeck/config/zsh"
-    elif [ "$ZSH_THEME" = workdeck ]; then
-      ZSH_THEME="robbyrussell"
-    fi
+    ZSH_THEME="${WORKDECK_ZSH_THEME:-robbyrussell}"
     plugins=(git)
     . "$ZSH/oh-my-zsh.sh"
+  fi
+  if [ -f "${XDG_DATA_HOME:-$HOME/.local/share}/zinit/zinit.git/zinit.zsh" ]; then
+    . "${XDG_DATA_HOME:-$HOME/.local/share}/zinit/zinit.git/zinit.zsh"
+    zinit light zdharma-continuum/fast-syntax-highlighting
+    zinit light zsh-users/zsh-autosuggestions
+    zinit light zsh-users/zsh-completions
   fi
 fi
 

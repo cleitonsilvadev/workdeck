@@ -327,7 +327,7 @@ com_shell() {
 enfeitar() {
   local jan n ia
   tmux list-windows -a -F '#{window_id} #{window_panes}' 2>/dev/null | while read -r jan n; do
-    if [ "$n" -gt 1 ]; then tmux setw -t "$jan" pane-border-status top; else tmux setw -t "$jan" pane-border-status off; fi
+    tmux setw -u -t "$jan" pane-border-status 2>/dev/null || true
     ia="$(tmux list-panes -t "$jan" -F '#{@papel}' | grep -c '^AGENTE\|^REVIEW' || true)"
     if [ "$ia" -gt 0 ]; then tmux set -w -t "$jan" @ia 1; else tmux set -w -u -t "$jan" @ia 2>/dev/null || true; fi
   done

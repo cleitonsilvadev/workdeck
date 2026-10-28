@@ -3,6 +3,11 @@
 O `work update` mostra o trecho da versão nova antes de perguntar se quer
 atualizar. Cada versão é uma tag `vX.Y.Z`.
 
+## v1.0.18
+
+- Menos configuração: o zsh carrega na mesma ordem de um setup comum (oh-my-zsh e depois o zinit), com o tema robbyrussell.
+- Os painéis voltam a não ter título; só as bordas do tema.
+
 ## v1.0.17
 
 - A barra volta ao estilo anterior: ❯_ work em bloco e as janelas como 1 painel, com o número em destaque.

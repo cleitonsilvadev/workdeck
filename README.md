@@ -82,8 +82,8 @@ instalação. Para rodar a instalação de novo com outras opções, use
 ### O zsh do workdeck
 
 A instalação já deixa o zsh pronto, com "sim" como resposta padrão: o
-[oh-my-zsh](https://ohmyz.sh) com o tema do workdeck, igual ao do site
-(`~/projetos/web ❯`), e o [zinit](https://github.com/zdharma-continuum/zinit) com três plugins:
+[oh-my-zsh](https://ohmyz.sh) com o tema robbyrussell
+(`➜  projeto git:(main) ✗`), e o [zinit](https://github.com/zdharma-continuum/zinit) com três plugins:
 sugestões enquanto digita (zsh-autosuggestions), cores nos comandos
 (fast-syntax-highlighting) e mais coisa para completar com Tab
 (zsh-completions). Tudo é carregado pelo bloco do workdeck no `.zshrc`; o resto
@@ -93,7 +93,7 @@ do seu arquivo fica como está.
   não mexe.
 - No Linux sem zsh, ele instala o zsh e pergunta antes de trocar o seu shell
   padrão (pede a senha).
-- Prefere outro tema do oh-my-zsh? Ponha `export WORKDECK_ZSH_THEME=robbyrussell`
+- Prefere outro tema do oh-my-zsh? Ponha `export WORKDECK_ZSH_THEME=agnoster`
   (ou qualquer outro) no `~/.zshrc`, antes do bloco do workdeck.
 - Não quer? Responda "n" na instalação. Para tirar depois, `work uninstall`.
 - Quem já tinha o workdeck recebe a pergunta no próximo `work update`.
