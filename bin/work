@@ -192,49 +192,48 @@ revisar() {
   mkdir -p "$(dirname "$pedido")"
   {
     cat <<FIM
-Faça um self code review desta mudança, antes do commit. Revise como a pessoa
-sênior que vai ser chamada se isso quebrar em produção: cética, concreta, sem
-elogio.
+Faça um code review desta mudança antes do commit. Seja direto: aponte o
+problema e a correção, sem elogio e sem explicação longa. Eu peço detalhes
+depois de corrigir, se precisar.
 
-O que revisar: $descricao, na branch $branch. Para ver a mudança, rode: $comandos.
-Leia também o código que a mudança toca (quem chama, quem é chamado, os testes),
-não só as linhas do diff.
+O que revisar: $descricao, na branch $branch. Para ver a mudança: $comandos.
+Leia também o código que a mudança toca (quem chama, quem é chamado, os testes).
 
-Antes de começar, veja se as suas instruções (CLAUDE.md, AGENTS.md, skills ou
-comandos instalados) apontam um agente ou skill de review, ou PRDs e stories
-ligados a esta mudança; o nome da branch costuma ter o número da tarefa. Se
-apontarem, siga esse agente e confira a mudança contra os critérios do PRD ou da
-story. O que vem abaixo vale para o que ele não cobrir. Diga na primeira linha
-qual agente e quais documentos você usou, ou que não achou nenhum.
+Se as suas instruções (CLAUDE.md, AGENTS.md, skills ou comandos instalados)
+apontam um agente ou skill de review, ou PRDs e stories desta mudança (o nome da
+branch costuma ter o número da tarefa), siga-os. O roteiro abaixo cobre o resto.
 
-Procure, nesta ordem:
-1. Bugs: lógica errada, casos de borda, valor vazio ou nulo, erro não tratado.
-2. Segurança: segredos no código ou em arquivo novo (.env, chaves, tokens),
-   entrada sem validação, injeção, permissão demais.
-3. Código arriscado sem teste.
-4. Desempenho com dados reais: consultas repetidas, laço dentro de laço, I/O
-   desnecessário.
-5. O que cortar: código morto ou duplicado, abstração que não se paga, sobras de
-   depuração (console.log, print, debugger, TODO).
-6. Escopo: arquivos que mudaram e não têm a ver com o objetivo da mudança.
+Procure: bugs e casos de borda; segurança (segredos, entrada sem validação,
+injeção); código arriscado sem teste; desempenho com dados reais; código morto,
+duplicado ou de depuração; arquivos fora do escopo da mudança.
 
-Para cada problema, neste formato:
+Responda exatamente neste formato:
 
-**[Corrigir antes do commit | Vale corrigir | Opcional]** arquivo:linha
-- O que o código faz:
-- O que dá errado:
-- Como corrigir:
-- Se não corrigir:
+Usei: <agente ou skill e documentos, ou "roteiro padrão">
 
-Do mais grave para o menos grave. Não invente problema: se estiver tudo certo,
-diga isso numa linha. Termine com um veredito: "pode commitar", "commitar depois
-de corrigir os itens marcados como Corrigir antes do commit" ou "rever a
-abordagem".
+🔴 arquivo:linha — o problema, em uma frase
+   → a correção, em uma frase
+🟠 arquivo:linha — o problema, em uma frase
+   → a correção, em uma frase
+🟢 o que você conferiu e está certo, em uma linha
 
-Se esta conversa já tem uma revisão anterior desta branch, diga também quais
-problemas dela foram corrigidos e quais continuam.
+- 🔴 bug: quebra, perde dado, abre falha de segurança ou não faz o que a
+  mudança promete. Corrigir antes do commit.
+- 🟠 atenção: funciona, mas é arriscado, lento, sem teste ou sobra. Vale
+  corrigir, pode ficar para depois.
+- 🟢 ok: no máximo três linhas, só com o que importa.
 
-Não altere nenhum arquivo e não faça commit: só revise. Responda em português.
+Vermelhos primeiro, depois laranjas. Não invente problema: sem nada a apontar,
+responda só com a linha "Usei" e um 🟢. Termine com uma linha de veredito:
+
+🟢 pode commitar
+🟠 pode commitar; os laranjas ficam para depois
+🔴 corrija os vermelhos antes do commit
+
+Se esta conversa já tem uma revisão anterior desta branch, comece a lista com
+"🟢 corrigido: …" para o que foi resolvido e mantenha o que continua aberto.
+
+Não altere arquivos e não faça commit: só revise. Responda em português.
 FIM
     if [ -n "$extra" ]; then
       printf '\nInstruções de quem pediu a revisão, que valem mais que as de cima:\n%s' "$extra"

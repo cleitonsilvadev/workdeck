@@ -3,6 +3,10 @@
 O `work update` mostra o trecho da versão nova antes de perguntar se quer
 atualizar. Cada versão é uma tag `vX.Y.Z`.
 
+## v1.2.0
+
+- O `work review` responde direto, uma bolinha por achado: 🔴 bug para corrigir antes do commit, 🟠 atenção que pode ficar para depois, 🟢 ok. Cada achado vem com arquivo:linha, o problema e a correção em uma frase cada, e no fim um veredito. Explicação longa só se você pedir.
+
 ## v1.1.2
 
 - A integração do BMAD segue o padrão oficial do BMAD Method: `npx bmad-method install` no projeto, com Node.js 20.12+ e Python 3.10+, e depois `bmad-help` e `bmad-build` na sua IA.

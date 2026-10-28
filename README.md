@@ -154,10 +154,20 @@ funciona. Todos os atalhos, inclusive os de uma tecla com Alt, estão em
 
 ### Self code review
 
-`work review` manda a mudança para a sua IA revisar como a pessoa sênior que vai
-ser chamada se aquilo quebrar: bugs, segurança, segredos, código sem teste,
-lentidão e o que está fora do escopo. Cada achado vem com a gravidade e como
-corrigir, e no fim, um veredito. Ela só revisa, não altera nada.
+`work review` manda a mudança para a sua IA revisar antes do commit, e a
+resposta vem direta, uma bolinha por achado:
+
+```
+🔴 src/api/pedidos.ts:42 — o token vai inteiro para o log
+   → logar só o id do usuário
+🟠 src/lista.tsx:18 — uma consulta por item dentro do map
+   → buscar todos de uma vez antes do map
+
+🔴 corrija os vermelhos antes do commit
+```
+
+🔴 é bug, para corrigir antes do commit; 🟠 é atenção, pode ficar para depois;
+🟢 está ok. A IA só revisa, não altera nada.
 
 O review usa o agente e os padrões que as instruções do projeto apontam
 (`CLAUDE.md`, `AGENTS.md`, skills). Com o Claude Code, cada branch mantém uma
