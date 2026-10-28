@@ -49,6 +49,18 @@ case "${1:-}" in
       echo "$p — defina a sua IA com: work agent <comando>"
       exit 1
     fi
+    if [ -n "${TMUX:-}" ]; then
+      aberto="$(tmux list-panes ${TMUX_PANE:+-t "$TMUX_PANE"} -F '#{pane_id} #{@papel}' |
+        awk -v t="$titulo" '$2 == t {print $1; exit} $2 ~ /^(AGENTE|REVIEW)$/ && !a {a = $1} END {if (a) print a}' | head -1)"
+      if [ -n "$aberto" ]; then
+        tmux load-buffer -b workdeck-pedido "$arquivo"
+        tmux paste-buffer -p -d -b workdeck-pedido -t "$aberto"
+        sleep 0.5
+        tmux send-keys -t "$aberto" Enter
+        tmux select-pane -t "$aberto"
+        exit 0
+      fi
+    fi
     nome="$(basename "${AGENT_CMD%% *}")"
     case "$nome" in
       claude|codex) cmd="$AGENT_CMD \"\$(cat '$arquivo')\"" ;;
