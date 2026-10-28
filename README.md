@@ -319,6 +319,12 @@ um preferido, estes são os mais usados em cada sistema:
 No Linux e no Windows, `Alt` chega ao tmux e os atalhos funcionam sem
 configurar nada. No Mac, veja a seção abaixo.
 
+**O visual nos terminais.** Na instalação, o workdeck pergunta uma vez se deve
+aplicar o tema, a fonte e as cores nos terminais que encontrar: Terminal.app e
+kitty no Mac, GNOME Terminal e kitty no Linux. Assim a borda em volta da tela
+fica da mesma cor do fundo. O `work uninstall` desfaz. Para mudar de ideia
+depois, `work install`.
+
 ### A tecla Option, no macOS
 
 Opcional: só para os atalhos diretos. No Mac, a tecla Option (⌥) escreve

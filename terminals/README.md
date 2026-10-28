@@ -13,17 +13,27 @@ atalhos para o `cmd`:
   vai para a janela, `cmd+d` / `cmd+shift+d` divide ao lado / embaixo,
   `cmd+shift+enter` dá zoom, `cmd+shift+w` fecha o painel.
 
+Nos terminais mais comuns de cada sistema, a instalação aplica o visual
+sozinha, depois de perguntar uma vez:
+
+| Sistema | Terminais | Como |
+|---|---|---|
+| macOS | Terminal.app e kitty | o perfil padrão do Terminal.app recebe a fonte e as cores; o kitty, o bloco abaixo |
+| Linux | GNOME Terminal e kitty | o GNOME Terminal ganha um perfil `workdeck`, marcado como padrão; o kitty, o bloco abaixo sem os atalhos `cmd` |
+
+O `work uninstall` desfaz: o Terminal.app volta à fonte e às cores de antes, e o
+GNOME Terminal volta ao perfil que era o padrão. Para os outros, cole o trecho:
+
 | Terminal | Arquivo | Instalação |
 |---|---|---|
-| kitty | `kitty.conf` | `./install.sh --terminal kitty` |
+| kitty | `kitty.conf` | automático, ou `work install --terminal kitty` |
 | Ghostty | `ghostty.conf` | cole em `~/.config/ghostty/config` |
 | WezTerm | `wezterm.lua` | cole em `~/.wezterm.lua` |
 | Alacritty | `alacritty.toml` | cole em `~/.config/alacritty/alacritty.toml` |
 
 Só o kitty é instalado automaticamente, porque é o único que o instalador sabe
 editar sem risco de quebrar o resto do arquivo. Os outros são trechos para
-colar. O Terminal.app não deixa mapear o `cmd` nem trocar a fonte por arquivo;
-nele, use `Ctrl+b` e o mouse.
+colar. O Terminal.app não deixa mapear o `cmd`; nele, use `Ctrl+b` e o mouse.
 
 ## A fonte
 

@@ -3,6 +3,12 @@
 O `work update` mostra o trecho da versão nova antes de perguntar se quer
 atualizar. Cada versão é uma tag `vX.Y.Z`.
 
+## v1.0.7
+
+- Uma pergunta só aplica o visual nos terminais encontrados: Terminal.app e kitty no Mac, GNOME Terminal e kitty no Linux.
+- As cores aplicadas seguem o tema escolhido (--theme), não só o padrão.
+- No Linux, o kitty recebe o tema sem os atalhos cmd, que lá roubariam a tecla Super.
+
 ## v1.0.6
 
 - No Terminal.app, a instalação oferece aplicar a fonte e as cores do workdeck no perfil; some a borda preta em volta.

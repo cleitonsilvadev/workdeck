@@ -83,7 +83,21 @@ FIM
         then
           say "Terminal.app: perfil $perfil voltou à fonte e às cores de antes"
         fi
-        rm -f "$CONFIG_DIR/terminal-app"
+        rm -f "$CONFIG_DIR/terminal-app" "$CONFIG_DIR/visual"
+        ;;
+      gnome)
+        base="/org/gnome/terminal/legacy/profiles:/"; id="5e1f9a2c-7d3b-4c6a-9b8e-0a1d2c3b4e5f"
+        if [ "$DRY" = 1 ]; then
+          say "[dry-run] tiraria o perfil workdeck do GNOME Terminal"
+        elif command -v dconf >/dev/null; then
+          if [ "$alvo" = vazio ]; then dconf reset "${base}default"; else dconf write "${base}default" "$alvo"; fi
+          lista="$(dconf read "${base}list" 2>/dev/null || true)"
+          lista="$(printf '%s' "$lista" | sed "s/, '$id'//; s/'$id', //; s/'$id'//")"
+          [ -n "$lista" ] && dconf write "${base}list" "$lista"
+          dconf reset -f "${base}:$id/"
+          say "GNOME Terminal: perfil workdeck removido e o padrão de antes de volta"
+        fi
+        rm -f "$CONFIG_DIR/visual"
         ;;
       fonte)
         if [ "$ALL" = 1 ]; then

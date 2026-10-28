@@ -196,34 +196,52 @@ option_ligado_no_terminal_app() {
   [ "$v" = true ]
 }
 
-TERMINAL_APP_ESCOLHA="$CONFIG_DIR/terminal-app"
+VISUAL_ESCOLHA="$CONFIG_DIR/visual"
+GNOME_BASE="/org/gnome/terminal/legacy/profiles:/"
+GNOME_ID="5e1f9a2c-7d3b-4c6a-9b8e-0a1d2c3b4e5f"
 
-visual_no_terminal_app() {
-  local antes r escolha
-  command -v osascript >/dev/null || return 0
-  escolha="$(cat "$TERMINAL_APP_ESCOLHA" 2>/dev/null || true)"
-  [ "$escolha" = nao ] && return 0
-  if [ "$escolha" != sim ]; then
-    if [ "$YES" = 1 ] || [ ! -t 0 ]; then
-      say "Terminal.app: para a fonte e as cores do workdeck, rode work install e responda sim"
-      return 0
-    fi
-    parar
-    printf '  Aplicar a fonte e as cores do workdeck no perfil do Terminal.app? [S/n] '
-    read -r r || r=n
-    girar
-    case "${r:-s}" in s|S|y|Y) escolha=sim ;; *) escolha=nao ;; esac
-    [ "$DRY" = 1 ] || { mkdir -p "$CONFIG_DIR"; echo "$escolha" > "$TERMINAL_APP_ESCOLHA"; }
-    [ "$escolha" = sim ] || { say "Terminal.app: perfil sem mudanças"; return 0; }
+cor() { awk -v k="$1" '$1 == k {print $2}' "$ROOT/themes/$THEME.conf"; }
+cor_16bits() { local h="${1#\#}"; printf '%d, %d, %d' $((16#${h:0:2} * 257)) $((16#${h:2:2} * 257)) $((16#${h:4:2} * 257)); }
+
+kitty_instalado() {
+  [ -d /Applications/kitty.app ] || command -v kitty >/dev/null || [ -x "$HOME/.local/kitty.app/bin/kitty" ]
+}
+
+terminais_com_visual() {
+  if [ "$SO" = macOS ]; then
+    command -v osascript >/dev/null && echo "Terminal.app"
+  elif command -v gnome-terminal >/dev/null && command -v dconf >/dev/null; then
+    echo "GNOME Terminal"
+  fi
+  kitty_instalado && echo "kitty"
+  return 0
+}
+
+aplicar_kitty() {
+  local bloco
+  bloco="$(sed '$d' "$ROOT/terminals/kitty.conf" | sed '/^# O tema entra aqui/d')"
+  [ "$SO" = macOS ] || bloco="$(printf '%s\n' "$bloco" | grep -v '^map cmd\|^macos_')"
+  write_block "$HOME/.config/kitty/kitty.conf" "$(printf '%s\n' "$bloco"; cat "$ROOT/themes/$THEME.conf"; echo '# <<< workdeck <<<')"
+  say "kitty.conf — tema, fonte e atalhos"
+}
+
+aplicar_terminal_app() {
+  local antes
+  if ! pgrep -x Terminal >/dev/null; then
+    say "Terminal.app fechado; abra ele e rode work install para aplicar o visual nele"
+    return 1
   fi
   [ "$DRY" = 1 ] && { say "[dry-run] aplicaria a fonte e as cores no Terminal.app"; return 0; }
-  antes="$(osascript -e 'tell application "Terminal" to get {name, font name, font size, background color, normal text color} of default settings' 2>/dev/null | tr -d ' ')" || return 0
+  antes="$(osascript -e 'tell application "Terminal" to get {name, font name, font size, background color, normal text color} of default settings' 2>/dev/null | tr -d ' ')" || {
+    aviso "não consegui falar com o Terminal.app; escolha a fonte em Settings → Profiles → Text"
+    return 1
+  }
   grep -qF "terminal-app|" "$MANIFESTO" 2>/dev/null || anota terminal-app "$antes"
-  if osascript >> "$LOG" 2>&1 <<'FIM'
+  if osascript >> "$LOG" 2>&1 <<FIM
 tell application "Terminal"
   set s to default settings
-  set background color of s to {7710, 7710, 11822}
-  set normal text color of s to {52685, 54998, 62708}
+  set background color of s to {$(cor_16bits "$(cor background)")}
+  set normal text color of s to {$(cor_16bits "$(cor foreground)")}
   try
     set font name of s to "JetBrainsMono-Regular"
     set font size of s to 12
@@ -231,11 +249,69 @@ tell application "Terminal"
 end tell
 FIM
   then
-    say "Terminal.app: fonte JetBrains Mono e cores do workdeck no perfil ${antes%%,*}"
-    resumo "Ctrl+b, mouse e Alt · Terminal.app com a fonte e as cores do workdeck"
+    say "Terminal.app: fonte e cores do workdeck no perfil ${antes%%,*}"
   else
     aviso "não consegui mudar o perfil do Terminal.app; escolha a fonte em Settings → Profiles → Text"
+    return 1
   fi
+}
+
+aplicar_gnome() {
+  local lista padrao paleta i k
+  [ "$DRY" = 1 ] && { say "[dry-run] criaria o perfil workdeck no GNOME Terminal"; return 0; }
+  lista="$(dconf read "${GNOME_BASE}list" 2>/dev/null || true)"
+  padrao="$(dconf read "${GNOME_BASE}default" 2>/dev/null || true)"
+  grep -qF "gnome|" "$MANIFESTO" 2>/dev/null || anota gnome "${padrao:-vazio}"
+  paleta="["
+  for i in $(seq 0 15); do paleta="$paleta'$(cor "color$i")'"; [ "$i" -lt 15 ] && paleta="$paleta, "; done
+  paleta="$paleta]"
+  k="${GNOME_BASE}:$GNOME_ID/"
+  dconf write "${k}visible-name" "'workdeck'"
+  dconf write "${k}use-theme-colors" "false"
+  dconf write "${k}background-color" "'$(cor background)'"
+  dconf write "${k}foreground-color" "'$(cor foreground)'"
+  dconf write "${k}palette" "$paleta"
+  dconf write "${k}use-system-font" "false"
+  dconf write "${k}font" "'JetBrains Mono 12'"
+  dconf write "${k}cell-height-scale" "1.1"
+  case "$lista" in
+    *"$GNOME_ID"*) ;;
+    ""|"@as []") dconf write "${GNOME_BASE}list" "['b1dcc9dd-5262-4d8d-a863-c897e6d979b9', '$GNOME_ID']" ;;
+    *) dconf write "${GNOME_BASE}list" "${lista%]}, '$GNOME_ID']" ;;
+  esac
+  dconf write "${GNOME_BASE}default" "'$GNOME_ID'"
+  say "GNOME Terminal: perfil workdeck criado e marcado como padrão"
+}
+
+visual_dos_terminais() {
+  local achados escolha r aplicados="" t
+  achados="$(terminais_com_visual)"
+  [ -n "$achados" ] || return 0
+  escolha="$(cat "$VISUAL_ESCOLHA" 2>/dev/null || cat "$CONFIG_DIR/terminal-app" 2>/dev/null || true)"
+  [ "$escolha" = nao ] && return 0
+  if [ "$escolha" != sim ]; then
+    if [ "$YES" = 1 ] || [ ! -t 0 ]; then
+      say "visual do workdeck nos terminais: rode work install e responda sim"
+      return 0
+    fi
+    parar
+    printf '  Aplicar o visual do workdeck (tema, fonte e cores) nos seus terminais?\n'
+    printf '  Achei: %s   [S/n] ' "$(printf '%s\n' "$achados" | paste -sd, - | sed 's/,/, /g')"
+    read -r r || r=n
+    girar
+    case "${r:-s}" in s|S|y|Y) escolha=sim ;; *) escolha=nao ;; esac
+    [ "$DRY" = 1 ] || { mkdir -p "$CONFIG_DIR"; echo "$escolha" > "$VISUAL_ESCOLHA"; rm -f "$CONFIG_DIR/terminal-app"; }
+    [ "$escolha" = sim ] || { say "terminais sem mudanças"; return 0; }
+  fi
+  while IFS= read -r t; do
+    case "$t" in
+      "Terminal.app") aplicar_terminal_app && aplicados="$aplicados, Terminal.app" ;;
+      kitty) aplicar_kitty && aplicados="$aplicados, kitty" ;;
+      "GNOME Terminal") aplicar_gnome && aplicados="$aplicados, GNOME Terminal" ;;
+    esac
+  done <<< "$achados"
+  [ -n "$aplicados" ] && resumo "Ctrl+b, mouse e Alt · visual em ${aplicados#, }"
+  return 0
 }
 
 como_ligar_option() {
@@ -456,9 +532,9 @@ resumo "Ctrl+b, mouse e atalhos em Alt"
 
 case "$TERMINAL" in
   "")
+    visual_dos_terminais
     if [ "$SO" = macOS ]; then
       term="$(terminal_atual)"
-      [ "$term" = Apple_Terminal ] && visual_no_terminal_app
       if [ "$term" = Apple_Terminal ] && option_ligado_no_terminal_app; then
         say "Terminal.app: Option já funciona como Alt"
       else
@@ -472,13 +548,8 @@ case "$TERMINAL" in
     fi
     ;;
   kitty)
-    write_block "$HOME/.config/kitty/kitty.conf" \
-      "$(sed '$d' "$ROOT/terminals/kitty.conf" | sed '/^# O tema entra aqui/d'; cat "$ROOT/themes/$THEME.conf"; echo '# <<< workdeck <<<')"
-    say "kitty.conf — tema, fonte, Option como Alt e atalhos em cmd"
+    aplicar_kitty
     resumo "Ctrl+b, mouse e Alt · kitty com tema e cmd (reabra o kitty)"
-    if [ "$SO" = macOS ] && ! ls ~/Library/Fonts /Library/Fonts 2>/dev/null | grep -qi jetbrains; then
-      aviso "a fonte JetBrains Mono não está instalada; para ela: brew install --cask font-jetbrains-mono"
-    fi
     ;;
   wezterm|alacritty|ghostty)
     say "o adaptador do $TERMINAL é um trecho para colar, não instalo automático:"
@@ -621,11 +692,11 @@ ${passo_shell}       work                ${dim}abre o painel, que mostra como ad
   Ajuda a qualquer hora: work help, ou Ctrl+b e h dentro do work.
 FIM
 
-if [ "$SO" = macOS ] && [ "$(terminal_atual)" = Apple_Terminal ] && [ "$(cat "$TERMINAL_APP_ESCOLHA" 2>/dev/null)" = nao ]; then
+if [ "$SO" = macOS ] && [ "$(terminal_atual)" = Apple_Terminal ] && [ "$(cat "$VISUAL_ESCOLHA" 2>/dev/null)" = nao ]; then
   cat <<FIM
 
-  ${dim}Dica: para o Terminal.app ficar com a fonte e as cores do workdeck, rode
-  work install e responda sim, ou escolha a JetBrains Mono em Settings → Profiles.${reset}
+  ${dim}Dica: para os terminais ficarem com a fonte e as cores do workdeck, rode
+  work install e responda sim.${reset}
 FIM
 fi
 
