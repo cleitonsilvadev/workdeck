@@ -1,4 +1,4 @@
-export const version = "v1.1.2"
+export const version = "v1.0.0"
 
 export const repoUrl = "https://github.com/thiagofeliperibeiro/workdeck"
 
