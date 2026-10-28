@@ -1,4 +1,6 @@
-export const released = false
+export const released = true
+
+export const version = "v1.0.3"
 
 export const comingSoonPhrases = [
   "repositório público, licença mit",
@@ -18,6 +20,7 @@ export const commands = [
   { cmd: "work review", desc: "A IA faz um self code review da mudança num painel embaixo do chat. Com staged ou branch, muda o recorte." },
   { cmd: "work update", desc: "Mostra o que mudou na versão nova e atualiza. O work e o painel avisam quando há uma." },
   { cmd: "work kill", desc: "Fecha a sessão inteira. O próximo work abre com a lista de projetos atual." },
+  { cmd: "work uninstall", desc: "Desinstala tudo o que o workdeck instalou. Mostra o que vai sair e pergunta antes." },
 ]
 
 export const features = [
@@ -34,7 +37,7 @@ export const features = [
   {
     icon: "history",
     title: "A sessão sobrevive",
-    desc: "Fechar o terminal, cair a conexão ou reiniciar a máquina. Você volta com work e tudo está onde estava, agente incluso.",
+    desc: "Fechar o terminal ou cair a conexão. Você volta com work e tudo está onde estava, agente incluso. Depois de reiniciar a máquina, o work abre os projetos de novo.",
   },
   {
     icon: "undo",
@@ -133,10 +136,10 @@ export const install = {
 }
 
 export const uninstall = [
-  { cmd: "uninstall.sh", desc: "Tira os blocos e os scripts. Sua config fica." },
+  { cmd: "work uninstall", desc: "Desinstala tudo: blocos, código, zsh, fonte, kitty e config. O que você já tinha fica." },
+  { cmd: "work uninstall --dry-run", desc: "Mostra o que faria, sem apagar nada." },
+  { cmd: "uninstall.sh", desc: "Tira só os blocos e os scripts. Sua config fica." },
   { cmd: "uninstall.sh --restore", desc: "Devolve os arquivos ao estado de antes da instalação." },
-  { cmd: "uninstall.sh --all", desc: "Remove tudo, inclusive ~/.config/workdeck e a cópia do código." },
-  { cmd: "uninstall.sh --dry-run", desc: "Mostra o que faria, sem escrever nada." },
 ]
 
 export const testimonials = [

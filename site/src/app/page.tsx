@@ -11,7 +11,7 @@ import { ShortcutList } from "@/components/shortcut-list"
 import { TerminalDemo } from "@/components/terminal-demo"
 import { Testimonials } from "@/components/testimonials"
 import { ThemePreview } from "@/components/theme-preview"
-import { commands, features, installCommand, released, repoUrl, uninstall } from "@/lib/site"
+import { commands, features, installCommand, released, repoUrl, uninstall, version } from "@/lib/site"
 import { cn } from "@/lib/utils"
 
 const icons = {
@@ -87,7 +87,7 @@ export default function Home() {
               {released ? (
                 <a href={repoUrl} target="_blank" rel="noreferrer" className="group mb-6 inline-flex items-center rounded-full border border-ctp-surface0 bg-ctp-mantle/80 px-3 py-1 text-xs">
                   <AnimatedShinyText className="mx-0 inline-flex items-center gap-1.5 text-ctp-subtext0 dark:via-ctp-text/90">
-                    open source · MIT · macOS e Linux
+                    {version} · open source · MIT · macOS e Linux
                     <ArrowRight className="size-3 transition-transform group-hover:translate-x-0.5" />
                   </AnimatedShinyText>
                 </a>
@@ -102,7 +102,7 @@ export default function Home() {
                 O terminal onde você e o <span className="text-gradient">agente de IA</span> trabalham lado a lado.
               </h1>
               <p className="mt-6 max-w-xl text-lg text-pretty text-ctp-subtext0">
-                Uma sessão do tmux, uma janela por projeto, o agente num pane ao lado e o que você precisa olhar enquanto ele trabalha: o diff do que ele escreveu e o estado dos seus repositórios.
+                Uma sessão do tmux, uma janela por projeto, o agente num pane ao lado e o que você precisa olhar enquanto ele trabalha: o estado dos seus repositórios e um self code review antes do commit.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
                 <a href="#instalar" className={cn(buttonVariants({ size: "lg" }), "h-11 gap-2 px-5 text-sm")}>
@@ -196,7 +196,7 @@ export default function Home() {
                   <h3 className="font-medium">Desinstalar devolve tudo</h3>
                 </div>
                 <p className="mb-5 text-sm text-ctp-subtext0">
-                  Antes de tocar num arquivo pela primeira vez, o instalador guarda uma cópia e anota o que fez num manifesto. Seu <code className="font-mono text-ctp-subtext1">.tmux.conf</code> e seu <code className="font-mono text-ctp-subtext1">.zshrc</code> voltam byte a byte. O desinstalador fica em <code className="font-mono text-ctp-subtext1">~/.local/share/workdeck</code>; rode com <code className="font-mono text-ctp-subtext1">bash</code>.
+                  Antes de tocar num arquivo pela primeira vez, o instalador guarda uma cópia e anota o que fez num manifesto. Seu <code className="font-mono text-ctp-subtext1">.tmux.conf</code> e seu <code className="font-mono text-ctp-subtext1">.zshrc</code> voltam byte a byte. Para tirar menos, use o <code className="font-mono text-ctp-subtext1">uninstall.sh</code> direto, em <code className="font-mono text-ctp-subtext1">~/.local/share/workdeck</code>, com <code className="font-mono text-ctp-subtext1">bash</code>.
                 </p>
                 <dl className="grid gap-x-6 gap-y-3 font-mono text-sm sm:grid-cols-[auto_1fr]">
                   {uninstall.map((u) => (
