@@ -13,6 +13,7 @@ e um code review antes de cada commit — numa sessão que não se perde.
 [Recursos](#recursos) ·
 [Documentação](#documentação)
 
+[![CI](https://github.com/thiagofeliperibeiro/workdeck/actions/workflows/ci.yml/badge.svg)](https://github.com/thiagofeliperibeiro/workdeck/actions/workflows/ci.yml)
 ![macOS](https://img.shields.io/badge/macOS-suportado-555?logo=apple)
 ![Linux](https://img.shields.io/badge/Linux-suportado-555?logo=linux&logoColor=white)
 ![Licença MIT](https://img.shields.io/badge/licen%C3%A7a-MIT-555)
@@ -221,6 +222,8 @@ exato de antes da instalação. [Detalhes →](docs/instalacao.md#desinstalar)
 | [Temas](docs/temas.md) | Os temas e como criar um |
 | [Agente e integrações](docs/integracoes.md) | O agente de IA, BMAD, Spec Kit e ai-memory |
 | [Customizando](docs/customizando.md) | O que dá para mudar e onde |
+| [Contribuindo](CONTRIBUTING.md) | Estrutura do código, testes e como enviar mudanças |
+| [Segurança](SECURITY.md) | O que o instalador faz e como relatar uma falha |
 
 ## Filosofia
 

@@ -3,6 +3,13 @@
 O `work update` mostra o trecho da versão nova antes de perguntar se quer
 atualizar. Cada versão é uma tag `vX.Y.Z`.
 
+## v1.1.0
+
+- Testes automáticos em `tests/` (instalação, tema, painéis, sessão e desinstalação) e lint com shellcheck, rodando no CI do GitHub no Ubuntu e no macOS.
+- O código foi reorganizado: o `install.sh` tem uma função por etapa, e os caminhos e funções comuns ficam em `lib/comum.sh`.
+- Se o código do workdeck sumir de `~/.local/share/workdeck`, o `work` diz como reinstalar, em vez de abrir uma sessão quebrada.
+- Novos `CONTRIBUTING.md` e `SECURITY.md`.
+
 ## v1.0.6
 
 - O painel mostra onde pôr o seu próprio bloco, até você criar o primeiro.

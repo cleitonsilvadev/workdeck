@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 set -uo pipefail
 
-CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/workdeck"
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/lib/comum.sh"
+CONFIG_DIR="$WORKDECK_CONFIG"
 CONFIG="$CONFIG_DIR/agent.conf"
-CONHECIDOS="claude codex copilot aider gemini opencode cursor-agent crush goose q"
+CONHECIDOS="$AGENTES_CONHECIDOS"
 
 carrega() { AGENT_CMD=""; [ -f "$CONFIG" ] && . "$CONFIG"; }
 
