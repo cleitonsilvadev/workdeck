@@ -33,7 +33,12 @@ if [ -n "${ZSH_VERSION:-}" ] && grep -qx sim "${XDG_CONFIG_HOME:-$HOME/.config}/
   fi
   if [ -f "$HOME/.oh-my-zsh/oh-my-zsh.sh" ]; then
     export ZSH="$HOME/.oh-my-zsh"
-    ZSH_THEME="robbyrussell"
+    ZSH_THEME="${WORKDECK_ZSH_THEME:-workdeck}"
+    if [ "$ZSH_THEME" = workdeck ] && [ -f "${XDG_DATA_HOME:-$HOME/.local/share}/workdeck/config/zsh/themes/workdeck.zsh-theme" ]; then
+      ZSH_CUSTOM="${XDG_DATA_HOME:-$HOME/.local/share}/workdeck/config/zsh"
+    elif [ "$ZSH_THEME" = workdeck ]; then
+      ZSH_THEME="robbyrussell"
+    fi
     plugins=(git)
     . "$ZSH/oh-my-zsh.sh"
   fi

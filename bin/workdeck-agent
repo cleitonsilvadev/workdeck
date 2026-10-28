@@ -42,7 +42,7 @@ case "${1:-}" in
     ;;
   --pedido)
     arquivo="${2:?use: workdeck-agent --pedido <arquivo> [título]}"
-    titulo="${3:-IA}"
+    titulo="${3:-AGENTE}"
     carrega
     p="$(problema "$AGENT_CMD")"
     if [ -n "$p" ]; then
@@ -162,7 +162,7 @@ fi
 
 if [ "${1:-}" = "--here" ] || [ -z "${TMUX:-}" ]; then
   if [ -n "${TMUX:-}" ]; then
-    tmux set -p @papel "IA · ${AGENT_CMD%% *}"
+    tmux set -p @papel "AGENTE · ${AGENT_CMD%% *}"
     tmux set -w @ia 1
   fi
   exec $AGENT_CMD
@@ -170,5 +170,5 @@ fi
 
 flag="-h"; [ "${AGENT_SPLIT:-h}" = "v" ] && flag="-v"
 painel="$(tmux split-window "$flag" -P -F '#{pane_id}' -c "#{pane_current_path}" "$AGENT_CMD")"
-tmux set -p -t "$painel" @papel "IA · ${AGENT_CMD%% *}"
+tmux set -p -t "$painel" @papel "AGENTE · ${AGENT_CMD%% *}"
 tmux set -w -t "$painel" @ia 1
