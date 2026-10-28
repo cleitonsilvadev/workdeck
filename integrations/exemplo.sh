@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Modelo de integração. Copie, renomeie e preencha as três funções.
+# Modelo de integração. Copie, renomeie e preencha as três funções (usar é opcional).
 
 descrever() {
   echo "Exemplo"
@@ -13,4 +13,8 @@ verificar() {
 
 instalar() {
   echo "nada a fazer: isto é só um modelo"
+}
+
+usar() {            # opcional: mostrado depois de instalar e quando já está instalada
+  echo "nada a usar: isto é só um modelo"
 }

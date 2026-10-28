@@ -23,6 +23,21 @@ No Claude Code, por exemplo:
   claude mcp add ai-memory -- <comando do servidor>
 
 Em outros agentes, procure por "MCP" na documentação.
+FIM
+}
+
+usar() {
+  cat <<'FIM'
+O ai-memory guarda o que acontece nas sessões (decisões, convenções, armadilhas)
+e devolve esse contexto quando você abre a IA de novo no mesmo projeto.
+
+  1. Confira se ele aparece no seu agente. No Claude Code: claude mcp list
+  2. Abra a IA num projeto e pergunte o que ela lembra dele.
+
+Memória não substitui o CLAUDE.md. As regras que a IA deve sempre seguir e os
+caminhos do projeto (BMAD, PRDs, padrões) ficam no CLAUDE.md ou no AGENTS.md;
+a memória completa com o histórico. Se a IA lembrar de algo que virou regra,
+peça para ela passar para o CLAUDE.md.
 
 O workdeck não precisa dele para nada: é só uma peça que costuma aparecer em
 fluxo de trabalho com agentes, e deixamos o atalho aqui.

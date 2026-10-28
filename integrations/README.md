@@ -15,6 +15,10 @@ Cada arquivo `<nome>.sh` aqui é um script com três funções: `descrever`,
 `verificar` e `instalar`. O instalador chama as duas primeiras antes de
 perguntar qualquer coisa, e a terceira só depois de você confirmar.
 
+Uma quarta, `usar`, é opcional: explica como deixar a integração funcionando
+com a IA (o que pôr no `CLAUDE.md`, por exemplo). O instalador a mostra depois
+de `instalar` e também quando a integração já estava instalada.
+
 ## Escrevendo uma
 
 Copie `exemplo.sh` e preencha:
@@ -33,6 +37,10 @@ verificar() {           # 0 = já está instalado
 instalar() {            # o que fazer; pode pedir confirmação do usuário
   echo "rodando o instalador oficial…"
   # ...
+}
+
+usar() {                # opcional: como usar depois de instalada
+  echo "aponte para ela no CLAUDE.md do projeto"
 }
 ```
 

@@ -12,16 +12,33 @@ verificar() {
 
 instalar() {
   cat <<'FIM'
-O BMAD é instalado por projeto, não na máquina. Precisa do Node.js.
+O BMAD pode ficar dentro de cada projeto ou numa pasta só, fora deles.
+A instalação precisa do Node.js.
 
-  1. Vá para a pasta do projeto (Shift+→ no work).
-  2. Rode: npx bmad-method install
-  3. Escolha os módulos e a sua IA quando ele perguntar.
+  Dentro do projeto
+    1. Vá para a pasta do projeto (Shift+→ no work).
+    2. Rode: npx bmad-method install
+    3. Escolha os módulos e a sua IA quando ele perguntar.
+    Ele cria a pasta do BMAD no projeto e os comandos dentro do seu agente.
 
-Ele cria a pasta do BMAD no projeto e os comandos dentro do seu agente.
+  Fora do projeto (um repositório do time, uma pasta sua)
+    Instale ou clone o BMAD uma vez, na pasta onde ele vai ficar, e aponte
+    para ela a partir de cada projeto. Todos os projetos usam a mesma cópia,
+    e o repositório do projeto não carrega o BMAD.
+FIM
+}
 
-O work review pede à IA que use o agente de review e os PRDs que as instruções
-dela apontam. Se o seu BMAD fica fora do projeto (um repositório do time, por
-exemplo), diga onde no CLAUDE.md ou no AGENTS.md da sua IA.
+usar() {
+  cat <<'FIM'
+Nos dois casos, a IA só usa o que as instruções dela apontam. Deixe o
+CLAUDE.md (ou o AGENTS.md) do projeto dizendo:
+
+  - onde fica o BMAD, com o caminho completo se ele estiver fora do projeto;
+  - onde ficam os PRDs, as stories e os padrões do time;
+  - qual agente usar para revisar o código (o work review procura por ele).
+
+O que vale para todos os projetos vai no ~/.claude/CLAUDE.md; o que é de um
+projeto só fica no CLAUDE.md dele. Instruções curtas e com caminhos certos
+funcionam melhor que um texto longo.
 FIM
 }

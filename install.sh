@@ -639,6 +639,7 @@ else
       titulo="$(descrever | head -1)"
       if verificar 2>/dev/null; then
         say "$titulo já está instalada"
+        if declare -F usar >/dev/null; then echo; usar | sed 's/^/    /'; fi
         exit 0
       fi
       echo
@@ -651,6 +652,7 @@ else
       fi
       [ "$DRY" = 1 ] && { say "[dry-run] instalaria $titulo"; exit 0; }
       instalar | sed 's/^/    /'
+      if declare -F usar >/dev/null; then echo; usar | sed 's/^/    /'; fi
     )
   done
 fi
