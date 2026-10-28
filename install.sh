@@ -566,7 +566,7 @@ ZSH_PLUGINS="${XDG_DATA_HOME:-$HOME/.local/share}/workdeck-zsh"
 ja_tem_zsh_turbinado() {
   [ -d "$HOME/.oh-my-zsh" ] || [ -d "${XDG_DATA_HOME:-$HOME/.local/share}/zinit" ] || [ -d "$HOME/.zinit" ] && return 0
   [ -f "$HOME/.zshrc" ] && awk '/^# >>> workdeck >>>$/{s=1} !s{print} /^# <<< workdeck <<<$/{s=0}' "$HOME/.zshrc" \
-    | grep -qE 'zsh-autosuggestions|fast-syntax-highlighting|zsh-syntax-highlighting|zinit|oh-my-zsh' && return 0
+    | grep -qE 'zsh-autosuggestions|fast-syntax-highlighting|zsh-syntax-highlighting|zinit|oh-my-zsh|starship|powerlevel10k|p10k|spaceship|pure' && return 0
   return 1
 }
 
@@ -750,7 +750,9 @@ if [ "$RELOAD" = 1 ] && command -v tmux >/dev/null && tmux info >/dev/null 2>&1;
 fi
 
 rm -f "$ZSH_ESCOLHA.anterior"
-if [ "$REINICIAR_SHELL" = 1 ] && [ -z "${WORKDECK_SHELL_NOVO:-}" ]; then
+if [ "$REINICIAR_SHELL" = 1 ] && [ -n "${WORKDECK_ATUALIZANDO:-}" ]; then
+  : > "$CONFIG_DIR/.shell-novo"
+elif [ "$REINICIAR_SHELL" = 1 ] && [ -z "${WORKDECK_SHELL_NOVO:-}" ]; then
   printf '\n  %s●%s O zsh do workdeck só vale num shell novo. Feche e abra o terminal, ou\n' "$amarelo" "$reset"
   printf '    rode %sexec zsh -l%s. Dentro do work, os painéis novos já vêm com ele.\n' "$bold" "$reset"
 fi

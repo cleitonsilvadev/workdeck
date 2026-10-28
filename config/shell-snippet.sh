@@ -30,6 +30,17 @@ if [ -n "${ZSH_VERSION:-}" ] && [ -d "$_wd_zsh" ] && grep -qx sim "${XDG_CONFIG_
   autoload -Uz compinit && compinit -i
   [ -f "$_wd_zsh/zsh-autosuggestions/zsh-autosuggestions.zsh" ] && . "$_wd_zsh/zsh-autosuggestions/zsh-autosuggestions.zsh"
   [ -f "$_wd_zsh/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh" ] && . "$_wd_zsh/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh"
+  setopt prompt_subst
+  _wd_git() {
+    local b
+    b="$(git symbolic-ref --short HEAD 2>/dev/null || git rev-parse --short HEAD 2>/dev/null)" || return 0
+    if [ -n "$(git status --porcelain --ignore-submodules=dirty 2>/dev/null | head -1)" ]; then
+      print -n " %F{blue}git:(%F{red}$b%F{blue}) %F{yellow}✗%f"
+    else
+      print -n " %F{blue}git:(%F{red}$b%F{blue})%f"
+    fi
+  }
+  PROMPT='%(?:%B%F{green}➜ :%B%F{red}➜ )%b %F{cyan}%c%f$(_wd_git) '
 fi
 unset _wd_zsh
 

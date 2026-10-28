@@ -85,10 +85,12 @@ instalação. Para rodar a instalação de novo com outras opções, use
 A instalação pergunta, com "não" como resposta padrão, se você quer o zsh do
 workdeck: sugestões enquanto digita (zsh-autosuggestions), cores nos comandos
 (fast-syntax-highlighting) e mais coisa para completar com Tab
-(zsh-completions). São só esses três plugins, carregados pelo bloco do
-workdeck no `.zshrc`, sem oh-my-zsh nem zinit.
+(zsh-completions), e um prompt no estilo do robbyrussell do oh-my-zsh
+(`➜  projeto git:(main) ✗`). São só esses três plugins e o prompt, carregados
+pelo bloco do workdeck no `.zshrc`, sem oh-my-zsh nem zinit.
 
-- Se você já tem oh-my-zsh, zinit ou esses plugins, ele não pergunta e não mexe.
+- Se você já tem oh-my-zsh, zinit, Starship, Powerlevel10k ou esses plugins, ele
+  não pergunta e não mexe.
 - No Linux sem zsh, ele instala o zsh e pergunta antes de trocar o seu shell
   padrão (pede a senha).
 - Quem já tinha o workdeck recebe a pergunta no próximo `work update`.
