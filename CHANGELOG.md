@@ -3,6 +3,10 @@
 O `work update` mostra o trecho da versão nova antes de perguntar se quer
 atualizar. Cada versão é uma tag `vX.Y.Z`.
 
+## v1.0.11
+
+- Quando o zsh do workdeck é ligado, a instalação e a atualização avisam que ele só vale num shell novo.
+
 ## v1.0.10
 
 - O work update faz as perguntas novas que você ainda não respondeu (zsh, visual dos terminais), sem precisar de work install.

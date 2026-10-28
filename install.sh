@@ -586,6 +586,7 @@ baixar_plugins_zsh() {
 opcao_zsh() {
   local escolha r zsh_bin
   escolha="$(cat "$ZSH_ESCOLHA" 2>/dev/null || true)"
+  printf '%s' "$escolha" > "$ZSH_ESCOLHA.anterior" 2>/dev/null || true
   [ "$escolha" = nao ] && [ "$QUER_ZSH" = 0 ] && return 0
   if [ "$escolha" != sim ]; then
     if ja_tem_zsh_turbinado; then
@@ -628,7 +629,7 @@ opcao_zsh() {
       s|S|y|Y)
         parar
         grep -qx "$zsh_bin" /etc/shells 2>/dev/null || echo "$zsh_bin" | $sudo tee -a /etc/shells >/dev/null
-        if chsh -s "$zsh_bin" </dev/tty; then SHELL="$zsh_bin"; else aviso "não troquei o shell padrão; dá para fazer depois com: chsh -s $zsh_bin"; fi
+        if chsh -s "$zsh_bin" </dev/tty; then SHELL="$zsh_bin"; REINICIAR_SHELL=1; else aviso "não troquei o shell padrão; dá para fazer depois com: chsh -s $zsh_bin"; fi
         girar ;;
     esac
   fi
@@ -636,11 +637,13 @@ opcao_zsh() {
     mkdir -p "$CONFIG_DIR"; echo sim > "$ZSH_ESCOLHA"
     grep -qF "zsh|$ZSH_PLUGINS|" "$MANIFESTO" 2>/dev/null || anota zsh "$ZSH_PLUGINS"
     ZSH_RESUMO="zsh do workdeck: sugestões, cores e Tab"
+    [ "$(cat "$ZSH_ESCOLHA.anterior" 2>/dev/null)" = sim ] || REINICIAR_SHELL=1
   else
     aviso "não consegui baixar os plugins do zsh; rode work install --zsh mais tarde"
   fi
 }
 ZSH_RESUMO=""
+REINICIAR_SHELL=0
 sudo=""; [ "$(id -u)" != 0 ] && sudo="sudo"
 opcao_zsh
 
@@ -746,6 +749,11 @@ if [ "$RELOAD" = 1 ] && command -v tmux >/dev/null && tmux info >/dev/null 2>&1;
   run tmux source-file "$HOME/.tmux.conf" && say "tmux recarregado"
 fi
 
+rm -f "$ZSH_ESCOLHA.anterior"
+if [ "$REINICIAR_SHELL" = 1 ] && [ -z "${WORKDECK_SHELL_NOVO:-}" ]; then
+  printf '\n  %s●%s O zsh do workdeck só vale num shell novo. Feche e abra o terminal, ou\n' "$amarelo" "$reset"
+  printf '    rode %sexec zsh -l%s. Dentro do work, os painéis novos já vêm com ele.\n' "$bold" "$reset"
+fi
 [ -n "${WORKDECK_ATUALIZANDO:-}" ] && exit 0
 
 if [ "$BONITO" = 1 ]; then
