@@ -93,7 +93,7 @@ check_in_background() {
   last="$(cache_get checked)"
   if [ -n "$last" ] && [ $((now - last)) -lt 86400 ]; then return 0; fi
   (
-    quiet_git fetch -q --tags --prune --prune-tags origin || exit 0
+    quiet_git fetch -q --tags --force --prune --prune-tags origin || exit 0
     cache_set latest "$(git -C "$CODE" tag -l 'v*' | latest_version)"
     cache_set checked "$now"
   ) </dev/null >/dev/null 2>&1 &
@@ -107,7 +107,7 @@ update() {
     echo "rode o ./install.sh de um clone do repositório uma vez, e o work update passa a funcionar."
     return 1
   fi
-  if ! quiet_git fetch -q --tags --prune --prune-tags origin 2>/dev/null; then
+  if ! quiet_git fetch -q --tags --force --prune --prune-tags origin 2>/dev/null; then
     echo "não consegui falar com o repositório do workdeck; tente de novo mais tarde."
     return 1
   fi
