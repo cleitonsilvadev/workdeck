@@ -4,8 +4,8 @@ set -g @wd_surface "#434c5e"
 set -g @wd_text "#eceff4"
 set -g @wd_dim "#4c566a"
 set -g @wd_muted "#81a1c1"
-# No Nord a barra é mais CLARA que o fundo: a paleta não tem nada
-# abaixo do nord0, então a hierarquia se faz por elevação.
+# In Nord the status bar is LIGHTER than the background: the palette has
+# nothing below nord0, so hierarchy comes from elevation.
 set -g status-style "bg=#3b4252,fg=#81a1c1"
 setw -g pane-border-style "fg=#3b4252"
 setw -g pane-active-border-style "fg=#81a1c1"

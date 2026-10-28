@@ -13,13 +13,13 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-. "$ROOT/lib/comum.sh"
+. "$ROOT/lib/common.sh"
 CONFIG_DIR="$WORKDECK_CONFIG"
-MANIFESTO="$CONFIG_DIR/.install-manifest"
+MANIFEST="$CONFIG_DIR/.install-manifest"
 RESTORE=0
 ALL=0
 DRY=0
-APAGAR_CODIGO=""
+DELETE_CODE=""
 
 for arg in "$@"; do
   case "$arg" in
@@ -34,13 +34,13 @@ done
 say() { printf '  %s\n' "$*"; }
 run() { [ "$DRY" = 1 ] && { say "[dry-run] $*"; return 0; }; "$@"; }
 
-tirar_bloco() {
+remove_block() {
   local file="$1" tmp
   [ -f "$file" ] || return 0
-  tem_bloco "$file" || return 0
+  has_block "$file" || return 0
   if [ "$DRY" = 1 ]; then say "[dry-run] tiraria o bloco de ${file#"$HOME"/}"; return 0; fi
   tmp="$(mktemp)"
-  sem_bloco "$file" > "$tmp"
+  without_block "$file" > "$tmp"
   mv "$tmp" "$file"
   say "bloco removido de ${file#"$HOME"/}"
 }
@@ -48,88 +48,86 @@ tirar_bloco() {
 echo "workdeck → desinstalando"
 echo
 
-if [ -f "$MANIFESTO" ]; then
-  # ---- caminho preciso: desfaz exatamente o que foi instalado --------------
-  while IFS="|" read -r tipo alvo backup; do
-    [ -z "${tipo:-}" ] && continue
-    case "$tipo" in
-      bloco)
+[ "$DRY" = 1 ] || migrate_legacy_config
+
+if [ -f "$MANIFEST" ]; then
+  while IFS="|" read -r kind target backup; do
+    [ -z "${kind:-}" ] && continue
+    case "$kind" in
+      block)
         if [ "$RESTORE" = 1 ] && [ -n "${backup:-}" ] && [ -f "$backup" ]; then
-          run cp "$backup" "$alvo"
-          say "${alvo#"$HOME"/} restaurado como estava antes"
+          run cp "$backup" "$target"
+          say "${target#"$HOME"/} restaurado como estava antes"
         else
-          tirar_bloco "$alvo"
-          # Criado pelo instalador e sem nada além do bloco: não sobra arquivo vazio.
-          if [ "${backup:-}" = ":criado" ] && [ -f "$alvo" ] && ! grep -q '[^[:space:]]' "$alvo"; then
-            run rm -f "$alvo"
-            say "${alvo#"$HOME"/} apagado: foi criado pela instalação"
+          remove_block "$target"
+          if [ "${backup:-}" = ":created" ] && [ -f "$target" ] && ! grep -q '[^[:space:]]' "$target"; then
+            run rm -f "$target"
+            say "${target#"$HOME"/} apagado: foi criado pela instalação"
           fi
         fi
         ;;
       kitty)
         if [ "$ALL" = 1 ]; then
-          run rm -rf "$alvo"
-          say "removido ${alvo#"$HOME"/}"
+          run rm -rf "$target"
+          say "removido ${target#"$HOME"/}"
         else
-          say "o kitty continua em ${alvo#"$HOME"/}; para remover também: rm -rf $alvo"
+          say "o kitty continua em ${target#"$HOME"/}; para remover também: rm -rf $target"
         fi
         ;;
       zsh)
-        run rm -rf "$alvo"
+        run rm -rf "$target"
         rm -f "$CONFIG_DIR/zsh"
         ;;
       omz|zinit)
-        run rm -rf "$alvo"
+        run rm -rf "$target"
         rm -f "$CONFIG_DIR/zsh"
-        say "removido ${alvo#"$HOME"/}"
+        say "removido ${target#"$HOME"/}"
         ;;
-      fonte)
+      font)
         if [ "$ALL" = 1 ]; then
-          run rm -f "$alvo"/JetBrainsMono*.ttf
-          say "fonte JetBrains Mono removida de ${alvo#"$HOME"/}"
+          run rm -f "$target"/JetBrainsMono*.ttf
+          say "fonte JetBrains Mono removida de ${target#"$HOME"/}"
         fi
         ;;
-      codigo)
-        if [ -d "$alvo" ] && [ "$alvo" != "$ROOT" ]; then
-          run rm -rf "$alvo"
-          say "removido ${alvo#"$HOME"/}"
-        elif [ -d "$alvo" ]; then
-          APAGAR_CODIGO="$alvo"
+      code)
+        if [ -d "$target" ] && [ "$target" != "$ROOT" ]; then
+          run rm -rf "$target"
+          say "removido ${target#"$HOME"/}"
+        elif [ -d "$target" ]; then
+          DELETE_CODE="$target"
         fi
         run rm -rf "$WORKDECK_CACHE"
         ;;
       script)
-        nome="$(basename "$alvo")"
-        origem="$ROOT/bin/$nome"
-        if [ ! -f "$alvo" ]; then
+        name="$(basename "$target")"
+        source_file="$ROOT/bin/$name"
+        if [ ! -f "$target" ]; then
           :
-        elif [ -f "$origem" ] && iguais "$origem" "$alvo"; then
-          run rm -f "$alvo"
-          say "removido ${alvo#"$HOME"/}"
+        elif [ -f "$source_file" ] && same_file "$source_file" "$target"; then
+          run rm -f "$target"
+          say "removido ${target#"$HOME"/}"
         else
-          say "deixei ${alvo#"$HOME"/}: foi alterado depois da instalação"
+          say "deixei ${target#"$HOME"/}: foi alterado depois da instalação"
         fi
         ;;
     esac
-  done < "$MANIFESTO"
+  done < "$MANIFEST"
 else
-  # ---- sem manifesto: tenta o básico --------------------------------------
   say "sem manifesto de instalação; removendo o que der"
   for f in "$HOME/.tmux.conf" "$HOME/.config/kitty/kitty.conf" \
            "$HOME/.zshrc" "$HOME/.bashrc" "$HOME/.bash_profile"; do
-    tirar_bloco "$f"
+    remove_block "$f"
   done
   for script in "$ROOT"/bin/*; do
-    alvo="$WORKDECK_BIN/$(basename "$script")"
-    if [ -f "$alvo" ] && iguais "$script" "$alvo"; then
-      run rm -f "$alvo"; say "removido ${alvo#"$HOME"/}"
-    elif [ -f "$alvo" ]; then
-      say "deixei ${alvo#"$HOME"/}: foi alterado depois da instalação"
+    target="$WORKDECK_BIN/$(basename "$script")"
+    if [ -f "$target" ] && same_file "$script" "$target"; then
+      run rm -f "$target"; say "removido ${target#"$HOME"/}"
+    elif [ -f "$target" ]; then
+      say "deixei ${target#"$HOME"/}: foi alterado depois da instalação"
     fi
   done
-  # Sem manifesto não dá para saber o resto, mas o código instalado é sempre este.
-  if [ "$ALL" = 1 ] && [ "$ROOT" = "$WORKDECK_CODIGO" ]; then
-    APAGAR_CODIGO="$ROOT"
+  if [ "$ALL" = 1 ] && [ "$ROOT" = "$WORKDECK_CODE" ]; then
+    DELETE_CODE="$ROOT"
     run rm -rf "$WORKDECK_CACHE"
   fi
 fi
@@ -147,7 +145,7 @@ fi
 echo
 echo "Reabra o terminal, ou:  tmux source-file ~/.tmux.conf"
 
-if [ -n "$APAGAR_CODIGO" ]; then
-  run rm -rf "$APAGAR_CODIGO"
-  say "removido ${APAGAR_CODIGO#"$HOME"/}"
+if [ -n "$DELETE_CODE" ]; then
+  run rm -rf "$DELETE_CODE"
+  say "removido ${DELETE_CODE#"$HOME"/}"
 fi

@@ -11,7 +11,7 @@
 # começam com 00- aparecem sem título.
 set -uo pipefail
 
-. "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/lib/comum.sh"
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/lib/common.sh"
 PANELS="$WORKDECK_CONFIG/panels"
 INTERVAL=60
 ONCE=0
@@ -27,11 +27,11 @@ done
 
 bold=$'\e[1;38;5;183m'; reset=$'\e[0m'
 
-titulo_de() { # 20-docker → Docker
+panel_title() {
   basename "$1" | sed 's/^[0-9]*-//; s/[-_]/ /g' | awk '{print toupper(substr($0,1,1)) substr($0,2)}'
 }
 
-desenha() {
+draw() {
   if [ ! -d "$PANELS" ]; then
     echo "Nenhum painel ainda."
     echo
@@ -43,36 +43,36 @@ desenha() {
     return
   fi
 
-  local achou=0
-  for painel in "$PANELS"/*; do
-    [ -x "$painel" ] || continue
-    achou=1
-    case "$(basename "$painel")" in
+  local found=0
+  for panel in "$PANELS"/*; do
+    [ -x "$panel" ] || continue
+    found=1
+    case "$(basename "$panel")" in
       00-*) ;;
-      *) printf '%s%s%s\n' "$bold" "$(titulo_de "$painel")" "$reset" ;;
+      *) printf '%s%s%s\n' "$bold" "$(panel_title "$panel")" "$reset" ;;
     esac
-    "$painel" 2>&1 | sed 's/^/  /'
+    "$panel" 2>&1 | sed 's/^/  /'
     echo
   done
 
-  if [ "$achou" = 0 ]; then
+  if [ "$found" = 0 ]; then
     echo "$PANELS existe mas não tem nenhum executável."
     echo "Lembre do chmod +x."
   fi
 }
 
 if [ "$ONCE" = 1 ]; then
-  desenha
+  draw
   exit 0
 fi
 
 trap 'printf "\e[?25h"; exit 0' INT TERM
-printf '\e[?25l'                                  # esconde o cursor
+printf '\e[?25l'
 
 while true; do
-  saida="$(desenha)"
-  printf '\e[H\e[2J%s\n' "$saida"
-  read -r -t "$INTERVAL" -n 1 tecla && [ "$tecla" = "q" ] && break
+  output="$(draw)"
+  printf '\e[H\e[2J%s\n' "$output"
+  read -r -t "$INTERVAL" -n 1 key && [ "$key" = "q" ] && break
 done
 
 printf '\e[?25h'

@@ -1,26 +1,26 @@
-falhar() {
-  echo "FALHOU: $*"
+fail() {
+  echo "FAILED: $*"
   exit 1
 }
 
-afirmar() {
-  local descricao="$1"; shift
-  "$@" || falhar "$descricao"
+assert() {
+  local description="$1"; shift
+  "$@" || fail "$description"
 }
 
-afirmar_igual() {
-  [ "$1" = "$2" ] || falhar "${3:-valores diferentes}: esperado [$2], veio [$1]"
+assert_equal() {
+  [ "$1" = "$2" ] || fail "${3:-values differ}: expected [$2], got [$1]"
 }
 
-afirmar_contem() {
-  case "$1" in *"$2"*) ;; *) falhar "${3:-texto não encontrado}: [$2] não está em [$1]" ;; esac
+assert_contains() {
+  case "$1" in *"$2"*) ;; *) fail "${3:-text not found}: [$2] is not in [$1]" ;; esac
 }
 
-afirmar_nao_contem() {
-  case "$1" in *"$2"*) falhar "${3:-texto inesperado}: [$2] está em [$1]" ;; esac
+assert_not_contains() {
+  case "$1" in *"$2"*) fail "${3:-unexpected text}: [$2] is in [$1]" ;; esac
 }
 
-esperar() {
+wait_for() {
   local n=0
   while [ "$n" -lt 50 ]; do
     "$@" >/dev/null 2>&1 && return 0
@@ -30,69 +30,69 @@ esperar() {
   return 1
 }
 
-contar_blocos() {
+count_blocks() {
   grep -c '^# >>> workdeck >>>$' "$1" 2>/dev/null || true
 }
 
-preparar_repo() {
-  TESTE_TMP="$(mktemp -d "${TMPDIR:-/tmp}/workdeck-testes.XXXXXX")"
-  REPO="$TESTE_TMP/repo"
+setup_repo() {
+  TEST_TMP="$(mktemp -d "${TMPDIR:-/tmp}/workdeck-tests.XXXXXX")"
+  REPO="$TEST_TMP/repo"
   mkdir -p "$REPO"
-  if git -C "$RAIZ" rev-parse >/dev/null 2>&1; then
-    git -C "$RAIZ" ls-files -co --exclude-standard | while IFS= read -r f; do
-      [ -f "$RAIZ/$f" ] || continue
+  if git -C "$ROOT" rev-parse >/dev/null 2>&1; then
+    git -C "$ROOT" ls-files -co --exclude-standard | while IFS= read -r f; do
+      [ -f "$ROOT/$f" ] || continue
       mkdir -p "$REPO/$(dirname "$f")"
-      cp -p "$RAIZ/$f" "$REPO/$f"
+      cp -p "$ROOT/$f" "$REPO/$f"
     done
   else
-    (cd "$RAIZ" && tar cf - --exclude .git .) | (cd "$REPO" && tar xf -)
+    (cd "$ROOT" && tar cf - --exclude .git .) | (cd "$REPO" && tar xf -)
   fi
   git -C "$REPO" init -q
   git -C "$REPO" add -A
-  git -C "$REPO" -c user.name=teste -c user.email=teste@exemplo.com commit -qm teste
+  git -C "$REPO" -c user.name=test -c user.email=test@example.com commit -qm test
   REAL_TMUX="$(command -v tmux)"
-  export TESTE_TMP REPO REAL_TMUX
+  export TEST_TMP REPO REAL_TMUX
 }
 
-preparar_home() {
-  local nome="$1" base="$TESTE_TMP/$1" pasta_git
+setup_home() {
+  local name="$1" base="$TEST_TMP/$1" git_dir
   mkdir -p "$base/home/.config/workdeck" "$base/bin"
-  SOCKET="wdt-$nome-$$"
-  SOCKET_HOST="wdh-$nome-$$"
+  SOCKET="wdt-$name-$$"
+  SOCKET_HOST="wdh-$name-$$"
   cat > "$base/bin/tmux" <<FAKE
 #!/bin/sh
 if [ "\$1" = display-menu ] && [ -n "\${WD_MENU_LOG:-}" ]; then printf '%s\n' "\$@" > "\$WD_MENU_LOG"; exit 0; fi
 exec "$REAL_TMUX" -L "$SOCKET" "\$@"
 FAKE
   chmod +x "$base/bin/tmux"
-  echo nao > "$base/home/.config/workdeck/zsh"
+  echo no > "$base/home/.config/workdeck/zsh"
   unset XDG_CONFIG_HOME XDG_DATA_HOME XDG_CACHE_HOME TMUX KITTY_WINDOW_ID WORKDECK_SESSION
   export HOME="$base/home"
-  pasta_git="$(dirname "$(command -v git)")"
-  export PATH="$base/bin:$HOME/.local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$pasta_git"
+  git_dir="$(dirname "$(command -v git)")"
+  export PATH="$base/bin:$HOME/.local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$git_dir"
   export SHELL=/bin/bash TERM=xterm-256color NO_COLOR=1
   export SOCKET SOCKET_HOST
   export CONFIG="$HOME/.config/workdeck"
-  export CODIGO="$HOME/.local/share/workdeck"
+  export CODE="$HOME/.local/share/workdeck"
   export BASE="$base"
 }
 
-limpar_tmux() {
+cleanup_tmux() {
   "$REAL_TMUX" -L "$SOCKET" kill-server >/dev/null 2>&1 || true
   "$REAL_TMUX" -L "$SOCKET_HOST" kill-server >/dev/null 2>&1 || true
 }
 
-instalar() {
+install_workdeck() {
   bash "$REPO/install.sh" --yes --no-deps --no-reload "$@" </dev/null
 }
 
-arquivo_do_shell() {
+shell_rc_file() {
   if [ "$(uname -s)" = Darwin ]; then echo "$HOME/.bash_profile"; else echo "$HOME/.bashrc"; fi
 }
 
-abrir_work_num_terminal() {
+open_work_in_terminal() {
   "$REAL_TMUX" -L "$SOCKET_HOST" -f /dev/null new-session -d -s host -x 120 -y 40 \
     "env -i HOME='$HOME' PATH='$PATH' SHELL=/bin/bash TERM=xterm-256color bash --norc --noprofile"
-  esperar "$REAL_TMUX" -L "$SOCKET_HOST" has-session -t host || falhar "o terminal de teste não abriu"
+  wait_for "$REAL_TMUX" -L "$SOCKET_HOST" has-session -t host || fail "the test terminal did not open"
   "$REAL_TMUX" -L "$SOCKET_HOST" send-keys -t host "$*" Enter
 }

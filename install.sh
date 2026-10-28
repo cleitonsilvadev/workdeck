@@ -18,21 +18,21 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-. "$ROOT/lib/comum.sh"
+. "$ROOT/lib/common.sh"
 
 CONFIG_DIR="$WORKDECK_CONFIG"
 BIN_DIR="$WORKDECK_BIN"
-CODIGO="$WORKDECK_CODIGO"
+CODE="$WORKDECK_CODE"
 BACKUPS="$CONFIG_DIR/.backups"
-MANIFESTO="$CONFIG_DIR/.install-manifest"
-ZSH_ESCOLHA="$CONFIG_DIR/zsh"
+MANIFEST="$CONFIG_DIR/.install-manifest"
+ZSH_CHOICE="$CONFIG_DIR/zsh"
 ZSH_PLUGINS="${XDG_DATA_HOME:-$HOME/.local/share}/workdeck-zsh"
 ZINIT_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/zinit/zinit.git"
-INTEGRACOES_ESCOLHA="$CONFIG_DIR/integracoes"
+INTEGRATIONS_CHOICE="$CONFIG_DIR/integrations"
 
 THEME=""
-QUER_ZSH=0
-REINICIAR_SHELL=0
+WANT_ZSH=0
+RESTART_SHELL=0
 AGENT=""
 WITH=""
 YES=0
@@ -40,29 +40,30 @@ DEPS=1
 RELOAD=1
 DRY=0
 
-SO=""
-GERENCIADOR=""
+OS_NAME=""
+PKG_MANAGER=""
 SUDO=""
-PASTA_FONTES=""
-FONTE=""
-ZSH_RESUMO=""
-ESCOLHIDAS=0
+FONTS_DIR=""
+FONT=""
+ZSH_SUMMARY=""
+CHOSEN=0
 
-BONITO=0
-verde=""; amarelo=""; vermelho=""; roxo=""; dim=""; bold=""; reset=""
+FANCY=0
+green=""; yellow=""; red=""; purple=""; dim=""; bold=""; reset=""
 LOG=""
-ETAPA=""; RESUMO=""; AVISOS=(); GIRO=""
+UPDATING="${WORKDECK_UPDATING:-${WORKDECK_ATUALIZANDO:-}}"
+STEP=""; SUMMARY=""; WARNINGS=(); SPINNER=""
 
-ler_opcoes() {
+parse_options() {
   while [ $# -gt 0 ]; do
     case "$1" in
       --theme) THEME="${2:?--theme precisa de um nome}"; shift 2 ;;
       --agent) AGENT="${2:?--agent precisa de um comando}"; shift 2 ;;
       --with) WITH="${2:?--with precisa de um nome}"; shift 2 ;;
       --yes|-y) YES=1; shift ;;
-      --list-integrations) listar_integracoes; exit 0 ;;
+      --list-integrations) list_integrations; exit 0 ;;
       --no-deps) DEPS=0; shift ;;
-      --zsh) QUER_ZSH=1; shift ;;
+      --zsh) WANT_ZSH=1; shift ;;
       --no-reload) RELOAD=0; shift ;;
       --dry-run) DRY=1; shift ;;
       -h|--help) sed -n '2,14p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
@@ -71,140 +72,135 @@ ler_opcoes() {
   done
 }
 
-listar_integracoes() {
+list_integrations() {
   local f
   for f in "$ROOT"/integrations/*.sh; do
-    [ "$(basename "$f")" = "exemplo.sh" ] && continue
-    ( . "$f"; printf '  %s\n' "$(descrever | head -1)"
-      descrever | tail -n +2 | sed 's/^/      /' )
+    [ "$(basename "$f")" = "example.sh" ] && continue
+    ( . "$f"; printf '  %s\n' "$(describe | head -1)"
+      describe | tail -n +2 | sed 's/^/      /' )
     echo
   done
 }
 
-anota() { # tipo, caminho, backup
+record() {
   [ "$DRY" = 1 ] && return 0
-  mkdir -p "$(dirname "$MANIFESTO")"
-  grep -qxF "$1|$2|${3:-}" "$MANIFESTO" 2>/dev/null || echo "$1|$2|${3:-}" >> "$MANIFESTO"
+  mkdir -p "$(dirname "$MANIFEST")"
+  grep -qxF "$1|$2|${3:-}" "$MANIFEST" 2>/dev/null || echo "$1|$2|${3:-}" >> "$MANIFEST"
 }
 
-# Guarda uma cópia do arquivo como ele estava antes de o workdeck existir nele.
-# Só na primeira vez: reinstalar não sobrescreve o backup original.
-faz_backup() { # arquivo → imprime o caminho do backup, ou vazio
-  local file="$1" nome destino
+backup_file() {
+  local file="$1" name dest
   [ -f "$file" ] || return 0
-  tem_bloco "$file" && return 0
-  nome="$(echo "${file#"$HOME"/}" | tr '/' '-' | sed 's/^\.//')"
-  destino="$BACKUPS/$nome.$(date +%Y%m%d-%H%M%S)"
+  has_block "$file" && return 0
+  name="$(echo "${file#"$HOME"/}" | tr '/' '-' | sed 's/^\.//')"
+  dest="$BACKUPS/$name.$(date +%Y%m%d-%H%M%S)"
   [ "$DRY" = 1 ] && { echo ""; return 0; }
   mkdir -p "$BACKUPS"
-  cp "$file" "$destino"
-  echo "$destino"
+  cp "$file" "$dest"
+  echo "$dest"
 }
 
-# Troca o bloco entre os marcadores, ou acrescenta se ainda não existir.
-write_block() { # arquivo, conteúdo
+write_block() {
   local file="$1" body="$2" tmp backup
   if [ -e "$file" ] && [ ! -f "$file" ]; then
-    aviso "$(curto "$file") não é um arquivo comum; não mexi nele"
+    warn "$(short_path "$file") não é um arquivo comum; não mexi nele"
     return 0
   fi
-  backup="$(faz_backup "$file")"
+  backup="$(backup_file "$file")"
   [ -n "$backup" ] && say "cópia do original em ${backup#"$HOME"/}"
-  # Arquivo que não existia: o uninstall apaga em vez de deixá-lo vazio.
-  [ -e "$file" ] || backup=":criado"
-  # Só a primeira instalação diz como o arquivo era antes; reinstalar não reescreve isso.
-  grep -qF "bloco|$file|" "$MANIFESTO" 2>/dev/null || anota bloco "$file" "$backup"
+  [ -e "$file" ] || backup=":created"
+  grep -qF "block|$file|" "$MANIFEST" 2>/dev/null || record block "$file" "$backup"
   [ "$DRY" = 1 ] && { say "[dry-run] atualizaria o bloco em $file"; return 0; }
   mkdir -p "$(dirname "$file")"
   touch "$file"
   tmp="$(mktemp)"
-  sem_bloco "$file" > "$tmp"
+  without_block "$file" > "$tmp"
   awk 'BEGIN{n=0} {l[n++]=$0} END{while(n>0 && l[n-1]~/^[[:space:]]*$/) n--; for(i=0;i<n;i++) print l[i]}' "$tmp" > "$tmp.2"
   { cat "$tmp.2"; [ -s "$tmp.2" ] && echo; echo "$body"; } > "$file"
   rm -f "$tmp" "$tmp.2"
 }
 
-pode_perguntar_novidade() {
+can_ask() {
   [ -t 0 ] || return 1
-  [ "$YES" = 0 ] || [ -n "${WORKDECK_ATUALIZANDO:-}" ]
+  [ "$YES" = 0 ] || [ -n "$UPDATING" ]
 }
 
 say() {
-  if [ "$BONITO" = 1 ]; then printf '%s\n' "$*" >> "$LOG"; else printf '  %s\n' "$*"; fi
+  if [ "$FANCY" = 1 ]; then printf '%s\n' "$*" >> "$LOG"; else printf '  %s\n' "$*"; fi
 }
-aviso() {
-  [ "$BONITO" = 1 ] && AVISOS+=("$*")
+warn() {
+  [ "$FANCY" = 1 ] && WARNINGS+=("$*")
   say "$*"
 }
-resumo() { RESUMO="$*"; }
+summary() { SUMMARY="$*"; }
 run() {
   [ "$DRY" = 1 ] && { say "[dry-run] $*"; return 0; }
-  if [ "$BONITO" = 1 ]; then "$@" >> "$LOG" 2>&1; else "$@"; fi
+  if [ "$FANCY" = 1 ]; then "$@" >> "$LOG" 2>&1; else "$@"; fi
 }
 
-girar() {
-  [ "$BONITO" = 1 ] || return 0
+spin() {
+  [ "$FANCY" = 1 ] || return 0
   (
-    quadros=(⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏); i=0
+    frames=(⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏); i=0
     while :; do
-      printf '\r  %s%s%s %s' "$roxo" "${quadros[$((i % 10))]}" "$reset" "$ETAPA"
+      printf '\r  %s%s%s %s' "$purple" "${frames[$((i % 10))]}" "$reset" "$STEP"
       i=$((i + 1)); sleep 0.08
     done
   ) &
-  GIRO=$!
+  SPINNER=$!
 }
-parar() {
-  if [ -n "$GIRO" ]; then
-    kill "$GIRO" 2>/dev/null || true
-    wait "$GIRO" 2>/dev/null || true
-    GIRO=""
+stop_spin() {
+  if [ -n "$SPINNER" ]; then
+    kill "$SPINNER" 2>/dev/null || true
+    wait "$SPINNER" 2>/dev/null || true
+    SPINNER=""
     printf '\r\033[K'
   fi
   return 0
 }
-etapa() {
-  ETAPA="$2"; RESUMO=""; AVISOS=()
-  if [ "$BONITO" = 1 ]; then girar; else echo "[$1/7] $2"; fi
+step() {
+  STEP="$2"; SUMMARY=""; WARNINGS=()
+  if [ "$FANCY" = 1 ]; then spin; else echo "[$1/7] $2"; fi
 }
-concluir() {
-  local a marca largura
-  if [ "$BONITO" = 1 ]; then
-    parar
-    marca="${verde}✓${reset}"
-    [ ${#AVISOS[@]} -gt 0 ] && marca="${amarelo}!${reset}"
-    largura=$(printf '%s' "$ETAPA" | LC_ALL=C tr -d '\200-\277' | wc -c)
-    printf '  %s %s%*s %s%s%s\n' "$marca" "$ETAPA" $((14 - largura)) "" "$dim" "$RESUMO" "$reset"
-    for a in ${AVISOS[@]+"${AVISOS[@]}"}; do printf '      %s%s%s\n' "$amarelo" "$a" "$reset"; done
+finish_step() {
+  local a mark width
+  if [ "$FANCY" = 1 ]; then
+    stop_spin
+    mark="${green}✓${reset}"
+    [ ${#WARNINGS[@]} -gt 0 ] && mark="${yellow}!${reset}"
+    width=$(printf '%s' "$STEP" | LC_ALL=C tr -d '\200-\277' | wc -c)
+    printf '  %s %s%*s %s%s%s\n' "$mark" "$STEP" $((14 - width)) "" "$dim" "$SUMMARY" "$reset"
+    for a in ${WARNINGS[@]+"${WARNINGS[@]}"}; do printf '      %s%s%s\n' "$yellow" "$a" "$reset"; done
   else
     echo
   fi
-  ETAPA=""
+  STEP=""
 }
-ao_sair() {
+on_exit() {
   local status=$?
-  parar
-  if [ "$status" != 0 ] && [ "$BONITO" = 1 ] && [ -n "$ETAPA" ]; then
-    printf '  %s✗%s %s\n' "$vermelho" "$reset" "$ETAPA"
+  stop_spin
+  if [ "$status" != 0 ] && [ "$FANCY" = 1 ] && [ -n "$STEP" ]; then
+    printf '  %s✗%s %s\n' "$red" "$reset" "$STEP"
     tail -n 15 "$LOG" | sed 's/^/      /'
   fi
-  [ "$BONITO" = 1 ] && printf '\033[?25h'
+  [ "$FANCY" = 1 ] && printf '\033[?25h'
   rm -f "$LOG"
 }
 
-preparar_saida() {
-  if [ -t 1 ] && [ -z "${NO_COLOR:-}" ] && [ "${TERM:-dumb}" != dumb ] && [ "$DRY" = 0 ]; then BONITO=1; fi
-  if [ "$BONITO" = 1 ]; then
-    verde=$'\033[32m'; amarelo=$'\033[33m'; vermelho=$'\033[31m'; roxo=$'\033[35m'
+setup_output() {
+  if [ -t 1 ] && [ -z "${NO_COLOR:-}" ] && [ "${TERM:-dumb}" != dumb ] && [ "$DRY" = 0 ]; then FANCY=1; fi
+  if [ "$FANCY" = 1 ]; then
+    green=$'\033[32m'; yellow=$'\033[33m'; red=$'\033[31m'; purple=$'\033[35m'
     dim=$'\033[2m'; bold=$'\033[1m'; reset=$'\033[0m'
   fi
   LOG="$(mktemp)"
-  trap ao_sair EXIT
-  if [ "$BONITO" = 1 ]; then exec 2>>"$LOG"; fi
+  trap on_exit EXIT
+  if [ "$FANCY" = 1 ]; then exec 2>>"$LOG"; fi
 }
 
-escolher_tema() {
+choose_theme() {
   if [ -z "$THEME" ]; then
-    THEME="$(cat "$CONFIG_DIR/tema" 2>/dev/null || true)"
+    THEME="$(cat "$CONFIG_DIR/theme" 2>/dev/null || true)"
     [ -f "$ROOT/themes/${THEME:-_}.conf" ] || THEME="catppuccin-mocha"
   fi
   if [ ! -f "$ROOT/themes/$THEME.conf" ]; then
@@ -213,47 +209,46 @@ escolher_tema() {
     for t in "$ROOT"/themes/*.conf; do t="$(basename "$t")"; echo "  ${t%.conf}"; done
     exit 1
   fi
-  [ "$DRY" = 1 ] || { mkdir -p "$CONFIG_DIR"; echo "$THEME" > "$CONFIG_DIR/tema"; }
+  [ "$DRY" = 1 ] || { mkdir -p "$CONFIG_DIR"; echo "$THEME" > "$CONFIG_DIR/theme"; }
 }
 
-detectar_sistema() {
+detect_system() {
   local g
   case "$(uname -s)" in
-    Darwin) SO="macOS"; GERENCIADOR="brew" ;;
+    Darwin) OS_NAME="macOS"; PKG_MANAGER="brew" ;;
     Linux)
-      SO="Linux"
-      if grep -qi microsoft /proc/version 2>/dev/null; then SO="Linux (WSL)"; fi
+      OS_NAME="Linux"
+      if grep -qi microsoft /proc/version 2>/dev/null; then OS_NAME="Linux (WSL)"; fi
       for g in apt-get dnf pacman zypper apk; do
-        command -v "$g" >/dev/null && { GERENCIADOR="$g"; break; }
+        command -v "$g" >/dev/null && { PKG_MANAGER="$g"; break; }
       done
       ;;
     MINGW*|MSYS*|CYGWIN*)
       echo "O workdeck roda em macOS e Linux."
       exit 1
       ;;
-    *) SO="$(uname -s)" ;;
+    *) OS_NAME="$(uname -s)" ;;
   esac
-  # Como root (num container, por exemplo) não há sudo, nem precisa.
   [ "$(id -u)" != 0 ] && SUDO="sudo"
-  if [ "$SO" = macOS ]; then PASTA_FONTES="$HOME/Library/Fonts"; else PASTA_FONTES="${XDG_DATA_HOME:-$HOME/.local/share}/fonts"; fi
+  if [ "$OS_NAME" = macOS ]; then FONTS_DIR="$HOME/Library/Fonts"; else FONTS_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/fonts"; fi
 }
 
-mostrar_cabecalho() {
-  if [ "$BONITO" = 1 ]; then
-    if [ -n "${WORKDECK_ATUALIZANDO:-}" ]; then
+show_header() {
+  if [ "$FANCY" = 1 ]; then
+    if [ -n "$UPDATING" ]; then
       printf '\033[?25l'
     else
-      printf '\033[?25l\n  %sworkdeck%s %s· %s · %s%s\n\n' "$bold" "$reset" "$dim" "$SO" "$THEME" "$reset"
+      printf '\033[?25l\n  %sworkdeck%s %s· %s · %s%s\n\n' "$bold" "$reset" "$dim" "$OS_NAME" "$THEME" "$reset"
     fi
   else
-    echo "workdeck → $SO, tema $THEME"
+    echo "workdeck → $OS_NAME, tema $THEME"
     echo
   fi
 }
 
-no_kitty() { [ -n "${KITTY_WINDOW_ID:-}" ] || [ "${TERM:-}" = xterm-kitty ]; }
+in_kitty() { [ -n "${KITTY_WINDOW_ID:-}" ] || [ "${TERM:-}" = xterm-kitty ]; }
 
-kitty_de_outra_conta() {
+kitty_from_other_account() {
   case "$1" in
     "$HOME"/*) return 1 ;;
     /Users/*|/home/*) return 0 ;;
@@ -261,508 +256,506 @@ kitty_de_outra_conta() {
   return 1
 }
 
-kitty_instalado() {
+kitty_installed() {
   local k
   [ -d /Applications/kitty.app ] || [ -d "$HOME/Applications/kitty.app" ] \
     || [ -x "$HOME/.local/kitty.app/bin/kitty" ] && return 0
   k="$(command -v kitty 2>/dev/null)" || return 1
-  ! kitty_de_outra_conta "$k"
+  ! kitty_from_other_account "$k"
 }
 
-instalar_kitty() {
-  local app destino
-  if kitty_instalado; then say "kitty já instalado"; return 0; fi
+install_kitty() {
+  local app dest
+  if kitty_installed; then say "kitty já instalado"; return 0; fi
   rm -f "$CONFIG_DIR/kitty"
-  if [ "$DEPS" = 0 ]; then aviso "kitty não instalado (--no-deps): https://sw.kovidgoyal.net/kitty/binary/"; return 1; fi
+  if [ "$DEPS" = 0 ]; then warn "kitty não instalado (--no-deps): https://sw.kovidgoyal.net/kitty/binary/"; return 1; fi
   [ "$DRY" = 1 ] && { say "[dry-run] instalaria o kitty pelo instalador oficial"; return 0; }
-  if ! command -v curl >/dev/null; then aviso "sem curl; instale o kitty: https://sw.kovidgoyal.net/kitty/binary/"; return 1; fi
-  if [ "$SO" = macOS ]; then destino="$HOME/Applications"; else destino="$HOME/.local"; fi
-  mkdir -p "$destino"
-  if ! curl -fsSL https://sw.kovidgoyal.net/kitty/installer.sh | sh /dev/stdin dest="$destino" launch=n >> "$LOG" 2>&1; then
-    aviso "não consegui instalar o kitty; instale por https://sw.kovidgoyal.net/kitty/binary/ e rode a instalação de novo"
+  if ! command -v curl >/dev/null; then warn "sem curl; instale o kitty: https://sw.kovidgoyal.net/kitty/binary/"; return 1; fi
+  if [ "$OS_NAME" = macOS ]; then dest="$HOME/Applications"; else dest="$HOME/.local"; fi
+  mkdir -p "$dest"
+  if ! curl -fsSL https://sw.kovidgoyal.net/kitty/installer.sh | sh /dev/stdin dest="$dest" launch=n >> "$LOG" 2>&1; then
+    warn "não consegui instalar o kitty; instale por https://sw.kovidgoyal.net/kitty/binary/ e rode a instalação de novo"
     return 1
   fi
-  app="$destino/kitty.app"
-  if [ "$SO" != macOS ]; then
+  app="$dest/kitty.app"
+  if [ "$OS_NAME" != macOS ]; then
     mkdir -p "$BIN_DIR" "$HOME/.local/share/applications"
     ln -sf "$app/bin/kitty" "$app/bin/kitten" "$BIN_DIR/"
     cp "$app/share/applications/kitty.desktop" "$app/share/applications/kitty-open.desktop" "$HOME/.local/share/applications/"
     sed -i "s|Icon=kitty|Icon=$app/share/icons/hicolor/256x256/apps/kitty.png|g; s|Exec=kitty|Exec=$app/bin/kitty|g" \
       "$HOME/.local/share/applications"/kitty*.desktop
   fi
-  anota kitty "$app"
-  say "kitty instalado em $(curto "$app")"
+  record kitty "$app"
+  say "kitty instalado em $(short_path "$app")"
 }
 
-aplicar_kitty() {
+apply_kitty() {
   local bloco
-  bloco="$(sed '$d' "$ROOT/terminals/kitty.conf" | sed '/^# O tema entra aqui/d')"
-  [ "$SO" = macOS ] || bloco="$(printf '%s\n' "$bloco" | grep -v '^map cmd\|^macos_')"
+  bloco="$(sed '$d' "$ROOT/terminals/kitty.conf" | sed '/^# The theme is appended here/d')"
+  [ "$OS_NAME" = macOS ] || bloco="$(printf '%s\n' "$bloco" | grep -v '^map cmd\|^macos_')"
   write_block "$HOME/.config/kitty/kitty.conf" "$(printf '%s\n' "$bloco"; cat "$ROOT/themes/$THEME.conf"; echo '# <<< workdeck <<<')"
   say "kitty.conf — tema, fonte e atalhos"
 }
 
-tem_fonte() {
+has_font() {
   local f
-  for f in "$PASTA_FONTES"/*[Jj]et[Bb]rains[Mm]ono* /Library/Fonts/*[Jj]et[Bb]rains[Mm]ono*; do
+  for f in "$FONTS_DIR"/*[Jj]et[Bb]rains[Mm]ono* /Library/Fonts/*[Jj]et[Bb]rains[Mm]ono*; do
     [ -e "$f" ] && return 0
   done
   command -v fc-list >/dev/null && fc-list 2>/dev/null | grep -qi 'JetBrains Mono' && return 0
   return 1
 }
 
-instalar_fonte() {
+install_font() {
   local zip
-  if tem_fonte; then
-    FONTE="JetBrains Mono"
+  if has_font; then
+    FONT="JetBrains Mono"
   elif [ "$DEPS" = 0 ]; then
     say "fonte JetBrains Mono não instalada (--no-deps)"
   elif [ "$DRY" = 1 ]; then
-    say "[dry-run] baixaria a fonte JetBrains Mono para $PASTA_FONTES"
+    say "[dry-run] baixaria a fonte JetBrains Mono para $FONTS_DIR"
   elif ! command -v curl >/dev/null || ! command -v unzip >/dev/null; then
-    aviso "sem curl ou unzip; a fonte JetBrains Mono fica para depois"
+    warn "sem curl ou unzip; a fonte JetBrains Mono fica para depois"
   else
     zip="$(mktemp)"
     if curl -fsSL -o "$zip" https://github.com/JetBrains/JetBrainsMono/releases/download/v2.304/JetBrainsMono-2.304.zip >> "$LOG" 2>&1 \
-       && mkdir -p "$PASTA_FONTES" && unzip -qo -j "$zip" 'fonts/ttf/*.ttf' -d "$PASTA_FONTES" >> "$LOG" 2>&1; then
-      if command -v fc-cache >/dev/null; then fc-cache -f "$PASTA_FONTES" >> "$LOG" 2>&1; fi
-      anota fonte "$PASTA_FONTES"
-      FONTE="JetBrains Mono instalada"
+       && mkdir -p "$FONTS_DIR" && unzip -qo -j "$zip" 'fonts/ttf/*.ttf' -d "$FONTS_DIR" >> "$LOG" 2>&1; then
+      if command -v fc-cache >/dev/null; then fc-cache -f "$FONTS_DIR" >> "$LOG" 2>&1; fi
+      record font "$FONTS_DIR"
+      FONT="JetBrains Mono instalada"
     else
-      aviso "não consegui baixar a fonte JetBrains Mono; o resto segue normal"
+      warn "não consegui baixar a fonte JetBrains Mono; o resto segue normal"
     fi
     rm -f "$zip"
   fi
 }
 
-instalar_dependencias() {
-  local falta=() pacote instalar versoes=""
-  etapa 1 "dependências"
-  command -v tmux >/dev/null || falta+=(tmux)
-  if [ ${#falta[@]} -eq 0 ]; then
+install_dependencies() {
+  local missing=() package setup versions=""
+  step 1 "dependências"
+  command -v tmux >/dev/null || missing+=(tmux)
+  if [ ${#missing[@]} -eq 0 ]; then
     say "tmux já instalado"
   elif [ "$DEPS" = 0 ]; then
-    aviso "faltando: ${falta[*]} — instale por conta (--no-deps)"
+    warn "faltando: ${missing[*]} — instale por conta (--no-deps)"
   else
-    if [ -n "$SUDO" ] && [ "$GERENCIADOR" != brew ] && [ "$BONITO" = 1 ]; then
-      parar; sudo -v; girar
+    if [ -n "$SUDO" ] && [ "$PKG_MANAGER" != brew ] && [ "$FANCY" = 1 ]; then
+      stop_spin; sudo -v; spin
     fi
-    [ "$GERENCIADOR" = apt-get ] && { run ${SUDO:+"$SUDO"} apt-get update -qq || true; }
-    for pacote in "${falta[@]}"; do
-      case "$GERENCIADOR" in
-        brew)    instalar=(brew install "$pacote") ;;
-        apt-get) instalar=(${SUDO:+"$SUDO"} apt-get install -y "$pacote") ;;
-        dnf)     instalar=(${SUDO:+"$SUDO"} dnf install -y "$pacote") ;;
-        pacman)  instalar=(${SUDO:+"$SUDO"} pacman -S --needed --noconfirm "$pacote") ;;
-        zypper)  instalar=(${SUDO:+"$SUDO"} zypper install -y "$pacote") ;;
-        apk)     instalar=(${SUDO:+"$SUDO"} apk add "$pacote") ;;
-        *)       aviso "não reconheci o gerenciador de pacotes; instale: ${falta[*]}"; break ;;
+    [ "$PKG_MANAGER" = apt-get ] && { run ${SUDO:+"$SUDO"} apt-get update -qq || true; }
+    for package in "${missing[@]}"; do
+      case "$PKG_MANAGER" in
+        brew)    setup=(brew install "$package") ;;
+        apt-get) setup=(${SUDO:+"$SUDO"} apt-get install -y "$package") ;;
+        dnf)     setup=(${SUDO:+"$SUDO"} dnf install -y "$package") ;;
+        pacman)  setup=(${SUDO:+"$SUDO"} pacman -S --needed --noconfirm "$package") ;;
+        zypper)  setup=(${SUDO:+"$SUDO"} zypper install -y "$package") ;;
+        apk)     setup=(${SUDO:+"$SUDO"} apk add "$package") ;;
+        *)       warn "não reconheci o gerenciador de pacotes; instale: ${missing[*]}"; break ;;
       esac
-      run "${instalar[@]}" || aviso "não consegui instalar $pacote pelo $GERENCIADOR"
+      run "${setup[@]}" || warn "não consegui instalar $package pelo $PKG_MANAGER"
     done
   fi
-  instalar_fonte
-  if command -v tmux >/dev/null; then versoes="tmux $(tmux -V | awk '{print $2}')"; fi
-  resumo "${versoes}${FONTE:+ · $FONTE}"
-  concluir
+  install_font
+  if command -v tmux >/dev/null; then versions="tmux $(tmux -V | awk '{print $2}')"; fi
+  summary "${versions}${FONT:+ · $FONT}"
+  finish_step
 }
 
-instalar_codigo() {
-  local origem
-  if [ "$ROOT" = "$CODIGO" ]; then
-    anota codigo "$CODIGO"
+install_code() {
+  local origin_url
+  if [ "$ROOT" = "$CODE" ]; then
+    record code "$CODE"
   elif git -C "$ROOT" rev-parse >/dev/null 2>&1; then
-    origem="$(git -C "$ROOT" remote get-url origin 2>/dev/null || true)"
-    run rm -rf "$CODIGO"
-    run mkdir -p "$(dirname "$CODIGO")"
-    run git clone -q "$ROOT" "$CODIGO"
-    [ -n "$origem" ] && run git -C "$CODIGO" remote set-url origin "$origem"
-    run git -C "$CODIGO" checkout -q "$(git -C "$ROOT" rev-parse HEAD)"
-    anota codigo "$CODIGO"
-    say "cópia do código em $(curto "$CODIGO"), para o work update"
+    origin_url="$(git -C "$ROOT" remote get-url origin 2>/dev/null || true)"
+    run rm -rf "$CODE"
+    run mkdir -p "$(dirname "$CODE")"
+    run git clone -q "$ROOT" "$CODE"
+    [ -n "$origin_url" ] && run git -C "$CODE" remote set-url origin "$origin_url"
+    run git -C "$CODE" checkout -q "$(git -C "$ROOT" rev-parse HEAD)"
+    record code "$CODE"
+    say "cópia do código em $(short_path "$CODE"), para o work update"
   else
-    aviso "$ROOT não é um clone do git; o work update não vai funcionar"
+    warn "$ROOT não é um clone do git; o work update não vai funcionar"
   fi
 }
 
-tirar_scripts_antigos() {
-  local tipo alvo
-  [ -f "$MANIFESTO" ] && [ "$DRY" = 0 ] || return 0
-  while IFS='|' read -r tipo alvo _; do
+remove_old_scripts() {
+  local tipo target
+  [ -f "$MANIFEST" ] && [ "$DRY" = 0 ] || return 0
+  while IFS='|' read -r tipo target _; do
     [ "$tipo" = script ] || continue
-    [ "$(basename "$alvo")" = work ] && continue
-    rm -f "$alvo"
-    grep -vxF "script|$alvo|" "$MANIFESTO" > "$MANIFESTO.tmp" && mv "$MANIFESTO.tmp" "$MANIFESTO"
-    say "$(basename "$alvo") saiu de $(curto "$BIN_DIR"): só o work fica no PATH"
-  done < <(grep '^script|' "$MANIFESTO" || true)
+    [ "$(basename "$target")" = work ] && continue
+    rm -f "$target"
+    grep -vxF "script|$target|" "$MANIFEST" > "$MANIFEST.tmp" && mv "$MANIFEST.tmp" "$MANIFEST"
+    say "$(basename "$target") saiu de $(short_path "$BIN_DIR"): só o work fica no PATH"
+  done < <(grep '^script|' "$MANIFEST" || true)
 }
 
-instalar_scripts() {
-  local alvo="$BIN_DIR/work"
-  etapa 2 "scripts"
+install_scripts() {
+  local target="$BIN_DIR/work"
+  step 2 "scripts"
   run mkdir -p "$BIN_DIR"
-  if [ -f "$alvo" ] && ! iguais "$ROOT/bin/work" "$alvo" && ! grep -qxF "script|$alvo|" "$MANIFESTO" 2>/dev/null; then
-    aviso "work — já existe um work que não é do workdeck; não substituí"
+  if [ -f "$target" ] && ! same_file "$ROOT/bin/work" "$target" && ! grep -qxF "script|$target|" "$MANIFEST" 2>/dev/null; then
+    warn "work — já existe um work que não é do workdeck; não substituí"
   else
     say "work"
-    run install -m 755 "$ROOT/bin/work" "$alvo"
-    anota script "$alvo"
+    run install -m 755 "$ROOT/bin/work" "$target"
+    record script "$target"
   fi
   case ":$PATH:" in
     *":$BIN_DIR:"*) ;;
     *) say "atenção: $BIN_DIR não está no PATH — o bloco do shell resolve isso" ;;
   esac
-  instalar_codigo
-  tirar_scripts_antigos
-  resumo "work em $(curto "$BIN_DIR")"
-  concluir
+  install_code
+  remove_old_scripts
+  summary "work em $(short_path "$BIN_DIR")"
+  finish_step
 }
 
-versao_distribuida() {
-  local alvo="$1" caminho="$2" atual c
-  atual="$(cksum < "$alvo")"
+is_shipped_version() {
+  local target="$1" path="$2" current c
+  current="$(cksum < "$target")"
   git -C "$ROOT" rev-parse >/dev/null 2>&1 || return 1
-  for c in $(git -C "$ROOT" log --format=%h -- "$caminho" 2>/dev/null); do
-    [ "$(git -C "$ROOT" show "$c:$caminho" 2>/dev/null | cksum)" = "$atual" ] && return 0
+  for c in $(git -C "$ROOT" log --format=%h -- "$path" 2>/dev/null); do
+    [ "$(git -C "$ROOT" show "$c:$path" 2>/dev/null | cksum)" = "$current" ] && return 0
   done
   return 1
 }
 
-instalar_paineis() {
-  local velho f painel nome alvo
-  for velho in 10-maquina 00-comece-aqui 20-git; do
-    f="$CONFIG_DIR/panels/$velho"
-    if [ -f "$f" ] && versao_distribuida "$f" "config/panels/$velho"; then
+install_panels() {
+  local old f panel name target
+  for old in 10-maquina 00-comece-aqui 20-git; do
+    f="$CONFIG_DIR/panels/$old"
+    if [ -f "$f" ] && is_shipped_version "$f" "config/panels/$old"; then
       run rm -f "$f"
-      say "painel antigo $velho removido"
+      say "painel antigo $old removido"
     fi
   done
-  for painel in "$ROOT"/config/panels/*; do
-    nome="$(basename "$painel")"
-    alvo="$CONFIG_DIR/panels/$nome"
-    if [ ! -f "$alvo" ]; then
-      run install -m 755 "$painel" "$alvo"
-      say "painel $nome"
-    elif [ ! -x "$alvo" ]; then
-      say "painel $nome desligado por você — não toquei nele"
-    elif iguais "$painel" "$alvo"; then
-      say "painel $nome"
-    elif versao_distribuida "$alvo" "config/panels/$nome"; then
-      run install -m 755 "$painel" "$alvo"
-      say "painel $nome atualizado"
+  for panel in "$ROOT"/config/panels/*; do
+    name="$(basename "$panel")"
+    target="$CONFIG_DIR/panels/$name"
+    if [ ! -f "$target" ]; then
+      run install -m 755 "$panel" "$target"
+      say "painel $name"
+    elif [ ! -x "$target" ]; then
+      say "painel $name desligado por você — não toquei nele"
+    elif same_file "$panel" "$target"; then
+      say "painel $name"
+    elif is_shipped_version "$target" "config/panels/$name"; then
+      run install -m 755 "$panel" "$target"
+      say "painel $name atualizado"
     else
-      say "painel $nome foi editado por você — não toquei nele"
+      say "painel $name foi editado por você — não toquei nele"
     fi
   done
 }
 
-instalar_config() {
-  etapa 3 "config"
+install_config() {
+  step 3 "config"
   run mkdir -p "$CONFIG_DIR/panels"
   if [ -f "$CONFIG_DIR/projects.conf" ]; then
     say "projects.conf já existe — não toquei nele"
   else
     say "projetos: adicione com work add <caminho>"
   fi
-  instalar_paineis
+  install_panels
   if [ -d "${XDG_CONFIG_HOME:-$HOME/.config}/git-review" ]; then
     run rm -rf "${XDG_CONFIG_HOME:-$HOME/.config}/git-review"
     say "configuração antiga do git-review removida"
   fi
-  resumo "$(curto "$CONFIG_DIR")"
-  concluir
+  summary "$(short_path "$CONFIG_DIR")"
+  finish_step
 }
 
-configurar_tmux_kitty() {
-  etapa 4 "tmux e kitty"
+configure_tmux_kitty() {
+  step 4 "tmux e kitty"
   write_block "$HOME/.tmux.conf" \
-    "$(sed '$d' "$ROOT/config/tmux.conf" | sed '/^# O tema entra aqui/d'; cat "$ROOT/themes/$THEME.tmux"; echo '# <<< workdeck <<<')"
+    "$(sed '$d' "$ROOT/config/tmux.conf" | sed '/^# The theme is appended here/d'; cat "$ROOT/themes/$THEME.tmux"; echo '# <<< workdeck <<<')"
   say "tmux.conf — Ctrl+b, mouse e atalhos em Alt"
-  resumo "Ctrl+b, mouse e atalhos em Alt"
-  if instalar_kitty; then
-    aplicar_kitty
-    resumo "Ctrl+b, mouse e atalhos em Alt · kitty com tema e fonte"
+  summary "Ctrl+b, mouse e atalhos em Alt"
+  if install_kitty; then
+    apply_kitty
+    summary "Ctrl+b, mouse e atalhos em Alt · kitty com tema e fonte"
   else
-    resumo "Ctrl+b, mouse e atalhos em Alt · sem o kitty"
+    summary "Ctrl+b, mouse e atalhos em Alt · sem o kitty"
   fi
-  concluir
+  finish_step
 }
 
-# Só conta o que o .zshrc carrega fora do bloco do workdeck: uma pasta do
-# oh-my-zsh ou do zinit que nada carrega (sobra de outra instalação) não é
-# configuração do usuário, e o workdeck reaproveita a pasta.
-ja_tem_zsh_turbinado() {
-  [ -f "$HOME/.zshrc" ] && sem_bloco "$HOME/.zshrc" \
+has_custom_zsh() {
+  [ -f "$HOME/.zshrc" ] && without_block "$HOME/.zshrc" \
     | grep -qE 'zsh-autosuggestions|fast-syntax-highlighting|zsh-syntax-highlighting|zinit|oh-my-zsh|starship|powerlevel10k|p10k|spaceship|pure' && return 0
   return 1
 }
 
-instalar_omz_zinit() {
+install_omz_zinit() {
   if [ ! -d "$HOME/.oh-my-zsh" ]; then
     git clone -q --depth 1 https://github.com/ohmyzsh/ohmyzsh.git "$HOME/.oh-my-zsh" >> "$LOG" 2>&1 || return 1
-    anota omz "$HOME/.oh-my-zsh"
+    record omz "$HOME/.oh-my-zsh"
   fi
   if [ ! -f "$ZINIT_DIR/zinit.zsh" ]; then
     mkdir -p "$(dirname "$ZINIT_DIR")"
     git clone -q --depth 1 https://github.com/zdharma-continuum/zinit.git "$ZINIT_DIR" >> "$LOG" 2>&1 || return 1
-    anota zinit "$(dirname "$ZINIT_DIR")"
+    record zinit "$(dirname "$ZINIT_DIR")"
   fi
   [ -d "$ZSH_PLUGINS" ] && rm -rf "$ZSH_PLUGINS"
   return 0
 }
 
-opcao_zsh() {
-  local escolha r zsh_bin
-  escolha="$(cat "$ZSH_ESCOLHA" 2>/dev/null || true)"
-  printf '%s' "$escolha" > "$ZSH_ESCOLHA.anterior" 2>/dev/null || true
-  [ "$escolha" = nao ] && [ "$QUER_ZSH" = 0 ] && return 0
-  if [ "$escolha" != sim ]; then
-    if ja_tem_zsh_turbinado; then
+setup_zsh() {
+  local choice r zsh_bin
+  choice="$(cat "$ZSH_CHOICE" 2>/dev/null || true)"
+  printf '%s' "$choice" > "$ZSH_CHOICE.previous" 2>/dev/null || true
+  [ "$choice" = no ] && [ "$WANT_ZSH" = 0 ] && return 0
+  if [ "$choice" != yes ]; then
+    if has_custom_zsh; then
       say "zsh: você já tem plugins (oh-my-zsh, zinit ou outros); não mexi"
       return 0
     fi
-    if [ "$QUER_ZSH" = 0 ] && pode_perguntar_novidade; then
-      parar
+    if [ "$WANT_ZSH" = 0 ] && can_ask; then
+      stop_spin
       printf '  Quer o zsh do workdeck? Sugestões enquanto digita, cores nos comandos\n'
       printf '  e mais completar com Tab. [S/n] '
       read -r r || r=s
-      girar
-      case "$r" in ""|s|S|y|Y) ;; *) [ "$DRY" = 1 ] || { mkdir -p "$CONFIG_DIR"; echo nao > "$ZSH_ESCOLHA"; }; return 0 ;; esac
+      spin
+      case "$r" in ""|s|S|y|Y) ;; *) [ "$DRY" = 1 ] || { mkdir -p "$CONFIG_DIR"; echo no > "$ZSH_CHOICE"; }; return 0 ;; esac
     fi
   fi
   [ "$DRY" = 1 ] && { say "[dry-run] instalaria o zsh do workdeck"; return 0; }
   if ! command -v zsh >/dev/null; then
-    if [ "$SO" != macOS ] && [ "$DEPS" = 1 ] && [ -n "$GERENCIADOR" ]; then
-      parar
-      case "$GERENCIADOR" in
+    if [ "$OS_NAME" != macOS ] && [ "$DEPS" = 1 ] && [ -n "$PKG_MANAGER" ]; then
+      stop_spin
+      case "$PKG_MANAGER" in
         apt-get) ${SUDO:+"$SUDO"} apt-get install -y zsh ;;
         dnf) ${SUDO:+"$SUDO"} dnf install -y zsh ;;
         pacman) ${SUDO:+"$SUDO"} pacman -S --needed --noconfirm zsh ;;
         zypper) ${SUDO:+"$SUDO"} zypper install -y zsh ;;
         apk) ${SUDO:+"$SUDO"} apk add zsh ;;
       esac >> "$LOG" 2>&1 || true
-      girar
+      spin
     fi
-    command -v zsh >/dev/null || { aviso "não consegui instalar o zsh; instale pelo gerenciador e rode a instalação de novo com --zsh"; return 0; }
+    command -v zsh >/dev/null || { warn "não consegui instalar o zsh; instale pelo gerenciador e rode a instalação de novo com --zsh"; return 0; }
   fi
   zsh_bin="$(command -v zsh)"
   if [ "$(basename "${SHELL:-}")" != zsh ]; then
-    parar
+    stop_spin
     printf '  Usar o zsh como o seu shell padrão? Pede a sua senha. [S/n] '
     read -r r </dev/tty 2>/dev/null || r=n
-    girar
+    spin
     case "${r:-s}" in
       s|S|y|Y)
-        parar
+        stop_spin
         grep -qx "$zsh_bin" /etc/shells 2>/dev/null || echo "$zsh_bin" | ${SUDO:+"$SUDO"} tee -a /etc/shells >/dev/null
-        if chsh -s "$zsh_bin" </dev/tty; then SHELL="$zsh_bin"; REINICIAR_SHELL=1; else aviso "não troquei o shell padrão; dá para fazer depois com: chsh -s $zsh_bin"; fi
-        girar ;;
+        if chsh -s "$zsh_bin" </dev/tty; then SHELL="$zsh_bin"; RESTART_SHELL=1; else warn "não troquei o shell padrão; dá para fazer depois com: chsh -s $zsh_bin"; fi
+        spin ;;
     esac
   fi
-  if instalar_omz_zinit; then
-    mkdir -p "$CONFIG_DIR"; echo sim > "$ZSH_ESCOLHA"
-    ZSH_RESUMO="oh-my-zsh (robbyrussell) e zinit"
-    [ "$(cat "$ZSH_ESCOLHA.anterior" 2>/dev/null)" = sim ] || REINICIAR_SHELL=1
+  if install_omz_zinit; then
+    mkdir -p "$CONFIG_DIR"; echo yes > "$ZSH_CHOICE"
+    ZSH_SUMMARY="oh-my-zsh (robbyrussell) e zinit"
+    [ "$(cat "$ZSH_CHOICE.previous" 2>/dev/null)" = yes ] || RESTART_SHELL=1
   else
-    aviso "não consegui baixar o oh-my-zsh ou o zinit; rode a instalação de novo com --zsh mais tarde"
+    warn "não consegui baixar o oh-my-zsh ou o zinit; rode a instalação de novo com --zsh mais tarde"
   fi
 }
 
-configurar_shell() {
+configure_shell() {
   local rc=""
-  etapa 5 "shell"
-  opcao_zsh
+  step 5 "shell"
+  setup_zsh
   case "$(basename "${SHELL:-/bin/bash}")" in
     zsh)  rc="$HOME/.zshrc" ;;
-    bash) if [ "$SO" = "macOS" ]; then rc="$HOME/.bash_profile"; else rc="$HOME/.bashrc"; fi ;;
+    bash) if [ "$OS_NAME" = "macOS" ]; then rc="$HOME/.bash_profile"; else rc="$HOME/.bashrc"; fi ;;
   esac
   if [ -n "$rc" ]; then
     write_block "$rc" "$(cat "$ROOT/config/shell-snippet.sh")"
-    if [ "$(cat "$ZSH_ESCOLHA" 2>/dev/null)" = sim ] && [ "$DRY" = 0 ] && command -v zsh >/dev/null; then
+    if [ "$(cat "$ZSH_CHOICE" 2>/dev/null)" = yes ] && [ "$DRY" = 0 ] && command -v zsh >/dev/null; then
       zsh -i -c exit </dev/null >> "$LOG" 2>&1 || true
     fi
     say "$(basename "$rc")"
-    resumo "$(curto "$rc")${ZSH_RESUMO:+ · $ZSH_RESUMO}"
+    summary "$(short_path "$rc")${ZSH_SUMMARY:+ · $ZSH_SUMMARY}"
   else
-    aviso "shell '$SHELL' não reconhecido — adicione à mão: source $ROOT/config/shell-snippet.sh"
+    warn "shell '$SHELL' não reconhecido — adicione à mão: source $ROOT/config/shell-snippet.sh"
   fi
-  concluir
+  finish_step
 }
 
-configurar_agente() {
-  local agente_atual="" achados=() c a i escolha
-  etapa 6 "agente de IA"
-  [ -f "$CONFIG_DIR/agent.conf" ] && agente_atual="$(. "$CONFIG_DIR/agent.conf"; echo "${AGENT_CMD:-}")"
+configure_agent() {
+  local current_agent="" found=() c a i choice
+  step 6 "agente de IA"
+  [ -f "$CONFIG_DIR/agent.conf" ] && current_agent="$(. "$CONFIG_DIR/agent.conf"; echo "${AGENT_CMD:-}")"
   if [ -n "$AGENT" ]; then
     run "$ROOT/bin/workdeck-agent" --set "$AGENT" && say "agente: $AGENT"
-    resumo "$AGENT"
-  elif [ -n "$agente_atual" ]; then
-    say "agente já configurado: $agente_atual"
-    resumo "$agente_atual"
+    summary "$AGENT"
+  elif [ -n "$current_agent" ]; then
+    say "agente já configurado: $current_agent"
+    summary "$current_agent"
   else
-    for c in $AGENTES_CONHECIDOS; do
-      command -v "$c" >/dev/null && achados+=("$c")
+    for c in $KNOWN_AGENTS; do
+      command -v "$c" >/dev/null && found+=("$c")
     done
-    if [ ${#achados[@]} -eq 0 ]; then
+    if [ ${#found[@]} -eq 0 ]; then
       say "nenhum agente de IA encontrado no PATH"
       say "o work review usa a IA que estiver aberta na janela"
-      resumo "nenhum no PATH; o review usa a IA aberta na janela"
+      summary "nenhum no PATH; o review usa a IA aberta na janela"
     elif [ "$YES" = 1 ] || [ ! -t 0 ]; then
-      say "achei no PATH: ${achados[*]}"
+      say "achei no PATH: ${found[*]}"
       say "o work review usa a IA que estiver aberta na janela"
-      resumo "achei ${achados[*]}; o review usa a IA aberta na janela"
+      summary "achei ${found[*]}; o review usa a IA aberta na janela"
     else
-      parar
+      stop_spin
       echo
       echo "  Achei estes agentes de IA no seu PATH:"
-      i=1; for a in "${achados[@]}"; do echo "    $i) $a"; i=$((i+1)); done
+      i=1; for a in "${found[@]}"; do echo "    $i) $a"; i=$((i+1)); done
       echo "    0) nenhum por enquanto"
       echo
-      printf '  Qual você usa? [0-%s] ' "${#achados[@]}"
-      read -r escolha || escolha=0
-      if [ "${escolha:-0}" -ge 1 ] 2>/dev/null && [ "$escolha" -le "${#achados[@]}" ]; then
-        run "$ROOT/bin/workdeck-agent" --set "${achados[$((escolha-1))]}" >/dev/null \
-          && say "agente: ${achados[$((escolha-1))]}"
-        resumo "${achados[$((escolha-1))]}"
+      printf '  Qual você usa? [0-%s] ' "${#found[@]}"
+      read -r choice || choice=0
+      if [ "${choice:-0}" -ge 1 ] 2>/dev/null && [ "$choice" -le "${#found[@]}" ]; then
+        run "$ROOT/bin/workdeck-agent" --set "${found[$((choice-1))]}" >/dev/null \
+          && say "agente: ${found[$((choice-1))]}"
+        summary "${found[$((choice-1))]}"
       else
         say "nenhum padrão; o work review usa a IA aberta na janela"
-        resumo "nenhum padrão; o review usa a IA aberta na janela"
+        summary "nenhum padrão; o review usa a IA aberta na janela"
       fi
       echo
     fi
   fi
-  concluir
+  finish_step
 }
 
-perguntar_integracoes() {
-  local disponiveis=() f n i escolha e
+ask_integrations() {
+  local available=() f n i choice e
   for f in "$ROOT"/integrations/*.sh; do
-    [ "$(basename "$f")" = exemplo.sh ] || disponiveis+=("$(basename "$f" .sh)")
+    [ "$(basename "$f")" = example.sh ] || available+=("$(basename "$f" .sh)")
   done
-  [ ${#disponiveis[@]} -gt 0 ] || return 0
-  parar
+  [ ${#available[@]} -gt 0 ] || return 0
+  stop_spin
   echo
   echo "  Você usa algum destes com a IA? O workdeck mostra como ligar cada um."
   i=1
-  for n in "${disponiveis[@]}"; do
-    printf '    %s) %-10s %s%s%s\n' "$i" "$n" "$dim" "$(. "$ROOT/integrations/$n.sh"; descrever | sed -n 2p)" "$reset"
+  for n in "${available[@]}"; do
+    printf '    %s) %-10s %s%s%s\n' "$i" "$n" "$dim" "$(. "$ROOT/integrations/$n.sh"; describe | sed -n 2p)" "$reset"
     i=$((i+1))
   done
   echo
   printf '  Quais? Números separados por espaço, Enter para nenhum: '
-  read -r escolha || escolha=""
-  for e in ${escolha//,/ }; do
-    if [ "$e" -ge 1 ] 2>/dev/null && [ "$e" -le "${#disponiveis[@]}" ]; then
-      case ",$WITH," in *",${disponiveis[$((e-1))]},"*) ;; *) WITH="${WITH:+$WITH,}${disponiveis[$((e-1))]}" ;; esac
+  read -r choice || choice=""
+  for e in ${choice//,/ }; do
+    if [ "$e" -ge 1 ] 2>/dev/null && [ "$e" -le "${#available[@]}" ]; then
+      case ",$WITH," in *",${available[$((e-1))]},"*) ;; *) WITH="${WITH:+$WITH,}${available[$((e-1))]}" ;; esac
     fi
   done
-  [ "$DRY" = 1 ] || { mkdir -p "$CONFIG_DIR"; echo "${WITH:-nenhuma}" > "$INTEGRACOES_ESCOLHA"; }
-  ESCOLHIDAS=1
-  girar
+  [ "$DRY" = 1 ] || { mkdir -p "$CONFIG_DIR"; echo "${WITH:-none}" > "$INTEGRATIONS_CHOICE"; }
+  CHOSEN=1
+  spin
 }
 
-ligar_integracao() {
-  local nome="$1" arquivo="$ROOT/integrations/$1.sh"
-  if [ ! -f "$arquivo" ]; then
-    aviso "não conheço a integração '$nome'"
+enable_integration() {
+  local name="$1" file_path="$ROOT/integrations/$1.sh"
+  if [ ! -f "$file_path" ]; then
+    warn "não conheço a integração '$name'"
     return 0
   fi
   (
-    . "$arquivo"
-    titulo="$(descrever | head -1)"
-    if verificar 2>/dev/null; then
-      say "$titulo já está instalada"
-      if declare -F usar >/dev/null; then echo; usar | sed 's/^/    /'; fi
+    . "$file_path"
+    title="$(describe | head -1)"
+    if is_installed 2>/dev/null; then
+      say "$title já está instalada"
+      if declare -F usage >/dev/null; then echo; usage | sed 's/^/    /'; fi
       exit 0
     fi
     echo
-    descrever | sed 's/^/    /'
+    describe | sed 's/^/    /'
     echo
-    if [ "$YES" = 0 ] && [ "$ESCOLHIDAS" = 0 ] && [ -t 0 ]; then
-      printf '  Instalar %s? [s/N] ' "$titulo"
+    if [ "$YES" = 0 ] && [ "$CHOSEN" = 0 ] && [ -t 0 ]; then
+      printf '  Instalar %s? [s/N] ' "$title"
       read -r r || r=n
       case "$r" in s|S|y|Y) ;; *) say "pulada"; exit 0 ;; esac
     fi
-    [ "$DRY" = 1 ] && { say "[dry-run] instalaria $titulo"; exit 0; }
-    instalar | sed 's/^/    /'
-    if declare -F usar >/dev/null; then echo; usar | sed 's/^/    /'; fi
+    [ "$DRY" = 1 ] && { say "[dry-run] instalaria $title"; exit 0; }
+    setup | sed 's/^/    /'
+    if declare -F usage >/dev/null; then echo; usage | sed 's/^/    /'; fi
   )
 }
 
-configurar_integracoes() {
-  local pedidas=() nome
-  etapa 7 "integrações"
-  if [ -z "$WITH" ] && [ ! -f "$INTEGRACOES_ESCOLHA" ] && pode_perguntar_novidade; then
-    perguntar_integracoes
+configure_integrations() {
+  local requested=() name
+  step 7 "integrações"
+  if [ -z "$WITH" ] && [ ! -f "$INTEGRATIONS_CHOICE" ] && can_ask; then
+    ask_integrations
   fi
   if [ -z "$WITH" ]; then
-    if [ -f "$INTEGRACOES_ESCOLHA" ] && [ "$(cat "$INTEGRACOES_ESCOLHA")" != nenhuma ]; then
-      say "escolhidas antes: $(cat "$INTEGRACOES_ESCOLHA"); para ver de novo: rode a instalação de novo com --with <nome>"
-      resumo "$(cat "$INTEGRACOES_ESCOLHA")"
+    if [ -f "$INTEGRATIONS_CHOICE" ] && [ "$(cat "$INTEGRATIONS_CHOICE")" != none ]; then
+      say "escolhidas antes: $(cat "$INTEGRATIONS_CHOICE"); para ver de novo: rode a instalação de novo com --with <nome>"
+      summary "$(cat "$INTEGRATIONS_CHOICE")"
     else
       say "nenhuma; para ligar depois: rode a instalação de novo com --with <nome>"
-      resumo "nenhuma (--with <nome>)"
+      summary "nenhuma (--with <nome>)"
     fi
   else
-    parar
-    resumo "$WITH"
-    IFS=',' read -r -a pedidas <<< "$WITH"
-    for nome in "${pedidas[@]}"; do ligar_integracao "$nome"; done
+    stop_spin
+    summary "$WITH"
+    IFS=',' read -r -a requested <<< "$WITH"
+    for name in "${requested[@]}"; do enable_integration "$name"; done
   fi
-  concluir
+  finish_step
 }
 
-finalizar() {
-  local abrir
+finish() {
+  local open_hint
   if [ "$RELOAD" = 1 ] && command -v tmux >/dev/null && tmux info >/dev/null 2>&1; then
     run tmux source-file "$HOME/.tmux.conf" && say "tmux recarregado"
   fi
-  rm -f "$ZSH_ESCOLHA.anterior"
-  if [ -n "${WORKDECK_ATUALIZANDO:-}" ]; then
-    if [ "$REINICIAR_SHELL" = 1 ]; then
-      printf '\n  %s●%s Feche e abra o kitty para carregar o zsh e o visual novos.\n' "$amarelo" "$reset"
+  rm -f "$ZSH_CHOICE.previous"
+  if [ -n "$UPDATING" ]; then
+    if [ "$RESTART_SHELL" = 1 ]; then
+      printf '\n  %s●%s Feche e abra o kitty para carregar o zsh e o visual novos.\n' "$yellow" "$reset"
     fi
     exit 0
   fi
-  if [ "$BONITO" = 1 ]; then
-    printf '\n  %s✓ pronto em %ss%s\n' "$verde" "$SECONDS" "$reset"
+  if [ "$FANCY" = 1 ]; then
+    printf '\n  %s✓ pronto em %ss%s\n' "$green" "$SECONDS" "$reset"
   else
     echo "Pronto."
   fi
-  if no_kitty; then
-    abrir="${bold}feche e abra o kitty${reset}     ${dim}carrega o zsh, o visual e os comandos do workdeck${reset}"
-  elif kitty_instalado; then
-    abrir="${bold}abra o kitty${reset}              ${dim}com o tema, a fonte e os atalhos cmd do workdeck${reset}"
+  if in_kitty; then
+    open_hint="${bold}feche e abra o kitty${reset}     ${dim}carrega o zsh, o visual e os comandos do workdeck${reset}"
+  elif kitty_installed; then
+    open_hint="${bold}abra o kitty${reset}              ${dim}com o tema, a fonte e os atalhos cmd do workdeck${reset}"
   else
-    abrir="${bold}feche e abra o terminal${reset}   ${dim}carrega o zsh e os comandos do workdeck${reset}"
+    open_hint="${bold}feche e abra o terminal${reset}   ${dim}carrega o zsh e os comandos do workdeck${reset}"
   fi
-  cat <<FIM
+  cat <<EOF
 
   Agora:
-       $abrir
+       $open_hint
        work                      ${dim}abre o painel, que mostra como adicionar os projetos${reset}
 
   Para navegar: Shift+← / Shift+→ troca de janela, Shift+↑ / Shift+↓ troca de
   painel, e Ctrl+b e depois 1…9 vai direto para uma janela. Clicar na barra
   também funciona.
   Ajuda a qualquer hora: Ctrl+b e h dentro do work.
-FIM
+EOF
 }
 
 main() {
-  ler_opcoes "$@"
-  preparar_saida
-  escolher_tema
-  detectar_sistema
-  mostrar_cabecalho
-  instalar_dependencias
-  instalar_scripts
-  instalar_config
-  configurar_tmux_kitty
-  configurar_shell
-  configurar_agente
-  configurar_integracoes
-  finalizar
+  parse_options "$@"
+  setup_output
+  [ "$DRY" = 1 ] || migrate_legacy_config
+  choose_theme
+  detect_system
+  show_header
+  install_dependencies
+  install_scripts
+  install_config
+  configure_tmux_kitty
+  configure_shell
+  configure_agent
+  configure_integrations
+  finish
 }
 
 if [ "${BASH_SOURCE[0]}" = "$0" ]; then

@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
 
-descrever() {
+describe() {
   echo "Spec Kit"
   echo "Desenvolvimento guiado por especificação: spec, plano e tarefas antes do código."
   echo "Projeto de terceiros: https://github.com/github/spec-kit"
 }
 
-verificar() {
+is_installed() {
   command -v specify >/dev/null
 }
 
-instalar() {
-  cat <<'FIM'
+setup() {
+  cat <<'EOF'
 O Spec Kit usa o comando specify, distribuído pelo uv (Python).
 
   1. Instale o uv: https://docs.astral.sh/uv/
@@ -20,5 +20,5 @@ O Spec Kit usa o comando specify, distribuído pelo uv (Python).
 
 Ele cria os comandos /speckit.* dentro do seu agente. O workdeck não depende
 dele: o work review funciona com ou sem.
-FIM
+EOF
 }

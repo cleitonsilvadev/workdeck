@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
 
-descrever() {
+describe() {
   echo "BMAD Method"
   echo "Framework de agentes (PM, arquiteto, dev, QA) que guia a IA do PRD ao código."
   echo "Projeto de terceiros: https://github.com/bmad-code-org/BMAD-METHOD"
 }
 
-verificar() {
+is_installed() {
   return 1
 }
 
-instalar() {
-  cat <<'FIM'
+setup() {
+  cat <<'EOF'
 Precisa do Node.js 20.12+ e do Python 3.10+.
 
   1. Vá para a pasta do projeto (Shift+→ no work).
@@ -19,11 +19,11 @@ Precisa do Node.js 20.12+ e do Python 3.10+.
   3. Escolha os módulos e a sua IA quando ele perguntar.
 
 O instalador do BMAD deixa os comandos dele prontos dentro da sua IA.
-FIM
+EOF
 }
 
-usar() {
-  cat <<'FIM'
+usage() {
+  cat <<'EOF'
 Abra a sua IA na pasta do projeto e:
 
   - bmad-help   diz o que fazer a seguir, a qualquer momento;
@@ -31,5 +31,5 @@ Abra a sua IA na pasta do projeto e:
 
 Para o work review usar o review do BMAD, diga isso no CLAUDE.md (ou no
 AGENTS.md) do projeto. Documentação: https://github.com/bmad-code-org/BMAD-METHOD
-FIM
+EOF
 }

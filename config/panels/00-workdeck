@@ -1,19 +1,19 @@
 #!/usr/bin/env bash
 CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/workdeck"
 
-projetos=0
+projects=0
 if [ -f "$CONFIG_DIR/projects.conf" ]; then
-  projetos=$(grep -v '^[[:space:]]*#' "$CONFIG_DIR/projects.conf" | awk -F'|' 'NF >= 2 && $3 == ""' | wc -l | tr -d ' ')
+  projects=$(grep -v '^[[:space:]]*#' "$CONFIG_DIR/projects.conf" | awk -F'|' 'NF >= 2 && $3 == ""' | wc -l | tr -d ' ')
 fi
-codigo="${XDG_DATA_HOME:-$HOME/.local/share}/workdeck"
-command -v work >/dev/null && work update --verificar >/dev/null 2>&1
-versao="$(git -C "$codigo" describe --tags --abbrev=0 2>/dev/null || true)"
-nova="$(sed -n 's/^nova=//p' "${XDG_CACHE_HOME:-$HOME/.cache}/workdeck/atualizacao" 2>/dev/null | tail -1)"
+code="${XDG_DATA_HOME:-$HOME/.local/share}/workdeck"
+command -v work >/dev/null && work update --check >/dev/null 2>&1
+version="$(git -C "$code" describe --tags --abbrev=0 2>/dev/null || true)"
+latest="$(sed -n 's/^latest=//p' "${XDG_CACHE_HOME:-$HOME/.cache}/workdeck/update" 2>/dev/null | tail -1)"
 
 m=$'\033[48;5;183m'; e=$'\033[48;5;234m'; x=$'\033[0m'
-roxo=$'\033[1;38;5;183m'; dim=$'\033[2m'; amarelo=$'\033[33m'; verde=$'\033[32m'
+purple=$'\033[1;38;5;183m'; dim=$'\033[2m'; yellow=$'\033[33m'; green=$'\033[32m'
 
-desenho=(
+logo=(
   ".MMMMMMMMM."
   "MMMMMMMMMMM"
   "MMEMMMMMMMM"
@@ -25,69 +25,69 @@ desenho=(
   ".MMMMMMMMM."
 )
 
-if [ "$projetos" -gt 0 ]; then
-  linha_projetos="${verde}✓${x} projetos  $projetos"
+if [ "$projects" -gt 0 ]; then
+  projects_line="${green}✓${x} projetos  $projects"
 else
-  linha_projetos="${amarelo}!${x} projetos  nenhum ainda"
+  projects_line="${yellow}!${x} projetos  nenhum ainda"
 fi
-linha_versao=""
-maior="$(printf '%s\n%s\n' "$nova" "${versao:-v0.0.0}" | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | awk -F'[v.]' '{printf "%09d%09d%09d %s\n", $2, $3, $4, $0}' | sort | tail -1 | cut -d' ' -f2)"
-if [ -n "$nova" ] && [ "$nova" != "$versao" ] && [ "$maior" = "$nova" ]; then
-  linha_versao="${amarelo}●${x} ${versao:-sem versão} → $nova: work update"
-elif [ -n "$versao" ]; then
-  linha_versao="${dim}$versao${x}"
+version_line=""
+highest="$(printf '%s\n%s\n' "$latest" "${version:-v0.0.0}" | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | awk -F'[v.]' '{printf "%09d%09d%09d %s\n", $2, $3, $4, $0}' | sort | tail -1 | cut -d' ' -f2)"
+if [ -n "$latest" ] && [ "$latest" != "$version" ] && [ "$highest" = "$latest" ]; then
+  version_line="${yellow}●${x} ${version:-sem versão} → $latest: work update"
+elif [ -n "$version" ]; then
+  version_line="${dim}$version${x}"
 fi
 
-texto=(
+text=(
   ""
   ""
-  "${roxo}workdeck${x}  $linha_versao"
+  "${purple}workdeck${x}  $version_line"
   "${dim}terminal para agentes de IA${x}"
   ""
-  "$linha_projetos"
+  "$projects_line"
   ""
   ""
   ""
 )
 
-for ((i = 0; i < ${#desenho[@]}; i++)); do
-  linha=""
-  row="${desenho[$i]}"
+for ((i = 0; i < ${#logo[@]}; i++)); do
+  line=""
+  row="${logo[$i]}"
   for ((j = 0; j < ${#row}; j++)); do
     case "${row:$j:1}" in
-      M) linha="$linha$m  " ;;
-      E) linha="$linha$e  " ;;
-      *) linha="$linha$x  " ;;
+      M) line="$line$m  " ;;
+      E) line="$line$e  " ;;
+      *) line="$line$x  " ;;
     esac
   done
-  printf '%s%s   %s\n' "$linha" "$x" "${texto[$i]}"
+  printf '%s%s   %s\n' "$line" "$x" "${text[$i]}"
 done
 echo
 
-passo() {
+step() {
   local n
   n=$(printf '%s' "$1" | LC_ALL=C tr -d '\200-\277' | wc -c)
-  printf '  %s%s%*s%s %s\n' "$roxo" "$1" $((22 - n)) "" "$x" "$2"
+  printf '  %s%s%*s%s %s\n' "$purple" "$1" $((22 - n)) "" "$x" "$2"
 }
 
-if [ "$projetos" = 0 ]; then
-  printf '%sPara começar%s, no terminal aqui embaixo:\n' "$roxo" "$x"
-  passo "work add ~/projeto" "cada projeto vira uma janela; Tab completa o caminho"
+if [ "$projects" = 0 ]; then
+  printf '%sPara começar%s, no terminal aqui embaixo:\n' "$purple" "$x"
+  step "work add ~/projeto" "cada projeto vira uma janela; Tab completa o caminho"
   echo
 fi
 
 if [ -n "${TMUX:-}" ] && [ "$(tmux display -p '#{client_termname}' 2>/dev/null)" != xterm-kitty ]; then
-  printf '%sFora do kitty%s: o work funciona, mas o tema, a fonte e os atalhos cmd só valem lá.\n\n' "$roxo" "$x"
+  printf '%sFora do kitty%s: o work funciona, mas o tema, a fonte e os atalhos cmd só valem lá.\n\n' "$purple" "$x"
 fi
 
 printf '%sCtrl+b h abre o menu: projetos, review, dividir a tela%s\n' "$dim" "$x"
 
-proprios=0
+custom=0
 for f in "$CONFIG_DIR"/panels/*; do
   case "$(basename "$f")" in 00-workdeck|20-projetos) continue ;; esac
-  [ -x "$f" ] && proprios=$((proprios + 1))
+  [ -x "$f" ] && custom=$((custom + 1))
 done
-if [ "$proprios" = 0 ]; then
+if [ "$custom" = 0 ]; then
   printf '%sPara pôr o seu no painel: um executável em ~/.config/workdeck/panels/%s\n' "$dim" "$x"
-  printf '%s  guia: github.com/thiagofeliperibeiro/workdeck/blob/main/docs/paineis.md%s\n' "$dim" "$x"
+  printf '%s  guia: github.com/thiagofeliperibeiro/workdeck/blob/main/docs/panels.pt-BR.md%s\n' "$dim" "$x"
 fi

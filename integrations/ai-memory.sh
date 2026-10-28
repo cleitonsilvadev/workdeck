@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
-# ai-memory — memória de longo prazo para agentes de IA, via MCP.
+# ai-memory: long-term memory for AI agents, via MCP.
 
-descrever() {
+describe() {
   echo "ai-memory"
   echo "Memória entre sessões para o seu agente: decisões, convenções e contexto."
   echo "Projeto de terceiros, instalado pelo gerenciador do seu agente."
 }
 
-verificar() {
+is_installed() {
   command -v ai-memory >/dev/null
 }
 
-instalar() {
-  cat <<'FIM'
+setup() {
+  cat <<'EOF'
 O ai-memory não é distribuído pelo workdeck, e a instalação depende de qual
 agente você usa — cada um registra servidores MCP de um jeito.
 
@@ -23,11 +23,11 @@ No Claude Code, por exemplo:
   claude mcp add ai-memory -- <comando do servidor>
 
 Em outros agentes, procure por "MCP" na documentação.
-FIM
+EOF
 }
 
-usar() {
-  cat <<'FIM'
+usage() {
+  cat <<'EOF'
 O ai-memory guarda o que acontece nas sessões (decisões, convenções, armadilhas)
 e devolve esse contexto quando você abre a IA de novo no mesmo projeto.
 
@@ -41,5 +41,5 @@ peça para ela passar para o CLAUDE.md.
 
 O workdeck não precisa dele para nada: é só uma peça que costuma aparecer em
 fluxo de trabalho com agentes, e deixamos o atalho aqui.
-FIM
+EOF
 }

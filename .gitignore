@@ -1,6 +1,5 @@
-# A config local do usuário nunca entra no repositório.
-# Ela mora em ~/.config/workdeck/, não aqui — estas linhas são só
-# uma rede de segurança para quem copiar os arquivos para dentro do projeto.
+# User config lives in ~/.config/workdeck/ and never belongs in the repository.
+# These entries are a safety net for anyone who copies those files into the project.
 projects.conf
 *.conf.local
 *.local
