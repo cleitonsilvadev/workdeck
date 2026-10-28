@@ -1,9 +1,8 @@
 # kitty
 
-O workdeck funciona em qualquer terminal, mas fica completo no
-[kitty](https://sw.kovidgoyal.net/kitty/), que roda no macOS e no Linux. A
-instalação pergunta se você quer o kitty; se sim, baixa pelo instalador oficial,
-sem sudo, e acrescenta o bloco de `kitty.conf` ao seu `~/.config/kitty/kitty.conf`:
+O workdeck requer o [kitty](https://sw.kovidgoyal.net/kitty/), que roda no macOS e
+no Linux. A instalação baixa o kitty pelo instalador oficial, sem sudo, e
+acrescenta o bloco de `kitty.conf` ao seu `~/.config/kitty/kitty.conf`:
 
 - **Tema** do workdeck (`--theme`), o mesmo da barra do tmux.
 - **Fonte** JetBrains Mono, com espaçamento de linha um pouco maior.
@@ -21,6 +20,6 @@ Se você já tem o kitty, a instalação usa o seu e só acrescenta o bloco. O q
 você escreveu fora dos marcadores `# >>> workdeck >>>` não muda, e o
 desinstalador tira só o bloco. O kitty continua instalado.
 
-**Outro terminal** também abre o `work`: os atalhos são do tmux (`Ctrl+b`,
-`Shift`+setas, mouse). O que muda é o visual e os atalhos `cmd`; o painel lembra disso quando
-você está fora do kitty.
+**Outro terminal** (por SSH, no terminal do editor) também abre o `work`, porque
+os atalhos são do tmux, e o painel avisa que você está fora do kitty. O visual e
+os atalhos `cmd` só são garantidos no kitty.

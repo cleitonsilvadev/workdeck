@@ -3,6 +3,10 @@
 O `work update` mostra o trecho da versão nova antes de perguntar se quer
 atualizar. Cada versão é uma tag `vX.Y.Z`.
 
+## v1.0.8
+
+- O kitty é pré-requisito oficial: a instalação sempre instala o kitty, sem perguntar. Em outro terminal o `work` abre, mas o visual e os atalhos `cmd` ficam fora do suporte.
+
 ## v1.0.7
 
 - O menu (Ctrl+b h) lista os seus projetos, cada um com o número da janela como tecla, e ganha "Atualizar o workdeck". Sai o "Ir para um projeto".
