@@ -81,3 +81,13 @@ if [ -n "${TMUX:-}" ] && [ "$(tmux display -p '#{client_termname}' 2>/dev/null)"
 fi
 
 printf '%sCtrl+b h abre o menu: projetos, review, dividir a tela%s\n' "$dim" "$x"
+
+proprios=0
+for f in "$CONFIG_DIR"/panels/*; do
+  case "$(basename "$f")" in 00-workdeck|20-projetos) continue ;; esac
+  [ -x "$f" ] && proprios=$((proprios + 1))
+done
+if [ "$proprios" = 0 ]; then
+  printf '%sPara pôr o seu no painel: um executável em ~/.config/workdeck/panels/%s\n' "$dim" "$x"
+  printf '%s  guia: github.com/thiagofeliperibeiro/workdeck/blob/main/docs/paineis.md%s\n' "$dim" "$x"
+fi

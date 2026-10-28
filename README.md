@@ -163,11 +163,15 @@ O review usa o agente e os padrões que as instruções do projeto apontam
 única conversa de review, que lembra o que já foi apontado.
 [Como funciona e como personalizar →](docs/review.md)
 
-### Painel
+### Painel personalizável
 
 A janela 1 é o painel: a visão geral do seu work em cima e um terminal embaixo.
-Ele se atualiza sozinho, e cada bloco é um executável qualquer em
-`~/.config/workdeck/panels/`:
+Ele vem com o estado dos projetos, e você põe ali o que quiser acompanhar:
+containers, PRs abertos, o build do CI, as tarefas do dia.
+
+Cada bloco do painel é um programa em `~/.config/workdeck/panels/`. O painel
+roda todos em ordem alfabética, mostra o que cada um imprime e repete a cada
+60 segundos. Para acrescentar um:
 
 ```bash
 cat > ~/.config/workdeck/panels/30-docker <<'EOF'
@@ -177,8 +181,10 @@ EOF
 chmod +x ~/.config/workdeck/panels/30-docker
 ```
 
-Pronto: o próximo ciclo já mostra os seus containers.
-[Mais sobre painéis →](docs/paineis.md)
+No próximo ciclo, os seus containers aparecem com o título "Docker". Qualquer
+linguagem serve, desde que imprima texto; `chmod -x` desliga um painel,
+inclusive os que vêm prontos.
+[Passo a passo, regras e ideias →](docs/paineis.md)
 
 ### Temas
 

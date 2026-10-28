@@ -3,6 +3,12 @@
 O `work update` mostra o trecho da versão nova antes de perguntar se quer
 atualizar. Cada versão é uma tag `vX.Y.Z`.
 
+## v1.0.6
+
+- O painel mostra onde pôr o seu próprio bloco, até você criar o primeiro.
+- `chmod -x` desliga um painel, inclusive os que vêm prontos, e o `work update` não liga de novo.
+- Guia de painéis refeito: passo a passo, regras, ideias e como mudar os que vêm prontos.
+
 ## v1.0.5
 
 - README ganha "Como funciona": um desenho da tela (agente, shell, review e a barra de projetos) e o ciclo de trabalho, de `work add` ao commit.

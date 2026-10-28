@@ -407,6 +407,8 @@ for painel in "$ROOT"/config/panels/*; do
   if [ ! -f "$alvo" ]; then
     run install -m 755 "$painel" "$alvo"
     say "painel $nome"
+  elif [ ! -x "$alvo" ]; then
+    say "painel $nome desligado por você — não toquei nele"
   elif iguais "$painel" "$alvo"; then
     say "painel $nome"
   elif versao_distribuida "$alvo" "config/panels/$nome"; then
