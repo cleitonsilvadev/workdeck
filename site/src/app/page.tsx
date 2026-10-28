@@ -1,4 +1,4 @@
-import { ArrowRight, Bot, History, LayoutPanelLeft, Palette, Terminal, Undo2 } from "lucide-react"
+import { ArrowRight, Bot, History, KeyRound, LayoutPanelLeft, Palette, Terminal, Undo2 } from "lucide-react"
 import { AnimatedGridPattern } from "@/components/ui/animated-grid-pattern"
 import { AnimatedShinyText } from "@/components/ui/animated-shiny-text"
 import { buttonVariants } from "@/components/ui/button"
@@ -6,12 +6,12 @@ import { ComingSoon } from "@/components/coming-soon"
 import { CommandLine } from "@/components/copy-button"
 import { GlowCard } from "@/components/glow-card"
 import { InstallTabs } from "@/components/install-tabs"
+import { PanelDemo } from "@/components/panel-demo"
 import { Reveal, Stagger, StaggerItem } from "@/components/reveal"
 import { ShortcutList } from "@/components/shortcut-list"
 import { TerminalDemo } from "@/components/terminal-demo"
-import { Testimonials } from "@/components/testimonials"
 import { ThemePreview } from "@/components/theme-preview"
-import { commands, features, installCommand, released, repoUrl, uninstall, version } from "@/lib/site"
+import { commands, features, installCommand, panelRules, panelsUrl, released, repoUrl, uninstall, version } from "@/lib/site"
 import { cn } from "@/lib/utils"
 
 const icons = {
@@ -60,6 +60,7 @@ export default function Home() {
           <nav className="hidden items-center gap-6 text-sm text-ctp-subtext0 md:flex">
             <a href="#recursos" className="transition-colors hover:text-ctp-text">Recursos</a>
             <a href="#atalhos" className="transition-colors hover:text-ctp-text">Atalhos</a>
+            <a href="#painel" className="transition-colors hover:text-ctp-text">Painel</a>
             <a href="#temas" className="transition-colors hover:text-ctp-text">Temas</a>
             <a href="#instalar" className="transition-colors hover:text-ctp-text">Instalar</a>
           </nav>
@@ -169,6 +170,39 @@ export default function Home() {
           </Reveal>
         </Section>
 
+        <Section id="painel" eyebrow="painel" title="O que você quer ver enquanto o agente trabalha" desc="A janela 1 é o painel: a branch e as mudanças de cada projeto, e o que mais você quiser. Cada bloco é um executável em ~/.config/workdeck/panels/, e o que ele imprimir aparece ali.">
+          <div className="grid items-center gap-10 lg:grid-cols-[1.15fr_1fr]">
+            <Reveal className="min-w-0">
+              <PanelDemo />
+            </Reveal>
+            <Reveal delay={0.1} className="min-w-0 space-y-4">
+              <p className="text-sm text-ctp-subtext0">
+                Containers rodando, build quebrado, fila de deploy, tarefas do dia. Qualquer coisa que imprima texto serve, e não precisa reinstalar nem reiniciar: o painel relê a pasta a cada ciclo, de 60 em 60 segundos.
+              </p>
+              <dl className="grid gap-x-5 gap-y-3 rounded-2xl border border-border bg-ctp-mantle/70 p-5 text-sm sm:grid-cols-[auto_1fr]">
+                {panelRules.map((r) => (
+                  <div key={r.code} className="contents">
+                    <dt className="font-mono text-ctp-mauve">{r.code}</dt>
+                    <dd className="text-ctp-subtext0">{r.desc}</dd>
+                  </div>
+                ))}
+              </dl>
+              <div className="flex items-start gap-3 rounded-2xl border border-dashed border-ctp-surface1 p-5 text-sm text-ctp-subtext0">
+                <KeyRound className="mt-0.5 size-4 shrink-0 text-ctp-yellow" />
+                <p>
+                  Painel que fala com uma API? Deixe o token fora do script, num arquivo em <code className="font-mono text-ctp-text">~/.config/workdeck/</code>. Assim o painel pode ser compartilhado e as credenciais continuam só suas.
+                </p>
+              </div>
+              {released && (
+                <a href={panelsUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 text-sm text-ctp-mauve transition-colors hover:text-ctp-text">
+                  Mais sobre painéis
+                  <ArrowRight className="size-3.5" />
+                </a>
+              )}
+            </Reveal>
+          </div>
+        </Section>
+
         <Section id="temas" eyebrow="cores" title="Três temas para começar" desc="Em fundo escuro, texto acima de 11:1 cansa em sessão longa. Vermelho e verde precisam se separar também em luminosidade, senão o diff fica difícil de ler.">
           <Reveal>
             <ThemePreview />
@@ -214,12 +248,6 @@ export default function Home() {
             <p>
               Depois de instalar, o painel, a janela 1 do work, mostra o que falta: adicionar os projetos com <code className="font-mono text-ctp-text">work add</code>, uma versão nova para o <code className="font-mono text-ctp-text">work update</code> e se você abriu fora do kitty.
             </p>
-          </Reveal>
-        </Section>
-
-        <Section id="quem-usa" eyebrow="quem usa" title="O que mudou no dia a dia">
-          <Reveal>
-            <Testimonials />
           </Reveal>
         </Section>
 

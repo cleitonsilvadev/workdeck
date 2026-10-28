@@ -56,6 +56,15 @@ export const features = [
   },
 ] as const
 
+export const panelRules = [
+  { code: "30-docker", desc: "O nome do arquivo vira o título: aparece como Docker." },
+  { code: "10- 20- 30-", desc: "A ordem é alfabética. Um prefixo numérico decide quem vem antes." },
+  { code: "00-", desc: "Os que começam assim aparecem sem título, como o logo do topo." },
+  { code: "chmod +x", desc: "Precisa ser executável. Esqueceu? O painel avisa." },
+] as const
+
+export const panelsUrl = `${repoUrl}/blob/main/docs/paineis.md`
+
 export const shortcuts = {
   navegar: [
     { prefix: true, keys: ["h"], desc: "Abre o menu com tudo" },
