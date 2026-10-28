@@ -350,6 +350,14 @@ case "${1:-}" in
       --verificar) verificar_em_segundo_plano; exit 0 ;;
     esac
     atualizar 1; exit $? ;;
+  kill)
+    if tmux has-session -t "$SESSION" 2>/dev/null; then
+      tmux kill-session -t "$SESSION"
+      echo "sessão $SESSION fechada"
+    else
+      echo "nenhuma sessão $SESSION aberta"
+    fi
+    exit 0 ;;
   sincronizar) sincronizar; exit 0 ;;
   _painel) shift; exec "$LIB/work-panel" "$@" ;;
   _menu) shift; menu "$@"; exit 0 ;;
@@ -359,6 +367,7 @@ case "${1:-}" in
     echo "  work add <pasta>    acrescenta um projeto"
     echo "  work review         a IA revisa a mudança antes do commit"
     echo "  work update         atualiza o workdeck"
+    echo "  work kill           fecha a sessão inteira"
     exit 1 ;;
 esac
 

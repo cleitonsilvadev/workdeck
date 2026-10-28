@@ -22,6 +22,7 @@ work                  # abre a sessão, uma janela por projeto
 work add ~/projeto    # acrescenta um projeto; Tab completa o caminho
 work review           # a IA faz um self code review da mudança, num painel embaixo
 work update           # atualiza o workdeck
+work kill             # fecha a sessão inteira
 ```
 
 Dentro do work, <kbd>Ctrl</kbd>+<kbd>b</kbd> e <kbd>h</kbd> abre o menu: os seus
@@ -168,7 +169,7 @@ não existe no disco é pulado sem erro, então dá para deixar linhas de coisas
 que você ainda não clonou.
 
 **Para adicionar um projeto:** `work add <caminho>`. Para reordenar, edite o
-arquivo, feche a sessão (`tmux kill-session -t work`) e abra de novo com `work`. As janelas são criadas na abertura da
+arquivo, feche a sessão com `work kill` e abra de novo com `work`. As janelas são criadas na abertura da
 sessão; sem fechar, a sessão antiga continua com a lista antiga.
 
 | Comando | O que faz |
@@ -177,6 +178,7 @@ sessão; sem fechar, a sessão antiga continua com a lista antiga.
 | `work add <caminho>` | Acrescenta o projeto como janela; sem caminho, usa a pasta atual |
 | `work review [staged\|branch]` | A IA faz um self code review da mudança antes do commit |
 | `work update` | Atualiza o workdeck |
+| `work kill` | Fecha a sessão inteira |
 
 Para usar outro nome de sessão: `export WORKDECK_SESSION=outro`.
 
@@ -430,7 +432,7 @@ Quase tudo aqui é para ser trocado. O resumo:
 
 | Quero mudar | Onde | Depois |
 |---|---|---|
-| Os projetos e a ordem das janelas | `~/.config/workdeck/projects.conf` | feche a sessão e rode `work` |
+| Os projetos e a ordem das janelas | `~/.config/workdeck/projects.conf` | `work kill` e `work` |
 | Um atalho do teclado | o seu `~/.tmux.conf`, depois do bloco do workdeck | `Ctrl+b r` |
 | Os atalhos `cmd` e o visual do kitty | o seu `kitty.conf`, fora do bloco do workdeck | reabra o kitty |
 | As cores | a instalação com `--theme <nome>` | — |
