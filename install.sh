@@ -199,7 +199,7 @@ instalar_kitty() {
   if [ "$SO" = macOS ]; then destino="$HOME/Applications"; else destino="$HOME/.local"; fi
   mkdir -p "$destino"
   if ! curl -fsSL https://sw.kovidgoyal.net/kitty/installer.sh | sh /dev/stdin dest="$destino" launch=n >> "$LOG" 2>&1; then
-    aviso "não consegui instalar o kitty; instale por https://sw.kovidgoyal.net/kitty/binary/ e rode work install"
+    aviso "não consegui instalar o kitty; instale por https://sw.kovidgoyal.net/kitty/binary/ e rode a instalação de novo"
     return 1
   fi
   app="$destino/kitty.app"
@@ -358,6 +358,15 @@ elif git -C "$ROOT" rev-parse >/dev/null 2>&1; then
 else
   aviso "$ROOT não é um clone do git; o work update não vai funcionar"
 fi
+if [ -f "$MANIFESTO" ] && [ "$DRY" = 0 ]; then
+  while IFS='|' read -r tipo alvo _; do
+    [ "$tipo" = script ] || continue
+    [ -e "$ROOT/bin/$(basename "$alvo")" ] && continue
+    rm -f "$alvo"
+    grep -vxF "script|$alvo|" "$MANIFESTO" > "$MANIFESTO.tmp" && mv "$MANIFESTO.tmp" "$MANIFESTO"
+    say "$(basename "$alvo") removido: não faz mais parte do workdeck"
+  done < <(grep '^script|' "$MANIFESTO" || true)
+fi
 resumo "$instalados comandos em $(curto "$BIN_DIR")"
 concluir
 
@@ -482,7 +491,7 @@ opcao_zsh() {
       esac >> "$LOG" 2>&1 || true
       girar
     fi
-    command -v zsh >/dev/null || { aviso "não consegui instalar o zsh; instale pelo gerenciador e rode work install --zsh"; return 0; }
+    command -v zsh >/dev/null || { aviso "não consegui instalar o zsh; instale pelo gerenciador e rode a instalação de novo com --zsh"; return 0; }
   fi
   zsh_bin="$(command -v zsh)"
   if [ "$(basename "${SHELL:-}")" != zsh ]; then
@@ -503,7 +512,7 @@ opcao_zsh() {
     ZSH_RESUMO="oh-my-zsh (robbyrussell) e zinit"
     [ "$(cat "$ZSH_ESCOLHA.anterior" 2>/dev/null)" = sim ] || REINICIAR_SHELL=1
   else
-    aviso "não consegui baixar o oh-my-zsh ou o zinit; rode work install --zsh mais tarde"
+    aviso "não consegui baixar o oh-my-zsh ou o zinit; rode a instalação de novo com --zsh mais tarde"
   fi
 }
 ZSH_RESUMO=""
@@ -546,12 +555,12 @@ else
   done
   if [ ${#achados[@]} -eq 0 ]; then
     say "nenhum agente de IA encontrado no PATH"
-    say "quando tiver um: work agent <comando>"
-    resumo "nenhum no PATH; depois: work agent <comando>"
+    say "o work review usa a IA que estiver aberta na janela"
+    resumo "nenhum no PATH; o review usa a IA aberta na janela"
   elif [ "$YES" = 1 ] || [ ! -t 0 ]; then
     say "achei no PATH: ${achados[*]}"
-    say "para escolher: work agent <comando>"
-    resumo "achei ${achados[*]}; escolha com work agent <comando>"
+    say "o work review usa a IA que estiver aberta na janela"
+    resumo "achei ${achados[*]}; o review usa a IA aberta na janela"
   else
     parar
     echo
@@ -566,8 +575,8 @@ else
         && say "agente: ${achados[$((escolha-1))]}"
       resumo "${achados[$((escolha-1))]}"
     else
-      say "nenhum agente definido; depois use work agent <comando>"
-      resumo "nenhum; depois: work agent <comando>"
+      say "nenhum padrão; o work review usa a IA aberta na janela"
+      resumo "nenhum padrão; o review usa a IA aberta na janela"
     fi
     echo
   fi
@@ -607,10 +616,10 @@ if [ -z "$WITH" ] && [ ! -f "$INTEGRACOES_ESCOLHA" ] && pode_perguntar_novidade;
 fi
 if [ -z "$WITH" ]; then
   if [ -f "$INTEGRACOES_ESCOLHA" ] && [ "$(cat "$INTEGRACOES_ESCOLHA")" != nenhuma ]; then
-    say "escolhidas antes: $(cat "$INTEGRACOES_ESCOLHA"); para ver de novo: work install --with <nome>"
+    say "escolhidas antes: $(cat "$INTEGRACOES_ESCOLHA"); para ver de novo: rode a instalação de novo com --with <nome>"
     resumo "$(cat "$INTEGRACOES_ESCOLHA")"
   else
-    say "nenhuma; para ligar depois: work install --with <nome> (veja --list-integrations)"
+    say "nenhuma; para ligar depois: rode a instalação de novo com --with <nome>"
     resumo "nenhuma (--with <nome>)"
   fi
 else
@@ -678,5 +687,5 @@ cat <<FIM
   Para navegar: Shift+← / Shift+→ troca de janela, Shift+↑ / Shift+↓ troca de
   painel, e Ctrl+b e depois 1…9 vai direto para uma janela. Clicar na barra
   também funciona.
-  Ajuda a qualquer hora: work help, ou Ctrl+b e h dentro do work.
+  Ajuda a qualquer hora: Ctrl+b e h dentro do work.
 FIM

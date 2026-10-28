@@ -31,25 +31,29 @@ uuid_de() {
 
 panes() { tmux list-panes ${TMUX_PANE:+-t "$TMUX_PANE"} -F "$1"; }
 
-pane_do_agente() {
-  local id tty papel
+agente_na_janela() {
+  local id tty papel c
+  [ -n "${TMUX:-}" ] || return 0
   while IFS='|' read -r id tty papel; do
     case "$papel" in REVIEW*) continue ;; esac
-    if ps -o comm= -t "${tty#/dev/}" 2>/dev/null | awk -F/ '{print $NF}' | grep -qx "$1"; then
-      echo "$id"
-      return 0
-    fi
+    for c in $(ps -o comm= -t "${tty#/dev/}" 2>/dev/null | awk -F/ '{print $NF}'); do
+      case " $CONHECIDOS " in *" $c "*) echo "$id $c"; return 0 ;; esac
+    done
   done < <(panes '#{pane_id}|#{pane_tty}|#{@papel}')
   return 0
 }
 
 pedido() {
-  local arquivo="$1" titulo="$2" chave="$3" nome cmd id aberto chave_aberta alvo painel texto
+  local arquivo="$1" titulo="$2" chave="$3" nome cmd id aberto chave_aberta alvo="" painel texto ativo p
   carrega
-  local p
+  ativo="$(agente_na_janela)"
+  if [ -n "$ativo" ]; then
+    alvo="${ativo%% *}"
+    [ "$(basename "${AGENT_CMD%% *}")" = "${ativo#* }" ] || AGENT_CMD="${ativo#* }"
+  fi
   p="$(problema "$AGENT_CMD")"
   if [ -n "$p" ]; then
-    echo "$p — defina a sua IA com: work agent <comando>"
+    echo "não sei qual IA usar: abra a sua (claude, codex…) num painel desta janela e rode de novo."
     return 1
   fi
   nome="$(basename "${AGENT_CMD%% *}")"
@@ -91,7 +95,6 @@ pedido() {
   if [ -z "${TMUX:-}" ]; then
     exec bash -c "$cmd"
   fi
-  alvo="$(pane_do_agente "$nome")"
   alvo="${alvo:-${TMUX_PANE:-}}"
   painel="$(tmux split-window -v -l 40% ${alvo:+-t "$alvo"} ${CLAUDE_CONFIG_DIR:+-e "CLAUDE_CONFIG_DIR=$CLAUDE_CONFIG_DIR"} -P -F '#{pane_id}' -c "$PWD" "$cmd")"
   tmux set -p -t "$painel" @papel "$titulo · $nome"
@@ -112,48 +115,12 @@ case "${1:-}" in
     exit $?
     ;;
   --set)
-    cmd="${2:?use: work agent <comando>}"
-    nome="${cmd%% *}"
-    if do_workdeck "$nome"; then
-      echo "'$nome' é um comando do próprio workdeck, não um agente de IA."
-      echo "Use o comando do seu agente, por exemplo: work agent claude"
-      exit 1
-    fi
-    type -P "$nome" >/dev/null || {
-      echo "'$nome' não está no PATH. Instale primeiro, ou use outro comando."
-      exit 1
-    }
+    cmd="${2:?use: workdeck-agent --set <comando>}"
+    do_workdeck "$cmd" && { echo "'$cmd' é um comando do workdeck, não um agente de IA."; exit 1; }
+    type -P "${cmd%% *}" >/dev/null || { echo "'${cmd%% *}' não está no PATH."; exit 1; }
     mkdir -p "$CONFIG_DIR"
     printf 'AGENT_CMD="%s"\n' "$cmd" > "$CONFIG"
     echo "agente definido: $cmd"
     exit 0
     ;;
-  --show)
-    carrega
-    [ -n "$AGENT_CMD" ] && echo "$AGENT_CMD" || echo "nenhum agente configurado"
-    exit 0
-    ;;
-  --list)
-    echo "Agentes conhecidos encontrados no PATH:"
-    achou=0
-    for c in $CONHECIDOS; do
-      command -v "$c" >/dev/null && { echo "  $c"; achou=1; }
-    done
-    [ "$achou" = 0 ] && echo "  nenhum"
-    echo
-    echo "Qualquer CLI serve, não só estas. Para definir:"
-    echo "  work agent <comando>"
-    exit 0
-    ;;
 esac
-
-carrega
-cat <<FIM
-work agent — qual IA o work review usa.
-
-  Sua IA: ${AGENT_CMD:-nenhuma ainda}
-
-  work agent claude       define (precisa estar instalada)
-  work agent              mostra a atual
-  work agent --list       procura agentes conhecidos no PATH
-FIM

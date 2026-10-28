@@ -18,8 +18,8 @@ sudo, e acrescenta o bloco de `kitty.conf` ao seu `~/.config/kitty/kitty.conf`:
 
 Se você já tem o kitty, a instalação usa o seu e só acrescenta o bloco. O que
 você escreveu fora dos marcadores `# >>> workdeck >>>` não muda, e o
-`work uninstall` tira só o bloco. O kitty continua instalado.
+desinstalador tira só o bloco. O kitty continua instalado.
 
 **Outro terminal** também abre o `work`: os atalhos são do tmux (`Ctrl+b`,
-`Shift`+setas, mouse). O que muda é o visual e os atalhos `cmd`, por isso o `work`
-avisa uma vez por dia. Para não ver o aviso: `work kitty --nao-avisar`.
+`Shift`+setas, mouse). O que muda é o visual e os atalhos `cmd`; o painel lembra disso quando
+você está fora do kitty.

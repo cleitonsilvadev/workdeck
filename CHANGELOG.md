@@ -3,6 +3,12 @@
 O `work update` mostra o trecho da versão nova antes de perguntar se quer
 atualizar. Cada versão é uma tag `vX.Y.Z`.
 
+## v1.0.2
+
+- Só quatro comandos: `work`, `work add`, `work review` e `work update`. Saem `escolher`, `painel`, `kill`, `doctor`, `help`, `versao`, `install`, `uninstall`, `agent` e `kitty`, e a atualização apaga o `workdeck-doctor` antigo.
+- O `work review` usa a IA que está aberta na janela; o `agent.conf` só vale quando não há nenhuma.
+- Sai o aviso diário fora do kitty; fica só a linha no painel. Para desinstalar: `bash ~/.local/share/workdeck/uninstall.sh`.
+
 ## v1.0.1
 
 - `work review` abre num painel embaixo do chat e reaproveita: o mesmo painel enquanto ele estiver aberto, e uma sessão do claude por branch, em vez de um chat novo a cada review.

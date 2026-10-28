@@ -26,7 +26,7 @@ work update           # atualiza o workdeck
 ```
 
 Dentro do work, <kbd>Ctrl</kbd>+<kbd>b</kbd> e <kbd>h</kbd> abre o menu com
-tudo, e `work help` lista os outros comandos.
+tudo, e <kbd>Ctrl</kbd>+<kbd>b</kbd> e <kbd>?</kbd> lista os atalhos.
 
 ---
 
@@ -73,12 +73,12 @@ apt, dnf, pacman, zypper ou apk no Linux — e instala o que faltar (`tmux` e
 
 É idempotente: rodar de novo atualiza em vez de duplicar. Tudo o que ele
 escreve nos seus arquivos fica entre marcadores `# >>> workdeck >>>`, e o
-`work uninstall` remove exatamente esse trecho.
+desinstalador remove exatamente esse trecho.
 
 Se já existir um script seu com o mesmo nome em `~/.local/bin`, o instalador não
-o substitui e avisa. O `work uninstall` só remove o que não foi alterado desde a
-instalação. Para rodar a instalação de novo com outras opções, use
-`work install`, por exemplo `work install --theme nord`.
+o substitui e avisa. O desinstalador só remove o que não foi alterado desde a
+instalação. Para instalar de novo com outras opções, rode o mesmo comando com
+elas no fim: `curl -fsSL … | bash -s -- --theme nord`.
 
 ---
 
@@ -98,31 +98,15 @@ do seu arquivo fica como está.
   padrão (pede a senha).
 - Prefere outro tema do oh-my-zsh? Ponha `export WORKDECK_ZSH_THEME=agnoster`
   (ou qualquer outro) no `~/.zshrc`, antes do bloco do workdeck.
-- Não quer? Responda "n" na instalação. Para tirar depois, `work uninstall`.
+- Não quer? Responda "n" na instalação.
 - Quem já tinha o workdeck recebe a pergunta no próximo `work update`.
 
 ## O agente de IA
 
-O workdeck não traz nem abre nenhum agente: você abre o seu como sempre, no
-painel que quiser (`claude`, `codex`…). O `work agent` só diz qual IA o
-`work review` usa.
-
-```bash
-work agent --list               # procura agentes conhecidos no PATH
-work agent claude               # define o seu
-work agent                      # mostra o atual
-```
-
-O comando pode ter argumentos:
-
-```bash
-work agent "aider --no-auto-commits"
-```
-
-Na instalação, se você não passar `--agent`, ele procura no seu PATH e pergunta
-qual usar. `--yes` pula a pergunta. O instalador conhece `claude`, `codex`,
-`copilot`, `aider`, `gemini`, `opencode`, `cursor-agent`, `crush`, `goose` e
-`q`, mas isso é só para oferecer uma lista. Qualquer comando serve.
+O workdeck não traz nem abre nenhum agente: você abre o seu como sempre, num
+painel da janela do projeto (`claude`, `codex`…). O `work review` usa a IA que
+estiver aberta ali. Se não houver nenhuma, usa a que você escolheu na
+instalação, guardada em `~/.config/workdeck/agent.conf`.
 
 ---
 
@@ -134,32 +118,13 @@ sessões (ai-memory).
 
 Na primeira instalação, o instalador lista as integrações e pergunta quais você
 usa; para cada uma escolhida, mostra de quem é e como ligar. Ele guarda a
-resposta e não pergunta de novo. Para ver ou ligar depois:
-
-```bash
-work install --list-integrations   # ver o que existe
-work install --with bmad           # ativar (vírgula separa várias)
-``` Para escrever a sua, veja `integrations/README.md`.
+resposta e não pergunta de novo. Para ligar depois, rode a instalação com
+`--with bmad` (vírgula separa várias). Para escrever a sua, veja
+`integrations/README.md`.
 
 O workdeck é um workflow, não um gerenciador de pacotes. Estas integrações
 estão aqui porque aparecem muito em trabalho com agentes — não porque o
 projeto as mantém ou as auditou.
-
----
-
-## Diagnóstico
-
-```bash
-workdeck-doctor
-```
-
-Diz o que funciona no seu ambiente e o que não vai funcionar: se o tmux e o
-delta estão instalados, qual terminal você está usando, se ele suporta cores
-de 24 bits, se os atalhos em `cmd` são possíveis aí, se há um agente
-configurado e se o `~/.local/bin` está no PATH. Com `--quiet`, só os
-problemas.
-
-Rode isso antes de abrir uma issue dizendo que algo não funciona.
 
 ---
 
@@ -180,27 +145,8 @@ Para tirar um projeto, feche a janela dele: `exit` no último painel, ou
 próximo `work` não abre mais. Para voltar, `work add` de novo. Fechar só um dos
 painéis divididos, ou o agente, não tira nada.
 
-Para escolher vários de uma vez, `work escolher` procura os repositórios git da
-sua pasta pessoal (até 4 níveis, sem `Library`, `node_modules` nem pastas
-ocultas) e mostra uma lista, dos mais usados para os menos. A busca pode
-demorar numa pasta pessoal grande, ou quando o macOS pede permissão para
-pastas como Documentos:
-
-```
-  Escolha os projetos do seu work
-  ↑↓ move · espaço marca · a marca todos · enter confirma · q sai
-
-  [x] api                  ~/code/api                                 hoje
-  [x] web                  ~/code/web                                 ontem
-  [ ] blog                 ~/projetos/blog                            há 2 meses
-```
-
-Os cinco mais usados já vêm marcados; na maioria das vezes basta um
-<kbd>enter</kbd>. A escolha fica salva, e os próximos `work` abrem direto. Rodar
-`work escolher` de novo mostra a lista com os atuais marcados.
-
-A escolha vira `~/.config/workdeck/projects.conf`, uma linha por janela, que
-também dá para editar à mão:
+Os projetos ficam em `~/.config/workdeck/projects.conf`, uma linha por janela,
+que também dá para editar à mão:
 
 ```
 nome|caminho|comando opcional
@@ -213,7 +159,7 @@ web|$HOME/projetos/meu-front
 notas|~/notas
 ```
 
-- **nome** vira o nome da janela no tmux, e o argumento de `work <nome>`
+- **nome** vira o nome da janela no tmux
 - **caminho** é onde a janela abre; aceita `~` e `$HOME`
 - **comando** é opcional — se existir, a janela roda isso em vez de um shell
 
@@ -221,26 +167,16 @@ A ordem do arquivo é a ordem das janelas, numeradas a partir de 1. Projeto que
 não existe no disco é pulado sem erro, então dá para deixar linhas de coisas
 que você ainda não clonou.
 
-**Para adicionar um projeto:** `work add <caminho>`. Para tirar ou
-reordenar, `work escolher` ou edite o arquivo, e depois feche a sessão com
-`work kill` e abra de novo com `work`. As janelas são criadas na abertura da
+**Para adicionar um projeto:** `work add <caminho>`. Para reordenar, edite o
+arquivo, feche a sessão (`tmux kill-session -t work`) e abra de novo com `work`. As janelas são criadas na abertura da
 sessão; sem fechar, a sessão antiga continua com a lista antiga.
 
 | Comando | O que faz |
 |---|---|
 | `work` | Abre a sessão, ou volta para ela |
-| `work api` | Abre e já vai para a janela `api` |
 | `work add <caminho>` | Acrescenta o projeto como janela; sem caminho, usa a pasta atual |
-| `work escolher` | Escolhe de novo os projetos |
-| `work kill` | Fecha a sessão inteira |
-| `work help` | Abre o menu com as ações; `--texto` mostra comandos, atalhos e o que falta configurar |
-| `work doctor` | Diz o que funciona no seu ambiente |
-| `work agent <cmd>` | Define o agente de IA; sem nada, mostra o atual |
 | `work review [staged\|branch]` | A IA faz um self code review da mudança antes do commit |
-| `work painel` | Abre o painel de contexto |
-
-`add`, `help`, `doctor`, `agent`, `review`, `painel`, `escolher`, `update`, `versao`, `install`, `uninstall` e `kill` são palavras
-reservadas: uma janela com um desses nomes não é aberta por `work <nome>`.
+| `work update` | Atualiza o workdeck |
 
 Para usar outro nome de sessão: `export WORKDECK_SESSION=outro`.
 
@@ -268,7 +204,7 @@ baixo, ou num painel, e arraste a borda para mudar o tamanho.
 
 Só as teclas do workdeck funcionam depois do <kbd>Ctrl</kbd>+<kbd>b</kbd>; uma
 fora da lista mostra "tecla sem uso no workdeck — Ctrl+b h abre o menu". A lista
-completa está em `work help`, ou <kbd>Ctrl</kbd>+<kbd>b</kbd> e <kbd>?</kbd>.
+completa está em <kbd>Ctrl</kbd>+<kbd>b</kbd> e <kbd>?</kbd>.
 
 <details>
 <summary>Atalhos de uma tecla com Alt, e como mudar os atalhos</summary>
@@ -301,13 +237,8 @@ JetBrains Mono, a Option do Mac como Alt e, no Mac, atalhos em `cmd`
 lista completa está em `terminals/README.md`.
 
 Em outro terminal o `work` abre do mesmo jeito, porque os atalhos são do tmux:
-`Ctrl+b`, `Shift`+setas e o mouse funcionam em qualquer um. Ele só avisa, uma vez
-por dia, que o visual e os atalhos `cmd` são do kitty. Por SSH ele não avisa.
-
-```bash
-work kitty                 # diz se você está no kitty
-work kitty --nao-avisar    # desliga o aviso; --avisar liga de novo
-```
+`Ctrl+b`, `Shift`+setas e o mouse funcionam em qualquer um. O que muda é o
+visual e os atalhos `cmd`, e o painel lembra disso quando você está fora do kitty.
 
 ---
 
@@ -342,12 +273,9 @@ primeira linha qual usou. Se o seu framework fica fora do projeto, num
 repositório do time, por exemplo, diga onde nas instruções da IA: assim ele
 vale também quando você pede uma revisão direto, sem o workdeck.
 
-Para acrescentar algo a todo review, como a branch base ou a skill preferida:
-
-```bash
-work review --editar            # vale para todos os projetos
-work review --editar projeto    # só para este, em .workdeck/review.md
-```
+Para acrescentar algo a todo review, como a branch base ou a skill preferida,
+escreva em `~/.config/workdeck/review.md` (todos os projetos) ou em
+`.workdeck/review.md` dentro do projeto (só nele). O texto vai no fim do pedido.
 
 Com `claude`, `codex` e `gemini`, o pedido já entra na conversa. Com outra IA, ele
 vai para a área de transferência e para `~/.cache/workdeck/pedido-de-review.md`,
@@ -392,7 +320,6 @@ Por baixo, o `work-panel` mostra a saída de vários comandos, atualizando
 sozinho. Não depende de nada além do que já está instalado.
 
 ```bash
-work painel         # abre ou redesenha a janela do painel e vai até ela
 work-panel          # atualiza a cada 60s
 work-panel 10       # a cada 10s
 work-panel --once   # imprime uma vez e sai
@@ -460,7 +387,7 @@ Assim o painel pode ser compartilhado e o que é seu continua sendo seu.
 | `min-dark` | `#1f1f1f` | Neutro, derivado do tema Min Dark do VS Code, com o contraste do texto baixado para ~9,6:1. |
 
 ```bash
-work install --theme nord
+curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/instalar.sh | bash -s -- --theme nord
 ```
 
 **Para criar um tema**, copie dois arquivos em `themes/`: `<nome>.conf` com as
@@ -496,10 +423,8 @@ disso, a pasta que você clonou pode ir embora: atualizar não depende dela.
 
 ```bash
 work update              # procura a versão nova, mostra o que mudou e pergunta
-work versao              # a versão instalada
 work update --desligar   # para de avisar; work update continua funcionando
 work update --ligar      # volta a avisar
-work uninstall --all     # desinstala, sem precisar da pasta clonada
 ```
 
 O `work` e o painel também conferem sozinhos, no máximo uma vez por dia e em
@@ -516,10 +441,10 @@ instalação; seus projetos, painéis e a escolha do agente ficam como estão.
 ## Desinstalar
 
 ```bash
-work uninstall            # tira os blocos e os scripts; sua config fica
-work uninstall --restore  # devolve os arquivos ao estado de antes da instalação
-work uninstall --all      # remove tudo, inclusive ~/.config/workdeck e a cópia do código
-work uninstall --dry-run  # mostra o que faria
+bash ~/.local/share/workdeck/uninstall.sh             # tira os blocos e os scripts; sua config fica
+bash ~/.local/share/workdeck/uninstall.sh --restore   # devolve os arquivos ao estado de antes
+bash ~/.local/share/workdeck/uninstall.sh --all       # remove tudo, inclusive ~/.config/workdeck e o código
+bash ~/.local/share/workdeck/uninstall.sh --dry-run   # mostra o que faria
 ```
 
 O instalador guarda uma cópia de cada arquivo antes de tocar nele pela primeira
@@ -539,10 +464,10 @@ Quase tudo aqui é para ser trocado. O resumo:
 
 | Quero mudar | Onde | Depois |
 |---|---|---|
-| Os projetos e a ordem das janelas | `~/.config/workdeck/projects.conf` | `work kill` e `work` |
+| Os projetos e a ordem das janelas | `~/.config/workdeck/projects.conf` | feche a sessão e rode `work` |
 | Um atalho do teclado | o seu `~/.tmux.conf`, depois do bloco do workdeck | `Ctrl+b r` |
 | Os atalhos `cmd` e o visual do kitty | o seu `kitty.conf`, fora do bloco do workdeck | reabra o kitty |
-| As cores | `work install --theme <nome>` | — |
+| As cores | a instalação com `--theme <nome>` | — |
 | O que aparece no painel | `~/.config/workdeck/panels/` | nada, ele relê sozinho |
 | O nome da sessão | `export WORKDECK_SESSION=outro` | — |
 | Algo que não existe aqui | um fork do repositório, com o seu script em `bin/` | `./install.sh` no fork |

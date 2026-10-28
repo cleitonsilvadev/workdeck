@@ -5,14 +5,10 @@ projetos=0
 if [ -f "$CONFIG_DIR/projects.conf" ]; then
   projetos=$(grep -v '^[[:space:]]*#' "$CONFIG_DIR/projects.conf" | awk -F'|' 'NF >= 2 && $3 == ""' | wc -l | tr -d ' ')
 fi
-AGENT_CMD=""
-[ -f "$CONFIG_DIR/agent.conf" ] && . "$CONFIG_DIR/agent.conf"
 codigo="${XDG_DATA_HOME:-$HOME/.local/share}/workdeck"
 command -v work >/dev/null && work update --verificar >/dev/null 2>&1
 versao="$(git -C "$codigo" describe --tags --abbrev=0 2>/dev/null || true)"
 nova="$(sed -n 's/^nova=//p' "${XDG_CACHE_HOME:-$HOME/.cache}/workdeck/atualizacao" 2>/dev/null | tail -1)"
-problema_agente=""
-[ -n "$AGENT_CMD" ] && problema_agente="$(workdeck-agent --check 2>/dev/null)"
 
 m=$'\033[48;5;183m'; e=$'\033[48;5;234m'; x=$'\033[0m'
 roxo=$'\033[1;38;5;183m'; dim=$'\033[2m'; amarelo=$'\033[33m'; verde=$'\033[32m'
@@ -34,15 +30,6 @@ if [ "$projetos" -gt 0 ]; then
 else
   linha_projetos="${amarelo}!${x} projetos  nenhum ainda"
 fi
-if [ -n "$problema_agente" ]; then
-  linha_agente="${amarelo}!${x} agente    $AGENT_CMD não funciona"
-  AGENT_CMD=""
-elif [ -n "$AGENT_CMD" ]; then
-  linha_agente="${verde}✓${x} agente    $AGENT_CMD"
-else
-  linha_agente="${amarelo}!${x} agente    nenhum ainda"
-fi
-
 linha_versao=""
 maior="$(printf '%s\n%s\n' "$nova" "${versao:-v0.0.0}" | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | awk -F'[v.]' '{printf "%09d%09d%09d %s\n", $2, $3, $4, $0}' | sort | tail -1 | cut -d' ' -f2)"
 if [ -n "$nova" ] && [ "$nova" != "$versao" ] && [ "$maior" = "$nova" ]; then
@@ -58,7 +45,7 @@ texto=(
   "${dim}terminal para agentes de IA${x}"
   ""
   "$linha_projetos"
-  "$linha_agente"
+  ""
   ""
   ""
 )
@@ -83,12 +70,9 @@ passo() {
   printf '  %s%s%*s%s %s\n' "$roxo" "$1" $((22 - n)) "" "$x" "$2"
 }
 
-if [ "$projetos" = 0 ] || [ -z "$AGENT_CMD" ]; then
+if [ "$projetos" = 0 ]; then
   printf '%sPara começar%s, no terminal aqui embaixo:\n' "$roxo" "$x"
-  [ "$projetos" = 0 ] && passo "work add ~/projeto" "cada projeto vira uma janela; Tab completa o caminho"
-  if [ -z "$AGENT_CMD" ]; then
-    passo "work agent claude" "define a IA do work review (instale antes: claude, codex…)"
-  fi
+  passo "work add ~/projeto" "cada projeto vira uma janela; Tab completa o caminho"
   echo
 fi
 
