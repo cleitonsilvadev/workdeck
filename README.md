@@ -141,15 +141,17 @@ painel fica a um clique na barra. É o ponto do projeto.
 ## Integrações
 
 Nada é instalado por padrão. Cada integração é uma peça de terceiros que você
-pode querer ou não:
+pode querer ou não: o framework que guia a IA (BMAD, Spec Kit) e a memória entre
+sessões (ai-memory).
+
+Na primeira instalação, o instalador lista as integrações e pergunta quais você
+usa; para cada uma escolhida, mostra de quem é e como ligar. Ele guarda a
+resposta e não pergunta de novo. Para ver ou ligar depois:
 
 ```bash
 work install --list-integrations   # ver o que existe
-work install --with ai-memory      # ativar (vírgula separa várias)
-```
-
-O instalador mostra o que a integração é e de quem é, e só age depois de você
-confirmar. Para escrever a sua, veja `integrations/README.md`.
+work install --with bmad           # ativar (vírgula separa várias)
+``` Para escrever a sua, veja `integrations/README.md`.
 
 O workdeck é um workflow, não um gerenciador de pacotes. Estas integrações
 estão aqui porque aparecem muito em trabalho com agentes — não porque o
@@ -373,7 +375,8 @@ work review staged     # só o que está no stage (git add)
 work review branch     # tudo o que a branch mudou em relação à principal
 ```
 
-Ela abre numa conversa nova, ao lado, separada da que escreveu o código, e
+Se a janela já tem a IA aberta (`ai` ou um review anterior), o pedido entra
+nessa conversa, sem abrir outra; só quando não há nenhuma ela abre ao lado. Ela
 procura bugs, falhas de segurança e segredos, código arriscado sem teste,
 trechos lentos, o que dá para cortar e arquivos fora do escopo. Cada achado vem
 com a gravidade (corrigir antes do commit, vale corrigir, opcional), o que o

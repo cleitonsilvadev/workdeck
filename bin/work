@@ -190,7 +190,7 @@ verificar_em_segundo_plano() {
   ultima="$(de_cache checado)"
   if [ -n "$ultima" ] && [ $((agora - ultima)) -lt 86400 ]; then return 0; fi
   (
-    git_quieto fetch -q --tags origin || exit 0
+    git_quieto fetch -q --tags --prune --prune-tags origin || exit 0
     gravar_cache nova "$(mais_nova $(git -C "$CODIGO" tag -l 'v*'))"
     gravar_cache checado "$agora"
   ) </dev/null >/dev/null 2>&1 &
@@ -204,7 +204,7 @@ atualizar() {
     echo "rode o ./install.sh de um clone do repositório uma vez, e o work update passa a funcionar."
     return 1
   fi
-  if ! git_quieto fetch -q --tags origin 2>/dev/null; then
+  if ! git_quieto fetch -q --tags --prune --prune-tags origin 2>/dev/null; then
     echo "não consegui falar com o repositório do workdeck; tente de novo mais tarde."
     return 1
   fi

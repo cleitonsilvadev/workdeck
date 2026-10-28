@@ -29,7 +29,7 @@ fi
 
 if [ -d "$CODIGO/.git" ]; then
   echo "workdeck já está em ${CODIGO/#$HOME/~}; buscando a versão mais nova."
-  git -C "$CODIGO" fetch -q --tags origin
+  git -C "$CODIGO" fetch -q --tags --prune --prune-tags origin
 else
   echo "baixando o workdeck para ${CODIGO/#$HOME/~}"
   rm -rf "$CODIGO"
