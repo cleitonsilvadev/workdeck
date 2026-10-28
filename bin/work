@@ -240,10 +240,11 @@ FIM
 }
 
 menu() {
-  local cliente="$1" pane="$2" sessao id idx nome ativa marca args=()
+  local cliente="$1" pane="$2" sessao id idx nome ativa marca a altura linhas=8 args=() atalhos
   sessao="$(tmux display -p -c "$cliente" '#{session_name}')"
   while IFS='|' read -r id idx ativa nome; do
     marca="  "; [ "$ativa" = 1 ] && marca="● "
+    linhas=$((linhas + 1))
     if [ "$idx" -le 9 ]; then
       args+=("$marca${nome//#/##}" "$idx" "select-window -t $id")
     else
@@ -258,6 +259,21 @@ menu() {
     "Dividir a tela" v "if-shell -F '#{e|>:#{pane_width},#{e|*:#{pane_height},2}}' \"split-window -h -c '#{pane_current_path}'\" \"split-window -v -c '#{pane_current_path}'\""
     "Zoom no painel (de novo volta)" z "resize-pane -Z"
     "Fechar este painel" x "kill-pane")
+  atalhos=(
+    "Shift ← →     projeto anterior / próximo"
+    "Shift ↑ ↓     painel anterior / próximo"
+    "Ctrl+b 1…9    vai direto para a janela"
+    "Ctrl+b d      sai e deixa a sessão rodando"
+    "mouse         clica na barra, arrasta a borda"
+  )
+  if [ "$(uname -s)" = Darwin ] && [ "$(tmux display -p -c "$cliente" '#{client_termname}')" = xterm-kitty ]; then
+    atalhos+=("cmd+1…9       o mesmo, sem o Ctrl+b")
+  fi
+  altura="$(tmux display -p -c "$cliente" '#{client_height}')"
+  if [ "$altura" -ge $((linhas + ${#atalhos[@]} + 3)) ]; then
+    args+=("")
+    for a in "${atalhos[@]}"; do args+=("-$a" "" ""); done
+  fi
   tmux display-menu -c "$cliente" -t "$pane" -x C -y C -T "#[align=centre] workdeck " "${args[@]}"
 }
 

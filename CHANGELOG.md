@@ -3,6 +3,10 @@
 O `work update` mostra o trecho da versão nova antes de perguntar se quer
 atualizar. Cada versão é uma tag `vX.Y.Z`.
 
+## v1.0.10
+
+- O menu (Ctrl+b h) mostra no fim os atalhos do dia a dia: Shift+setas para projeto e painel, Ctrl+b 1…9, Ctrl+b d, o mouse e, no kitty do Mac, cmd+1…9. Numa janela baixa, essa parte some para o menu caber.
+
 ## v1.0.9
 
 - Volta o `work kill`, que fecha a sessão inteira.
