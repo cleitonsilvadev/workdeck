@@ -53,6 +53,16 @@ Use these rules to decide whether something belongs in workdeck:
 - The Portuguese README and docs are written as natural Brazilian Portuguese, not as a literal
   translation of the English text.
 
+## Versions
+
+- Versions follow semantic versioning and are published as `vX.Y.Z` tags on `main`, each with
+  its section in `CHANGELOG.md` (in Portuguese, since `work update` shows it).
+- Patch (`v1.0.1`): a fix users notice. Minor (`v1.1.0`): a new feature that keeps existing
+  installs working as before. Major (`v2.0.0`): a change that breaks something users rely on,
+  such as a removed command or a config that is no longer read.
+- Not every commit is a version. Docs, tests, CI and internal refactors that change nothing for
+  the user stay on `main` and go out with the next version that does.
+
 ## Commits
 
 - Imperative subject line in English, up to 72 characters, no trailing period
