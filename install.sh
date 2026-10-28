@@ -196,6 +196,48 @@ option_ligado_no_terminal_app() {
   [ "$v" = true ]
 }
 
+TERMINAL_APP_ESCOLHA="$CONFIG_DIR/terminal-app"
+
+visual_no_terminal_app() {
+  local antes r escolha
+  command -v osascript >/dev/null || return 0
+  escolha="$(cat "$TERMINAL_APP_ESCOLHA" 2>/dev/null || true)"
+  [ "$escolha" = nao ] && return 0
+  if [ "$escolha" != sim ]; then
+    if [ "$YES" = 1 ] || [ ! -t 0 ]; then
+      say "Terminal.app: para a fonte e as cores do workdeck, rode work install e responda sim"
+      return 0
+    fi
+    parar
+    printf '  Aplicar a fonte e as cores do workdeck no perfil do Terminal.app? [S/n] '
+    read -r r || r=n
+    girar
+    case "${r:-s}" in s|S|y|Y) escolha=sim ;; *) escolha=nao ;; esac
+    [ "$DRY" = 1 ] || { mkdir -p "$CONFIG_DIR"; echo "$escolha" > "$TERMINAL_APP_ESCOLHA"; }
+    [ "$escolha" = sim ] || { say "Terminal.app: perfil sem mudanças"; return 0; }
+  fi
+  [ "$DRY" = 1 ] && { say "[dry-run] aplicaria a fonte e as cores no Terminal.app"; return 0; }
+  antes="$(osascript -e 'tell application "Terminal" to get {name, font name, font size, background color, normal text color} of default settings' 2>/dev/null | tr -d ' ')" || return 0
+  grep -qF "terminal-app|" "$MANIFESTO" 2>/dev/null || anota terminal-app "$antes"
+  if osascript >> "$LOG" 2>&1 <<'FIM'
+tell application "Terminal"
+  set s to default settings
+  set background color of s to {7710, 7710, 11822}
+  set normal text color of s to {52685, 54998, 62708}
+  try
+    set font name of s to "JetBrainsMono-Regular"
+    set font size of s to 12
+  end try
+end tell
+FIM
+  then
+    say "Terminal.app: fonte JetBrains Mono e cores do workdeck no perfil ${antes%%,*}"
+    resumo "Ctrl+b, mouse e Alt · Terminal.app com a fonte e as cores do workdeck"
+  else
+    aviso "não consegui mudar o perfil do Terminal.app; escolha a fonte em Settings → Profiles → Text"
+  fi
+}
+
 como_ligar_option() {
   case "$1" in
     Apple_Terminal) echo 'Terminal → Ajustes → Perfis → Teclado → marque "Usar Option como tecla Meta"' ;;
@@ -416,6 +458,7 @@ case "$TERMINAL" in
   "")
     if [ "$SO" = macOS ]; then
       term="$(terminal_atual)"
+      [ "$term" = Apple_Terminal ] && visual_no_terminal_app
       if [ "$term" = Apple_Terminal ] && option_ligado_no_terminal_app; then
         say "Terminal.app: Option já funciona como Alt"
       else
@@ -578,11 +621,11 @@ ${passo_shell}       work                ${dim}abre o painel, que mostra como ad
   Ajuda a qualquer hora: work help, ou Ctrl+b e h dentro do work.
 FIM
 
-if [ "$SO" = macOS ] && [ "$(terminal_atual)" = Apple_Terminal ] && [ -n "$fonte" ]; then
+if [ "$SO" = macOS ] && [ "$(terminal_atual)" = Apple_Terminal ] && [ "$(cat "$TERMINAL_APP_ESCOLHA" 2>/dev/null)" = nao ]; then
   cat <<FIM
 
-  ${dim}Dica: para o Terminal.app ficar com a fonte do workdeck, escolha a
-  JetBrains Mono em Terminal → Settings → Profiles → Text → Font.${reset}
+  ${dim}Dica: para o Terminal.app ficar com a fonte e as cores do workdeck, rode
+  work install e responda sim, ou escolha a JetBrains Mono em Settings → Profiles.${reset}
 FIM
 fi
 

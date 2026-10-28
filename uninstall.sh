@@ -67,6 +67,24 @@ if [ -f "$MANIFESTO" ]; then
           fi
         fi
         ;;
+      terminal-app)
+        IFS=, read -r perfil fnome ftam b1 b2 b3 t1 t2 t3 <<< "$alvo"
+        if [ "$DRY" = 1 ]; then
+          say "[dry-run] devolveria a fonte e as cores do perfil $perfil do Terminal.app"
+        elif command -v osascript >/dev/null && osascript >/dev/null 2>&1 <<FIM
+tell application "Terminal"
+  set s to settings set "$perfil"
+  set background color of s to {$b1, $b2, $b3}
+  set normal text color of s to {$t1, $t2, $t3}
+  set font name of s to "$fnome"
+  set font size of s to $ftam
+end tell
+FIM
+        then
+          say "Terminal.app: perfil $perfil voltou à fonte e às cores de antes"
+        fi
+        rm -f "$CONFIG_DIR/terminal-app"
+        ;;
       fonte)
         if [ "$ALL" = 1 ]; then
           run rm -f "$alvo"/JetBrainsMono*.ttf

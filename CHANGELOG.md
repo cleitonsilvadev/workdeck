@@ -3,6 +3,12 @@
 O `work update` mostra o trecho da versão nova antes de perguntar se quer
 atualizar. Cada versão é uma tag `vX.Y.Z`.
 
+## v1.0.6
+
+- No Terminal.app, a instalação oferece aplicar a fonte e as cores do workdeck no perfil; some a borda preta em volta.
+- O terminal do painel espera você se conectar para ficar com 8 linhas.
+- work uninstall devolve a fonte e as cores que o perfil tinha.
+
 ## v1.0.5
 
 - A instalação numa linha termina num shell novo: é só digitar work, sem source.

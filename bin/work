@@ -576,7 +576,14 @@ if ! tmux has-session -t "$SESSION" 2>/dev/null; then
   done
   tmux set -t "$SESSION" @workdeck 1
   if tmux list-windows -t "$SESSION" -F '#W' | grep -qx painel; then
-    ( sleep 0.6; tmux resize-pane -t "$SESSION:painel.{bottom}" -y 8 ) </dev/null >/dev/null 2>&1 &
+    (
+      for _ in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20; do
+        sleep 0.25
+        [ -n "$(tmux list-clients -t "$SESSION" 2>/dev/null)" ] && break
+      done
+      sleep 0.3
+      tmux resize-pane -t "$SESSION:painel.{bottom}" -y 8
+    ) </dev/null >/dev/null 2>&1 &
   fi
   tmux select-window -t "$SESSION:1"
 fi
