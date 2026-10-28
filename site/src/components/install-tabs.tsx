@@ -7,7 +7,6 @@ import { install } from "@/lib/site"
 const systems = [
   { id: "macos", label: "macOS" },
   { id: "linux", label: "Linux" },
-  { id: "windows", label: "Windows (WSL)" },
 ] as const
 
 export function InstallTabs() {

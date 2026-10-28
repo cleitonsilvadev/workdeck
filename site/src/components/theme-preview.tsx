@@ -40,7 +40,7 @@ export function ThemePreview() {
                 </span>
               </div>
               <p className="mt-1 text-sm text-ctp-subtext0">{theme.note}</p>
-              <code className="mt-2 block font-mono text-xs text-ctp-overlay1">./install.sh --theme {theme.id}</code>
+              <code className="mt-2 block font-mono text-xs text-ctp-overlay1">work install --theme {theme.id}</code>
             </button>
           )
         })}

@@ -87,14 +87,14 @@ export default function Home() {
               {released ? (
                 <a href={repoUrl} target="_blank" rel="noreferrer" className="group mb-6 inline-flex items-center rounded-full border border-ctp-surface0 bg-ctp-mantle/80 px-3 py-1 text-xs">
                   <AnimatedShinyText className="mx-0 inline-flex items-center gap-1.5 text-ctp-subtext0 dark:via-ctp-text/90">
-                    open source · MIT · macOS, Linux e WSL
+                    open source · MIT · macOS e Linux
                     <ArrowRight className="size-3 transition-transform group-hover:translate-x-0.5" />
                   </AnimatedShinyText>
                 </a>
               ) : (
                 <span className="mb-6 inline-flex items-center rounded-full border border-ctp-surface0 bg-ctp-mantle/80 px-3 py-1 text-xs">
                   <AnimatedShinyText className="mx-0 inline-flex items-center gap-1.5 text-ctp-subtext0 dark:via-ctp-text/90">
-                    em breve · macOS, Linux e WSL
+                    em breve · macOS e Linux
                   </AnimatedShinyText>
                 </span>
               )}
@@ -175,9 +175,18 @@ export default function Home() {
           </Reveal>
         </Section>
 
-        <Section id="instalar" eyebrow="instalar" title="Um script, e ele desfaz o que fez" desc="O instalador detecta o sistema e o gerenciador de pacotes e instala o que faltar: tmux e git-delta. É idempotente; rodar de novo atualiza em vez de duplicar.">
+        <Section id="instalar" eyebrow="instalar" title="Um script, e ele desfaz o que fez" desc="Uma linha, sem clonar nada. O instalador detecta o sistema e o gerenciador de pacotes e instala o que faltar: tmux e git-delta. Depois, o work update avisa e traz as versões novas.">
           <Reveal className="mx-auto max-w-3xl">
-            {released ? <InstallTabs /> : <ComingSoon />}
+            {released ? (
+              <>
+                <InstallTabs />
+                <p className="mt-4 text-center text-sm text-ctp-subtext0">
+                  No fim, o instalador abre um shell novo, que já conhece o <code className="font-mono text-ctp-subtext1">work</code>. Quer ler o script antes? Baixe com <code className="font-mono text-ctp-subtext1">-o instalar.sh</code> em vez de <code className="font-mono text-ctp-subtext1">| bash</code>.
+                </p>
+              </>
+            ) : (
+              <ComingSoon />
+            )}
           </Reveal>
           <Reveal className="mx-auto mt-10 max-w-3xl">
             <GlowCard>

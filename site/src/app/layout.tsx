@@ -16,7 +16,7 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "workdeck — um workflow de terminal para agentes de IA",
   description:
-    "Uma sessão do tmux, uma janela por projeto, o agente num pane ao lado e o git review para ver o que ele escreveu. macOS, Linux e WSL.",
+    "Uma sessão do tmux, uma janela por projeto, o agente num pane ao lado e o work review para a IA revisar o que ele escreveu. macOS e Linux.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

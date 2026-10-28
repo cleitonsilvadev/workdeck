@@ -10,7 +10,7 @@ export const comingSoonPhrases = [
 
 export const repoUrl = "https://github.com/thiagofeliperibeiro/workdeck"
 
-export const installCommand = `git clone ${repoUrl}.git && cd workdeck && ./install.sh`
+export const installCommand = "curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/instalar.sh | bash"
 
 export const commands = [
   { cmd: "work", desc: "Abre a sessão, uma janela por projeto. Ou volta para ela." },
@@ -32,7 +32,7 @@ export const features = [
   {
     icon: "terminal",
     title: "Qualquer terminal",
-    desc: "Os atalhos são do tmux, não do terminal. macOS e Linux; no Windows, pelo WSL.",
+    desc: "Os atalhos são do tmux, não do terminal. Roda em macOS e Linux.",
   },
   {
     icon: "history",
@@ -126,32 +126,20 @@ export const themes = [
 
 export const install = {
   macos: [
-    { cmd: `git clone ${repoUrl}.git`, out: "" },
-    { cmd: "cd workdeck && ./install.sh", out: "brew instala tmux e git-delta se faltarem" },
-    { cmd: "source ~/.zshrc", out: "" },
-    { cmd: "work add ~/code/api", out: "um projeto por vez; Tab completa o caminho" },
-    { cmd: "work", out: "" },
+    { cmd: installCommand, out: "baixa a versão publicada e instala tmux e git-delta pelo brew" },
+    { cmd: "work", out: "abre o painel, que mostra como adicionar os seus projetos" },
   ],
   linux: [
-    { cmd: `git clone ${repoUrl}.git`, out: "" },
-    { cmd: "cd workdeck && ./install.sh", out: "apt, dnf, pacman, zypper ou apk, o que houver" },
-    { cmd: "source ~/.bashrc", out: "" },
-    { cmd: "work add ~/code/api", out: "um projeto por vez; Tab completa o caminho" },
-    { cmd: "work", out: "" },
-  ],
-  windows: [
-    { cmd: "wsl --install", out: "no PowerShell, como administrador" },
-    { cmd: "wsl", out: "entra no Linux" },
-    { cmd: `git clone ${repoUrl}.git`, out: "" },
-    { cmd: "cd workdeck && ./install.sh", out: "a partir daqui, igual ao Linux" },
+    { cmd: installCommand, out: "apt, dnf, pacman, zypper ou apk, o que houver" },
+    { cmd: "work", out: "abre o painel, que mostra como adicionar os seus projetos" },
   ],
 }
 
 export const uninstall = [
-  { cmd: "./uninstall.sh", desc: "Tira os blocos e os scripts. Sua config fica." },
-  { cmd: "./uninstall.sh --restore", desc: "Devolve os arquivos ao estado de antes da instalação." },
-  { cmd: "./uninstall.sh --all", desc: "Remove tudo, inclusive ~/.config/workdeck." },
-  { cmd: "./uninstall.sh --dry-run", desc: "Mostra o que faria, sem escrever nada." },
+  { cmd: "work uninstall", desc: "Tira os blocos e os scripts. Sua config fica." },
+  { cmd: "work uninstall --restore", desc: "Devolve os arquivos ao estado de antes da instalação." },
+  { cmd: "work uninstall --all", desc: "Remove tudo, inclusive ~/.config/workdeck e a cópia do código." },
+  { cmd: "work uninstall --dry-run", desc: "Mostra o que faria, sem escrever nada." },
 ]
 
 export const testimonials = [
