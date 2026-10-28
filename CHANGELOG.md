@@ -3,6 +3,10 @@
 O `work update` mostra o trecho da versão nova antes de perguntar se quer
 atualizar. Cada versão é uma tag `vX.Y.Z`.
 
+## v1.0.4
+
+- README novo, mais curto e direto: o que é, instalação, primeiros passos e recursos. Os detalhes foram para guias em `docs/` (instalação, projetos, atalhos, review, painéis, temas, integrações e customização).
+
 ## v1.0.3
 
 - A instalação não conta mais o kitty que está na pasta de outro usuário do Mac, como o de uma conta apagada, e instala o kitty na sua.

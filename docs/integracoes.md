@@ -1,0 +1,48 @@
+# Agente e integrações
+
+## O agente de IA
+
+O workdeck não traz nem abre nenhum agente: você abre o seu como sempre, num
+painel da janela do projeto (`claude`, `codex`, `copilot`, `aider`, `gemini`…).
+O `work review` usa a IA que estiver aberta ali. Se não houver nenhuma, usa a
+escolhida na instalação, guardada em `~/.config/workdeck/agent.conf`.
+
+Para trocar sem perguntas: rode a instalação com `--agent <comando>`.
+
+## Integrações
+
+Nada é instalado por padrão. Cada integração é uma peça de terceiros que
+aparece muito no trabalho com agentes:
+
+| Integração | Para que serve |
+|---|---|
+| `bmad` | Framework que guia a IA por papéis e etapas (PRD, stories, review) |
+| `spec-kit` | Desenvolvimento guiado por especificação |
+| `ai-memory` | Memória entre sessões do agente |
+
+Na primeira instalação, o instalador lista as integrações e pergunta quais você
+usa. Para cada uma escolhida, mostra de quem é, como instalar e como deixar a
+IA usando, mesmo quando ela já estava instalada. A resposta fica guardada.
+
+Para ligar depois:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/instalar.sh | bash -s -- --with bmad,ai-memory
+```
+
+## Deixar a IA usando
+
+A IA só usa o que as instruções dela apontam. Deixe o `CLAUDE.md` (ou o
+`AGENTS.md`) do projeto dizendo:
+
+- onde fica o framework, inclusive quando ele mora fora do projeto, num
+  repositório do time, por exemplo;
+- onde ficam os PRDs e os padrões;
+- qual agente usar no review.
+
+A memória do ai-memory completa essas instruções com o histórico, mas não as
+substitui.
+
+O workdeck é um workflow, não um gerenciador de pacotes: estas integrações
+estão aqui porque são comuns, não porque o projeto as mantém ou auditou. Para
+escrever a sua, veja [integrations/README.md](../integrations/README.md).
