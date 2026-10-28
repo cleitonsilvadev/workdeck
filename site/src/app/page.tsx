@@ -1,4 +1,4 @@
-import { ArrowRight, Bot, History, LayoutPanelLeft, Palette, Stethoscope, Terminal, Undo2 } from "lucide-react"
+import { ArrowRight, Bot, History, LayoutPanelLeft, Palette, Terminal, Undo2 } from "lucide-react"
 import { AnimatedGridPattern } from "@/components/ui/animated-grid-pattern"
 import { AnimatedShinyText } from "@/components/ui/animated-shiny-text"
 import { buttonVariants } from "@/components/ui/button"
@@ -124,10 +124,10 @@ export default function Home() {
           </div>
         </section>
 
-        <Section eyebrow="o dia a dia" title="Tudo o que você digita" desc="O resto está no menu: Ctrl+b e h, de dentro do work. Nada de alias para decorar.">
-          <Stagger className="mx-auto grid max-w-5xl gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <Section eyebrow="o dia a dia" title="Tudo o que você digita" desc="O resto está no menu: Ctrl+b e h, de dentro do work, com os seus projetos, as ações e os atalhos do dia a dia. Nada de alias para decorar.">
+          <Stagger className="mx-auto flex max-w-5xl flex-wrap justify-center gap-3">
             {commands.map((c) => (
-              <StaggerItem key={c.cmd}>
+              <StaggerItem key={c.cmd} className="w-full sm:w-[calc(50%_-_0.375rem)] lg:w-[calc((100%_-_1.5rem)/3)]">
                 <GlowCard className="rounded-xl">
                   <div className="p-5">
                     <code className="font-mono text-sm text-ctp-mauve">
@@ -163,7 +163,7 @@ export default function Home() {
           </Stagger>
         </Section>
 
-        <Section id="atalhos" eyebrow="teclado" title="Ctrl+b e uma tecla, em qualquer terminal" desc="Aperte Ctrl+b, solte e aperte a tecla. Quem interpreta é o tmux, não o terminal, e o mouse também funciona: clique na janela na barra ou arraste a borda do painel.">
+        <Section id="atalhos" eyebrow="teclado" title="Ctrl+b e uma tecla" desc="Aperte Ctrl+b, solte e aperte a tecla. Quem interpreta é o tmux, não o terminal, e o mouse também funciona: clique na janela na barra ou arraste a borda do painel.">
           <Reveal>
             <ShortcutList />
           </Reveal>
@@ -175,13 +175,13 @@ export default function Home() {
           </Reveal>
         </Section>
 
-        <Section id="instalar" eyebrow="instalar" title="Um script, e ele desfaz o que fez" desc="Uma linha, sem clonar nada. O instalador detecta o sistema e o gerenciador de pacotes e instala o que faltar: tmux e git-delta. Depois, o work update avisa e traz as versões novas.">
+        <Section id="instalar" eyebrow="instalar" title="Um script, e ele desfaz o que fez" desc="Uma linha, sem clonar nada. O instalador detecta o sistema e o gerenciador de pacotes e instala o tmux, se faltar, e o kitty, já com tema e fonte. Depois, o work update avisa e traz as versões novas.">
           <Reveal className="mx-auto max-w-3xl">
             {released ? (
               <>
                 <InstallTabs />
                 <p className="mt-4 text-center text-sm text-ctp-subtext0">
-                  No fim, o instalador abre um shell novo, que já conhece o <code className="font-mono text-ctp-subtext1">work</code>. Quer ler o script antes? Baixe com <code className="font-mono text-ctp-subtext1">-o instalar.sh</code> em vez de <code className="font-mono text-ctp-subtext1">| bash</code>.
+                  No fim, abra o kitty, ou feche e abra, se a instalação rodou nele, para ele carregar o <code className="font-mono text-ctp-subtext1">work</code>. Quer ler o script antes? Baixe com <code className="font-mono text-ctp-subtext1">-o instalar.sh</code> em vez de <code className="font-mono text-ctp-subtext1">| bash</code>.
                 </p>
               </>
             ) : (
@@ -196,7 +196,7 @@ export default function Home() {
                   <h3 className="font-medium">Desinstalar devolve tudo</h3>
                 </div>
                 <p className="mb-5 text-sm text-ctp-subtext0">
-                  Antes de tocar num arquivo pela primeira vez, o instalador guarda uma cópia e anota o que fez num manifesto. Seu <code className="font-mono text-ctp-subtext1">.tmux.conf</code> e seu <code className="font-mono text-ctp-subtext1">.zshrc</code> voltam byte a byte.
+                  Antes de tocar num arquivo pela primeira vez, o instalador guarda uma cópia e anota o que fez num manifesto. Seu <code className="font-mono text-ctp-subtext1">.tmux.conf</code> e seu <code className="font-mono text-ctp-subtext1">.zshrc</code> voltam byte a byte. O desinstalador fica em <code className="font-mono text-ctp-subtext1">~/.local/share/workdeck</code>; rode com <code className="font-mono text-ctp-subtext1">bash</code>.
                 </p>
                 <dl className="grid gap-x-6 gap-y-3 font-mono text-sm sm:grid-cols-[auto_1fr]">
                   {uninstall.map((u) => (
@@ -210,9 +210,9 @@ export default function Home() {
             </GlowCard>
           </Reveal>
           <Reveal className="mx-auto mt-6 flex max-w-3xl items-start gap-3 rounded-2xl border border-dashed border-ctp-surface1 p-5 text-sm text-ctp-subtext0">
-            <Stethoscope className="mt-0.5 size-4 shrink-0 text-ctp-teal" />
+            <LayoutPanelLeft className="mt-0.5 size-4 shrink-0 text-ctp-teal" />
             <p>
-              Antes de abrir uma issue, rode <code className="font-mono text-ctp-text">work doctor</code>: ele diz se o tmux e o delta estão instalados, se o terminal suporta cores de 24 bits, se há um agente configurado e se o <code className="font-mono text-ctp-text">~/.local/bin</code> está no PATH.
+              Depois de instalar, o painel, a janela 1 do work, mostra o que falta: adicionar os projetos com <code className="font-mono text-ctp-text">work add</code>, uma versão nova para o <code className="font-mono text-ctp-text">work update</code> e se você abriu fora do kitty.
             </p>
           </Reveal>
         </Section>

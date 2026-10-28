@@ -40,7 +40,7 @@ export function ThemePreview() {
                 </span>
               </div>
               <p className="mt-1 text-sm text-ctp-subtext0">{theme.note}</p>
-              <code className="mt-2 block font-mono text-xs text-ctp-overlay1">work install --theme {theme.id}</code>
+              <code className="mt-2 block font-mono text-xs text-ctp-overlay1">curl … | bash -s -- --theme {theme.id}</code>
             </button>
           )
         })}
@@ -55,10 +55,10 @@ export function ThemePreview() {
           <div>
             <motion.span animate={{ color: t.green }} transition={ease}>~/projetos/api</motion.span>
             <motion.span animate={{ color: t.accent }} transition={ease}> ❯ </motion.span>
-            git review
+            git diff
           </div>
           <div className="pt-2">
-            <motion.span className="font-bold" animate={{ color: t.blue }} transition={ease}>git review</motion.span>
+            <motion.span className="font-bold" animate={{ color: t.blue }} transition={ease}>diff</motion.span>
             <span className="font-bold">  main</span>
           </div>
           <div> src/server.ts | 4 <motion.span animate={{ color: t.green }} transition={ease}>+++</motion.span><motion.span animate={{ color: t.red }} transition={ease}>-</motion.span></div>

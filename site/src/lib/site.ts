@@ -14,25 +14,22 @@ export const installCommand = "curl -fsSL https://raw.githubusercontent.com/thia
 
 export const commands = [
   { cmd: "work", desc: "Abre a sessão, uma janela por projeto. Ou volta para ela." },
-  { cmd: "work add ~/code/api", desc: "Acrescenta um projeto. Sem caminho, usa a pasta atual." },
-  { cmd: "ai", desc: "Abre a IA ao lado, para te ajudar no projeto, já na pasta dele. O ai help explica." },
-  { cmd: "work review", desc: "A IA faz um self code review da mudança antes do commit, numa conversa nova ao lado." },
-  { cmd: "work agent claude", desc: "Define qual é o seu agente de IA. Qualquer comando serve." },
-  { cmd: "work painel", desc: "Abre o painel de contexto: branches, mudanças soltas, o que você quiser." },
-  { cmd: "work doctor", desc: "Diz o que funciona no seu ambiente e o que não vai funcionar." },
-  { cmd: "work help", desc: "O menu com as ações, os atalhos e o que falta configurar." },
+  { cmd: "work add ~/projeto", desc: "Acrescenta um projeto. Sem caminho, usa a pasta atual; Tab completa o caminho." },
+  { cmd: "work review", desc: "A IA faz um self code review da mudança num painel embaixo do chat. Com staged ou branch, muda o recorte." },
+  { cmd: "work update", desc: "Mostra o que mudou na versão nova e atualiza. O work e o painel avisam quando há uma." },
+  { cmd: "work kill", desc: "Fecha a sessão inteira. O próximo work abre com a lista de projetos atual." },
 ]
 
 export const features = [
   {
     icon: "bot",
     title: "Qualquer agente de CLI",
-    desc: "Claude Code, Codex, Copilot CLI, Aider, Gemini. O workdeck não embute nenhum: abre o comando que você escolher.",
+    desc: "Claude Code, Codex, Copilot CLI, Aider, Gemini. O workdeck não traz nem abre nenhum: você abre o seu num painel, e o work review usa ele.",
   },
   {
     icon: "terminal",
-    title: "Qualquer terminal",
-    desc: "Os atalhos são do tmux, não do terminal. Roda em macOS e Linux.",
+    title: "Feito para o kitty",
+    desc: "O kitty é o terminal do workdeck, e a instalação já traz ele com tema, fonte e atalhos cmd no Mac. Por SSH ou no terminal do editor o work abre, mas fica fora do suporte.",
   },
   {
     icon: "history",
@@ -62,9 +59,9 @@ export const shortcuts = {
     { prefix: false, keys: ["Shift", "← →"], desc: "Projeto anterior / próximo" },
     { prefix: true, keys: ["1…9"], desc: "Vai direto para a janela N" },
     { prefix: false, keys: ["Shift", "↑ ↓"], desc: "Troca de painel na janela" },
+    { prefix: true, keys: ["d"], desc: "Sai e deixa a sessão rodando" },
   ],
   agir: [
-    { prefix: true, keys: ["a"], desc: "Abre a IA ao lado" },
     { prefix: true, keys: ["Enter"], desc: "Divide a tela onde couber" },
     { prefix: true, keys: ["v"], desc: "Divide ao lado" },
     { prefix: true, keys: ["-"], desc: "Divide embaixo" },
@@ -126,20 +123,20 @@ export const themes = [
 
 export const install = {
   macos: [
-    { cmd: installCommand, out: "baixa a versão publicada e instala tmux e git-delta pelo brew" },
+    { cmd: installCommand, out: "instala o tmux pelo brew e o kitty, já com tema e fonte" },
     { cmd: "work", out: "abre o painel, que mostra como adicionar os seus projetos" },
   ],
   linux: [
-    { cmd: installCommand, out: "apt, dnf, pacman, zypper ou apk, o que houver" },
+    { cmd: installCommand, out: "tmux por apt, dnf, pacman, zypper ou apk, e o kitty" },
     { cmd: "work", out: "abre o painel, que mostra como adicionar os seus projetos" },
   ],
 }
 
 export const uninstall = [
-  { cmd: "work uninstall", desc: "Tira os blocos e os scripts. Sua config fica." },
-  { cmd: "work uninstall --restore", desc: "Devolve os arquivos ao estado de antes da instalação." },
-  { cmd: "work uninstall --all", desc: "Remove tudo, inclusive ~/.config/workdeck e a cópia do código." },
-  { cmd: "work uninstall --dry-run", desc: "Mostra o que faria, sem escrever nada." },
+  { cmd: "uninstall.sh", desc: "Tira os blocos e os scripts. Sua config fica." },
+  { cmd: "uninstall.sh --restore", desc: "Devolve os arquivos ao estado de antes da instalação." },
+  { cmd: "uninstall.sh --all", desc: "Remove tudo, inclusive ~/.config/workdeck e a cópia do código." },
+  { cmd: "uninstall.sh --dry-run", desc: "Mostra o que faria, sem escrever nada." },
 ]
 
 export const testimonials = [

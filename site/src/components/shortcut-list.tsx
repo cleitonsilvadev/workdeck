@@ -65,9 +65,9 @@ export function ShortcutList() {
             Prefere uma tecla só?
           </div>
           <p className="text-sm leading-relaxed text-ctp-subtext0">
-            Há atalhos diretos com Alt: Alt+1…9 vai para a janela, Alt+setas troca de painel e Alt+Shift+letra faz as ações. No Mac, a Option precisa agir como Alt, e o work doctor diz onde ligar. Para usar cmd+1, há adaptadores para kitty, WezTerm e Alacritty; só o do kitty é instalado automaticamente:
+            Há atalhos diretos com Alt: Alt+1…9 vai para a janela, Alt+setas troca de painel e Alt+Shift+letra faz as ações. No kitty do workdeck funcionam de cara, inclusive no Mac, onde a Option já age como Alt. No Mac, o kitty também traz atalhos em cmd:
           </p>
-          <code className="mt-3 block font-mono text-xs text-ctp-mauve">work install --terminal kitty</code>
+          <code className="mt-3 block font-mono text-xs text-ctp-mauve">cmd+1…9 · cmd+d · cmd+h</code>
         </div>
       </div>
       <Group title="Agir" items={shortcuts.agir} />
