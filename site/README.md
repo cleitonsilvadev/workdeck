@@ -26,7 +26,7 @@ npm run dev        # http://localhost:3000
 | `npm run dev` | Servidor de desenvolvimento |
 | `npm run build` | Build de produção |
 | `npm run lint` | ESLint com as regras do Next.js |
-| `npm run typecheck` | Checagem de tipos do TypeScript |
+| `npm run typecheck` | Gera os tipos das rotas (`next typegen`) e checa os tipos do TypeScript |
 | `npm test` | Testes com Vitest, em modo watch; `npx vitest run` roda uma vez |
 
 ## Stack
