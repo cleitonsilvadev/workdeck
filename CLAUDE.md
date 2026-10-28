@@ -1,5 +1,25 @@
 # workdeck
 
+## What workdeck is
+
+workdeck is to tmux what oh-my-zsh is to zsh: an opinionated distribution of tmux for working
+with AI agents. tmux is the engine (sessions, windows, panes, keys); workdeck is the workflow on
+top of it: one window per project, a CLI agent beside the code, a context panel, `work review`
+before every commit, and an install that `work uninstall` fully reverts.
+
+It is not a terminal, not a fork of tmux, not an editor integration and not an AI agent.
+
+Use these rules to decide whether something belongs in workdeck:
+
+1. It serves the flow project → agent → review → commit. Otherwise it stays out.
+2. It is tmux configuration or a script on top of tmux. Anything that needs to change tmux itself
+   stays out.
+3. tmux is the only dependency. `work` behaves the same in any terminal; anything specific to one
+   terminal (kitty, Warp, …) is an optional extra, and docs, panels and messages never treat
+   another terminal as the exception.
+4. It is reversible: the installer only adds marked blocks and recorded files, and
+   `work uninstall` removes them.
+
 ## Language
 
 | What | Language |
