@@ -80,7 +80,7 @@ export function Pane({ title, active, children, className }: { title: string; ac
   )
 }
 
-export function TerminalWindow({ children }: { children: React.ReactNode }) {
+export function TerminalWindow({ children, title = "workdeck — tmux" }: { children: React.ReactNode; title?: string }) {
   const id = useId()
   return (
     <div className="relative">
@@ -91,7 +91,7 @@ export function TerminalWindow({ children }: { children: React.ReactNode }) {
           <span className="size-3 rounded-full bg-ctp-red/80" />
           <span className="size-3 rounded-full bg-ctp-yellow/80" />
           <span className="size-3 rounded-full bg-ctp-green/80" />
-          <span className="ml-3 font-mono text-xs text-ctp-overlay0">workdeck — tmux</span>
+          <span className="ml-3 font-mono text-xs text-ctp-overlay0">{title}</span>
         </div>
         <LayoutGroup id={id}>{children}</LayoutGroup>
       </div>
@@ -99,27 +99,31 @@ export function TerminalWindow({ children }: { children: React.ReactNode }) {
   )
 }
 
-export function StatusBar({ windows, active, mark, hint }: { windows: readonly string[]; active: number; mark?: boolean; hint: string }) {
+export function StatusBar({ windows, active, mark, branch }: { windows: readonly string[]; active: number; mark?: boolean; branch?: string }) {
   return (
-    <div className="flex items-center justify-between bg-ctp-mantle px-2 py-1 text-[11px]">
-      <div className="flex items-center gap-1">
-        <span className="px-1.5 font-bold text-ctp-mauve">workdeck</span>
+    <div className="flex items-center justify-between gap-3 bg-ctp-mantle py-1 pr-2 text-[11px] whitespace-pre">
+      <div className="flex min-w-0 items-center">
+        <span className="mr-1 bg-ctp-mauve px-1.5 font-bold text-ctp-crust">❯_ work</span>
         {windows.map((w, i) => (
-          <span key={w} className="relative px-1.5 py-0.5 text-ctp-overlay1">
-            {i === active && <span className="absolute inset-0 rounded-sm bg-ctp-surface0" />}
-            <span className={cn("relative", i === active && "font-bold text-ctp-text")}>
-              {i + 1}:{w}
-              {i === active && mark && <span className="text-ctp-mauve"> ✦</span>}
-            </span>
+          <span key={w} className={cn("px-1", i === active ? "font-bold text-ctp-text" : "text-ctp-overlay1")}>
+            <span className={cn(i === active && "text-ctp-mauve")}>{i + 1}</span> {w}
+            {mark && i === active && <span className="text-ctp-mauve"> ✦</span>}
           </span>
         ))}
       </div>
-      <span className="hidden text-ctp-overlay0 sm:inline">{hint}</span>
+      <span className="hidden shrink-0 sm:inline">
+        {branch && <span className="text-ctp-mauve">{branch} · </span>}
+        <span className="text-ctp-overlay0">ctrl+b h menu · 14:32</span>
+      </span>
     </div>
   )
 }
 
 export function useTimeline(timeline: readonly number[]) {
+  return useSteps(timeline)[0]
+}
+
+export function useSteps(timeline: readonly number[]) {
   const last = timeline.length
   const reduce = useReducedMotion()
   const [step, setStep] = useState(0)
@@ -129,5 +133,5 @@ export function useTimeline(timeline: readonly number[]) {
     return () => clearTimeout(id)
   }, [step, reduce, last, timeline])
 
-  return step
+  return [step, setStep] as const
 }

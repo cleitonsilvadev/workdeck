@@ -1,6 +1,6 @@
 export const released = false
 
-export const version = "v1.0.3"
+export const version = "v1.1.0"
 
 export const comingSoonPhrases = [
   "repositório público, licença mit",
@@ -13,6 +13,13 @@ export const comingSoonPhrases = [
 export const repoUrl = "https://github.com/thiagofeliperibeiro/workdeck"
 
 export const installCommand = "curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/instalar.sh | bash"
+
+export const cycle = [
+  { label: "work add ~/api", code: true, when: "uma vez", desc: "work abre a sessão no painel; work add põe o projeto nela, numa janela em segundo plano." },
+  { label: "janela do projeto", code: false, when: "sempre aberta", desc: "Shift+→ vai até ela. Fechou o terminal? work volta onde estava." },
+  { label: "agente ao lado", code: false, when: "escreve o código", desc: "Claude Code, Codex ou o que você usar." },
+  { label: "work review", code: true, when: "self code review", desc: "Self code review: a IA revisa como quem vai ser chamado se aquilo quebrar, aponta o que corrigir com a gravidade e não mexe em nada." },
+] as const
 
 export const commands = [
   { cmd: "work", desc: "Abre a sessão, uma janela por projeto. Ou volta para ela." },
@@ -60,7 +67,7 @@ export const panelRules = [
   { code: "30-docker", desc: "O nome do arquivo vira o título: aparece como Docker." },
   { code: "10- 20- 30-", desc: "A ordem é alfabética. Um prefixo numérico decide quem vem antes." },
   { code: "00-", desc: "Os que começam assim aparecem sem título, como o logo do topo." },
-  { code: "chmod +x", desc: "Precisa ser executável. Esqueceu? O painel avisa." },
+  { code: "chmod -x", desc: "Só aparece o que é executável. Tirar o +x desliga um painel, até os que vêm prontos, e o work update respeita." },
 ] as const
 
 export const panelsUrl = `${repoUrl}/blob/main/docs/paineis.md`

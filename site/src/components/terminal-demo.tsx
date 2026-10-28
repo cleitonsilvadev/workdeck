@@ -21,7 +21,7 @@ export function TerminalDemo() {
               <Prompt text="work" typing={s === 0} done={s >= 1} caret={s === 0} />
               {s >= 1 && (
                 <Line className="text-ctp-overlay1">
-                  sessão <span className="text-ctp-mauve">workdeck</span> · 4 janelas
+                  sessão <span className="text-ctp-mauve">work</span> · 4 janelas
                 </Line>
               )}
               {s >= 2 && <Line className="text-ctp-overlay1">Ctrl+b v · claude no painel ao lado →</Line>}
@@ -78,7 +78,7 @@ export function TerminalDemo() {
             </AnimatePresence>
           </motion.div>
 
-          <StatusBar windows={["painel", "api", "web", "notas"]} active={2} mark={agentOpen} hint="Ctrl+b h abre o menu" />
+          <StatusBar windows={["painel", "api", "web", "notas"]} active={2} mark={agentOpen} branch="feature/login" />
         </div>
     </TerminalWindow>
   )

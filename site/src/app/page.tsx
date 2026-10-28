@@ -4,6 +4,7 @@ import { AnimatedShinyText } from "@/components/ui/animated-shiny-text"
 import { buttonVariants } from "@/components/ui/button"
 import { ComingSoon } from "@/components/coming-soon"
 import { CommandLine } from "@/components/copy-button"
+import { CycleDemo } from "@/components/cycle-demo"
 import { GlowCard } from "@/components/glow-card"
 import { InstallTabs } from "@/components/install-tabs"
 import { PanelDemo } from "@/components/panel-demo"
@@ -58,6 +59,7 @@ export default function Home() {
             </span>
           </a>
           <nav className="hidden items-center gap-6 text-sm text-ctp-subtext0 md:flex">
+            <a href="#como-funciona" className="transition-colors hover:text-ctp-text">Como funciona</a>
             <a href="#recursos" className="transition-colors hover:text-ctp-text">Recursos</a>
             <a href="#atalhos" className="transition-colors hover:text-ctp-text">Atalhos</a>
             <a href="#painel" className="transition-colors hover:text-ctp-text">Painel</a>
@@ -125,6 +127,12 @@ export default function Home() {
           </div>
         </section>
 
+        <Section id="como-funciona" eyebrow="como funciona" title="Do projeto ao review" desc="Cada projeto é uma janela, o agente fica ao lado do seu shell e o review abre embaixo dele quando você pede.">
+          <Reveal>
+            <CycleDemo />
+          </Reveal>
+        </Section>
+
         <Section eyebrow="o dia a dia" title="Tudo o que você digita" desc="O resto está no menu: Ctrl+b e h, de dentro do work, com os seus projetos, as ações e os atalhos do dia a dia. Nada de alias para decorar.">
           <Stagger className="mx-auto flex max-w-5xl flex-wrap justify-center gap-3">
             {commands.map((c) => (
@@ -177,7 +185,7 @@ export default function Home() {
             </Reveal>
             <Reveal delay={0.1} className="min-w-0 space-y-4">
               <p className="text-sm text-ctp-subtext0">
-                Containers rodando, build quebrado, fila de deploy, tarefas do dia. Qualquer coisa que imprima texto serve, e não precisa reinstalar nem reiniciar: o painel relê a pasta a cada ciclo, de 60 em 60 segundos.
+                Containers, PRs abertos, o build do CI, as tarefas do dia. Qualquer linguagem serve, Bash, Python, Node ou um binário, desde que imprima texto. Não precisa reinstalar nem reiniciar: o painel relê a pasta a cada ciclo, de 60 em 60 segundos.
               </p>
               <dl className="grid gap-x-5 gap-y-3 rounded-2xl border border-border bg-ctp-mantle/70 p-5 text-sm sm:grid-cols-[auto_1fr]">
                 {panelRules.map((r) => (
@@ -209,7 +217,7 @@ export default function Home() {
           </Reveal>
         </Section>
 
-        <Section id="instalar" eyebrow="instalar" title="Um script, e ele desfaz o que fez" desc="Uma linha, sem clonar nada. O instalador detecta o sistema e o gerenciador de pacotes e instala o tmux, se faltar, e o kitty, já com tema e fonte. Depois, o work update avisa e traz as versões novas.">
+        <Section id="instalar" eyebrow="instalar" title="Um script, e ele desfaz o que fez" desc="Uma linha, sem clonar nada. Funciona no macOS e no Linux, inclusive no WSL. O instalador detecta o sistema e o gerenciador de pacotes e instala o tmux, se faltar, e o kitty, já com tema e fonte. Depois, o work update avisa e traz as versões novas.">
           <Reveal className="mx-auto max-w-3xl">
             {released ? (
               <>

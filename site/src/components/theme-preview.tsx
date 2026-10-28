@@ -70,11 +70,14 @@ export function ThemePreview() {
             <motion.span animate={{ color: t.yellow }} transition={ease}>!</motion.span> 1 arquivo  <motion.span animate={{ color: t.green }} transition={ease}>+3</motion.span>  <motion.span animate={{ color: t.red }} transition={ease}>-1</motion.span>
           </div>
         </div>
-        <motion.div className="flex items-center gap-3 px-3 py-1.5" animate={{ backgroundColor: t.bar, color: t.muted }} transition={ease}>
-          <motion.span className="font-bold" animate={{ color: t.accent }} transition={ease}>workdeck</motion.span>
-          <span>1:api</span>
-          <motion.span className="rounded-sm px-1 font-bold" animate={{ color: t.fg, backgroundColor: `${t.muted}55` }} transition={ease}>2:web</motion.span>
-          <span>3:notas</span>
+        <motion.div className="flex items-center gap-2 py-1.5 pr-3 whitespace-pre" animate={{ backgroundColor: t.bar, color: t.muted }} transition={ease}>
+          <motion.span className="px-1.5 font-bold" animate={{ backgroundColor: t.accent, color: t.bg }} transition={ease}>❯_ work</motion.span>
+          <span>1 painel</span>
+          <span className="font-bold">
+            <motion.span animate={{ color: t.accent }} transition={ease}>2</motion.span>
+            <motion.span animate={{ color: t.fg }} transition={ease}> api</motion.span>
+          </span>
+          <span>3 web</span>
         </motion.div>
       </motion.div>
     </div>

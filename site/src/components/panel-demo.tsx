@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from "motion/react"
 import { Line, Pane, Prompt, StatusBar, TerminalWindow, useTimeline } from "@/components/terminal-parts"
+import { version } from "@/lib/site"
 import { cn } from "@/lib/utils"
 
 const timeline = [2300, 500, 700, 500, 2000, 900, 5600]
@@ -61,7 +62,7 @@ export function PanelDemo() {
               <Logo />
               <div className="space-y-0.5">
                 <div>
-                  <span className="font-bold text-ctp-mauve">workdeck</span> <span className="text-ctp-overlay0">v1.0.3</span>
+                  <span className="font-bold text-ctp-mauve">workdeck</span> <span className="text-ctp-overlay0">{version}</span>
                 </div>
                 <div className="text-ctp-overlay0">terminal para agentes de IA</div>
                 <div className="pt-2">
@@ -70,6 +71,7 @@ export function PanelDemo() {
               </div>
             </div>
             <div className="pt-2 text-ctp-overlay0">Ctrl+b h abre o menu: projetos, review, dividir a tela</div>
+            {!shown && <div className="text-ctp-overlay0">Para pôr o seu no painel: um executável em ~/.config/workdeck/panels/</div>}
             <div className="pt-2">
               <Title>Projetos</Title>
               {projects.map((p) => (
@@ -114,7 +116,7 @@ export function PanelDemo() {
           </Pane>
         </div>
 
-        <StatusBar windows={["painel", "api", "web", "mobile"]} active={0} hint="Ctrl+b h abre o menu" />
+        <StatusBar windows={["painel", "api", "web", "mobile"]} active={0} />
       </div>
     </TerminalWindow>
   )
