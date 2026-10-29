@@ -3,6 +3,13 @@
 O `work update` mostra o trecho da versão nova antes de perguntar se quer
 atualizar. Cada versão é uma tag `vX.Y.Z`.
 
+## v1.4.0
+
+- A barra do tmux marca com uma ✦ roxa a janela em que um agente terminou ou parou para perguntar algo, enquanto você está em outra. Com vários agentes na mesma janela, a estrela continua uma só. Ela some quando você abre a janela ou quando os agentes voltam a trabalhar. No Claude Code e no Codex, o fim é detectado pelo "esc to interrupt" da tela deles; nos outros agentes, por 10 segundos sem mudança na tela. Antes, a ✦ só marcava a janela com o review aberto num painel.
+- Novo `NOTIFY_AGENTS="yes"` no `settings.conf`: uma notificação do sistema avisa quando um agente termina numa janela que você não está olhando ("o claude terminou em api"). Vem desligado.
+- A aba do painel aparece na cor de destaque do tema, para diferenciar das janelas de projeto (vale a partir do próximo `work` depois de um `work kill`).
+- Rode `Ctrl+b r` depois de atualizar, para a barra usar a estrela nova, e `work` uma vez para o acompanhamento começar.
+
 ## v1.3.1
 
 - Correção: no macOS, se o `settings.conf` tivesse um comentário salvo com acentos em Latin-1 (por um editor antigo, por exemplo), nenhuma escolha era lida e o workdeck voltava aos padrões. Agora o arquivo é lido normalmente.
