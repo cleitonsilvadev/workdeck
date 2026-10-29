@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { Analytics } from "@vercel/analytics/next";
 import { Geist, JetBrains_Mono } from "next/font/google";
 import { Providers } from "@/components/providers";
 import { getDictionary } from "@/lib/dictionaries";
@@ -41,6 +42,7 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
     >
       <body className="min-h-full flex flex-col bg-ctp-crust">
         <Providers>{children}</Providers>
+        <Analytics />
       </body>
     </html>
   );
