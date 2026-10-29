@@ -46,3 +46,13 @@ test_split_keeps_the_panel_window_layout() {
   work _split "$terminal"
   assert_equal "$(tmux display -p -t "$FIRST_PANE" '#{pane_width}')" "$(tmux display -p -t grid '#{window_width}')" "the panel keeps the full width"
 }
+
+test_split_grid_survives_the_active_pane_line() {
+  install_workdeck >/dev/null || fail "install exited with an error"
+  grid_session
+  tmux setw -t grid pane-border-status top
+  for _ in 1 2 3; do work _split "$FIRST_PANE"; done
+  fourth="$(pane_ids | sed -n 4p)"
+  assert_equal "$(position_of "$fourth" | cut -d, -f1)" 0 "the fourth pane is in the first pane's column"
+  assert_equal "$(tmux list-panes -t grid -F '#{pane_left}' | sort -u | wc -l | tr -d ' ')" 2 "columns"
+}

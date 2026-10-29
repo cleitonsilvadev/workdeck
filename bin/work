@@ -369,10 +369,9 @@ split_where_it_fits() {
 }
 
 split_grid() {
-  local pane="${1:-${TMUX_PANE:-}}" win path height panes count columns rows target
+  local pane="${1:-${TMUX_PANE:-}}" win path panes count columns rows target
   win="$(tmux display -p -t "$pane" '#{window_id}')"
   path="$(tmux display -p -t "$pane" '#{pane_current_path}')"
-  height="$(tmux display -p -t "$pane" '#{window_height}')"
   panes="$(tmux list-panes -t "$win" -F '#{pane_left} #{pane_top} #{pane_height} #{pane_id}')"
   count="$(printf '%s\n' "$panes" | wc -l | tr -d ' ')"
   columns="$(printf '%s\n' "$panes" | awk '{print $1}' | sort -u | wc -l | tr -d ' ')"
@@ -384,7 +383,7 @@ split_grid() {
       target="$(printf '%s\n' "$panes" | sort -n | tail -1 | awk '{print $4}')"
       tmux split-window -v -t "$target" -c "$path" ;;
     3:2:2)
-      target="$(printf '%s\n' "$panes" | awk -v h="$height" '$1 == 0 && $2 == 0 && $3 == h {print $4; exit}')"
+      target="$(printf '%s\n' "$panes" | awk '$1 == 0 {n++; id = $4} END {if (n == 1) print id}')"
       if [ -n "$target" ]; then tmux split-window -v -t "$target" -c "$path"; else split_where_it_fits "$pane" "$path"; fi ;;
     4:2:2|[5-9]:*|[1-9][0-9]:*)
       if [ "$count" -ge 4 ] && ! tmux list-panes -t "$win" -F '#{@role}' | grep -q '^PANEL$'; then
