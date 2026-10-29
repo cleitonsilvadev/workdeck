@@ -11,10 +11,15 @@ REPO="${WORKDECK_REPO:-https://github.com/thiagofeliperibeiro/workdeck.git}"
 CODE="${XDG_DATA_HOME:-$HOME/.local/share}/workdeck"
 
 case "$(uname -s)" in
-  MINGW*|MSYS*|CYGWIN*|*_NT*|Windows*)
-    echo "O workdeck roda em macOS e Linux. No Windows, use pelo WSL: abra o Ubuntu do WSL e rode a instalação de lá."
-    exit 1 ;;
+  Darwin) ;;
+  Linux) [ -f "${XDG_CONFIG_HOME:-$HOME/.config}/workdeck/.install-manifest" ] || unsupported=1 ;;
+  *) unsupported=1 ;;
 esac
+if [ -n "${unsupported:-}" ]; then
+  echo "workdeck runs only on macOS."
+  echo "O workdeck roda só no macOS."
+  exit 1
+fi
 
 if ! command -v git >/dev/null; then
   echo "O workdeck precisa do git."
@@ -22,7 +27,7 @@ if ! command -v git >/dev/null; then
     echo "O macOS vai oferecer as ferramentas de desenvolvedor; aceite e rode este comando de novo."
     xcode-select --install 2>/dev/null || true
   else
-    echo "Instale com o gerenciador da sua distribuição (sudo apt install git, por exemplo) e rode de novo."
+    echo "Instale com o gerenciador do seu sistema e rode de novo."
   fi
   exit 1
 fi

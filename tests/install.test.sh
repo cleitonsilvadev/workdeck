@@ -127,11 +127,32 @@ test_agent_cmd_is_read_without_sourcing() {
   assert "the settings file was not executed" test ! -e "$TEST_TMP/pwned"
 }
 
+fake_linux() {
+  printf '#!/bin/sh\necho Linux\n' > "$BASE/bin/uname"
+  chmod +x "$BASE/bin/uname"
+}
+
+test_refuses_a_new_install_on_linux() {
+  fake_linux
+  if output="$(install_workdeck 2>&1)"; then fail "install should fail on a new Linux install"; fi
+  assert_contains "$output" "roda só no macOS"
+  assert "work was not installed" test ! -e "$HOME/.local/bin/work"
+  if output="$(bash "$REPO/get.sh" 2>&1)"; then fail "get.sh should fail on a new Linux install"; fi
+  assert_contains "$output" "only on macOS"
+}
+
+test_existing_linux_install_keeps_updating() {
+  install_workdeck >/dev/null || fail "first install"
+  fake_linux
+  output="$(install_workdeck 2>&1)" || fail "an existing Linux install should keep updating"
+  assert_contains "$output" "o Linux não tem mais suporte"
+}
+
 test_refuses_to_install_on_windows() {
   printf '#!/bin/sh\necho MINGW64_NT-10.0\n' > "$BASE/bin/uname"
   chmod +x "$BASE/bin/uname"
   if output="$(install_workdeck 2>&1)"; then fail "install should fail on Windows"; fi
-  assert_contains "$output" "use pelo WSL"
+  assert_contains "$output" "roda só no macOS"
   assert "work was not installed" test ! -e "$HOME/.local/bin/work"
   if grep -q '^THEME=' "$CONFIG/settings.conf" 2>/dev/null; then fail "the installer wrote settings before refusing"; fi
 }

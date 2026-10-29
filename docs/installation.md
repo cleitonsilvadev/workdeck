@@ -9,9 +9,9 @@ curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/g
 `get.sh` downloads the latest published version to `~/.local/share/workdeck`
 and runs `install.sh` from there. You do not need to clone the repository.
 
-workdeck runs on macOS and Linux. On Windows, install it inside WSL: open your
-WSL distribution (Ubuntu, for example) and run the command there. The installer
-stops before writing anything when it runs in Git Bash, MSYS or Cygwin.
+workdeck runs only on macOS. On Linux and Windows, the installer stops before
+writing anything. Installs made on Linux before v2.0.0 keep working and getting
+updates, without Linux testing or fixes.
 
 ## What the installer does
 
@@ -19,8 +19,7 @@ stops before writing anything when it runs in Git Bash, MSYS or Cygwin.
    Portuguese. The default follows the system language (`LANG`); `--lang en`
    or `--lang pt-BR` answers without asking, and the choice is saved as
    `LANGUAGE` in `~/.config/workdeck/settings.conf`.
-2. Detects the system and the package manager (brew on macOS; apt, dnf,
-   pacman, zypper or apk on Linux) and installs tmux if it is missing.
+2. Installs tmux with Homebrew if it is missing.
 3. Asks which terminal you use: [kitty](https://sw.kovidgoyal.net/kitty/),
    [Warp](https://www.warp.dev/) or another one. It checks that the terminal is
    installed and sets up its extras. **workdeck does not install a terminal:**
@@ -76,8 +75,6 @@ rest of the file stays as it is.
   the installer does not ask and does not touch it. An oh-my-zsh or zinit
   folder that `.zshrc` does not load (left over from another installation)
   does not count: the installer reuses the folder.
-- On Linux without zsh, it installs zsh and asks before changing your default
-  shell (it asks for your password).
 - For another oh-my-zsh theme, add `export WORKDECK_ZSH_THEME=agnoster` (or any
   other) to `~/.zshrc`, before the workdeck block.
 - To skip it, answer "n" during the installation.
@@ -93,8 +90,7 @@ rest of the file stays as it is.
 ~/.tmux.conf                        block between the markers
 ~/.zshrc or ~/.bashrc               block between the markers
 ~/.config/kitty/kitty.conf          block between the markers, only if you chose kitty
-~/.warp/themes/workdeck-*.yaml      the Warp theme, only if you accepted the look (Mac)
-~/.local/share/warp-terminal/themes/workdeck-*.yaml   the same, on Linux
+~/.warp/themes/workdeck-*.yaml      the Warp theme, only if you accepted the look
 ~/.oh-my-zsh, ~/.local/share/zinit  the workdeck zsh setup, if you accepted it
 ```
 

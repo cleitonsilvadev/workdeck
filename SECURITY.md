@@ -23,9 +23,8 @@ less get.sh && bash get.sh
 - **Before writing:** it saves a copy of each file in
   `~/.config/workdeck/.backups/` and records everything in a manifest, which
   `uninstall.sh` uses to undo it.
-- **When it asks for a password:** only to install tmux through the Linux
-  package manager (`sudo`) and, if you accept, to change your default shell
-  (`chsh`).
+- **When it asks for a password:** only if you accept changing your default
+  shell (`chsh`).
 - **What it downloads:** workdeck itself from GitHub and, if you accept,
   oh-my-zsh and zinit from their repositories. It does not download a terminal;
   you install it. If you accept the terminal look, it also downloads the

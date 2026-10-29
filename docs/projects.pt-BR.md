@@ -86,7 +86,7 @@ escolha "Ligar o aviso quando um agente termina" no menu (<kbd>Ctrl</kbd>+<kbd>b
 NOTIFY_AGENTS="yes"
 ```
 
-Ela usa o `osascript` no macOS e o `notify-send` no Linux, quando instalado.
+Ela usa as notificações do macOS, pelo `osascript`.
 
 ## Dois painéis por projeto
 

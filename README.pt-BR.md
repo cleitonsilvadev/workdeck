@@ -17,7 +17,6 @@ e um code review antes de cada commit — numa sessão que não se perde.
 
 [![CI](https://github.com/thiagofeliperibeiro/workdeck/actions/workflows/ci.yml/badge.svg)](https://github.com/thiagofeliperibeiro/workdeck/actions/workflows/ci.yml)
 ![macOS](https://img.shields.io/badge/macOS-suportado-555?logo=apple)
-![Linux](https://img.shields.io/badge/Linux-suportado-555?logo=linux&logoColor=white)
 ![Licença MIT](https://img.shields.io/badge/licen%C3%A7a-MIT-555)
 
 </div>
@@ -79,8 +78,7 @@ work add ~/api  →  janela do projeto  →  agente ao lado  →  work review  �
 curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/get.sh | bash
 ```
 
-Funciona no macOS e no Linux (inclusive WSL). O instalador detecta o sistema,
-instala o tmux, se faltar, pergunta qual terminal você usa
+Funciona no macOS. O instalador instala o tmux pelo Homebrew, se faltar, pergunta qual terminal você usa
 ([kitty](https://sw.kovidgoyal.net/kitty/), [Warp](https://www.warp.dev/) ou
 outro) e configura tudo. O terminal você instala por conta própria; o tema e a
 fonte do workdeck nele são opcionais. Nada é sobrescrito: o que ele escreve nos

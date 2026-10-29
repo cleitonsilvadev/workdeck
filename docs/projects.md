@@ -85,7 +85,7 @@ To also get a system notification ("claude finished in api"), choose
 NOTIFY_AGENTS="yes"
 ```
 
-It uses `osascript` on macOS and `notify-send` on Linux, when installed.
+It uses the macOS notifications, through `osascript`.
 
 ## Two panes per project
 

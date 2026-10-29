@@ -69,9 +69,9 @@ Each `tests/*.test.sh` file contains `test_*` functions. The helpers
 `open_work_in_terminal`…) are in `tests/lib.sh`. Fixed a bug? Write the test
 that would have caught it.
 
-CI runs the linter and the tests on Ubuntu and macOS on every push and pull
-request. On macOS the tests use the system `/bin/bash`, version 3.2, so avoid
-bash 4+ features such as `mapfile`, `declare -A` and `${var,,}`.
+CI runs the linter and the tests on macOS on every push and pull request.
+workdeck supports only macOS. The tests use the system `/bin/bash`, version
+3.2, so avoid bash 4+ features such as `mapfile`, `declare -A` and `${var,,}`.
 
 ## Testing by hand
 
