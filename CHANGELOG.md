@@ -3,6 +3,11 @@
 O `work update` mostra o trecho da versão nova antes de perguntar se quer
 atualizar. Cada versão é uma tag `vX.Y.Z`.
 
+## v1.5.0
+
+- O menu (`Ctrl+b h`) ganhou o item "Ligar o aviso quando um agente termina", que liga a notificação do sistema sem editar o `settings.conf`. Com o aviso ligado, o mesmo item aparece como "Desligar o aviso quando um agente termina".
+- Correção: quando a conversa mencionava "esc to interrupt", o `work review` dizia que o Claude ainda estava trabalhando, e a ✦ não aparecia quando o Claude ou o Codex terminava. Agora só conta a linha de status do agente, perto do campo de mensagem.
+
 ## v1.4.0
 
 - A barra do tmux marca com uma ✦ roxa a janela em que um agente terminou ou parou para perguntar algo, enquanto você está em outra. Com vários agentes na mesma janela, a estrela continua uma só. Ela some quando você abre a janela ou quando os agentes voltam a trabalhar. No Claude Code e no Codex, o fim é detectado pelo "esc to interrupt" da tela deles; nos outros agentes, por 10 segundos sem mudança na tela. Antes, a ✦ só marcava a janela com o review aberto num painel.
