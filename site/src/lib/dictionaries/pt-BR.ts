@@ -28,7 +28,7 @@ export const ptBR = {
   cycle: [
     { label: "work add ~/api", code: true, when: "uma vez", desc: "work abre a sessão no painel; work add põe o projeto nela, numa janela em segundo plano." },
     { label: "janela do projeto", code: false, when: "sempre aberta", desc: "Shift+→ vai até ela. Fechou o terminal? work volta onde estava." },
-    { label: "agente ao lado", code: false, when: "escreve o código", desc: "Claude Code, Codex ou o que você usar." },
+    { label: "agente ao lado", code: false, when: "escreve o código", desc: "Claude Code, Codex ou o que você usar. Quando ele termina, a ✦ na barra avisa, mesmo que você esteja em outra janela." },
     { label: "work review", code: true, when: "self code review", desc: "Quando o agente termina, o work review começa o review dele no mesmo chat, como um subagente com contexto próprio. Ele aponta o que corrigir e não mexe em nada." },
   ],
   layers: [
@@ -156,6 +156,7 @@ export const ptBR = {
     session: "sessão",
     windows: "4 janelas",
     agentHint: "Ctrl+b v · claude no painel ao lado →",
+    agentDone: "o agente terminou",
     reviewHint: "review começou no chat →",
     reviewBeside: "← review começou no chat do agente",
     reviewRunning: "rodando em segundo plano como @code-review",

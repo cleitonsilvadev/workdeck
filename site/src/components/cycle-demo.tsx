@@ -1,12 +1,12 @@
 "use client"
 
 import { useState } from "react"
-import { AnimatePresence, motion } from "motion/react"
+import { AnimatePresence, motion, useReducedMotion } from "motion/react"
 import { Line, Pane, Prompt, StatusBar, TerminalWindow, useSteps } from "@/components/terminal-parts"
 import type { Dictionary } from "@/lib/dictionaries"
 import { cn } from "@/lib/utils"
 
-const timeline = [1100, 1400, 1700, 1600, 1100, 1300, 1200, 900, 1000, 1700, 1000, 1200, 900, 1000, 1000, 3600]
+const timeline = [1100, 1400, 1700, 1600, 1100, 1300, 1200, 900, 1000, 1700, 2600, 1200, 900, 1000, 1000, 3600]
 const scenes = [0, 4, 7, 11, timeline.length]
 
 function sceneOf(step: number) {
@@ -19,6 +19,7 @@ function sceneDuration(scene: number) {
 
 export function CycleDemo({ cycle, demo }: { cycle: Dictionary["cycle"]; demo: Dictionary["demo"] }) {
   const [s, setStep] = useSteps(timeline)
+  const reduced = useReducedMotion()
   const [runs, setRuns] = useState(0)
   const scene = s >= timeline.length ? cycle.length - 1 : sceneOf(s)
   const finished = s >= timeline.length
@@ -29,6 +30,7 @@ export function CycleDemo({ cycle, demo }: { cycle: Dictionary["cycle"]; demo: D
   const inProject = s >= 5
   const agentOpen = s >= 7
   const reviewSent = s >= 12
+  const agentDone = s === 10
   const focus = s === 11 ? "shell" : agentOpen ? "agent" : "shell"
   const path = inProject ? "~/api" : "~"
 
@@ -75,7 +77,12 @@ export function CycleDemo({ cycle, demo }: { cycle: Dictionary["cycle"]; demo: D
       </div>
 
       <TerminalWindow title={inSession ? "workdeck — tmux" : demo.yourTerminal}>
-        <div className="grid h-[460px] grid-rows-[1fr_auto] font-mono text-[10.5px] leading-relaxed sm:h-[400px] sm:text-xs">
+        <motion.div
+          className="grid h-[460px] grid-rows-[1fr_auto] font-mono text-[10.5px] leading-relaxed sm:h-[400px] sm:text-xs"
+          style={{ transformOrigin: "12% 100%" }}
+          animate={{ scale: agentDone && !reduced ? 1.45 : 1 }}
+          transition={{ duration: 0.7, ease: [0.45, 0, 0.2, 1] }}
+        >
           <motion.div layout className={cn("grid min-h-0 gap-1.5 p-1.5", agentOpen ? "grid-cols-1 grid-rows-[1fr_auto] sm:grid-cols-2 sm:grid-rows-1" : "grid-cols-1")}>
             <AnimatePresence>
               {agentOpen && (
@@ -158,11 +165,11 @@ export function CycleDemo({ cycle, demo }: { cycle: Dictionary["cycle"]; demo: D
           </motion.div>
 
           {inSession ? (
-            <StatusBar windows={added ? ["painel", "api"] : ["painel"]} active={inProject ? 1 : 0} mark={agentOpen} branch={inProject ? "main" : undefined} />
+            <StatusBar windows={added ? ["painel", "api"] : ["painel"]} active={inProject ? 1 : 0} starred={agentDone ? 1 : undefined} note={demo.agentDone} branch={inProject ? "main" : undefined} />
           ) : (
             <div className="bg-ctp-mantle py-1 text-[11px]">&nbsp;</div>
           )}
-        </div>
+        </motion.div>
       </TerminalWindow>
 
       <div className="mx-auto mt-4 min-h-12 max-w-2xl text-center text-sm text-pretty text-ctp-subtext0">

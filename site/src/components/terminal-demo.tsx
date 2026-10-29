@@ -64,7 +64,7 @@ export function TerminalDemo({ demo }: { demo: Dictionary["demo"] }) {
             </AnimatePresence>
           </motion.div>
 
-          <StatusBar windows={["painel", "api", "web", "notas"]} active={2} mark={agentOpen} branch="feature/login" />
+          <StatusBar windows={["painel", "api", "web", "notas"]} active={2} starred={s >= 5 && s < 7 ? 2 : undefined} branch="feature/login" />
         </div>
     </TerminalWindow>
   )

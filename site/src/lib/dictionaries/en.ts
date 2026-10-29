@@ -29,7 +29,7 @@ export const en: Dictionary = {
   cycle: [
     { label: "work add ~/api", code: true, when: "once", desc: "work opens the session on the panel; work add puts the project in it, in a background window." },
     { label: "project window", code: false, when: "always open", desc: "Shift+→ takes you there. Closed the terminal? work brings you back where you were." },
-    { label: "agent beside it", code: false, when: "writes the code", desc: "Claude Code, Codex or whatever you use." },
+    { label: "agent beside it", code: false, when: "writes the code", desc: "Claude Code, Codex or whatever you use. When it finishes, the ✦ in the status bar tells you, even from another window." },
     { label: "work review", code: true, when: "self code review", desc: "Once the agent finishes, work review starts its own review in the same chat, as a subagent with its own context. It points out what to fix and changes nothing." },
   ],
   layers: [
@@ -157,6 +157,7 @@ export const en: Dictionary = {
     session: "session",
     windows: "4 windows",
     agentHint: "Ctrl+b v · claude in the pane beside →",
+    agentDone: "the agent finished",
     reviewHint: "review started in the chat →",
     reviewBeside: "← review started in the agent chat",
     reviewRunning: "running in the background as @code-review",

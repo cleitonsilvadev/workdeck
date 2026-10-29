@@ -99,15 +99,34 @@ export function TerminalWindow({ children, title = "workdeck — tmux" }: { chil
   )
 }
 
-export function StatusBar({ windows, active, mark, branch }: { windows: readonly string[]; active: number; mark?: boolean; branch?: string }) {
+export function StatusBar({ windows, active, starred, note, branch }: { windows: readonly string[]; active: number; starred?: number; note?: string; branch?: string }) {
   return (
     <div className="flex items-center justify-between gap-3 bg-ctp-mantle py-1 pr-2 text-[11px] whitespace-pre">
       <div className="flex min-w-0 items-center">
         <span className="mr-1 bg-ctp-mauve px-1.5 font-bold text-ctp-crust">❯_ work</span>
         {windows.map((w, i) => (
-          <span key={w} className={cn("px-1", i === active ? "font-bold text-ctp-text" : "text-ctp-overlay1")}>
+          <span key={w} className={cn("relative px-1", i === active ? "font-bold text-ctp-text" : "text-ctp-overlay1")}>
             <span className={cn(i === active && "text-ctp-mauve")}>{i + 1}</span> {w}
-            {mark && i === active && <span className="text-ctp-mauve"> ✦</span>}
+            {starred === i && (
+              <motion.span
+                className="ml-1 inline-block font-bold text-ctp-mauve"
+                initial={{ scale: 0, rotate: -90 }}
+                animate={{ scale: [0, 1.6, 1], rotate: 0 }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
+              >
+                ✦
+              </motion.span>
+            )}
+            {starred === i && note && (
+              <motion.span
+                className="absolute bottom-full left-0 mb-1.5 rounded-md border border-ctp-mauve/60 bg-ctp-base px-2 py-0.5 font-normal text-ctp-text shadow-lg"
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3, duration: 0.3 }}
+              >
+                <span className="text-ctp-mauve">✦</span> {note}
+              </motion.span>
+            )}
           </span>
         ))}
       </div>
