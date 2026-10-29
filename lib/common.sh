@@ -131,10 +131,17 @@ settings_ensure_template() {
   if ! grep -aqE '^#?PROJECT_LAYOUT=' "$WORKDECK_SETTINGS"; then
     settings_end_with_newline
     printf '\n%s\n%s\n%s\n%s\n' \
-      '# Janela de projeto em três painéis: o agente (1), o servidor (2) e um shell livre (3).' \
-      '# Os comandos do agente (AGENT_CMD) e do servidor (SERVER_COMMAND em .workdeck/project.conf' \
-      '# do projeto) aparecem digitados, sem rodar. Vale para as janelas abertas depois de ligar.' \
-      '#PROJECT_LAYOUT="agent-server-shell"' >> "$WORKDECK_SETTINGS"
+      '# Cada janela de projeto abre com o agente (AGENT_CMD) e um shell lado a lado. No shell, o' \
+      '# SERVER_COMMAND do .workdeck/project.conf do projeto aparece digitado, sem rodar.' \
+      '# "none" abre um painel só. Vale para as janelas abertas depois de mudar.' \
+      '#PROJECT_LAYOUT="none"' >> "$WORKDECK_SETTINGS"
+  fi
+  if ! grep -aqE '^#?REVIEW_AGENT_CMD=' "$WORKDECK_SETTINGS"; then
+    settings_end_with_newline
+    printf '\n%s\n%s\n%s\n' \
+      '# Agente que faz o work review, numa janela própria. Use outro modelo ou outra IA para' \
+      '# não repetir os pontos cegos de quem escreveu o código. Vazio: o review usa o seu agente.' \
+      '#REVIEW_AGENT_CMD="claude --model opus"' >> "$WORKDECK_SETTINGS"
   fi
   if ! grep -aqE '^#?NOTIFY_AGENTS=' "$WORKDECK_SETTINGS"; then
     settings_end_with_newline

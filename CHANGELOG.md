@@ -3,6 +3,13 @@
 O `work update` mostra o trecho da versão nova antes de perguntar se quer
 atualizar. Cada versão é uma tag `vX.Y.Z`.
 
+## v1.6.0
+
+- A janela de cada projeto abre com o agente e um shell lado a lado, em todos os projetos, sempre que o `work` abre a sessão. Antes, ela abria com um painel só, ou com três no `PROJECT_LAYOUT="agent-server-shell"`, que agora também abre dois. Para voltar a um painel só, use `PROJECT_LAYOUT="none"` no `settings.conf`. O `Ctrl+b Enter` continua igual.
+- Novo `REVIEW_AGENT_CMD` no `settings.conf`: escolhe o agente ou o modelo que faz o `work review`, como `claude --model opus`. Um modelo diferente do que escreveu o código não repete os mesmos pontos cegos.
+- O review separado abre numa janela própria, `review: <projeto>`, em vez de um painel embaixo do chat. A janela do projeto fica com os dois painéis.
+- Rode `work kill` e `work` depois de atualizar, para as janelas abrirem com os dois painéis.
+
 ## v1.5.0
 
 - O menu (`Ctrl+b h`) ganhou o item "Ligar o aviso quando um agente termina", que liga a notificação do sistema sem editar o `settings.conf`. Com o aviso ligado, o mesmo item aparece como "Desligar o aviso quando um agente termina".

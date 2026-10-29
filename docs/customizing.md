@@ -42,7 +42,8 @@ flag such as `--theme` or `--terminal`.
 | `ACTIVE_PANE` | `none` (default), `line` | A thin line over the active pane, in the theme accent |
 | `REVIEW_COMMAND` | a command, such as `/code-review high` | What `work review` pastes into the agent chat ([Review](review.md)) |
 | `NOTIFY_AGENTS` | `yes`, `no` (default) | A system notification when an agent finishes in a window you are not looking at ([Projects](projects.md)) |
-| `PROJECT_LAYOUT` | `none` (default), `agent-server-shell` | Opens each project window split into agent, server and shell ([Projects](projects.md)) |
+| `PROJECT_LAYOUT` | `agent-shell` (default), `none` | Opens each project window with the agent and a shell side by side; `none` opens a single pane ([Projects](projects.md)) |
+| `REVIEW_AGENT_CMD` | a command, such as `claude --model opus` | The agent that runs `work review`, in a window of its own ([Review](review.md)) |
 
 Only exact `KEY="value"` lines count: `KEY=value`, `KEY = "value"` and
 commented lines are ignored, and the first line of a key wins. Older versions

@@ -43,21 +43,20 @@ project_with_server_command() {
   echo 'SERVER_COMMAND="echo servidor-no-ar"' > "$HOME/api/.workdeck/project.conf"
 }
 
-test_project_layout_opens_three_panes_with_typed_commands() {
+test_project_layout_opens_two_panes_side_by_side_with_typed_commands() {
   install_workdeck >/dev/null || fail "install exited with an error"
-  echo 'PROJECT_LAYOUT="agent-server-shell"' >> "$CONFIG/settings.conf"
   echo 'AGENT_CMD="echo agente-no-ar"' >> "$CONFIG/settings.conf"
   project_with_server_command
   work add "$HOME/api" >/dev/null || fail "work add exited with an error"
   open_work_in_terminal work
-  wait_for sh -c "[ \"\$(tmux list-panes -t work:api 2>/dev/null | wc -l | tr -d ' ')\" = 3 ]" || fail "the project window did not get three panes: $(tmux list-panes -t work:api 2>&1)"
+  wait_for sh -c "[ \"\$(tmux list-panes -t work:api 2>/dev/null | wc -l | tr -d ' ')\" = 2 ]" || fail "the project window did not get two panes: $(tmux list-panes -t work:api 2>&1)"
+  sleep 0.5
+  assert_equal "$(tmux list-panes -t work:api | wc -l | tr -d ' ')" 2 "panes in the project window"
   panes="$(tmux list-panes -t work:api -F '#{pane_left},#{pane_top} #{pane_id}' | sort -n)"
   agent="$(printf '%s\n' "$panes" | awk '$1 == "0,0" {print $2}')"
   server="$(printf '%s\n' "$panes" | awk -F'[ ,]' '$1 > 0 && $2 == 0 {print $3}')"
-  shell_pane="$(printf '%s\n' "$panes" | awk -F'[ ,]' '$1 > 0 && $2 > 0 {print $3}')"
   assert "the agent pane is on the left" test -n "$agent"
-  assert "the server pane is on the top right" test -n "$server"
-  assert "the free shell is on the bottom right" test -n "$shell_pane"
+  assert "the shell pane is on the right" test -n "$server"
   wait_for sh -c "tmux capture-pane -p -t '$agent' | grep -q 'echo agente-no-ar'" || fail "the agent command was not typed: $(tmux capture-pane -p -t "$agent")"
   wait_for sh -c "tmux capture-pane -p -t '$server' | grep -q 'echo servidor-no-ar'" || fail "the server command was not typed: $(tmux capture-pane -p -t "$server")"
   sleep 1.5
@@ -72,7 +71,7 @@ open_layout_with_project_conf() {
   open_work_in_terminal work
   wait_for tmux_session has-session -t work || fail "the work session did not open"
   work add "$HOME/api" >/dev/null 2>&1
-  wait_for sh -c "[ \"\$(tmux list-panes -t work:api 2>/dev/null | wc -l | tr -d ' ')\" = 3 ]" || fail "the project window did not get three panes"
+  wait_for sh -c "[ \"\$(tmux list-panes -t work:api 2>/dev/null | wc -l | tr -d ' ')\" = 2 ]" || fail "the project window did not get two panes"
   SERVER_PANE="$(tmux list-panes -t work:api -F '#{pane_left},#{pane_top} #{pane_id}' | awk -F'[ ,]' '$1 > 0 && $2 == 0 {print $3}')"
 }
 
@@ -100,8 +99,9 @@ test_project_layout_warns_about_an_unknown_value() {
   assert_contains "$(work add "$HOME/api" 2>&1)" "PROJECT_LAYOUT=\"agent-server-terminal\" não existe"
 }
 
-test_project_layout_is_off_by_default() {
+test_project_layout_none_opens_a_single_pane() {
   install_workdeck >/dev/null || fail "install exited with an error"
+  echo 'PROJECT_LAYOUT="none"' >> "$CONFIG/settings.conf"
   mkdir -p "$HOME/api"
   work add "$HOME/api" >/dev/null || fail "work add exited with an error"
   open_work_in_terminal work
@@ -117,7 +117,7 @@ test_project_layout_applies_to_work_add_in_an_open_session() {
   wait_for tmux_session has-session -t work || fail "the work session did not open"
   mkdir -p "$HOME/api"
   work add "$HOME/api" >/dev/null || fail "work add exited with an error"
-  wait_for sh -c "[ \"\$(tmux list-panes -t work:api 2>/dev/null | wc -l | tr -d ' ')\" = 3 ]" || fail "the new window did not get three panes"
+  wait_for sh -c "[ \"\$(tmux list-panes -t work:api 2>/dev/null | wc -l | tr -d ' ')\" = 2 ]" || fail "the new window did not get two panes"
 }
 
 test_menu_toggles_the_agent_notification() {

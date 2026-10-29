@@ -21,7 +21,7 @@ picks the first option that applies:
 |---|---|---|
 | 1 | The project or your config sets a review command | That command is pasted into the agent chat |
 | 2 | The agent is Claude Code | `/code-review` is pasted into the chat; `work review branch` pastes `/code-review main...HEAD` |
-| 3 | Any other case | The workdeck review request opens in a separate pane |
+| 3 | Any other case | The workdeck review request opens in a window of its own |
 
 In cases 1 and 2 the review runs in the chat you are already using, so the
 agent that wrote the code is right there to fix what the review finds. Claude
@@ -69,9 +69,11 @@ separate pane. The files are read, not run, with the same rules as `settings.con
 
 ## The separate pane
 
-With `--pane`, with `staged`, or when no option above applies, `work review`
-opens the workdeck review request in a pane below your AI chat (or below the
-pane you are in). Running it again sends the request to the same pane.
+With `--pane`, with `staged`, with `REVIEW_AGENT_CMD` set, or when no option
+above applies, `work review` opens the workdeck review request in a window of
+its own, named `review: <project>`, right after the project window. The project
+window keeps its panes as they are. Running it again sends the request to the
+same window.
 
 The answer is a short list, one colored dot per finding. The request is written
 in Portuguese, like the rest of the workdeck interface:
@@ -103,8 +105,18 @@ each time. With `claude`, `codex` and `gemini`, the request goes straight into
 the conversation. With another AI, it goes to the clipboard and to
 `~/.cache/workdeck/review-request.md`, for you to paste.
 
-Which AI the pane uses: the one open in the window. If there is none, the one
-chosen during installation, stored as `AGENT_CMD` in `~/.config/workdeck/settings.conf`.
+Which AI the review uses: `REVIEW_AGENT_CMD` in `~/.config/workdeck/settings.conf`,
+when set. Otherwise the one open in the window, and if there is none, the one
+chosen during installation, stored as `AGENT_CMD`.
+
+A different model or AI for the review avoids repeating the blind spots of the
+one that wrote the code: agents built on the same model tend to make the same
+mistakes and to agree with each other. Set it once, and every `work review`
+runs in its own window with that agent, even with Claude Code open:
+
+```bash
+REVIEW_AGENT_CMD="claude --model opus"
+```
 
 ## Extra instructions
 

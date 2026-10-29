@@ -252,6 +252,7 @@ review() {
   for f in "$(dirname "$CONFIG")/review.md" "$root/.workdeck/review.md"; do
     [ -s "$f" ] && extra="$extra$(cat "$f")"$'\n'
   done
+  [ -z "$(setting_get REVIEW_AGENT_CMD)" ] || use_pane=1
   if [ "$use_pane" = 0 ] && review_in_chat "$root" "$target" "$base" "$extra"; then
     return 0
   fi
@@ -417,21 +418,21 @@ type_into() {
 
 project_layout() {
   local layout
-  layout="$(setting_get PROJECT_LAYOUT none)"
+  layout="$(setting_get PROJECT_LAYOUT agent-shell)"
   case "$layout" in
-    none|agent-server-shell) echo "$layout" ;;
+    none|agent-shell) echo "$layout" ;;
+    agent-server-shell) echo agent-shell ;;
     *)
-      echo "PROJECT_LAYOUT=\"$layout\" não existe no settings.conf; use agent-server-shell ou none. As janelas abrem com um painel só." >&2
-      echo none ;;
+      echo "PROJECT_LAYOUT=\"$layout\" não existe no settings.conf; use agent-shell ou none. As janelas abrem com o agente e o shell lado a lado." >&2
+      echo agent-shell ;;
   esac
 }
 
 setup_project_window() {
   local win="$1" dir="$2" layout="$3" agent_cmd="$4" agent server
-  [ "$layout" = agent-server-shell ] || return 0
+  [ "$layout" = agent-shell ] || return 0
   agent="$(tmux display -p -t "$win" '#{pane_id}')"
   server="$(tmux split-window -d -h -P -F '#{pane_id}' -t "$agent" -c "$dir")"
-  tmux split-window -d -v -t "$server" -c "$dir"
   tmux select-pane -t "$agent"
   (
     type_into "$agent" "$agent_cmd"
