@@ -3,6 +3,12 @@
 O `work update` mostra o trecho da versão nova antes de perguntar se quer
 atualizar. Cada versão é uma tag `vX.Y.Z`.
 
+## v1.3.0
+
+- Novo `PROJECT_LAYOUT="agent-server-shell"` no `settings.conf`: a janela de cada projeto já abre em três painéis, com o agente à esquerda, o servidor em cima à direita e um shell livre embaixo. O comando do agente (`AGENT_CMD`) e o do servidor (`SERVER_COMMAND` no `.workdeck/project.conf` do projeto) aparecem digitados, sem rodar: você aperta Enter onde for trabalhar. Vem desligado e vale para as janelas abertas depois de ligar.
+- No Windows, a instalação para logo no começo, antes de gravar qualquer coisa, e explica como instalar pelo WSL.
+- Correção: com o `ACTIVE_PANE="line"`, o `Ctrl+b Enter` não fechava a grade 2×2; agora o quarto painel vai para baixo do da esquerda também com o traço ligado.
+
 ## v1.2.0
 
 - `Ctrl+b Enter` e o "Dividir a tela" do menu montam uma grade sempre igual: o segundo painel abre ao lado, o terceiro embaixo do da direita e o quarto embaixo do da esquerda, fechando quatro painéis do mesmo tamanho. A partir do quinto, a janela vira uma grade igual. Os painéis que já existem não mudam de lugar. `Ctrl+b v` e `Ctrl+b -` continuam dividindo ao lado e embaixo, como antes. Rode `Ctrl+b r` depois de atualizar para a tecla nova valer na sessão aberta.
