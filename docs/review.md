@@ -29,10 +29,22 @@ Code runs `/code-review` as a background subagent with its own context, so the
 review does not inherit the conversation that wrote the code. Its findings show
 up in the chat when it finishes.
 
-`work review` pastes the command but does not press Enter: check the chat and
-press Enter yourself. That way it never answers a question the agent is asking,
-such as a permission request. If you were typing in the chat, the command is
-added to what you typed; run it with the chat prompt empty.
+The review is meant for when the agent has finished. With Claude Code,
+`work review` reads the chat screen first:
+
+| The Claude chat | What `work review` does |
+|---|---|
+| Idle, with an empty prompt | Sends the command and the review starts right away |
+| Still working | Sends nothing and asks you to run it again when Claude finishes |
+| Showing a question, such as a permission request | Sends nothing, so it never answers the question for you |
+| Holding a message you were typing | Sends nothing, so it never sends your message half written |
+
+With any other agent, `work review` pastes the command without pressing Enter:
+check the chat and press Enter yourself.
+
+With nothing uncommitted, `work review` still sends `/code-review` to Claude
+when the branch has commits not pushed yet, since that review covers them. The
+separate pane only reviews uncommitted changes.
 
 ## Your own review command
 

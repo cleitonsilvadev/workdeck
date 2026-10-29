@@ -164,9 +164,9 @@ commit, usando o melhor review que ele tiver:
 
 - **O seu comando de review**, como o do [BMAD](https://github.com/bmad-code-org/BMAD-METHOD),
   quando o projeto define um em `.workdeck/review.conf`.
-- **O review do próprio agente**: no Claude Code, o `work review` cola o
-  `/code-review` no chat que você está usando; você aperta Enter, e ele roda
-  como um subagente com contexto próprio, com os achados aparecendo ali para o
+- **O review do próprio agente**: no Claude Code, depois que o agente termina,
+  o `work review` começa o `/code-review` no chat que você está usando. Ele roda
+  como um subagente com contexto próprio, e os achados aparecem ali para o
   agente corrigir.
 - **O pedido de review do workdeck** num painel separado, para outros agentes ou
   com `work review --pane`. A resposta vem com uma bolinha por achado: 🔴 bug

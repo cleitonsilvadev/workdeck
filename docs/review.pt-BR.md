@@ -29,10 +29,22 @@ escreveu o código está ali para corrigir o que aparecer. O Claude Code roda o
 o review não herda a conversa que escreveu o código. Os achados chegam no chat
 quando ele termina.
 
-O `work review` cola o comando, mas não aperta Enter: confira no chat e aperte
-Enter você. Assim ele nunca responde a uma pergunta que o agente esteja fazendo,
-como um pedido de permissão. Se você estava digitando no chat, o comando entra
-junto do que você escreveu; rode com o campo do chat vazio.
+O review é para quando o agente terminou. No Claude Code, o `work review` lê a
+tela do chat antes:
+
+| O chat do Claude | O que o `work review` faz |
+|---|---|
+| Parado, com o campo vazio | Manda o comando e o review começa na hora |
+| Ainda trabalhando | Não manda nada e pede para rodar de novo quando o Claude terminar |
+| Com uma pergunta aberta, como um pedido de permissão | Não manda nada, para nunca responder a pergunta por você |
+| Com uma mensagem sua pela metade | Não manda nada, para nunca enviar a sua mensagem incompleta |
+
+Com qualquer outro agente, o `work review` cola o comando sem apertar Enter:
+confira no chat e aperte Enter você.
+
+Sem nada por commitar, o `work review` ainda manda o `/code-review` para o
+Claude quando a branch tem commits que não subiram, porque esse review cobre
+esses commits. O painel separado só revisa o que não foi commitado.
 
 ## O seu comando de review
 

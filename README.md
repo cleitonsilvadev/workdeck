@@ -168,10 +168,10 @@ commit, using the best review it has:
 
 - **Your review command**, such as a [BMAD](https://github.com/bmad-code-org/BMAD-METHOD)
   review, when the project sets one in `.workdeck/review.conf`.
-- **The agent's own review**: with Claude Code, `work review` pastes
-  `/code-review` into the chat you are using; you press Enter, and it runs as a
-  subagent with its own context, with the findings showing up there for the
-  agent to fix.
+- **The agent's own review**: with Claude Code, once the agent has finished,
+  `work review` starts `/code-review` in the chat you are using. It runs as a
+  subagent with its own context, and the findings show up there for the agent
+  to fix.
 - **The workdeck review request** in a separate pane, for other agents or with
   `work review --pane`. It answers with one colored dot per finding: 🔴 a bug
   to fix before the commit, 🟠 attention that can wait, 🟢 fine.

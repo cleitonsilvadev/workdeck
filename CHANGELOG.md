@@ -3,6 +3,11 @@
 O `work update` mostra o trecho da versão nova antes de perguntar se quer
 atualizar. Cada versão é uma tag `vX.Y.Z`.
 
+## v1.1.1
+
+- No Claude Code, o `work review` começa o review sozinho, sem você apertar Enter no chat. Ele só manda quando o Claude terminou: se ainda estiver trabalhando, com uma pergunta aberta ou com uma mensagem sua pela metade, não manda nada e diz o que falta.
+- Correção: sem nada por commitar, o `work review` dizia que não havia o que revisar mesmo com commits que ainda não subiram. Agora, com o Claude aberto, ele manda o `/code-review`, que revisa esses commits.
+
 ## v1.1.0
 
 - O `work review` usa o review do seu próprio agente. No Claude Code, ele cola o `/code-review` no chat que você está usando; você confere e aperta Enter, e os achados chegam ali, com o agente pronto para corrigir.
