@@ -11,8 +11,8 @@ REPO="${WORKDECK_REPO:-https://github.com/thiagofeliperibeiro/workdeck.git}"
 CODE="${XDG_DATA_HOME:-$HOME/.local/share}/workdeck"
 
 case "$(uname -s)" in
-  MINGW*|MSYS*|CYGWIN*)
-    echo "O workdeck roda em macOS e Linux."
+  MINGW*|MSYS*|CYGWIN*|*_NT*|Windows*)
+    echo "O workdeck roda em macOS e Linux. No Windows, use pelo WSL: abra o Ubuntu do WSL e rode a instalação de lá."
     exit 1 ;;
 esac
 

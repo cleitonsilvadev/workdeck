@@ -9,6 +9,10 @@ curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/g
 `get.sh` downloads the latest published version to `~/.local/share/workdeck`
 and runs `install.sh` from there. You do not need to clone the repository.
 
+workdeck runs on macOS and Linux. On Windows, install it inside WSL: open your
+WSL distribution (Ubuntu, for example) and run the command there. The installer
+stops before writing anything when it runs in Git Bash, MSYS or Cygwin.
+
 ## What the installer does
 
 1. Detects the system and the package manager (brew on macOS; apt, dnf,

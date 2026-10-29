@@ -237,10 +237,6 @@ detect_system() {
         command -v "$g" >/dev/null && { PKG_MANAGER="$g"; break; }
       done
       ;;
-    MINGW*|MSYS*|CYGWIN*)
-      echo "O workdeck roda em macOS e Linux."
-      exit 1
-      ;;
     *) OS_NAME="$(uname -s)" ;;
   esac
   [ "$(id -u)" != 0 ] && SUDO="sudo"
@@ -938,7 +934,16 @@ EOF
   show_choices
 }
 
+refuse_windows() {
+  case "$(uname -s)" in
+    MINGW*|MSYS*|CYGWIN*|*_NT*|Windows*)
+      echo "O workdeck roda em macOS e Linux. No Windows, use pelo WSL: abra o Ubuntu do WSL e rode a instalação de lá."
+      exit 1 ;;
+  esac
+}
+
 main() {
+  refuse_windows
   parse_options "$@"
   setup_output
   [ "$DRY" = 1 ] || { settings_ensure_header; migrate_legacy_config; }

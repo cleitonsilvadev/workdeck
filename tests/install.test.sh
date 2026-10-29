@@ -126,3 +126,12 @@ test_agent_cmd_is_read_without_sourcing() {
   assert_contains "$output" "'not-a-real-agent-xyz' não está no PATH"
   assert "the settings file was not executed" test ! -e "$TEST_TMP/pwned"
 }
+
+test_refuses_to_install_on_windows() {
+  printf '#!/bin/sh\necho MINGW64_NT-10.0\n' > "$BASE/bin/uname"
+  chmod +x "$BASE/bin/uname"
+  if output="$(install_workdeck 2>&1)"; then fail "install should fail on Windows"; fi
+  assert_contains "$output" "use pelo WSL"
+  assert "work was not installed" test ! -e "$HOME/.local/bin/work"
+  if grep -q '^THEME=' "$CONFIG/settings.conf" 2>/dev/null; then fail "the installer wrote settings before refusing"; fi
+}

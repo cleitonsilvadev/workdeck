@@ -9,6 +9,11 @@ curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/g
 O `get.sh` baixa a versão publicada mais nova para `~/.local/share/workdeck`
 e roda o `install.sh` de lá. Não é preciso clonar o repositório.
 
+O workdeck roda no macOS e no Linux. No Windows, instale dentro do WSL: abra a
+sua distribuição do WSL (o Ubuntu, por exemplo) e rode o comando lá. O
+instalador para antes de gravar qualquer coisa quando roda no Git Bash, no MSYS
+ou no Cygwin.
+
 ## O que o instalador faz
 
 1. Detecta o sistema e o gerenciador de pacotes — brew no macOS; apt, dnf,
