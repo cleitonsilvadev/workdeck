@@ -199,16 +199,29 @@ review_in_chat() {
     [ -z "$REVIEW_WARNING" ] || tell "$REVIEW_WARNING"
     return 1
   fi
-  "$LIB/workdeck-agent" --send "$pane" "$cmd"
   case "$cmd" in
     /code-review*) [ -z "$extra" ] || note="o review.md não vai para o /code-review; ponha essas regras no CLAUDE.md do projeto, que ele segue." ;;
   esac
+  if [ "$agent" = claude ]; then
+    case "$("$LIB/workdeck-agent" --claude-state "$pane")" in
+      busy) tell "o claude ainda está trabalhando; rode o work review quando ele terminar."; return 0 ;;
+      blocked) tell "o chat do claude não está livre: responda a pergunta que estiver aberta ou apague o que estiver digitado, e rode o work review de novo."; return 0 ;;
+    esac
+    if "$LIB/workdeck-agent" --submit "$pane" "$cmd"; then
+      tell ${REVIEW_WARNING:+"$REVIEW_WARNING"} "o review começou no chat do claude: $cmd" ${note:+"$note"}
+      return 0
+    fi
+  else
+    "$LIB/workdeck-agent" --send "$pane" "$cmd"
+  fi
   tell ${REVIEW_WARNING:+"$REVIEW_WARNING"} "colei no chat do $agent: $cmd" "confira e aperte Enter lá para começar o review." ${note:+"$note"}
   return 0
 }
 
+unpushed_commits() { git rev-list --count '@{upstream}..HEAD' 2>/dev/null || echo 0; }
+
 review() {
-  local target="" use_pane=0 arg base="" description commands request root branch extra f
+  local target="" use_pane=0 only_commits=0 arg base="" description commands request root branch extra f
   for arg in "$@"; do
     case "$arg" in
       --pane) use_pane=1 ;;
@@ -223,7 +236,9 @@ review() {
   fi
   case "$target" in
     uncommitted|"")
-      if [ -z "$(git status --porcelain)" ]; then echo "nada mudou desde o último commit; não há o que revisar."; return 0; fi
+      if [ -z "$(git status --porcelain)" ]; then
+        if [ "$(unpushed_commits)" -gt 0 ]; then only_commits=1; else echo "nada mudou desde o último commit; não há o que revisar."; return 0; fi
+      fi
       description="o que ainda não foi commitado"
       commands="git diff HEAD, e os arquivos novos de git ls-files --others --exclude-standard" ;;
     staged)
@@ -246,6 +261,10 @@ review() {
     [ -s "$f" ] && extra="$extra$(cat "$f")"$'\n'
   done
   if [ "$use_pane" = 0 ] && review_in_chat "$root" "$target" "$base" "$extra"; then
+    return 0
+  fi
+  if [ "$only_commits" = 1 ]; then
+    echo "nada mudou desde o último commit. Os commits que ainda não subiram só entram no review do próprio agente: abra o claude nesta janela e rode de novo."
     return 0
   fi
   request="$WORKDECK_CACHE/review-request.md"

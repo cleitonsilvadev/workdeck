@@ -106,6 +106,31 @@ send_to_pane() {
   tmux select-pane -t "$1"
 }
 
+screen_has_line() {
+  tmux capture-pane -p -t "$1" | awk -v want="$2" '{ sub(/[ \t]+$/, "") } $0 == want { found = 1 } END { exit !found }'
+}
+
+claude_state() {
+  if tmux capture-pane -p -t "$1" | grep -q 'esc to interrupt'; then echo busy
+  elif screen_has_line "$1" "❯"; then echo ready
+  else echo blocked
+  fi
+}
+
+submit_to_claude() {
+  local pane="$1" text="$2" n=0
+  send_to_pane "$pane" "$text"
+  while [ "$n" -lt 10 ]; do
+    if screen_has_line "$pane" "❯ $text"; then
+      tmux send-keys -t "$pane" Enter
+      return 0
+    fi
+    sleep 0.1
+    n=$((n + 1))
+  done
+  return 3
+}
+
 case "${1:-}" in
   --active)
     agent_in_window
@@ -113,6 +138,14 @@ case "${1:-}" in
     ;;
   --send)
     send_to_pane "${2:?use: workdeck-agent --send <painel> <texto>}" "${3:?use: workdeck-agent --send <painel> <texto>}"
+    exit $?
+    ;;
+  --claude-state)
+    claude_state "${2:?use: workdeck-agent --claude-state <painel>}"
+    exit 0
+    ;;
+  --submit)
+    submit_to_claude "${2:?use: workdeck-agent --submit <painel> <texto>}" "${3:?use: workdeck-agent --submit <painel> <texto>}"
     exit $?
     ;;
   --check)

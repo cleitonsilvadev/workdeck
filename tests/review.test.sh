@@ -38,8 +38,10 @@ test_review_without_changes_says_so() {
 }
 
 open_fake_agent() {
+  local screen="${2-❯ }"
   ln -s "$(command -v cat)" "$BASE/bin/$1"
-  AGENT_PANE="$(tmux new-session -d -P -F '#{pane_id}' -s work -x 120 -y 30 -c "$HOME/api" "$BASE/bin/$1")"
+  printf '%s' "$screen" > "$BASE/screen"
+  AGENT_PANE="$(tmux new-session -d -P -F '#{pane_id}' -s work -x 120 -y 30 -c "$HOME/api" "cat '$BASE/screen'; exec '$BASE/bin/$1'")"
   wait_for sh -c "ps -o comm= -t \"\$(tmux display -p -t '$AGENT_PANE' '#{pane_tty}' | sed 's#/dev/##')\" | grep -q '$1'" || fail "the fake $1 did not start"
 }
 
@@ -51,15 +53,80 @@ agent_screen() {
   tmux capture-pane -p -t "$AGENT_PANE"
 }
 
-test_review_sends_code_review_to_the_open_claude() {
+times_on_screen() {
+  tmux capture-pane -p -t "$AGENT_PANE" | grep -c -- "$1" || true
+}
+
+wait_on_screen() {
+  wait_for sh -c "tmux capture-pane -p -t '$AGENT_PANE' | grep -q -- '$1'" || fail "[$1] did not reach the agent: $(agent_screen)"
+}
+
+project_with_unpushed_commit() {
+  git init -q --bare "$HOME/remote.git"
+  mkdir -p "$HOME/api"
+  git -C "$HOME/api" init -q -b main
+  echo 'export const a = 1' > "$HOME/api/index.ts"
+  git -C "$HOME/api" add -A
+  git -C "$HOME/api" -c user.name=t -c user.email=t@t commit -qm initial
+  git -C "$HOME/api" remote add origin "$HOME/remote.git"
+  git -C "$HOME/api" push -q -u origin main 2>/dev/null
+  echo 'export const a = 2' > "$HOME/api/index.ts"
+  git -C "$HOME/api" -c user.name=t -c user.email=t@t commit -qam change
+}
+
+test_review_starts_code_review_in_the_idle_claude() {
   install_workdeck >/dev/null || fail "install exited with an error"
   project_with_change
   open_fake_agent claude
   output="$(review_from_window)"
-  assert_contains "$output" "colei no chat do claude: /code-review"
-  wait_for sh -c "tmux capture-pane -p -t '$AGENT_PANE' | grep -q '/code-review'" || fail "the command did not reach the agent: $(agent_screen)"
+  assert_contains "$output" "o review começou no chat do claude: /code-review"
+  wait_for sh -c "[ \"\$(tmux capture-pane -p -t '$AGENT_PANE' | grep -c /code-review)\" -ge 2 ]" || fail "Enter was not pressed: $(agent_screen)"
   assert_equal "$(tmux list-panes -t work | wc -l | tr -d ' ')" 1 "panes in the window"
   assert "no request file was written" test ! -e "$HOME/.cache/workdeck/review-request.md"
+}
+
+test_review_waits_while_claude_is_working() {
+  install_workdeck >/dev/null || fail "install exited with an error"
+  project_with_change
+  open_fake_agent claude "✽ Working… (esc to interrupt)
+❯ "
+  assert_contains "$(review_from_window)" "o claude ainda está trabalhando"
+  sleep 0.5
+  assert_equal "$(times_on_screen /code-review)" 0 "the command on the agent screen"
+}
+
+test_review_does_not_answer_an_open_question() {
+  install_workdeck >/dev/null || fail "install exited with an error"
+  project_with_change
+  open_fake_agent claude " Do you want to proceed?
+ ❯ 1. Yes
+   2. No
+"
+  assert_contains "$(review_from_window)" "o chat do claude não está livre"
+  sleep 0.5
+  assert_equal "$(times_on_screen /code-review)" 0 "the command on the agent screen"
+}
+
+test_review_does_not_send_over_a_typed_message() {
+  install_workdeck >/dev/null || fail "install exited with an error"
+  project_with_change
+  open_fake_agent claude "❯ meia mensagem"
+  assert_contains "$(review_from_window)" "o chat do claude não está livre"
+  sleep 0.5
+  assert_equal "$(times_on_screen /code-review)" 0 "the command on the agent screen"
+}
+
+test_review_covers_unpushed_commits_with_claude() {
+  install_workdeck >/dev/null || fail "install exited with an error"
+  project_with_unpushed_commit
+  open_fake_agent claude
+  assert_contains "$(review_from_window)" "o review começou no chat do claude: /code-review"
+}
+
+test_review_without_claude_explains_unpushed_commits() {
+  install_workdeck >/dev/null || fail "install exited with an error"
+  project_with_unpushed_commit
+  assert_contains "$(cd "$HOME/api" && work review 2>&1)" "Os commits que ainda não subiram só entram no review do próprio agente"
 }
 
 test_review_branch_sends_the_range_to_claude() {
@@ -76,7 +143,18 @@ test_review_uses_the_project_review_command() {
   echo 'REVIEW_COMMAND="/bmad-code-review"' > "$HOME/api/.workdeck/review.conf"
   open_fake_agent codex
   assert_contains "$(review_from_window)" "colei no chat do codex: /bmad-code-review"
-  wait_for sh -c "tmux capture-pane -p -t '$AGENT_PANE' | grep -q '/bmad-code-review'" || fail "the command did not reach the agent: $(agent_screen)"
+  wait_on_screen /bmad-code-review
+}
+
+test_review_does_not_press_enter_for_other_agents() {
+  install_workdeck >/dev/null || fail "install exited with an error"
+  project_with_change
+  echo 'REVIEW_COMMAND="/review"' >> "$CONFIG/settings.conf"
+  open_fake_agent codex
+  review_from_window >/dev/null
+  wait_on_screen /review
+  sleep 1
+  assert_equal "$(times_on_screen /review)" 1 "times the command shows on screen"
 }
 
 test_review_pane_flag_keeps_the_separate_pane() {
@@ -85,7 +163,7 @@ test_review_pane_flag_keeps_the_separate_pane() {
   open_fake_agent claude
   review_from_window --pane >/dev/null
   assert "the request was written" test -s "$HOME/.cache/workdeck/review-request.md"
-  assert_not_contains "$(agent_screen)" "/code-review" "the agent chat"
+  assert_equal "$(times_on_screen /code-review)" 0 "the command on the agent screen"
 }
 
 test_review_without_native_review_uses_the_pane() {
@@ -101,7 +179,8 @@ test_review_from_the_menu_reaches_the_open_claude() {
   project_with_change
   open_fake_agent claude
   tmux run-shell -t "$AGENT_PANE" -c "$HOME/api" 'WORKDECK_FROM_MENU=1 TMUX_PANE=#{pane_id} work review' >/dev/null 2>&1
-  wait_for sh -c "tmux capture-pane -p -t '$AGENT_PANE' | grep -q '/code-review'" || fail "the command did not reach the agent: $(agent_screen)"
+  wait_on_screen /code-review
+  assert_equal "$(tmux display -p -t "$AGENT_PANE" '#{pane_in_mode}')" 0 "the chat pane is not covered by tmux output"
 }
 
 test_review_ignores_a_project_command_with_arguments() {
@@ -112,8 +191,8 @@ test_review_ignores_a_project_command_with_arguments() {
   open_fake_agent claude
   output="$(review_from_window)"
   assert_contains "$output" "ignorei o REVIEW_COMMAND"
-  assert_contains "$output" "colei no chat do claude: /code-review"
-  assert_not_contains "$(agent_screen)" "push to main"
+  assert_contains "$output" "o review começou no chat do claude: /code-review"
+  assert_equal "$(times_on_screen 'push to main')" 0 "the project text on the agent screen"
 }
 
 test_review_accepts_any_command_from_the_user_config() {
@@ -121,17 +200,7 @@ test_review_accepts_any_command_from_the_user_config() {
   project_with_change
   echo 'REVIEW_COMMAND="/code-review high"' >> "$CONFIG/settings.conf"
   open_fake_agent claude
-  assert_contains "$(review_from_window)" "colei no chat do claude: /code-review high"
-}
-
-test_review_does_not_press_enter_in_the_chat() {
-  install_workdeck >/dev/null || fail "install exited with an error"
-  project_with_change
-  open_fake_agent claude
-  review_from_window >/dev/null
-  wait_for sh -c "tmux capture-pane -p -t '$AGENT_PANE' | grep -q '/code-review'" || fail "the command did not reach the agent"
-  sleep 1
-  assert_equal "$(tmux capture-pane -p -t "$AGENT_PANE" | grep -c '/code-review')" 1 "times the command shows on screen"
+  assert_contains "$(review_from_window)" "o review começou no chat do claude: /code-review high"
 }
 
 test_review_staged_keeps_the_pane_even_with_a_review_command() {
@@ -142,14 +211,5 @@ test_review_staged_keeps_the_pane_even_with_a_review_command() {
   open_fake_agent claude
   review_from_window staged >/dev/null
   assert "the request was written" test -s "$HOME/.cache/workdeck/review-request.md"
-  assert_not_contains "$(agent_screen)" "/code-review" "the agent chat"
-}
-
-test_review_from_the_menu_does_not_cover_the_chat() {
-  install_workdeck >/dev/null || fail "install exited with an error"
-  project_with_change
-  open_fake_agent claude
-  tmux run-shell -t "$AGENT_PANE" -c "$HOME/api" 'WORKDECK_FROM_MENU=1 TMUX_PANE=#{pane_id} work review' >/dev/null 2>&1
-  wait_for sh -c "tmux capture-pane -p -t '$AGENT_PANE' | grep -q '/code-review'" || fail "the command did not reach the agent"
-  assert_equal "$(tmux display -p -t "$AGENT_PANE" '#{pane_in_mode}')" 0 "the chat pane is not covered by tmux output"
+  assert_equal "$(times_on_screen /code-review)" 0 "the command on the agent screen"
 }
