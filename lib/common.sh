@@ -32,7 +32,7 @@ setting_get() { config_get "$WORKDECK_SETTINGS" "$@"; }
 config_get() {
   local file="$1" line value
   shift
-  if ! line="$(tr -d '\r' < "$file" 2>/dev/null | grep -a -m1 "^$1=\".*$SETTING_LINE_END")"; then
+  if ! line="$(LC_ALL=C tr -d '\r' < "$file" 2>/dev/null | grep -a -m1 "^$1=\".*$SETTING_LINE_END")"; then
     printf '%s\n' "${2:-}"
     return 0
   fi

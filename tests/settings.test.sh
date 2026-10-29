@@ -153,12 +153,13 @@ test_template_keeps_the_users_edits() {
   write_settings 'THEME="a"\n'
   settings_ensure_template
   assert_contains "$(cat "$WORKDECK_SETTINGS")" '#ACTIVE_PANE="line"' "the example is added next to other keys"
-  write_settings 'ACTIVE_PANE="line"\n'
+  assert_contains "$(cat "$WORKDECK_SETTINGS")" '#PROJECT_LAYOUT="agent-server-shell"' "the layout example is added"
+  write_settings 'ACTIVE_PANE="line"\nPROJECT_LAYOUT="agent-server-shell"\n'
   settings_ensure_template
-  assert_equal "$(cat "$WORKDECK_SETTINGS")" 'ACTIVE_PANE="line"' "an active key is left alone"
-  write_settings '#ACTIVE_PANE="none"\n'
+  assert_equal "$(cat "$WORKDECK_SETTINGS")" "$(printf 'ACTIVE_PANE="line"\nPROJECT_LAYOUT="agent-server-shell"')" "active keys are left alone"
+  write_settings '#ACTIVE_PANE="none"\n#PROJECT_LAYOUT="none"\n'
   settings_ensure_template
-  assert_equal "$(cat "$WORKDECK_SETTINGS")" '#ACTIVE_PANE="none"' "a commented key is left alone"
+  assert_equal "$(cat "$WORKDECK_SETTINGS")" "$(printf '#ACTIVE_PANE="none"\n#PROJECT_LAYOUT="none"')" "commented keys are left alone"
 }
 
 test_set_and_unset_write_through_a_symlinked_file() {
