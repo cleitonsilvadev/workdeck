@@ -13,20 +13,18 @@ asking whether to update. Each version is a `vX.Y.Z` tag.
 - O workdeck fala inglês ou português. Na primeira instalação, a primeira pergunta é o idioma, com o do sistema como padrão; `--lang en` ou `--lang pt-BR` responde sem perguntar, e a escolha fica como `LANGUAGE` no `settings.conf`. Quem já usa o workdeck responde uma vez, no próximo `work update`, com o português como padrão: Enter deixa tudo como estava.
 - Seguem o idioma: o instalador, o comando `work`, o menu, o painel, a janela do painel (`painel` ou `panel`), os avisos da barra, o pedido de review que vai para o agente e este registro de mudanças, que agora traz cada versão nos dois idiomas. As integrações, o desinstalador e o `get.sh` ficam para a próxima versão.
 - `work update --off` e `work update --on` ligam e desligam o aviso de versão nova; `--desligar` e `--ligar` continuam funcionando. `work --help` lista os comandos.
-- Rode `Ctrl+b r` depois de atualizar, para a barra usar as frases novas.
+- A janela de cada projeto abre com o agente e um shell lado a lado, em todos os projetos, sempre que o `work` abre a sessão. Antes, ela abria com um painel só, ou com três no `PROJECT_LAYOUT="agent-server-shell"`, que agora também abre dois. Para voltar a um painel só, use `PROJECT_LAYOUT="none"` no `settings.conf`. O `Ctrl+b Enter` continua igual.
+- Novo `REVIEW_AGENT_CMD` no `settings.conf`: escolhe o agente ou o modelo que faz o `work review`, como `claude --model opus`. O review roda no painel separado, embaixo do chat, e um modelo diferente do que escreveu o código não repete os mesmos pontos cegos.
+- Rode `Ctrl+b r` e depois `work kill` e `work`, para a barra usar as frases novas e as janelas abrirem com os dois painéis.
 
 ### English
 
 - workdeck speaks English or Portuguese. On the first install, the first question is the language, with the system language as the default; `--lang en` or `--lang pt-BR` answers without asking, and the choice is saved as `LANGUAGE` in `settings.conf`. If you already use workdeck, the next `work update` asks once, with Portuguese as the default: Enter keeps everything as it was.
 - These follow the language: the installer, the `work` command, the menu, the panel, the panel window (`panel` or `painel`), the status bar messages, the review request sent to the agent and this changelog, which now has each version in both languages. The integrations, the uninstaller and `get.sh` come in the next version.
 - `work update --off` and `work update --on` turn the new version notice off and on; `--desligar` and `--ligar` keep working. `work --help` lists the commands.
-- Run `Ctrl+b r` after updating, so the status bar uses the new messages.
-
-## v1.6.0
-
-- A janela de cada projeto abre com o agente e um shell lado a lado, em todos os projetos, sempre que o `work` abre a sessão. Antes, ela abria com um painel só, ou com três no `PROJECT_LAYOUT="agent-server-shell"`, que agora também abre dois. Para voltar a um painel só, use `PROJECT_LAYOUT="none"` no `settings.conf`. O `Ctrl+b Enter` continua igual.
-- Novo `REVIEW_AGENT_CMD` no `settings.conf`: escolhe o agente ou o modelo que faz o `work review`, como `claude --model opus`. O review roda no painel separado, embaixo do chat, e um modelo diferente do que escreveu o código não repete os mesmos pontos cegos.
-- Rode `work kill` e `work` depois de atualizar, para as janelas abrirem com os dois painéis.
+- Each project window opens with the agent and a shell side by side, in every project, whenever `work` opens the session. Before, it opened with a single pane, or with three under `PROJECT_LAYOUT="agent-server-shell"`, which now opens two as well. To go back to a single pane, use `PROJECT_LAYOUT="none"` in `settings.conf`. `Ctrl+b Enter` stays the same.
+- New `REVIEW_AGENT_CMD` in `settings.conf`: picks the agent or model that runs `work review`, such as `claude --model opus`. The review runs in the separate pane below the chat, and a model other than the one that wrote the code does not repeat the same blind spots.
+- Run `Ctrl+b r`, then `work kill` and `work`, so the status bar uses the new messages and the windows open with the two panes.
 
 ## v1.5.0
 
