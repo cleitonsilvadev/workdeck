@@ -3,6 +3,10 @@
 O `work update` mostra o trecho da versão nova antes de perguntar se quer
 atualizar. Cada versão é uma tag `vX.Y.Z`.
 
+## v1.2.0
+
+- `Ctrl+b Enter` e o "Dividir a tela" do menu montam uma grade sempre igual: o segundo painel abre ao lado, o terceiro embaixo do da direita e o quarto embaixo do da esquerda, fechando quatro painéis do mesmo tamanho. A partir do quinto, a janela vira uma grade igual. Os painéis que já existem não mudam de lugar. `Ctrl+b v` e `Ctrl+b -` continuam dividindo ao lado e embaixo, como antes. Rode `Ctrl+b r` depois de atualizar para a tecla nova valer na sessão aberta.
+
 ## v1.1.2
 
 - Correção: no Claude Code, o `work review` colava o `/code-review` mas não apertava Enter. A leitura da tela não reconhecia o campo de mensagem do Claude, que usa um espaço especial depois do `❯` e mostra uma sugestão apagada quando está vazio. Agora o review começa sozinho, como prometido na v1.1.1.

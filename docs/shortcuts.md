@@ -9,7 +9,7 @@
 | **Open the menu** (projects, review, split…) | <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>h</kbd> |
 | Previous / next project | <kbd>Shift</kbd>+<kbd>←</kbd> / <kbd>→</kbd> |
 | Go to window N | <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>1</kbd>…<kbd>9</kbd> |
-| Split the screen (side by side or stacked, whichever fits) | <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>Enter</kbd> |
+| Split the screen in a grid: beside, then below the right pane, then below the left one | <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>Enter</kbd> |
 | Pick the direction: side by side / stacked | <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>v</kbd> / <kbd>-</kbd> |
 | Previous / next pane | <kbd>Shift</kbd>+<kbd>↑</kbd> / <kbd>↓</kbd> |
 | Zoom the pane, and again to restore | <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>z</kbd> |

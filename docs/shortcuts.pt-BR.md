@@ -9,7 +9,7 @@
 | **Abrir o menu** (projetos, review, dividir…) | <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>h</kbd> |
 | Projeto anterior / próximo | <kbd>Shift</kbd>+<kbd>←</kbd> / <kbd>→</kbd> |
 | Ir direto para a janela N | <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>1</kbd>…<kbd>9</kbd> |
-| Dividir a tela (ao lado ou embaixo, onde couber) | <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>Enter</kbd> |
+| Dividir a tela em grade: ao lado, depois embaixo do da direita, depois embaixo do da esquerda | <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>Enter</kbd> |
 | Escolher o sentido: ao lado / embaixo | <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>v</kbd> / <kbd>-</kbd> |
 | Painel anterior / próximo | <kbd>Shift</kbd>+<kbd>↑</kbd> / <kbd>↓</kbd> |
 | Zoom no painel, e de novo para voltar | <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>z</kbd> |

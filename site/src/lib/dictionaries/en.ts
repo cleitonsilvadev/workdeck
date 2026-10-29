@@ -95,7 +95,7 @@ export const en: Dictionary = {
       { prefix: true, keys: ["d"], desc: "Leaves the session running" },
     ],
     act: [
-      { prefix: true, keys: ["Enter"], desc: "Splits where it fits" },
+      { prefix: true, keys: ["Enter"], desc: "Splits the screen in a grid, up to 2×2" },
       { prefix: true, keys: ["v"], desc: "Splits side by side" },
       { prefix: true, keys: ["-"], desc: "Splits below" },
       { prefix: true, keys: ["z"], desc: "Zooms the pane, again to go back" },

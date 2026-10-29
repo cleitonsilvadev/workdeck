@@ -94,7 +94,7 @@ export const ptBR = {
       { prefix: true, keys: ["d"], desc: "Sai e deixa a sessão rodando" },
     ],
     act: [
-      { prefix: true, keys: ["Enter"], desc: "Divide a tela onde couber" },
+      { prefix: true, keys: ["Enter"], desc: "Divide a tela em grade, até 2×2" },
       { prefix: true, keys: ["v"], desc: "Divide ao lado" },
       { prefix: true, keys: ["-"], desc: "Divide embaixo" },
       { prefix: true, keys: ["z"], desc: "Zoom no painel, e de novo para voltar" },
