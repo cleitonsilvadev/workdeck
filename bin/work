@@ -86,7 +86,7 @@ release_notes() {
 
 check_in_background() {
   local now last
-  aviso_ligado || return 0
+  notify_enabled || return 0
   [ -d "$CODE/.git" ] || return 0
   now=$(date +%s)
   last="$(cache_get checked)"
