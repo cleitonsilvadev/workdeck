@@ -15,10 +15,15 @@ function preferredLocale(request: NextRequest) {
 }
 
 export function proxy(request: NextRequest) {
-  request.nextUrl.pathname = `/${preferredLocale(request)}`
-  return NextResponse.redirect(request.nextUrl)
+  const { pathname } = request.nextUrl
+  if (pathname === "/") {
+    request.nextUrl.pathname = `/${preferredLocale(request)}`
+    return NextResponse.redirect(request.nextUrl)
+  }
+  if (hasLocale(pathname.split("/")[1] ?? "")) return
+  return new NextResponse("Not found", { status: 404, headers: { "content-type": "text/plain; charset=utf-8" } })
 }
 
 export const config = {
-  matcher: ["/"],
+  matcher: ["/((?!_next|api|.*\\..*).*)"],
 }
