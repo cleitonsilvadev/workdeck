@@ -15,12 +15,10 @@ function preferredLocale(request: NextRequest) {
 }
 
 export function proxy(request: NextRequest) {
-  const { pathname } = request.nextUrl
-  if (locales.some((l) => pathname === `/${l}` || pathname.startsWith(`/${l}/`))) return
-  request.nextUrl.pathname = `/${preferredLocale(request)}${pathname === "/" ? "" : pathname}`
+  request.nextUrl.pathname = `/${preferredLocale(request)}`
   return NextResponse.redirect(request.nextUrl)
 }
 
 export const config = {
-  matcher: ["/((?!_next|api|.*\\..*).*)"],
+  matcher: ["/"],
 }
