@@ -124,7 +124,7 @@ claude_prompt() {
 
 claude_state() {
   local prompt
-  if tmux capture-pane -p -t "$1" | grep -q 'esc to interrupt'; then echo busy; return 0; fi
+  if tmux capture-pane -p -t "$1" | LC_ALL=C awk "$SCREEN_BUSY_AWK"' { s = s $0 "\n" } END { exit !screen_busy(s) }'; then echo busy; return 0; fi
   prompt="$(claude_prompt "$1")"
   case "$prompt" in
     "prompt:"|"prompt:"$'\001'*) echo ready ;;

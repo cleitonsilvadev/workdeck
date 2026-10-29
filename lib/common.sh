@@ -4,6 +4,24 @@ WORKDECK_CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/workdeck"
 WORKDECK_BIN="$HOME/.local/bin"
 WORKDECK_SETTINGS="$WORKDECK_CONFIG/settings.conf"
 KNOWN_AGENTS="claude codex copilot aider gemini opencode cursor-agent crush goose q"
+SCREEN_BUSY_AWK='
+function is_prompt(t) {
+  sub(/^[ \t]+/, "", t)
+  return index(t, "\342\235\257") == 1 || index(t, "\342\200\272") == 1 || index(t, "\342\226\214") == 1
+}
+function is_status(t) {
+  t = tolower(t)
+  return index(t, "esc to interrupt)") || index(t, "\302\267 esc to interrupt") || index(t, "\342\200\242 esc to interrupt")
+}
+function screen_busy(s,   n, line, i, start) {
+  n = split(s, line, "\n")
+  while (n > 0 && line[n] ~ /^[ \t]*$/) n--
+  start = n - 20
+  for (i = n; i > 0; i--) if (is_prompt(line[i])) { start = i - 20; break }
+  if (start < 1) start = 1
+  for (i = start; i <= n; i++) if (is_status(line[i])) return 1
+  return 0
+}'
 
 short_path() {
   case "$1" in

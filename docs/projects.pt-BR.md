@@ -68,8 +68,9 @@ A estrela some quando você abre a janela, ou quando todos os agentes dela
 voltam a trabalhar. A janela que você está olhando nunca é marcada.
 
 No Claude Code e no Codex, o workdeck sabe que o agente está trabalhando
-enquanto a tela dele mostra "esc to interrupt". Nos outros agentes, ele
-acompanha as mudanças na tela e marca a janela depois de 10 segundos sem
+enquanto a linha de status dele, perto do campo de mensagem, mostra "esc to
+interrupt"; a mesma frase no meio da conversa não conta. Nos outros agentes,
+ele acompanha as mudanças na tela e marca a janela depois de 10 segundos sem
 mudança.
 
 Para receber também uma notificação do sistema ("o claude terminou em api"),

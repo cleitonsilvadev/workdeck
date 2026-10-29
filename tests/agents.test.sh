@@ -96,6 +96,47 @@ test_claude_is_done_when_esc_to_interrupt_goes_away() {
   assert_equal "$(agent_done_flag)" 1 "the window after claude finishes"
 }
 
+test_esc_to_interrupt_in_the_conversation_is_not_work() {
+  install_workdeck >/dev/null || fail "install exited with an error"
+  claude_session
+  check
+  claude_screen "✽ Working… (esc to interrupt)"
+  check
+  tmux send-keys -t "$AGENT_PANE" "clear; printf '%s\\n' 'fala de esc to interrupt' 2 3 4 5 6 7 8 '❯ '" Enter
+  sleep 1.6
+  check
+  assert_equal "$(agent_done_flag)" 1 "the window of a claude whose conversation mentions the phrase"
+}
+
+test_claude_with_a_todo_list_is_still_working() {
+  install_workdeck >/dev/null || fail "install exited with an error"
+  claude_session
+  check
+  claude_screen "✽ Working… (esc to interrupt)"
+  check
+  tmux send-keys -t "$AGENT_PANE" "clear; printf '%s\\n' '✽ Working… (esc to interrupt)' '  ⎿  ☐ um' '     ☐ dois' '     ☐ tres' '     ☐ quatro' '     ☐ cinco' '     ☐ seis' '' '────' '❯ ' '────' '  ? for shortcuts'" Enter
+  sleep 0.4
+  check
+  sleep 1.2
+  check
+  assert_equal "$(agent_done_flag)" "" "the window of a claude working through a todo list"
+}
+
+test_codex_status_line_counts_as_working() {
+  install_workdeck >/dev/null || fail "install exited with an error"
+  agent_session codex bash
+  wait_for sh -c "[ \"\$(tmux display -p -t '$AGENT_PANE' '#{cursor_x}')\" -gt 0 ]" || fail "the fake codex shell did not show a prompt"
+  check
+  claude_screen "• Working (1s • esc to interrupt)"
+  check
+  tmux send-keys -t "$AGENT_PANE" "clear; printf '%s\\n' '• Working (5s • esc to interrupt)' '' '› rascunho' 'linha 2' 'linha 3' 'linha 4' 'linha 5' 'linha 6' 'linha 7' 'linha 8' '' '  ⏎ send'" Enter
+  sleep 0.4
+  check
+  sleep 1.2
+  check
+  assert_equal "$(agent_done_flag)" "" "the window of a codex with a long draft"
+}
+
 test_claude_footer_notices_do_not_mark_it_done() {
   install_workdeck >/dev/null || fail "install exited with an error"
   claude_session

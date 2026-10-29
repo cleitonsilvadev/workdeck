@@ -67,8 +67,9 @@ the status bar. A window with several agents still shows a single star:
 The star goes away when you open the window, or when every agent in it is
 working again. Nothing is marked for the window you are looking at.
 
-For Claude Code and Codex, workdeck knows an agent is working while its screen
-shows "esc to interrupt". For other agents, it watches the screen change and
+For Claude Code and Codex, workdeck knows an agent is working while its status
+line near the message field shows "esc to interrupt"; the same words in the
+conversation do not count. For other agents, it watches the screen change and
 marks the window after 10 seconds without changes.
 
 To also get a system notification ("o claude terminou em api"), add this to

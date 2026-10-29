@@ -520,7 +520,7 @@ check_agents() {
   printf '%s\n' "$agents" > "$dir/agents"
   tmux list-panes -a -F '#{pane_id}	#{window_name}	#{@wd_working}	#{@wd_changed}	#{@wd_screen}' > "$dir/state" 2>/dev/null || true
   tmux "${capture[@]}" > "$dir/screens" 2>/dev/null || true
-  awk -v now="$now" -v idle="$idle" -v watched=" $watched " '
+  LC_ALL=C awk -v now="$now" -v idle="$idle" -v watched=" $watched " "$SCREEN_BUSY_AWK"'
     FILENAME ~ /agents$/ { win[$2] = $1; agent[$2] = $3; order[++n] = $2; next }
     FILENAME ~ /state$/ { split($0, f, "\t"); name[f[1]] = f[2]; working[f[1]] = f[3]; changed[f[1]] = f[4]; screen[f[1]] = f[5]; next }
     /^@@workdeck-pane / { current = $2; next }
@@ -529,7 +529,7 @@ check_agents() {
       for (i = 1; i <= n; i++) {
         p = order[i]; a = agent[p]
         if (a == "claude" || a == "codex") {
-          busy = (index(tolower(text[p]), "esc to interrupt") > 0)
+          busy = screen_busy(text[p])
         } else {
           h = 5381; s = text[p]
           for (j = 1; j <= length(s); j++) h = (h * 33 + index(" !\"#$%&()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}~", substr(s, j, 1))) % 2147483647

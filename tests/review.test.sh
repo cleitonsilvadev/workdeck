@@ -99,6 +99,21 @@ test_review_waits_while_claude_is_working() {
   assert_equal "$(times_on_screen /code-review)" 0 "the command on the agent screen"
 }
 
+test_review_ignores_esc_to_interrupt_in_the_conversation() {
+  install_workdeck >/dev/null || fail "install exited with an error"
+  project_with_change
+  open_fake_agent claude "o fim é detectado pelo \"esc to interrupt\" da tela
+linha 2
+linha 3
+linha 4
+linha 5
+linha 6
+linha 7
+────────
+❯$NBSP"
+  assert_contains "$(review_from_window)" "o review começou"
+}
+
 test_review_does_not_answer_an_open_question() {
   install_workdeck >/dev/null || fail "install exited with an error"
   project_with_change
