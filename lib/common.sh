@@ -139,7 +139,7 @@ settings_ensure_template() {
   if ! grep -aqE '^#?REVIEW_AGENT_CMD=' "$WORKDECK_SETTINGS"; then
     settings_end_with_newline
     printf '\n%s\n%s\n%s\n' \
-      '# Agente que faz o work review, numa janela própria. Use outro modelo ou outra IA para' \
+      '# Agente que faz o work review, num painel embaixo do chat. Use outro modelo ou outra IA para' \
       '# não repetir os pontos cegos de quem escreveu o código. Vazio: o review usa o seu agente.' \
       '#REVIEW_AGENT_CMD="claude --model opus"' >> "$WORKDECK_SETTINGS"
   fi

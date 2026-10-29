@@ -43,7 +43,7 @@ uma flag, como `--theme` ou `--terminal`.
 | `REVIEW_COMMAND` | um comando, como `/code-review high` | O que o `work review` cola no chat do agente ([Review](review.pt-BR.md)) |
 | `NOTIFY_AGENTS` | `yes`, `no` (padrão) | Uma notificação do sistema quando um agente termina numa janela que você não está olhando ([Projetos](projects.pt-BR.md)) |
 | `PROJECT_LAYOUT` | `agent-shell` (padrão), `none` | Abre a janela de cada projeto com o agente e um shell lado a lado; `none` abre um painel só ([Projetos](projects.pt-BR.md)) |
-| `REVIEW_AGENT_CMD` | um comando, como `claude --model opus` | O agente que faz o `work review`, numa janela própria ([Review](review.pt-BR.md)) |
+| `REVIEW_AGENT_CMD` | um comando, como `claude --model opus` | O agente que faz o `work review`, no painel separado ([Review](review.pt-BR.md)) |
 
 Só valem linhas exatamente no formato `CHAVE="valor"`: `CHAVE=valor`,
 `CHAVE = "valor"` e linhas comentadas são ignoradas, e vale a primeira linha de

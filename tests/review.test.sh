@@ -251,7 +251,7 @@ test_review_ignores_earlier_prompts_in_the_history() {
   assert_contains "$(review_from_window)" "o review começou no chat do claude: /code-review"
 }
 
-test_review_pane_opens_in_its_own_window() {
+test_review_pane_opens_below_the_agent() {
   install_workdeck >/dev/null || fail "install exited with an error"
   project_with_change
   open_fake_agent claude
@@ -259,11 +259,11 @@ test_review_pane_opens_in_its_own_window() {
   printf '#!/bin/sh\nexec sleep 30\n' > "$BASE/bin/claude"
   chmod +x "$BASE/bin/claude"
   review_from_window --pane >/dev/null
-  wait_for sh -c "tmux list-windows -t work -F '#W' | grep -qx 'review: api'" || fail "no review window: $(tmux list-windows -t work -F '#W')"
-  assert_equal "$(tmux list-panes -t "$AGENT_PANE" | wc -l | tr -d ' ')" 1 "panes in the project window"
+  wait_for sh -c "[ \"\$(tmux list-panes -t '$AGENT_PANE' | wc -l | tr -d ' ')\" = 2 ]" || fail "no review pane: $(tmux list-panes -t "$AGENT_PANE" -F '#{@role}')"
+  assert_equal "$(tmux list-windows -t work | wc -l | tr -d ' ')" 1 "windows in the session"
 }
 
-test_review_agent_cmd_reviews_in_its_own_window() {
+test_review_agent_cmd_reviews_in_the_pane() {
   install_workdeck >/dev/null || fail "install exited with an error"
   project_with_change
   echo 'REVIEW_AGENT_CMD="codex"' >> "$CONFIG/settings.conf"
@@ -271,7 +271,7 @@ test_review_agent_cmd_reviews_in_its_own_window() {
   chmod +x "$BASE/bin/codex"
   open_fake_agent claude
   review_from_window >/dev/null
-  wait_for sh -c "tmux list-windows -t work -F '#W' | grep -qx 'review: api'" || fail "no review window: $(tmux list-windows -t work -F '#W')"
+  wait_for sh -c "tmux list-panes -t '$AGENT_PANE' -F '#{@role}' | grep -qx 'REVIEW · codex'" || fail "no codex review pane: $(tmux list-panes -t "$AGENT_PANE" -F '#{@role}')"
   assert_equal "$(times_on_screen /code-review)" 0 "the command on the writer's chat"
-  assert_contains "$(tmux list-panes -s -t work -F '#{@role}')" "REVIEW · codex"
+  assert_equal "$(tmux list-windows -t work | wc -l | tr -d ' ')" 1 "windows in the session"
 }

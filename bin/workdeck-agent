@@ -29,8 +29,6 @@ uuid_for() {
 
 panes() { tmux list-panes ${TMUX_PANE:+-t "$TMUX_PANE"} -F "$1"; }
 
-session_panes() { tmux list-panes -s ${TMUX_PANE:+-t "$TMUX_PANE"} -F "$1"; }
-
 agent_in_window() {
   local id tty role c
   [ -n "${TMUX:-}" ] || return 0
@@ -44,17 +42,15 @@ agent_in_window() {
 }
 
 send_request() {
-  local file="$1" title="$2" key="$3" name cmd id open open_key pane text active p review_cmd project window
+  local file="$1" title="$2" key="$3" name cmd id open open_key target="" pane text active p review_cmd
   load_config
   review_cmd="$(setting_get REVIEW_AGENT_CMD)"
-  if [ -n "$review_cmd" ]; then
-    AGENT_CMD="$review_cmd"
-  else
-    active="$(agent_in_window)"
-    if [ -n "$active" ]; then
-      [ "$(basename "${AGENT_CMD%% *}")" = "${active#* }" ] || AGENT_CMD="${active#* }"
-    fi
+  active="$(agent_in_window)"
+  if [ -n "$active" ]; then
+    target="${active%% *}"
+    [ "$(basename "${AGENT_CMD%% *}")" = "${active#* }" ] || AGENT_CMD="${active#* }"
   fi
+  [ -z "$review_cmd" ] || AGENT_CMD="$review_cmd"
   p="$(agent_problem "$AGENT_CMD")"
   if [ -n "$p" ]; then
     echo "não sei qual IA usar: abra a sua (claude, codex…) num painel desta janela e rode de novo."
@@ -63,14 +59,13 @@ send_request() {
   name="$(basename "${AGENT_CMD%% *}")"
 
   if [ -n "${TMUX:-}" ]; then
-    read -r open open_key < <(session_panes '#{pane_id}|#{@role}|#{@key}' |
+    read -r open open_key < <(panes '#{pane_id}|#{@role}|#{@key}' |
       awk -F'|' -v t="$title" '$2 == t || index($2, t " ") == 1 {print $1, $3; exit}')
     if [ -n "${open:-}" ] && [ "${open_key:-}" = "$key" ]; then
       tmux load-buffer -b workdeck-request "$file"
       tmux paste-buffer -p -d -b workdeck-request -t "$open"
       sleep 0.5
       tmux send-keys -t "$open" Enter
-      tmux select-window -t "$open"
       tmux select-pane -t "$open"
       return 0
     fi
@@ -100,10 +95,8 @@ send_request() {
   if [ -z "${TMUX:-}" ]; then
     exec bash -c "$cmd"
   fi
-  project="${key%%:*}"
-  project="$(basename "${project:-$PWD}")"
-  window="$(tmux display -p ${TMUX_PANE:+-t "$TMUX_PANE"} '#{window_id}')"
-  pane="$(tmux new-window -a -t "$window" -n "review: $project" ${CLAUDE_CONFIG_DIR:+-e "CLAUDE_CONFIG_DIR=$CLAUDE_CONFIG_DIR"} -P -F '#{pane_id}' -c "$PWD" "$cmd")"
+  target="${target:-${TMUX_PANE:-}}"
+  pane="$(tmux split-window -v -l 40% ${target:+-t "$target"} ${CLAUDE_CONFIG_DIR:+-e "CLAUDE_CONFIG_DIR=$CLAUDE_CONFIG_DIR"} -P -F '#{pane_id}' -c "$PWD" "$cmd")"
   tmux set -p -t "$pane" @role "$title · $name"
   tmux set -p -t "$pane" @key "$key"
 }

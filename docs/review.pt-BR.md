@@ -21,7 +21,7 @@ primeira opção que se aplica:
 |---|---|---|
 | 1 | O projeto ou a sua config define um comando de review | Esse comando é colado no chat do agente |
 | 2 | O agente é o Claude Code | O `/code-review` é colado no chat; o `work review branch` cola `/code-review main...HEAD` |
-| 3 | Qualquer outro caso | O pedido de review do workdeck abre numa janela própria |
+| 3 | Qualquer outro caso | O pedido de review do workdeck abre num painel separado |
 
 Nos casos 1 e 2, o review roda no chat que você já está usando, e o agente que
 escreveu o código está ali para corrigir o que aparecer. O Claude Code roda o
@@ -71,10 +71,9 @@ ignoradas.
 ## O painel separado
 
 Com `--pane`, com `staged`, com o `REVIEW_AGENT_CMD` definido, ou quando nenhuma
-opção acima se aplica, o `work review` abre o pedido de review do workdeck numa
-janela própria, chamada `review: <projeto>`, logo depois da janela do projeto. A
-janela do projeto continua com os painéis como estão. Rodar de novo manda o
-pedido para a mesma janela.
+opção acima se aplica, o `work review` abre o pedido de review do workdeck num
+painel embaixo do chat da sua IA (ou do painel em que você está). Rodar de novo
+manda o pedido para o mesmo painel.
 
 A resposta é uma lista curta, uma bolinha por achado:
 
@@ -111,7 +110,7 @@ a escolhida na instalação, guardada como `AGENT_CMD`.
 
 Outro modelo ou outra IA no review evita repetir os pontos cegos de quem escreveu
 o código: agentes do mesmo modelo tendem a errar do mesmo jeito e a concordar
-entre si. Com ele definido, todo `work review` roda numa janela própria com esse
+entre si. Com ele definido, todo `work review` roda no painel separado com esse
 agente, mesmo com o Claude Code aberto:
 
 ```bash

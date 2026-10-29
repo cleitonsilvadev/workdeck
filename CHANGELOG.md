@@ -6,8 +6,7 @@ atualizar. Cada versão é uma tag `vX.Y.Z`.
 ## v1.6.0
 
 - A janela de cada projeto abre com o agente e um shell lado a lado, em todos os projetos, sempre que o `work` abre a sessão. Antes, ela abria com um painel só, ou com três no `PROJECT_LAYOUT="agent-server-shell"`, que agora também abre dois. Para voltar a um painel só, use `PROJECT_LAYOUT="none"` no `settings.conf`. O `Ctrl+b Enter` continua igual.
-- Novo `REVIEW_AGENT_CMD` no `settings.conf`: escolhe o agente ou o modelo que faz o `work review`, como `claude --model opus`. Um modelo diferente do que escreveu o código não repete os mesmos pontos cegos.
-- O review separado abre numa janela própria, `review: <projeto>`, em vez de um painel embaixo do chat. A janela do projeto fica com os dois painéis.
+- Novo `REVIEW_AGENT_CMD` no `settings.conf`: escolhe o agente ou o modelo que faz o `work review`, como `claude --model opus`. O review roda no painel separado, embaixo do chat, e um modelo diferente do que escreveu o código não repete os mesmos pontos cegos.
 - Rode `work kill` e `work` depois de atualizar, para as janelas abrirem com os dois painéis.
 
 ## v1.5.0
