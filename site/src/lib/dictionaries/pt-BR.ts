@@ -44,7 +44,7 @@ export const ptBR = {
   commands: [
     { cmd: "work", desc: "Abre a sessão, uma janela por projeto. Ou volta para ela." },
     { cmd: "work add ~/projeto", desc: "Acrescenta um projeto. Sem caminho, usa a pasta atual; Tab completa o caminho." },
-    { cmd: "work review", desc: "Quando o agente termina, começa o review dele no mesmo chat. Com --pane, abre o review num painel separado." },
+    { cmd: "work review", desc: "Quando o agente termina, começa o review dele no mesmo chat. Com --pane, ou com o REVIEW_AGENT_CMD apontando outro modelo, abre o review num painel separado." },
     { cmd: "work update", desc: "Mostra o que mudou na versão nova e atualiza. O work e o painel avisam quando há uma." },
     { cmd: "work kill", desc: "Fecha a sessão inteira. O próximo work abre com a lista de projetos atual." },
     { cmd: "work uninstall", desc: "Desinstala tudo o que o workdeck instalou. Mostra o que vai sair e pergunta antes." },

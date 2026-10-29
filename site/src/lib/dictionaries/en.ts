@@ -45,7 +45,7 @@ export const en: Dictionary = {
   commands: [
     { cmd: "work", desc: "Opens the session, one window per project. Or returns to it." },
     { cmd: "work add ~/project", desc: "Adds a project. Without a path, uses the current folder; Tab completes the path." },
-    { cmd: "work review", desc: "Once the agent finishes, starts its own review in the same chat. With --pane, opens the review in a separate pane." },
+    { cmd: "work review", desc: "Once the agent finishes, starts its own review in the same chat. With --pane, or with REVIEW_AGENT_CMD set to another model, opens the review in a separate pane." },
     { cmd: "work update", desc: "Shows what changed in the new version and updates. work and the panel tell you when there is one." },
     { cmd: "work kill", desc: "Closes the whole session. The next work opens with the current project list." },
     { cmd: "work uninstall", desc: "Uninstalls everything workdeck installed. Shows what will be removed and asks first." },
