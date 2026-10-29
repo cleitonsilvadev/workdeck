@@ -106,22 +106,38 @@ send_to_pane() {
   tmux select-pane -t "$1"
 }
 
-screen_has_line() {
-  tmux capture-pane -p -t "$1" | awk -v want="$2" '{ sub(/[ \t]+$/, "") } $0 == want { found = 1 } END { exit !found }'
+claude_prompt() {
+  tmux capture-pane -p -e -t "$1" | LC_ALL=C awk '
+    {
+      line = $0
+      gsub(/\033\[2m/, "\001", line)
+      gsub(/\033\[[0-9;]*m/, "", line)
+      gsub(/\302\240/, " ", line)
+      if (substr(line, 1, 3) != "\342\235\257") next
+      rest = substr(line, 4)
+      sub(/^ +/, "", rest)
+      sub(/ +$/, "", rest)
+      found = 1
+      last = rest
+    }
+    END { if (found) print "prompt:" last; else print "none" }'
 }
 
 claude_state() {
-  if tmux capture-pane -p -t "$1" | grep -q 'esc to interrupt'; then echo busy
-  elif screen_has_line "$1" "❯"; then echo ready
-  else echo blocked
-  fi
+  local prompt
+  if tmux capture-pane -p -t "$1" | grep -q 'esc to interrupt'; then echo busy; return 0; fi
+  prompt="$(claude_prompt "$1")"
+  case "$prompt" in
+    "prompt:"|"prompt:"$'\001'*) echo ready ;;
+    *) echo blocked ;;
+  esac
 }
 
 submit_to_claude() {
   local pane="$1" text="$2" n=0
   send_to_pane "$pane" "$text"
   while [ "$n" -lt 10 ]; do
-    if screen_has_line "$pane" "❯ $text"; then
+    if [ "$(claude_prompt "$pane")" = "prompt:$text" ]; then
       tmux send-keys -t "$pane" Enter
       return 0
     fi

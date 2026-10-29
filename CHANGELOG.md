@@ -3,6 +3,10 @@
 O `work update` mostra o trecho da versão nova antes de perguntar se quer
 atualizar. Cada versão é uma tag `vX.Y.Z`.
 
+## v1.1.2
+
+- Correção: no Claude Code, o `work review` colava o `/code-review` mas não apertava Enter. A leitura da tela não reconhecia o campo de mensagem do Claude, que usa um espaço especial depois do `❯` e mostra uma sugestão apagada quando está vazio. Agora o review começa sozinho, como prometido na v1.1.1.
+
 ## v1.1.1
 
 - No Claude Code, o `work review` começa o review sozinho, sem você apertar Enter no chat. Ele só manda quando o Claude terminou: se ainda estiver trabalhando, com uma pergunta aberta ou com uma mensagem sua pela metade, não manda nada e diz o que falta.

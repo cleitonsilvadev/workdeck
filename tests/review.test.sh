@@ -37,8 +37,12 @@ test_review_without_changes_says_so() {
   assert_contains "$(cd "$HOME/api" && work review 2>&1)" "nada mudou desde o último commit"
 }
 
+NBSP=$'\xc2\xa0'
+DIM=$'\033[2m'
+RESET=$'\033[0m'
+
 open_fake_agent() {
-  local screen="${2-❯ }"
+  local screen="${2-❯$NBSP}"
   ln -s "$(command -v cat)" "$BASE/bin/$1"
   printf '%s' "$screen" > "$BASE/screen"
   AGENT_PANE="$(tmux new-session -d -P -F '#{pane_id}' -s work -x 120 -y 30 -c "$HOME/api" "cat '$BASE/screen'; exec '$BASE/bin/$1'")"
@@ -110,7 +114,7 @@ test_review_does_not_answer_an_open_question() {
 test_review_does_not_send_over_a_typed_message() {
   install_workdeck >/dev/null || fail "install exited with an error"
   project_with_change
-  open_fake_agent claude "❯ meia mensagem"
+  open_fake_agent claude "❯${NBSP}meia mensagem"
   assert_contains "$(review_from_window)" "o chat do claude não está livre"
   sleep 0.5
   assert_equal "$(times_on_screen /code-review)" 0 "the command on the agent screen"
@@ -212,4 +216,22 @@ test_review_staged_keeps_the_pane_even_with_a_review_command() {
   review_from_window staged >/dev/null
   assert "the request was written" test -s "$HOME/.cache/workdeck/review-request.md"
   assert_equal "$(times_on_screen /code-review)" 0 "the command on the agent screen"
+}
+
+test_review_treats_the_placeholder_as_an_empty_prompt() {
+  install_workdeck >/dev/null || fail "install exited with an error"
+  project_with_change
+  open_fake_agent claude "❯${NBSP}${DIM}Try \"fix typecheck errors\"${RESET}"
+  output="$(review_from_window)"
+  assert_not_contains "$output" "não está livre"
+  wait_on_screen /code-review
+}
+
+test_review_ignores_earlier_prompts_in_the_history() {
+  install_workdeck >/dev/null || fail "install exited with an error"
+  project_with_change
+  open_fake_agent claude "❯${NBSP}valida o e-mail no login
+  ✓ pronto.
+❯${NBSP}"
+  assert_contains "$(review_from_window)" "o review começou no chat do claude: /code-review"
 }
