@@ -23,13 +23,13 @@ export const ptBR = {
   how: {
     eyebrow: "como funciona",
     title: "Do projeto ao review",
-    desc: "Cada projeto é uma janela, o agente fica ao lado do seu shell e o review abre embaixo dele quando você pede.",
+    desc: "Cada projeto é uma janela, o agente fica ao lado do seu shell e, quando ele termina, o work review começa o review no mesmo chat.",
   },
   cycle: [
     { label: "work add ~/api", code: true, when: "uma vez", desc: "work abre a sessão no painel; work add põe o projeto nela, numa janela em segundo plano." },
     { label: "janela do projeto", code: false, when: "sempre aberta", desc: "Shift+→ vai até ela. Fechou o terminal? work volta onde estava." },
     { label: "agente ao lado", code: false, when: "escreve o código", desc: "Claude Code, Codex ou o que você usar." },
-    { label: "work review", code: true, when: "self code review", desc: "Self code review: a IA revisa como quem vai ser chamado se aquilo quebrar, aponta o que corrigir com a gravidade e não mexe em nada." },
+    { label: "work review", code: true, when: "self code review", desc: "Quando o agente termina, o work review começa o review dele no mesmo chat, como um subagente com contexto próprio. Ele aponta o que corrigir e não mexe em nada." },
   ],
   layers: [
     { name: "workdeck", desc: "projetos, agente ao lado, work review e painel" },
@@ -44,7 +44,7 @@ export const ptBR = {
   commands: [
     { cmd: "work", desc: "Abre a sessão, uma janela por projeto. Ou volta para ela." },
     { cmd: "work add ~/projeto", desc: "Acrescenta um projeto. Sem caminho, usa a pasta atual; Tab completa o caminho." },
-    { cmd: "work review", desc: "A IA faz um self code review da mudança num painel embaixo do chat. Com staged ou branch, muda o recorte." },
+    { cmd: "work review", desc: "Quando o agente termina, começa o review dele no mesmo chat. Com --pane, abre o review num painel separado." },
     { cmd: "work update", desc: "Mostra o que mudou na versão nova e atualiza. O work e o painel avisam quando há uma." },
     { cmd: "work kill", desc: "Fecha a sessão inteira. O próximo work abre com a lista de projetos atual." },
     { cmd: "work uninstall", desc: "Desinstala tudo o que o workdeck instalou. Mostra o que vai sair e pergunta antes." },
@@ -148,7 +148,6 @@ export const ptBR = {
   demo: {
     yourTerminal: "seu terminal",
     agentPane: "IA · claude",
-    reviewPane: "IA · review",
     prompt: "valida o e-mail no login",
     reading: "lendo",
     creating: "criando",
@@ -157,8 +156,12 @@ export const ptBR = {
     session: "sessão",
     windows: "4 janelas",
     agentHint: "Ctrl+b v · claude no painel ao lado →",
-    reviewHint: "review embaixo do chat →",
-    reviewBelow: "← review embaixo do agente",
+    reviewHint: "review começou no chat →",
+    reviewBeside: "← review começou no chat do agente",
+    reviewRunning: "rodando em segundo plano como @code-review",
+    reviewFound: "2 achados",
+    issueEmail: "o regex aceita e-mail sem domínio",
+    issueTest: "falta teste para e-mail inválido",
     switchHint: "vai para a janela api",
     panelReload: "o painel relê a pasta a cada ciclo ↑",
   },

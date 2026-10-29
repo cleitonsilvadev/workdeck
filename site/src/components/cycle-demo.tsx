@@ -28,8 +28,8 @@ export function CycleDemo({ cycle, demo }: { cycle: Dictionary["cycle"]; demo: D
   const switching = s === 4
   const inProject = s >= 5
   const agentOpen = s >= 7
-  const reviewOpen = s >= 12
-  const focus = reviewOpen ? "review" : s === 11 ? "shell" : agentOpen ? "agent" : "shell"
+  const reviewSent = s >= 12
+  const focus = s === 11 ? "shell" : agentOpen ? "agent" : "shell"
   const path = inProject ? "~/api" : "~"
 
   return (
@@ -79,7 +79,7 @@ export function CycleDemo({ cycle, demo }: { cycle: Dictionary["cycle"]; demo: D
           <motion.div layout className={cn("grid min-h-0 gap-1.5 p-1.5", agentOpen ? "grid-cols-1 grid-rows-[1fr_auto] sm:grid-cols-2 sm:grid-rows-1" : "grid-cols-1")}>
             <AnimatePresence>
               {agentOpen && (
-                <motion.div key="ia" layout className={cn("grid min-h-0 gap-1.5", reviewOpen ? "grid-rows-[auto_1fr]" : "grid-rows-1")}>
+                <motion.div key="ia" layout className="grid min-h-0 grid-rows-1 gap-1.5">
                   <Pane title={demo.agentPane} active={focus === "agent"}>
                     {s >= 8 && (
                       <Line>
@@ -95,33 +95,19 @@ export function CycleDemo({ cycle, demo }: { cycle: Dictionary["cycle"]; demo: D
                       </>
                     )}
                     {s >= 10 && <Line className="text-ctp-green">  {demo.done}</Line>}
-                  </Pane>
-                  <AnimatePresence>
-                    {reviewOpen && (
-                      <Pane key="review" title={demo.reviewPane} active={focus === "review"}>
-                        <Line className="text-ctp-subtext0">
-                          lendo a mudança · <span className="text-ctp-green">+13</span> <span className="text-ctp-red">-2</span> em 2 arquivo(s)
+                    {s >= 12 && (
+                      <>
+                        <Line className="mt-1">
+                          <span className="text-ctp-peach">› </span>
+                          <span className="text-ctp-text">/code-review</span>
                         </Line>
-                        {s >= 13 && (
-                          <>
-                            <Line className="mt-1 text-ctp-text"><span className="text-ctp-red">●</span> email.ts:3 <span className="text-ctp-subtext0">— o regex aceita e-mail sem domínio</span></Line>
-                            <Line className="text-ctp-subtext0" delay={0.08}>  → exija um ponto depois do @</Line>
-                          </>
-                        )}
-                        {s >= 14 && (
-                          <>
-                            <Line className="text-ctp-text"><span className="text-ctp-peach">●</span> login.ts:13 <span className="text-ctp-subtext0">— falta teste para e-mail inválido</span></Line>
-                            <Line className="text-ctp-subtext0" delay={0.08}>  → acrescente um caso sem domínio</Line>
-                          </>
-                        )}
-                        {s >= 15 && (
-                          <Line className="mt-1 text-ctp-text">
-                            <span className="text-ctp-red">●</span> <span className="font-bold">corrija os vermelhos antes do commit</span>
-                          </Line>
-                        )}
-                      </Pane>
+                        <Line className="text-ctp-overlay1">  ⎿ {demo.reviewRunning}</Line>
+                      </>
                     )}
-                  </AnimatePresence>
+                    {s >= 13 && <Line className="mt-1 text-ctp-text" delay={0.05}>  {demo.reviewFound}</Line>}
+                    {s >= 14 && <Line className="text-ctp-subtext0" delay={0.05}>  email.ts:3   <span className="text-ctp-text">{demo.issueEmail}</span></Line>}
+                    {s >= 15 && <Line className="text-ctp-subtext0" delay={0.05}>  login.ts:13  <span className="text-ctp-text">{demo.issueTest}</span></Line>}
+                  </Pane>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -164,8 +150,8 @@ export function CycleDemo({ cycle, demo }: { cycle: Dictionary["cycle"]; demo: D
                       <Line className="text-ctp-subtext0">nothing to commit, working tree clean</Line>
                     </>
                   )}
-                  {s >= 11 && <Prompt path={path} text="work review" typing={s === 11} done={reviewOpen} caret={s === 11} />}
-                  {reviewOpen && <Line className="text-ctp-overlay1">{demo.reviewBelow}</Line>}
+                  {s >= 11 && <Prompt path={path} text="work review" typing={s === 11} done={reviewSent} caret={s === 11} />}
+                  {reviewSent && <Line className="text-ctp-overlay1">{demo.reviewBeside}</Line>}
                 </>
               )}
             </Pane>

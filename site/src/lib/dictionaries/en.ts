@@ -24,13 +24,13 @@ export const en: Dictionary = {
   how: {
     eyebrow: "how it works",
     title: "From project to review",
-    desc: "Each project is a window, the agent sits next to your shell and the review opens below it when you ask.",
+    desc: "Each project is a window, the agent sits next to your shell and, once it finishes, work review starts the review in the same chat.",
   },
   cycle: [
     { label: "work add ~/api", code: true, when: "once", desc: "work opens the session on the panel; work add puts the project in it, in a background window." },
     { label: "project window", code: false, when: "always open", desc: "Shift+→ takes you there. Closed the terminal? work brings you back where you were." },
     { label: "agent beside it", code: false, when: "writes the code", desc: "Claude Code, Codex or whatever you use." },
-    { label: "work review", code: true, when: "self code review", desc: "Self code review: the AI reviews like the person who gets paged if it breaks, points out what to fix with its severity and changes nothing." },
+    { label: "work review", code: true, when: "self code review", desc: "Once the agent finishes, work review starts its own review in the same chat, as a subagent with its own context. It points out what to fix and changes nothing." },
   ],
   layers: [
     { name: "workdeck", desc: "projects, the agent beside the code, work review and the panel" },
@@ -45,7 +45,7 @@ export const en: Dictionary = {
   commands: [
     { cmd: "work", desc: "Opens the session, one window per project. Or returns to it." },
     { cmd: "work add ~/project", desc: "Adds a project. Without a path, uses the current folder; Tab completes the path." },
-    { cmd: "work review", desc: "The AI does a self code review of the change in a pane below the chat. With staged or branch, the scope changes." },
+    { cmd: "work review", desc: "Once the agent finishes, starts its own review in the same chat. With --pane, opens the review in a separate pane." },
     { cmd: "work update", desc: "Shows what changed in the new version and updates. work and the panel tell you when there is one." },
     { cmd: "work kill", desc: "Closes the whole session. The next work opens with the current project list." },
     { cmd: "work uninstall", desc: "Uninstalls everything workdeck installed. Shows what will be removed and asks first." },
@@ -149,7 +149,6 @@ export const en: Dictionary = {
   demo: {
     yourTerminal: "your terminal",
     agentPane: "AI · claude",
-    reviewPane: "AI · review",
     prompt: "validate the email on login",
     reading: "reading",
     creating: "creating",
@@ -158,8 +157,12 @@ export const en: Dictionary = {
     session: "session",
     windows: "4 windows",
     agentHint: "Ctrl+b v · claude in the pane beside →",
-    reviewHint: "review below the chat →",
-    reviewBelow: "← review below the agent",
+    reviewHint: "review started in the chat →",
+    reviewBeside: "← review started in the agent chat",
+    reviewRunning: "running in the background as @code-review",
+    reviewFound: "2 findings",
+    issueEmail: "the regex accepts an email without a domain",
+    issueTest: "no test for an invalid email",
     switchHint: "goes to the api window",
     panelReload: "the panel rereads the folder every cycle ↑",
   },

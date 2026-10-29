@@ -40,8 +40,8 @@ projeto com o seu próprio caos. O workdeck organiza isso num só lugar.
 
 ## Como funciona
 
-Cada projeto é uma janela. Dentro dela, o agente fica ao lado do seu shell, e o
-review abre embaixo do agente quando você pede:
+Cada projeto é uma janela. Dentro dela, o agente fica ao lado do seu shell.
+Quando o agente termina, o `work review` no shell começa o review no chat dele:
 
 ```
 ┌─ seu terminal ───────────────────────────────────────────────┐
@@ -49,9 +49,9 @@ review abre embaixo do agente quando você pede:
 │  seu agente de IA             │  seu shell                   │
 │  (claude, codex…)             │  git, testes, servidor       │
 │                               │                              │
-├───────────────────────────────┤                              │
-│  work review                  │                              │
-│  a IA revisa a mudança        │                              │
+│  › /code-review               │  $ work review               │
+│    o agente revisa a          │                              │
+│    mudança no mesmo chat      │                              │
 │                               │                              │
 ├──────────────────────────────────────────────────────────────┤
 │ 1 painel  2 api  3 web  4 mobile                 Shift+← →   │

@@ -44,8 +44,8 @@ project with its own mess. workdeck puts all of it in one place.
 
 ## How it works
 
-Each project is a window. Inside it, the agent sits next to your shell, and the
-review opens below the agent when you ask for it:
+Each project is a window. Inside it, the agent sits next to your shell. When the
+agent finishes, `work review` in the shell starts the review in the agent chat:
 
 ```
 ┌─ your terminal ──────────────────────────────────────────────┐
@@ -53,9 +53,9 @@ review opens below the agent when you ask for it:
 │  your AI agent                │  your shell                  │
 │  (claude, codex…)             │  git, tests, server          │
 │                               │                              │
-├───────────────────────────────┤                              │
-│  work review                  │                              │
-│  the AI reviews the change    │                              │
+│  › /code-review               │  $ work review               │
+│    the agent reviews the      │                              │
+│    change in the same chat    │                              │
 │                               │                              │
 ├──────────────────────────────────────────────────────────────┤
 │ 1 painel  2 api  3 web  4 mobile                 Shift+← →   │

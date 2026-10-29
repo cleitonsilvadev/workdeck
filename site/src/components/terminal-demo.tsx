@@ -11,8 +11,8 @@ export function TerminalDemo({ demo }: { demo: Dictionary["demo"] }) {
   const s = useTimeline(timeline)
 
   const agentOpen = s >= 3
-  const reviewOpen = s >= 7
-  const focus = s >= 7 ? "review" : s === 6 ? "shell" : s >= 3 ? "agent" : "shell"
+  const reviewSent = s >= 7
+  const focus = s === 6 ? "shell" : s >= 3 ? "agent" : "shell"
 
   return (
     <TerminalWindow>
@@ -27,12 +27,12 @@ export function TerminalDemo({ demo }: { demo: Dictionary["demo"] }) {
               )}
               {s >= 2 && <Line className="text-ctp-overlay1">{demo.agentHint}</Line>}
               {s >= 6 && <Prompt text="work review" typing={s === 6} done={s >= 7} caret={s === 6} />}
-              {reviewOpen && <Line className="text-ctp-overlay1">{demo.reviewHint}</Line>}
+              {reviewSent && <Line className="text-ctp-overlay1">{demo.reviewHint}</Line>}
             </Pane>
 
             <AnimatePresence>
               {agentOpen && (
-                <motion.div key="ia" layout className={cn("grid min-h-0 gap-1.5", reviewOpen ? "grid-rows-[auto_1fr]" : "grid-rows-1")}>
+                <motion.div key="ia" layout className="grid min-h-0 grid-rows-1 gap-1.5">
                   <Pane title={demo.agentPane} active={focus === "agent"}>
                     <Line>
                       <span className="text-ctp-peach">› </span>
@@ -46,34 +46,19 @@ export function TerminalDemo({ demo }: { demo: Dictionary["demo"] }) {
                       </>
                     )}
                     {s >= 5 && <Line className="text-ctp-green">  {demo.done}</Line>}
-                  </Pane>
-                  <AnimatePresence>
-                    {reviewOpen && (
-                      <Pane key="review" title={demo.reviewPane} active={focus === "review"}>
-                        <Line className="text-ctp-overlay0">separado da conversa que escreveu</Line>
-                        <Line className="text-ctp-subtext0">
-                          lendo a mudança · <span className="text-ctp-green">+13</span> <span className="text-ctp-red">-2</span> em 2 arquivo(s)
+                    {s >= 7 && (
+                      <>
+                        <Line className="mt-1">
+                          <span className="text-ctp-peach">› </span>
+                          <span className="text-ctp-text">/code-review</span>
                         </Line>
-                        {s >= 8 && (
-                          <>
-                            <Line className="mt-1 text-ctp-text" delay={0.05}><span className="text-ctp-red">●</span> email.ts:3 <span className="text-ctp-subtext0">— o regex aceita e-mail sem domínio</span></Line>
-                            <Line className="text-ctp-subtext0" delay={0.12}>  → exija um ponto depois do @</Line>
-                          </>
-                        )}
-                        {s >= 9 && (
-                          <>
-                            <Line className="text-ctp-text" delay={0}><span className="text-ctp-peach">●</span> login.ts:13 <span className="text-ctp-subtext0">— falta teste para e-mail inválido</span></Line>
-                            <Line className="text-ctp-subtext0" delay={0.08}>  → acrescente um caso sem domínio</Line>
-                          </>
-                        )}
-                        {s >= 10 && (
-                          <Line className="mt-1 text-ctp-text" delay={0}>
-                            <span className="text-ctp-red">●</span> <span className="font-bold">corrija os vermelhos antes do commit</span>
-                          </Line>
-                        )}
-                      </Pane>
+                        <Line className="text-ctp-overlay1">  ⎿ {demo.reviewRunning}</Line>
+                      </>
                     )}
-                  </AnimatePresence>
+                    {s >= 8 && <Line className="mt-1 text-ctp-text" delay={0.05}>  {demo.reviewFound}</Line>}
+                    {s >= 9 && <Line className="text-ctp-subtext0" delay={0.05}>  email.ts:3   <span className="text-ctp-text">{demo.issueEmail}</span></Line>}
+                    {s >= 10 && <Line className="text-ctp-subtext0" delay={0.05}>  login.ts:13  <span className="text-ctp-text">{demo.issueTest}</span></Line>}
+                  </Pane>
                 </motion.div>
               )}
             </AnimatePresence>
