@@ -19,7 +19,7 @@ export const en: Dictionary = {
     subtitle:
       "Delegate to your AI agent without losing control of the code. Built on tmux: one window per project, your CLI agent beside the code, the state of your repositories and a review before every commit.",
     install: "Install",
-    notice: "The workdeck interface (CLI messages, the panel and the review) is in Brazilian Portuguese.",
+    notice: "workdeck speaks English or Brazilian Portuguese: the installer asks which one.",
   },
   how: {
     eyebrow: "how it works",

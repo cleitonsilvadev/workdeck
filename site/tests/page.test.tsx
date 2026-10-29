@@ -71,11 +71,11 @@ describe("home page", () => {
     expect(screen.queryByText(/em breve/)).toBeNull()
   })
 
-  test("in English, the heading, the menu and the Portuguese interface notice are in English", async () => {
+  test("in English, the heading, the menu and the language notice are in English", async () => {
     render(await page("en"))
     expect(screen.getByRole("heading", { level: 1 }).textContent).toContain("terminal framework for AI agents")
     expect(within(screen.getByRole("navigation")).getByRole("link", { name: "How it works" })).toBeTruthy()
-    expect(screen.getByText(/interface .* is in Brazilian Portuguese/)).toBeTruthy()
+    expect(screen.getByText(/speaks English or Brazilian Portuguese/)).toBeTruthy()
   })
 
   test("the language switcher marks the current language", async () => {
