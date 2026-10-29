@@ -5,12 +5,11 @@ atualizar. Cada versão é uma tag `vX.Y.Z`.
 
 ## v1.1.0
 
-- As suas escolhas ficam num arquivo só, `~/.config/workdeck/settings.conf`, uma `CHAVE="valor"` por linha: terminal, tema, visual, agente, integrações, zsh e o aviso de versão nova. Antes cada uma tinha o seu arquivo. O `work update` junta os arquivos antigos no novo sozinho e não perde nenhuma escolha. Pode editar à mão; a instalação só preenche o que faltar e só reescreve uma chave quando você pede com uma flag, como `--theme`.
-- Novo `ACTIVE_PANE="line"` no `settings.conf`: um traço fino na cor de destaque do tema sobre o painel ativo, para saber onde está o foco quando há dois painéis lado a lado (o tmux pinta só metade da borda). Vem desligado; `Ctrl+b r` aplica, sem reiniciar a sessão. O traço ocupa uma linha no topo da janela.
-- O `work review` usa o melhor review que o seu agente tiver. No Claude Code, ele cola o `/code-review` no chat que você já está usando; você confere e aperta Enter, e o review roda como um subagente com contexto próprio. Os achados chegam ali, com o agente pronto para corrigir.
-- Para usar o review de um método como o BMAD, ou uma skill sua, ponha `REVIEW_COMMAND="/o-comando"` em `.workdeck/review.conf` no projeto, ou no `~/.config/workdeck/settings.conf` para todos. No projeto, só vale um comando de barra sem argumentos, para que um repositório clonado não consiga mandar instruções ao seu agente.
-- `work review --pane` abre o painel separado com o pedido de review do workdeck, como antes. Ele continua sendo usado com `staged` e com agentes sem review próprio.
-- A checagem diária de versão nova voltou a funcionar: desde a reorganização do código ela não rodava, e o `work` e o painel não avisavam de versões novas.
+- O `work review` usa o review do seu próprio agente. No Claude Code, ele cola o `/code-review` no chat que você está usando; você confere e aperta Enter, e os achados chegam ali, com o agente pronto para corrigir.
+- Para usar outro review, como o do BMAD ou uma skill sua, ponha `REVIEW_COMMAND="/o-comando"` em `.workdeck/review.conf` no projeto (só um comando de barra, sem argumentos) ou no `settings.conf`, para todos. `work review --pane` abre o painel separado de antes, que continua valendo com `staged` e com agentes sem review próprio.
+- As suas escolhas ficam num arquivo só, `~/.config/workdeck/settings.conf`, uma `CHAVE="valor"` por linha: terminal, tema, visual, agente, integrações, zsh e o aviso de versão nova. O `work update` junta os arquivos antigos nele sem perder nenhuma escolha. Pode editar à mão; a instalação só reescreve uma chave quando você pede com uma flag, como `--theme`.
+- Novo `ACTIVE_PANE="line"` no `settings.conf`: um traço fino na cor de destaque do tema sobre o painel ativo, para saber onde está o foco com dois painéis lado a lado. Vem desligado; `Ctrl+b r` aplica, sem reiniciar a sessão.
+- Correção: a checagem diária de versão nova voltou a funcionar. Desde a reorganização do código ela não rodava, e o `work` e o painel não avisavam de versões novas.
 
 ## v1.0.1
 
