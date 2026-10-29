@@ -25,6 +25,13 @@ Use these rules to decide whether something belongs in workdeck:
 4. It is reversible: the installer only adds marked blocks and recorded files, and
    `work uninstall` removes them.
 
+## The site
+
+The landing page lives in `site/`, a Next.js app with its own `package.json`, tests, CI workflow
+(`.github/workflows/site.yml`) and `site/CLAUDE.md`. Follow `site/CLAUDE.md` for anything inside
+`site/`; the rules below cover the rest of the repository. The `ci` workflow does not run for
+changes that only touch `site/`, and the `site` workflow runs only for those.
+
 ## Language
 
 | What | Language |

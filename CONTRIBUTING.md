@@ -32,6 +32,7 @@ themes/               the kitty, tmux and Warp colors of each theme
 terminals/            the kitty configuration and the terminals guide
 integrations/         BMAD, Spec Kit, ai-memory and the template for new ones
 docs/                 the guides, in English and Portuguese
+site/                 the landing page (Next.js), with its own README and tests
 tests/                the tests and the linter
 ```
 

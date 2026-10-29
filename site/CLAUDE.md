@@ -1,6 +1,6 @@
 @AGENTS.md
 
-# workdeck-site
+# workdeck site (site/)
 
 ## Language
 

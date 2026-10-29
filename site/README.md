@@ -1,6 +1,6 @@
 <div align="center">
 
-# workdeck-site
+# workdeck site
 
 **The landing page for [workdeck](https://github.com/thiagofeliperibeiro/workdeck), a framework for working with AI coding agents in the terminal, built on tmux.**
 
@@ -10,7 +10,7 @@ the shortcuts and the customizable panel.
 
 **English** · [Português](README.pt-BR.md)
 
-[![CI](https://github.com/thiagofeliperibeiro/workdeck-site/actions/workflows/ci.yml/badge.svg)](https://github.com/thiagofeliperibeiro/workdeck-site/actions/workflows/ci.yml)
+[![site](https://github.com/thiagofeliperibeiro/workdeck/actions/workflows/site.yml/badge.svg)](https://github.com/thiagofeliperibeiro/workdeck/actions/workflows/site.yml)
 ![Next.js](https://img.shields.io/badge/Next.js-16-555?logo=nextdotjs)
 
 </div>
@@ -23,7 +23,11 @@ the shortcuts and the customizable panel.
 
 ## Running
 
+The site lives in `site/` inside the workdeck repository. Run every command
+below from that folder.
+
 ```bash
+cd site
 npm install
 npm run dev        # http://localhost:3000
 ```
@@ -105,10 +109,11 @@ The tests live in `tests/` and cover:
 - **The animation timeline** (`timeline.test.tsx`): advancing step by step, restarting at the end, jumping to a step and going straight to the end with reduced motion.
 - **The animated workflow** (`cycle-demo.test.tsx`): starting outside workdeck, `work add` opening the window in the background, `Shift+→` going to it and the clickable chapters.
 
-CI runs lint, typecheck, tests and the build on Ubuntu on every push to `main`
-and on pull requests.
+The `site` workflow runs lint, typecheck, tests and the build on Ubuntu when a
+push to `main` or a pull request changes something in `site/`.
 
 ## Deploy
 
-On Vercel: import the repository. The framework is detected automatically and
-there are no environment variables to set.
+On Vercel: import the workdeck repository and set **Root Directory** to `site`.
+The framework is detected automatically and there are no environment variables
+to set.

@@ -1,6 +1,6 @@
 <div align="center">
 
-# workdeck-site
+# site do workdeck
 
 **O site de apresentação do [workdeck](https://github.com/thiagofeliperibeiro/workdeck), um framework para trabalhar com agentes de IA no terminal, construído sobre o tmux.**
 
@@ -10,7 +10,7 @@ atalhos e o painel personalizável.
 
 [English](README.md) · **Português**
 
-[![CI](https://github.com/thiagofeliperibeiro/workdeck-site/actions/workflows/ci.yml/badge.svg)](https://github.com/thiagofeliperibeiro/workdeck-site/actions/workflows/ci.yml)
+[![site](https://github.com/thiagofeliperibeiro/workdeck/actions/workflows/site.yml/badge.svg)](https://github.com/thiagofeliperibeiro/workdeck/actions/workflows/site.yml)
 ![Next.js](https://img.shields.io/badge/Next.js-16-555?logo=nextdotjs)
 
 </div>
@@ -23,7 +23,11 @@ atalhos e o painel personalizável.
 
 ## Rodando
 
+O site fica em `site/`, dentro do repositório do workdeck. Rode todos os
+comandos abaixo a partir dessa pasta.
+
 ```bash
+cd site
 npm install
 npm run dev        # http://localhost:3000
 ```
@@ -103,10 +107,11 @@ Os testes ficam em `tests/` e cobrem:
 - **A linha do tempo das animações** (`timeline.test.tsx`): avançar passo a passo, recomeçar no fim, pular para um passo e ir direto para o fim com movimento reduzido.
 - **O ciclo animado** (`cycle-demo.test.tsx`): começar fora do workdeck, o `work add` abrindo a janela em segundo plano, o `Shift+→` levando até ela e os capítulos clicáveis.
 
-O CI roda lint, typecheck, testes e build no Ubuntu a cada push na `main` e em
-pull requests.
+O workflow `site` roda lint, typecheck, testes e build no Ubuntu quando um push
+na `main` ou um pull request muda algo em `site/`.
 
 ## Deploy
 
-Na Vercel: importe o repositório. O framework é detectado sozinho e não há
-variável de ambiente para configurar.
+Na Vercel: importe o repositório do workdeck e ponha `site` em **Root
+Directory**. O framework é detectado sozinho e não há variável de ambiente para
+configurar.

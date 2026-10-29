@@ -1,9 +1,19 @@
-name: ci
+name: site
 
 on:
   push:
     branches: [main]
+    paths:
+      - "site/**"
+      - ".github/workflows/site.yml"
   pull_request:
+    paths:
+      - "site/**"
+      - ".github/workflows/site.yml"
+
+defaults:
+  run:
+    working-directory: site
 
 jobs:
   lint:
@@ -14,11 +24,12 @@ jobs:
         with:
           node-version: 24
           cache: npm
+          cache-dependency-path: site/package-lock.json
       - run: npm ci
       - run: npm run lint
       - run: npm run typecheck
 
-  testes:
+  tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -26,6 +37,7 @@ jobs:
         with:
           node-version: 24
           cache: npm
+          cache-dependency-path: site/package-lock.json
       - run: npm ci
       - run: npx vitest run
 
@@ -37,5 +49,6 @@ jobs:
         with:
           node-version: 24
           cache: npm
+          cache-dependency-path: site/package-lock.json
       - run: npm ci
       - run: npm run build
