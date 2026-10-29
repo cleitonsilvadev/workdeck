@@ -16,9 +16,13 @@ ou no Cygwin.
 
 ## O que o instalador faz
 
-1. Detecta o sistema e o gerenciador de pacotes — brew no macOS; apt, dnf,
+1. Pergunta em que idioma o workdeck mostra as mensagens: inglês ou português.
+   O padrão segue o idioma do sistema (`LANG`); `--lang en` ou `--lang pt-BR`
+   responde sem perguntar, e a escolha fica salva como `LANGUAGE` no
+   `~/.config/workdeck/settings.conf`.
+2. Detecta o sistema e o gerenciador de pacotes — brew no macOS; apt, dnf,
    pacman, zypper ou apk no Linux — e instala o tmux, se faltar.
-2. Pergunta qual terminal você usa: [kitty](https://sw.kovidgoyal.net/kitty/),
+3. Pergunta qual terminal você usa: [kitty](https://sw.kovidgoyal.net/kitty/),
    [Warp](https://www.warp.dev/) ou outro. Confere se o terminal está instalado
    e configura os extras dele. **O workdeck não instala terminal:** se o
    escolhido faltar, avisa onde baixar, e você roda a instalação de novo depois.
@@ -27,12 +31,12 @@ ou no Cygwin.
    `VISUAL`), e `--terminal kitty|warp|other` e `--visual` /
    `--no-visual` respondem sem perguntar. Detalhes em
    [terminals/README.pt-BR.md](../terminals/README.pt-BR.md).
-3. Coloca o comando `work` em `~/.local/bin`.
-4. Escreve os blocos de configuração no `.tmux.conf` e no `.zshrc` (ou
+4. Coloca o comando `work` em `~/.local/bin`.
+5. Escreve os blocos de configuração no `.tmux.conf` e no `.zshrc` (ou
    `.bashrc`). O `kitty.conf` só recebe o bloco se você escolheu o kitty e ele
    está instalado. Se você aceitou o visual no Warp, a instalação copia o tema
    para a pasta de temas dele.
-5. Oferece o zsh do workdeck, pergunta qual é o seu agente de IA e quais
+6. Oferece o zsh do workdeck, pergunta qual é o seu agente de IA e quais
    integrações você usa.
 
 É idempotente: rodar de novo atualiza em vez de duplicar. Tudo o que ele
@@ -46,6 +50,7 @@ As opções vão no fim do comando: `curl -fsSL … | bash -s -- --theme nord`.
 
 | Opção | O que faz |
 |---|---|
+| `--lang en\|pt-BR` | Escolhe o idioma das mensagens sem perguntar; a escolha fica salva |
 | `--theme <nome>` | Escolhe um tema de `themes/` (padrão: `catppuccin-mocha`); a escolha fica salva |
 | `--agent <comando>` | Define o seu agente de IA sem perguntar (`claude`, `codex`…) |
 | `--with <nome>` | Liga integrações sem perguntar: `bmad`, `spec-kit`, `ai-memory` (vírgula separa) |
@@ -97,8 +102,8 @@ do arquivo fica como está.
 
 ```bash
 work update              # procura a versão nova, mostra o que mudou e pergunta
-work update --desligar   # para de avisar; work update continua funcionando
-work update --ligar      # volta a avisar
+work update --off        # para de avisar; work update continua funcionando
+work update --on         # volta a avisar
 ```
 
 O `work` e o painel conferem sozinhos, no máximo uma vez por dia e em segundo

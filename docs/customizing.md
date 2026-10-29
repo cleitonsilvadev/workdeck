@@ -32,13 +32,14 @@ flag such as `--theme` or `--terminal`.
 
 | Key | Values | What it does |
 |---|---|---|
+| `LANGUAGE` | `en`, `pt-BR` | The language of the messages; without it, the system language (`LANG`). Change it with `./install.sh --lang`, which also updates the tmux messages and the panel window name |
 | `TERMINAL` | `kitty`, `warp`, `other` | The terminal whose extras the installer sets up |
 | `VISUAL` | `yes`, `no` | The workdeck theme and font in kitty or Warp |
 | `THEME` | a theme name | The tmux colors |
 | `AGENT_CMD` | a command | The AI that `work review` uses when none is open |
 | `INTEGRATIONS` | `none` or a list | The optional integrations |
 | `ZSH` | `yes`, `no` | The workdeck zsh |
-| `NOTIFY` | `0` | `0` stops the new version notice (`work update --desligar`) |
+| `NOTIFY` | `0` | `0` stops the new version notice (`work update --off`) |
 | `ACTIVE_PANE` | `none` (default), `line` | A thin line over the active pane, in the theme accent |
 | `REVIEW_COMMAND` | a command, such as `/code-review high` | What `work review` pastes into the agent chat ([Review](review.md)) |
 | `NOTIFY_AGENTS` | `yes`, `no` (default) | A system notification when an agent finishes in a window you are not looking at ([Projects](projects.md)) |

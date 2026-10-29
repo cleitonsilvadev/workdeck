@@ -45,6 +45,10 @@ notas|~/notas
 - **caminho** é onde a janela abre; aceita `~` e `$HOME`.
 - **comando** é opcional: se existir, a janela roda isso em vez de um shell.
 
+A linha do `work-panel` é a janela do painel. O nome dela segue o seu idioma
+(`painel` ou `panel`), e a instalação troca o nome quando você muda com
+`--lang`.
+
 A ordem do arquivo é a ordem das janelas, numeradas a partir de 1. Projeto que
 não existe no disco é pulado sem erro, então dá para deixar linhas de coisas
 que ainda não foram clonadas.

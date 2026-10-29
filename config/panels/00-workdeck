@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+. "${WORKDECK_LIB_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/workdeck/lib}/common.sh" 2>/dev/null || msg() { printf '%s' "$1"; }
 CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/workdeck"
 
 projects=0
@@ -26,14 +27,14 @@ logo=(
 )
 
 if [ "$projects" -gt 0 ]; then
-  projects_line="${green}✓${x} projetos  $projects"
+  projects_line="${green}✓${x} $(msg panel_projects)  $projects"
 else
-  projects_line="${yellow}!${x} projetos  nenhum ainda"
+  projects_line="${yellow}!${x} $(msg panel_projects)  $(msg panel_projects_zero)"
 fi
 version_line=""
 highest="$(printf '%s\n%s\n' "$latest" "${version:-v0.0.0}" | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | awk -F'[v.]' '{printf "%09d%09d%09d %s\n", $2, $3, $4, $0}' | sort | tail -1 | cut -d' ' -f2)"
 if [ -n "$latest" ] && [ "$latest" != "$version" ] && [ "$highest" = "$latest" ]; then
-  version_line="${yellow}●${x} ${version:-sem versão} → $latest: work update"
+  version_line="${yellow}●${x} ${version:-$(msg panel_no_version)} → $latest: work update"
 elif [ -n "$version" ]; then
   version_line="${dim}$version${x}"
 fi
@@ -42,7 +43,7 @@ text=(
   ""
   ""
   "${purple}workdeck${x}  $version_line"
-  "${dim}terminal para agentes de IA${x}"
+  "${dim}$(msg panel_tagline)${x}"
   ""
   "$projects_line"
   ""
@@ -71,20 +72,20 @@ step() {
 }
 
 if [ "$projects" = 0 ]; then
-  printf '%sPara começar%s, no terminal aqui embaixo:\n' "$purple" "$x"
-  step "work add ~/projeto" "cada projeto vira uma janela; Tab completa o caminho"
+  printf '%s\n' "$(msg panel_start "$purple" "$x")"
+  step "$(msg panel_add_project)" "$(msg panel_add_project_hint)"
   echo
 fi
 
 if [ -n "${TMUX:-}" ] && [ "$(tmux display -p '#{client_termname}' 2>/dev/null)" != xterm-kitty ]; then
   if [ -n "${WARP_CLIENT_VERSION:-}" ]; then
-    printf '%sNo Warp%s: o work funciona com os atalhos Alt; os atalhos cmd só valem no kitty.\n\n' "$purple" "$x"
+    printf '%s\n\n' "$(msg panel_in_warp "$purple" "$x")"
   else
-    printf '%sFora do kitty%s: o work funciona, mas o tema, a fonte e os atalhos cmd só valem lá.\n\n' "$purple" "$x"
+    printf '%s\n\n' "$(msg panel_outside_kitty "$purple" "$x")"
   fi
 fi
 
-printf '%sCtrl+b h abre o menu: projetos, review, dividir a tela%s\n' "$dim" "$x"
+printf '%s%s%s\n' "$dim" "$(msg panel_menu_hint)" "$x"
 
 custom=0
 for f in "$CONFIG_DIR"/panels/*; do
@@ -92,6 +93,6 @@ for f in "$CONFIG_DIR"/panels/*; do
   [ -x "$f" ] && custom=$((custom + 1))
 done
 if [ "$custom" = 0 ]; then
-  printf '%sPara pôr o seu no painel: um executável em ~/.config/workdeck/panels/%s\n' "$dim" "$x"
-  printf '%s  guia: github.com/thiagofeliperibeiro/workdeck/blob/main/docs/panels.pt-BR.md%s\n' "$dim" "$x"
+  printf '%s%s%s\n' "$dim" "$(msg panel_custom_hint)" "$x"
+  printf '%s%s%s\n' "$dim" "$(msg panel_guide)" "$x"
 fi

@@ -24,6 +24,10 @@ e um code review antes de cada commit — numa sessão que não se perde.
 
 ---
 
+> O workdeck fala português ou inglês: o instalador pergunta qual na primeira
+> vez. As integrações, o desinstalador e o `get.sh` continuam em português e
+> passam a seguir o idioma na próxima versão.
+
 ## Por que o workdeck
 
 Trabalhar com um agente de IA no terminal costuma virar uma pilha de abas: o
@@ -215,8 +219,8 @@ work uninstall       # mostra o que vai sair e pergunta antes de apagar
 
 O workdeck confere sozinho se há versão nova, no máximo uma vez por dia e sem
 nunca esperar pela internet. Só contam versões publicadas; o que muda em cada
-uma está no [CHANGELOG](CHANGELOG.md). Atualizar mantém os seus projetos,
-painéis e escolhas.
+uma está no [CHANGELOG](CHANGELOG.md), em português e inglês. Atualizar mantém
+os seus projetos, painéis e escolhas.
 
 O desinstalador só remove o que o workdeck instalou. Um kitty ou um oh-my-zsh
 que você já tinha continua lá, e dá para devolver os seus arquivos ao estado

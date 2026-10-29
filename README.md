@@ -25,8 +25,10 @@ closing the terminal.
 
 ---
 
-> The workdeck interface (CLI messages, prompts and panels) is in Brazilian
-> Portuguese. The documentation is available in English and Portuguese.
+> workdeck speaks English or Brazilian Portuguese: the installer asks which one
+> on the first run. The integrations, the uninstaller and `get.sh` are still in
+> Portuguese and follow in the next version. The documentation is available in
+> English and Portuguese.
 
 ## Why workdeck
 
@@ -220,8 +222,8 @@ work uninstall       # shows what will be removed and asks before deleting
 
 workdeck checks for new versions on its own, at most once a day and without
 ever waiting on the network. Only published versions count; what changes in
-each one is in the [CHANGELOG](CHANGELOG.md) (in Portuguese, since `work update`
-shows it in the terminal). Updating keeps your projects, panels and choices.
+each one is in the [CHANGELOG](CHANGELOG.md), in English and Portuguese, and
+`work update` shows it in the terminal in your language. Updating keeps your projects, panels and choices.
 
 The uninstaller removes only what workdeck installed. A kitty or oh-my-zsh you
 already had stays, and your files can be restored to exactly how they were

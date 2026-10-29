@@ -36,7 +36,7 @@ name|path|optional command
 ```
 
 ```
-painel|$HOME|work-panel
+panel|$HOME|work-panel
 api|$HOME/projects/my-api
 web|$HOME/projects/my-frontend
 notes|~/notes
@@ -45,6 +45,10 @@ notes|~/notes
 - **name** becomes the tmux window name.
 - **path** is where the window opens; it accepts `~` and `$HOME`.
 - **command** is optional: when present, the window runs it instead of a shell.
+
+The `work-panel` line is the panel window. Its name follows your language
+(`panel` or `painel`), and the installer renames it when you switch with
+`--lang`.
 
 The order of the file is the order of the windows, numbered from 1. A project
 that does not exist on disk is skipped without an error, so you can keep lines
@@ -72,8 +76,8 @@ line near the message field shows "esc to interrupt"; the same words in the
 conversation do not count. For other agents, it watches the screen change and
 marks the window after 10 seconds without changes.
 
-To also get a system notification ("o claude terminou em api"), choose
-"Ligar o aviso quando um agente termina" in the menu (<kbd>Ctrl</kbd>+<kbd>b</kbd>
+To also get a system notification ("claude finished in api"), choose
+"Turn on the alert when an agent finishes" in the menu (<kbd>Ctrl</kbd>+<kbd>b</kbd>
 <kbd>h</kbd>). The same item turns it off. It saves this line in
 `~/.config/workdeck/settings.conf`, which you can also write by hand:
 

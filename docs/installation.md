@@ -15,9 +15,13 @@ stops before writing anything when it runs in Git Bash, MSYS or Cygwin.
 
 ## What the installer does
 
-1. Detects the system and the package manager (brew on macOS; apt, dnf,
+1. Asks which language workdeck uses for its messages, English or Brazilian
+   Portuguese. The default follows the system language (`LANG`); `--lang en`
+   or `--lang pt-BR` answers without asking, and the choice is saved as
+   `LANGUAGE` in `~/.config/workdeck/settings.conf`.
+2. Detects the system and the package manager (brew on macOS; apt, dnf,
    pacman, zypper or apk on Linux) and installs tmux if it is missing.
-2. Asks which terminal you use: [kitty](https://sw.kovidgoyal.net/kitty/),
+3. Asks which terminal you use: [kitty](https://sw.kovidgoyal.net/kitty/),
    [Warp](https://www.warp.dev/) or another one. It checks that the terminal is
    installed and sets up its extras. **workdeck does not install a terminal:**
    if the one you chose is missing, it tells you where to download it, and you
@@ -26,12 +30,12 @@ stops before writing anything when it runs in Git Bash, MSYS or Cygwin.
    in `~/.config/workdeck/settings.conf` (`TERMINAL` and `VISUAL`), and
    `--terminal kitty|warp|other` and `--visual` / `--no-visual` answer without
    asking. Details in [terminals/README.md](../terminals/README.md).
-3. Puts the `work` command in `~/.local/bin`.
-4. Writes the configuration blocks to `.tmux.conf` and `.zshrc` (or
+4. Puts the `work` command in `~/.local/bin`.
+5. Writes the configuration blocks to `.tmux.conf` and `.zshrc` (or
    `.bashrc`). `kitty.conf` only gets its block if you chose kitty and it is
    installed. If you accepted the look in Warp, the installer copies the theme
    to the Warp themes folder.
-5. Offers the workdeck zsh setup and asks which AI agent and which
+6. Offers the workdeck zsh setup and asks which AI agent and which
    integrations you use.
 
 It is idempotent: running it again updates instead of duplicating. Everything
@@ -45,6 +49,7 @@ Options go at the end of the command: `curl -fsSL … | bash -s -- --theme nord`
 
 | Option | What it does |
 |---|---|
+| `--lang en\|pt-BR` | Picks the language of the messages without asking; the choice is saved |
 | `--theme <name>` | Picks a theme from `themes/` (default: `catppuccin-mocha`); the choice is saved |
 | `--agent <command>` | Sets your AI agent without asking (`claude`, `codex`…) |
 | `--with <name>` | Enables integrations without asking: `bmad`, `spec-kit`, `ai-memory` (comma separated) |
@@ -97,8 +102,8 @@ rest of the file stays as it is.
 
 ```bash
 work update              # looks for a new version, shows what changed and asks
-work update --desligar   # stops the notices; work update keeps working
-work update --ligar      # turns the notices back on
+work update --off        # stops the notices; work update keeps working
+work update --on         # turns the notices back on
 ```
 
 `work` and the panel check on their own, at most once a day and in the

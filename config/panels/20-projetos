@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
+. "${WORKDECK_LIB_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/workdeck/lib}/common.sh" 2>/dev/null || msg() { printf '%s' "$1"; }
 CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/workdeck/projects.conf"
 purple=$'\033[38;5;183m'; green=$'\033[38;5;151m'; yellow=$'\033[38;5;223m'; dim=$'\033[2m'; x=$'\033[0m'
 
-[ -f "$CONFIG" ] || { echo "${dim}nenhum projeto ainda${x}"; exit 0; }
+[ -f "$CONFIG" ] || { echo "${dim}$(msg panel_projects_none)${x}"; exit 0; }
 
 found=0
 while IFS= read -r line; do
@@ -12,16 +13,16 @@ while IFS= read -r line; do
   found=1
   dir="${dir/#\~/$HOME}"; dir="${dir//\$\{HOME\}/$HOME}"; dir="${dir//\$HOME/$HOME}"
   if [ ! -d "$dir/.git" ]; then
-    printf '%-14s %s%-20s%s %ssem git%s\n' "$name" "$dim" "-" "$x" "$dim" "$x"
+    printf '%-14s %s%-20s%s %s%s%s\n' "$name" "$dim" "-" "$x" "$dim" "$(msg panel_no_git)" "$x"
     continue
   fi
   branch=$(git -C "$dir" branch --show-current 2>/dev/null)
   changed=$(git -C "$dir" status --porcelain 2>/dev/null | wc -l | tr -d ' ')
   if [ "$changed" -gt 0 ]; then
-    status="${yellow}● $changed alterado(s)${x}"
+    status="${yellow}$(msg panel_changed "$changed")${x}"
   else
-    status="${green}✓ limpo${x}"
+    status="${green}$(msg panel_clean)${x}"
   fi
   printf '%-14s %s%-20s%s %s\n' "$name" "$purple" "${branch:-?}" "$x" "$status"
 done < "$CONFIG"
-[ "$found" = 1 ] || echo "${dim}nenhum projeto ainda${x}"
+[ "$found" = 1 ] || echo "${dim}$(msg panel_projects_none)${x}"

@@ -14,9 +14,9 @@ is_workdeck_command() {
 
 agent_problem() {
   local name="${1%% *}"
-  if [ -z "$1" ]; then echo "nenhum agente definido"
-  elif is_workdeck_command "$1"; then echo "'$1' é um comando do workdeck, não um agente"
-  elif ! type -P "$name" >/dev/null; then echo "'$name' não está no PATH"
+  if [ -z "$1" ]; then msgln agent_none
+  elif is_workdeck_command "$1"; then msgln agent_is_workdeck "$1"
+  elif ! type -P "$name" >/dev/null; then msgln agent_not_in_path "$name"
   fi
   return 0
 }
@@ -53,7 +53,7 @@ send_request() {
   [ -z "$review_cmd" ] || AGENT_CMD="$review_cmd"
   p="$(agent_problem "$AGENT_CMD")"
   if [ -n "$p" ]; then
-    echo "não sei qual IA usar: abra a sua (claude, codex…) num painel desta janela e rode de novo."
+    msgln agent_unknown
     return 1
   fi
   name="$(basename "${AGENT_CMD%% *}")"
@@ -89,7 +89,7 @@ send_request() {
       elif command -v wl-copy >/dev/null; then wl-copy < "$file"
       elif command -v xclip >/dev/null; then xclip -selection clipboard < "$file"
       fi
-      echo "o pedido está na área de transferência e em $file: cole na IA que vai abrir." ;;
+      msgln agent_clipboard "$file" ;;
   esac
 
   if [ -z "${TMUX:-}" ]; then
@@ -178,10 +178,10 @@ case "${1:-}" in
     ;;
   --set)
     cmd="${2:?use: workdeck-agent --set <comando>}"
-    is_workdeck_command "$cmd" && { echo "'$cmd' é um comando do workdeck, não um agente de IA."; exit 1; }
-    type -P "${cmd%% *}" >/dev/null || { echo "'${cmd%% *}' não está no PATH."; exit 1; }
+    is_workdeck_command "$cmd" && { msgln agent_set_is_workdeck "$cmd"; exit 1; }
+    type -P "${cmd%% *}" >/dev/null || { msgln agent_set_not_in_path "${cmd%% *}"; exit 1; }
     setting_set AGENT_CMD "$cmd"
-    echo "agente definido: $cmd"
+    msgln agent_set_done "$cmd"
     exit 0
     ;;
 esac

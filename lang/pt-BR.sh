@@ -1,0 +1,335 @@
+msg_settings_header_1="# Configurações do workdeck. Cada linha é CHAVE=\"valor\"; linhas com # no começo são comentários."
+msg_settings_header_2="# A instalação lembra aqui as suas escolhas, e você pode editar à mão."
+msg_settings_active_pane_1="# Destaque do painel ativo: \"none\" (padrão, o visual do tema) ou \"line\""
+msg_settings_active_pane_2="# (traço fino no topo do painel ativo). Ctrl+b r aplica."
+msg_settings_layout_1="# Cada janela de projeto abre com o agente (AGENT_CMD) e um shell lado a lado. No shell, o"
+msg_settings_layout_2="# SERVER_COMMAND do .workdeck/project.conf do projeto aparece digitado, sem rodar."
+msg_settings_layout_3="# \"none\" abre um painel só. Vale para as janelas abertas depois de mudar."
+msg_settings_notify_agents="# Notificação do sistema quando um agente termina numa janela que você não está olhando."
+
+msg_work_help="Os comandos são:
+  work                abre a sessão, ou volta para ela
+  work add <pasta>    acrescenta um projeto
+  work review         o seu agente revisa a mudança antes do commit
+  work update         atualiza o workdeck
+  work kill           fecha a sessão inteira
+  work uninstall      desinstala tudo o que o workdeck instalou"
+msg_work_unknown="não conheço 'work %s'."
+msg_update_no_copy="não achei a cópia do workdeck em %s."
+msg_update_no_copy_hint="rode o ./install.sh de um clone do repositório uma vez, e o work update passa a funcionar."
+msg_update_unreachable="não consegui falar com o repositório do workdeck; tente de novo mais tarde."
+msg_update_none_published="ainda não há versão publicada do workdeck."
+msg_update_up_to_date="você está na %s, a mais nova."
+msg_update_no_version="sem versão"
+msg_update_new_version="uma versão nova"
+msg_update_changes="O que mudou"
+msg_update_ask="Atualizar agora? [S/n] "
+msg_update_later="tudo bem; quando quiser: work update"
+msg_update_done="✓ workdeck atualizado para %s"
+msg_update_notify_off="o work não vai mais perguntar sobre versões novas; work update continua funcionando."
+msg_update_notify_on="o work volta a avisar sobre versões novas."
+msg_menu_add="Adicionar um projeto…"
+msg_menu_add_prompt="caminho do projeto (Esc cancela):"
+msg_menu_review="Self code review da mudança"
+msg_menu_notify_on="Ligar o aviso quando um agente termina"
+msg_menu_notify_off="Desligar o aviso quando um agente termina"
+msg_menu_update="Atualizar o workdeck"
+msg_menu_press_key="aperte qualquer tecla para fechar"
+msg_menu_split="Dividir a tela"
+msg_menu_zoom="Zoom no painel (de novo volta)"
+msg_menu_close_pane="Fechar este painel"
+msg_menu_key_windows="Shift ← →     projeto anterior / próximo"
+msg_menu_key_panes="Shift ↑ ↓     painel anterior / próximo"
+msg_menu_key_number="Ctrl+b 1…9    vai direto para a janela"
+msg_menu_key_detach="Ctrl+b d      sai e deixa a sessão rodando"
+msg_menu_key_mouse="mouse         clica na barra, arrasta a borda"
+msg_menu_key_cmd="cmd+1…9       o mesmo, sem o Ctrl+b"
+msg_menu_close_hint="q ou Esc fecha o menu"
+msg_layout_invalid="PROJECT_LAYOUT=\"%s\" não existe no settings.conf; use agent-shell ou none. As janelas abrem com o agente e o shell lado a lado."
+msg_active_pane_invalid="workdeck: ACTIVE_PANE=\"%s\" inválido; use none ou line"
+msg_agent_done="o %s terminou em %s"
+msg_notify_agents_off="aviso desligado: só a ✦ na barra marca quando um agente termina"
+msg_notify_agents_on="aviso ligado: uma notificação do sistema avisa quando um agente termina em outra janela"
+msg_settings_not_writable="não consegui gravar em %s; confira se o arquivo pode ser alterado"
+msg_add_missing="não achei a pasta: %s"
+msg_add_exists="%s já está no seu work, como %s"
+msg_add_done="%s entrou no seu work como %s"
+msg_add_window_open="a janela %s já está aberta na sessão %s"
+msg_kill_done="sessão %s fechada"
+msg_kill_none="nenhuma sessão %s aberta"
+msg_uninstall_missing="não achei o desinstalador em %s"
+msg_uninstall_intro="O work uninstall desinstala tudo o que o workdeck instalou:
+  - os blocos do workdeck no .zshrc, no .tmux.conf e no kitty.conf
+  - o comando work e o código em %s
+  - o zsh do workdeck (oh-my-zsh e zinit), a fonte e o kitty, se foi ele que instalou
+  - a sua config em %s: projetos, painéis e escolhas
+
+O que já era seu antes da instalação fica. Para ver sem apagar: work uninstall --dry-run
+Para tirar só os blocos e manter a config: bash %s/uninstall.sh
+"
+msg_uninstall_ask="Desinstalar tudo? [s/N] "
+msg_nothing_done="nada feito"
+msg_no_projects="Seu work ainda não tem projetos. Adicione o primeiro:
+
+  work add ~/caminho/do/projeto      (Tab completa o caminho)"
+msg_skip_project="pulando %s: %s não existe"
+
+msg_install_help="workdeck — instalador. macOS e Linux.
+
+  ./install.sh                      instala com o tema padrão
+  ./install.sh --lang en            escolhe o idioma (en ou pt-BR) sem perguntar
+  ./install.sh --theme nord         escolhe um tema de themes/
+  ./install.sh --agent claude       define o seu agente de IA
+  ./install.sh --zsh                instala o oh-my-zsh e o zinit sem perguntar
+  ./install.sh --with ai-memory     ativa integrações opcionais (vírgula separa)
+  ./install.sh --list-integrations  mostra as integrações disponíveis e sai
+  ./install.sh --terminal warp      escolhe o terminal (kitty, warp ou other) sem perguntar
+  ./install.sh --visual             instala o tema e a fonte no terminal, sem perguntar
+  ./install.sh --no-visual          no terminal, só os atalhos
+  ./install.sh --yes                não pergunta nada; usa os padrões
+  ./install.sh --no-deps            não instala nada pelo gerenciador de pacotes
+  ./install.sh --no-reload          não recarrega o tmux no fim
+  ./install.sh --dry-run            só mostra o que faria
+
+É idempotente: rodar de novo atualiza em vez de duplicar. O que ele escreve
+nos seus arquivos fica entre marcadores >>> workdeck >>>, e o uninstall.sh
+remove exatamente esse trecho."
+msg_install_needs_value="%s precisa de um valor"
+msg_install_bad_terminal="terminal '%s' não existe. Disponíveis: kitty, warp, other"
+msg_install_bad_lang="idioma '%s' não existe. Disponíveis: en, pt-BR"
+msg_install_unknown_option="opção desconhecida: %s"
+msg_install_not_regular="%s não é um arquivo comum; não mexi nele"
+msg_install_backup="cópia do original em %s"
+msg_install_dry_block="[dry-run] atualizaria o bloco em %s"
+msg_install_bad_theme="tema '%s' não existe. Disponíveis:"
+msg_install_header_plain="workdeck → %s, tema %s"
+msg_install_kitty_full="kitty.conf — atalhos, tema e fonte"
+msg_install_kitty_keys="kitty.conf — atalhos"
+msg_install_other_terminal="outro"
+msg_install_ask_terminal="Qual terminal você usa? O workdeck confere se ele está instalado e ajusta o que der."
+msg_install_terminal_kitty="atalhos cmd do workdeck"
+msg_install_terminal_warp="atalhos Alt do tmux"
+msg_install_terminal_other="só o tmux; o terminal fica como está"
+msg_install_ask_number="Número (Enter para %s): "
+msg_install_ask_visual="Quer também o tema e a fonte JetBrains Mono do workdeck no %s? [s/N] "
+msg_install_dry_warp_theme="[dry-run] copiaria o tema do Warp para %s"
+msg_install_warp_theme="tema do Warp em %s"
+msg_install_kitty_missing="kitty não encontrado; instale por %s e rode a instalação de novo"
+msg_install_kitty_missing_short="kitty não encontrado"
+msg_install_kitty_summary_full="kitty com atalhos, tema e fonte"
+msg_install_kitty_summary_keys="kitty com atalhos"
+msg_install_warp_missing="Warp não encontrado; instale por %s e rode a instalação de novo"
+msg_install_warp_missing_short="Warp não encontrado"
+msg_install_warp_found="Warp encontrado: o tmux funciona com os atalhos Alt"
+msg_install_warp_summary_full="Warp com tema e fonte"
+msg_install_no_terminal_changes="terminal: sem ajustes; o tmux funciona em qualquer um"
+msg_install_font_present="fonte JetBrains Mono já instalada"
+msg_install_font_no_deps="fonte JetBrains Mono não instalada (--no-deps)"
+msg_install_dry_font="[dry-run] baixaria a fonte JetBrains Mono para %s"
+msg_install_font_no_tools="sem curl ou unzip; a fonte JetBrains Mono fica para depois"
+msg_install_font_done="fonte JetBrains Mono instalada em %s"
+msg_install_font_failed="não consegui baixar a fonte JetBrains Mono; o resto segue normal"
+msg_install_step_deps="dependências"
+msg_install_tmux_present="tmux já instalado"
+msg_install_missing_no_deps="faltando: %s — instale por conta (--no-deps)"
+msg_install_unknown_pkg="não reconheci o gerenciador de pacotes; instale: %s"
+msg_install_pkg_failed="não consegui instalar %s pelo %s"
+msg_install_code_copy="cópia do código em %s, para o work update"
+msg_install_not_clone="%s não é um clone do git; o work update não vai funcionar"
+msg_install_script_moved="%s saiu de %s: só o work fica no PATH"
+msg_install_step_scripts="scripts"
+msg_install_work_exists="work — já existe um work que não é do workdeck; não substituí"
+msg_install_not_in_path="atenção: %s não está no PATH — o bloco do shell resolve isso"
+msg_install_scripts_summary="work em %s"
+msg_install_old_panel="painel antigo %s removido"
+msg_install_panel="painel %s"
+msg_install_panel_off="painel %s desligado por você — não toquei nele"
+msg_install_panel_updated="painel %s atualizado"
+msg_install_panel_edited="painel %s foi editado por você — não toquei nele"
+msg_install_step_config="config"
+msg_install_projects_exists="projects.conf já existe — não toquei nele"
+msg_install_projects_hint="projetos: adicione com work add <caminho>"
+msg_install_git_review_removed="configuração antiga do git-review removida"
+msg_install_step_tmux="tmux e terminal"
+msg_install_tmux_summary="Ctrl+b, mouse e atalhos em Alt"
+msg_install_tmux_done="tmux.conf — Ctrl+b, mouse e atalhos em Alt"
+msg_install_zsh_custom="zsh: você já tem plugins (oh-my-zsh, zinit ou outros); não mexi"
+msg_install_ask_zsh="Quer o zsh do workdeck? Sugestões enquanto digita, cores nos comandos
+  e mais completar com Tab. [S/n] "
+msg_install_dry_zsh="[dry-run] instalaria o zsh do workdeck"
+msg_install_zsh_failed="não consegui instalar o zsh; instale pelo gerenciador e rode a instalação de novo com --zsh"
+msg_install_ask_chsh="Usar o zsh como o seu shell padrão? Pede a sua senha. [S/n] "
+msg_install_chsh_failed="não troquei o shell padrão; dá para fazer depois com: chsh -s %s"
+msg_install_omz_failed="não consegui baixar o oh-my-zsh ou o zinit; rode a instalação de novo com --zsh mais tarde"
+msg_install_step_shell="shell"
+msg_install_unknown_shell="shell '%s' não reconhecido — adicione à mão: source %s"
+msg_install_step_agent="agente de IA"
+msg_install_agent="agente: %s"
+msg_install_agent_set="agente já configurado: %s"
+msg_install_no_agent="nenhum agente de IA encontrado no PATH"
+msg_install_review_uses_open="o work review usa a IA que estiver aberta na janela"
+msg_install_no_agent_summary="nenhum no PATH; o review usa a IA aberta na janela"
+msg_install_found_agents="achei no PATH: %s"
+msg_install_found_agents_summary="achei %s; o review usa a IA aberta na janela"
+msg_install_ask_agent="Achei estes agentes de IA no seu PATH:"
+msg_install_agent_none_option="nenhum por enquanto"
+msg_install_ask_agent_number="Qual você usa? [0-%s] "
+msg_install_no_default_agent="nenhum padrão; o work review usa a IA aberta na janela"
+msg_install_no_default_agent_summary="nenhum padrão; o review usa a IA aberta na janela"
+msg_install_ask_integrations="Você usa algum destes com a IA? O workdeck mostra como ligar cada um."
+msg_install_ask_integration_numbers="Quais? Números separados por espaço, Enter para nenhum: "
+msg_install_unknown_integration="não conheço a integração '%s'"
+msg_install_integration_present="%s já está instalada"
+msg_install_ask_integration="Instalar %s? [s/N] "
+msg_install_skipped="pulada"
+msg_install_dry_integration="[dry-run] instalaria %s"
+msg_install_step_integrations="integrações"
+msg_install_integrations_before="escolhidas antes: %s; para ver de novo: rode a instalação de novo com --with <nome>"
+msg_install_integrations_none="nenhuma; para ligar depois: rode a instalação de novo com --with <nome>"
+msg_install_integrations_none_summary="nenhuma (--with <nome>)"
+msg_install_not_saved=" (detectado, não salvo)"
+msg_install_yes="sim"
+msg_install_no="não"
+msg_install_choices="Suas escolhas, que a instalação lembra nas próximas vezes:"
+msg_install_choice_language="idioma"
+msg_install_choice_language_hint="para mudar: ./install.sh --lang en|pt-BR"
+msg_install_choice_terminal_hint="para mudar: ./install.sh --terminal kitty|warp|other"
+msg_install_choice_visual_hint="para mudar: ./install.sh --visual (tema e fonte) ou --no-visual"
+msg_install_warp_todo="No Warp, falta escolher no app:"
+msg_install_warp_theme_steps="       tema      Settings › Appearance › Themes, e escolha \"workdeck %s\"
+                 (ou \"Open theme picker\" na Command Palette). Se o tema não aparecer, espere
+                 alguns minutos ou reabra o Warp
+       fonte     Settings › Appearance › Text › Font type › JetBrains Mono"
+msg_install_warp_option_steps="       Option    Settings › Features › \"Left Option key is Meta\" (ligado). Sem isso, os
+                 atalhos Alt do tmux (Alt+1…9, Alt+↑/↓) não funcionam no Mac"
+msg_install_tmux_reloaded="tmux recarregado"
+msg_install_restart_terminal="Feche e abra o %s para carregar o zsh e o visual novos."
+msg_install_done_fancy="✓ pronto em %ss"
+msg_install_done="Pronto."
+msg_install_open_kitty_restart="feche e abra o kitty"
+msg_install_open_kitty_restart_hint="carrega o zsh, o visual e os comandos do workdeck"
+msg_install_open_warp_restart="feche e abra o Warp"
+msg_install_open_terminal_restart_hint="carrega o zsh e os comandos do workdeck"
+msg_install_open_kitty="abra o kitty"
+msg_install_open_kitty_visual_hint="com o tema, a fonte e os atalhos cmd do workdeck"
+msg_install_open_kitty_hint="com os atalhos cmd do workdeck"
+msg_install_open_terminal_restart="feche e abra o terminal"
+msg_install_now="Agora:"
+msg_install_work_hint="abre o painel, que mostra como adicionar os projetos"
+msg_install_navigation="  Para navegar: Shift+← / Shift+→ troca de janela, Shift+↑ / Shift+↓ troca de
+  painel, e Ctrl+b e depois 1…9 vai direto para uma janela. Clicar na barra
+  também funciona.
+  Ajuda a qualquer hora: Ctrl+b e h dentro do work."
+msg_install_windows="O workdeck roda em macOS e Linux. No Windows, use pelo WSL: abra o Ubuntu do WSL e rode a instalação de lá."
+msg_install_ask_language="Em que idioma o workdeck mostra as mensagens?"
+
+msg_review_command_ignored="ignorei o REVIEW_COMMAND de %s: no projeto, só vale um comando de barra sem argumentos, como /bmad-code-review. Para mais que isso, use REVIEW_COMMAND no ~/.config/workdeck/settings.conf."
+msg_review_md_ignored="o review.md não vai para o /code-review; ponha essas regras no CLAUDE.md do projeto, que ele segue."
+msg_review_claude_busy="o claude ainda está trabalhando; rode o work review quando ele terminar."
+msg_review_claude_blocked="o chat do claude não está livre: responda a pergunta que estiver aberta ou apague o que estiver digitado, e rode o work review de novo."
+msg_review_started="o review começou no chat do claude: %s"
+msg_review_pasted="colei no chat do %s: %s"
+msg_review_press_enter="confira e aperte Enter lá para começar o review."
+msg_review_unknown="não conheço '%s'. Use: work review, work review staged ou work review branch, com --pane se quiser o painel separado"
+msg_review_not_git="%s não é um repositório git, então não há o que revisar."
+msg_review_go_to_project="Vá para a janela de um projeto (Shift+→) e rode de novo."
+msg_review_nothing="nada mudou desde o último commit; não há o que revisar."
+msg_review_nothing_staged="nada no stage (git add); não há o que revisar."
+msg_review_only_commits="nada mudou desde o último commit. Os commits que ainda não subiram só entram no review do próprio agente: abra o claude nesta janela e rode de novo."
+msg_review_scope_uncommitted="o que ainda não foi commitado"
+msg_review_commands_uncommitted="git diff HEAD, e os arquivos novos de git ls-files --others --exclude-standard"
+msg_review_scope_staged="o que está no stage, pronto para o commit"
+msg_review_scope_branch="tudo o que esta branch mudou em relação a %s"
+msg_review_commands_branch="git diff %s...HEAD, mais o que ainda não foi commitado (git diff HEAD)"
+msg_review_request="Faça um code review desta mudança antes do commit. Seja direto: aponte o
+problema e a correção, sem elogio e sem explicação longa. Eu peço detalhes
+depois de corrigir, se precisar.
+
+O que revisar: %s, na branch %s. Para ver a mudança: %s.
+Leia também o código que a mudança toca (quem chama, quem é chamado, os testes).
+
+Se as suas instruções (CLAUDE.md, AGENTS.md, skills ou comandos instalados)
+apontam um agente ou skill de review, ou PRDs e stories desta mudança (o nome da
+branch costuma ter o número da tarefa), siga-os. O roteiro abaixo cobre o resto.
+
+Procure: bugs e casos de borda; segurança (segredos, entrada sem validação,
+injeção); código arriscado sem teste; desempenho com dados reais; código morto,
+duplicado ou de depuração; arquivos fora do escopo da mudança.
+
+Responda exatamente neste formato:
+
+Usei: <agente ou skill e documentos, ou \"roteiro padrão\">
+
+🔴 arquivo:linha — o problema, em uma frase
+   → a correção, em uma frase
+🟠 arquivo:linha — o problema, em uma frase
+   → a correção, em uma frase
+🟢 o que você conferiu e está certo, em uma linha
+
+- 🔴 bug: quebra, perde dado, abre falha de segurança ou não faz o que a
+  mudança promete. Corrigir antes do commit.
+- 🟠 atenção: funciona, mas é arriscado, lento, sem teste ou sobra. Vale
+  corrigir, pode ficar para depois.
+- 🟢 ok: no máximo três linhas, só com o que importa.
+
+Vermelhos primeiro, depois laranjas. Não invente problema: sem nada a apontar,
+responda só com a linha \"Usei\" e um 🟢. Termine com uma linha de veredito:
+
+🟢 pode commitar
+🟠 pode commitar; os laranjas ficam para depois
+🔴 corrija os vermelhos antes do commit
+
+Se esta conversa já tem uma revisão anterior desta branch, comece a lista com
+\"🟢 corrigido: …\" para o que foi resolvido e mantenha o que continua aberto.
+
+Não altere arquivos e não faça commit: só revise. Responda em português."
+msg_review_extra="Instruções de quem pediu a revisão, que valem mais que as de cima:"
+msg_agent_unknown="não sei qual IA usar: abra a sua (claude, codex…) num painel desta janela e rode de novo."
+msg_agent_clipboard="o pedido está na área de transferência e em %s: cole na IA que vai abrir."
+msg_agent_none="nenhum agente definido"
+msg_agent_is_workdeck="'%s' é um comando do workdeck, não um agente"
+msg_agent_not_in_path="'%s' não está no PATH"
+msg_agent_set_is_workdeck="'%s' é um comando do workdeck, não um agente de IA."
+msg_agent_set_not_in_path="'%s' não está no PATH."
+msg_agent_set_done="agente definido: %s"
+
+msg_window_panel="painel"
+msg_panel_title_20_projetos="Projetos"
+msg_panel_help="work-panel mostra a saída de vários comandos em um painel, atualizando sozinho.
+
+  work-panel            atualiza a cada 60s
+  work-panel 10         atualiza a cada 10s
+  work-panel --once     imprime uma vez e sai
+
+Cada painel é um executável em ~/.config/workdeck/panels/. O nome do arquivo
+vira o título, e a ordem é alfabética: use um prefixo numérico para ordenar
+(10-docker, 20-git). Qualquer coisa que imprima texto serve."
+msg_panel_bad_interval="intervalo inválido: %s"
+msg_panel_none="Nenhum painel ainda."
+msg_panel_create="Crie um executável em %s/, qualquer coisa que imprima texto:"
+msg_panel_empty="%s existe mas não tem nenhum executável."
+msg_panel_chmod="Lembre do chmod +x."
+msg_panel_projects_none="nenhum projeto ainda"
+msg_panel_no_git="sem git"
+msg_panel_changed="● %s alterado(s)"
+msg_panel_clean="✓ limpo"
+msg_panel_projects="projetos"
+msg_panel_projects_zero="nenhum ainda"
+msg_panel_no_version="sem versão"
+msg_panel_tagline="terminal para agentes de IA"
+msg_panel_start="%sPara começar%s, no terminal aqui embaixo:"
+msg_panel_add_project="work add ~/projeto"
+msg_panel_add_project_hint="cada projeto vira uma janela; Tab completa o caminho"
+msg_panel_in_warp="%sNo Warp%s: o work funciona com os atalhos Alt; os atalhos cmd só valem no kitty."
+msg_panel_outside_kitty="%sFora do kitty%s: o work funciona, mas o tema, a fonte e os atalhos cmd só valem lá."
+msg_panel_menu_hint="Ctrl+b h abre o menu: projetos, review, dividir a tela"
+msg_panel_custom_hint="Para pôr o seu no painel: um executável em ~/.config/workdeck/panels/"
+msg_panel_guide="  guia: github.com/thiagofeliperibeiro/workdeck/blob/main/docs/panels.pt-BR.md"
+
+msg_tmux_unused_key="tecla sem uso no workdeck — Ctrl+b h abre o menu"
+msg_tmux_reloaded="tmux.conf recarregado"
+msg_install_zsh_summary="oh-my-zsh (robbyrussell) e zinit"
+msg_changelog_heading="Português"
+msg_settings_review_agent_1="# Agente que faz o work review, num painel embaixo do chat. Use outro modelo ou outra IA para"
+msg_settings_review_agent_2="# não repetir os pontos cegos de quem escreveu o código. Vazio: o review usa o seu agente."
+msg_review_scope_unpushed="os commits desta branch que ainda não subiram"

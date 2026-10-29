@@ -32,13 +32,14 @@ uma flag, como `--theme` ou `--terminal`.
 
 | Chave | Valores | O que faz |
 |---|---|---|
+| `LANGUAGE` | `en`, `pt-BR` | O idioma das mensagens; sem ele, o idioma do sistema (`LANG`). Mude com `./install.sh --lang`, que também atualiza as mensagens do tmux e o nome da janela do painel |
 | `TERMINAL` | `kitty`, `warp`, `other` | O terminal cujos extras a instalação configura |
 | `VISUAL` | `yes`, `no` | O tema e a fonte do workdeck no kitty ou no Warp |
 | `THEME` | o nome de um tema | As cores do tmux |
 | `AGENT_CMD` | um comando | A IA que o `work review` usa quando nenhuma está aberta |
 | `INTEGRATIONS` | `none` ou uma lista | As integrações opcionais |
 | `ZSH` | `yes`, `no` | O zsh do workdeck |
-| `NOTIFY` | `0` | `0` desliga o aviso de versão nova (`work update --desligar`) |
+| `NOTIFY` | `0` | `0` desliga o aviso de versão nova (`work update --off`) |
 | `ACTIVE_PANE` | `none` (padrão), `line` | Um traço fino sobre o painel ativo, na cor de destaque do tema |
 | `REVIEW_COMMAND` | um comando, como `/code-review high` | O que o `work review` cola no chat do agente ([Review](review.pt-BR.md)) |
 | `NOTIFY_AGENTS` | `yes`, `no` (padrão) | Uma notificação do sistema quando um agente termina numa janela que você não está olhando ([Projetos](projects.pt-BR.md)) |

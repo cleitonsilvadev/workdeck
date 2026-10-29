@@ -5,8 +5,12 @@ ARGS=("$@")
 LIB="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 [ -x "$LIB/workdeck-agent" ] || LIB="${XDG_DATA_HOME:-$HOME/.local/share}/workdeck/bin"
 if [ ! -f "$LIB/../lib/common.sh" ]; then
-  echo "o código do workdeck não está em ${LIB%/bin}."
-  echo "instale de novo: curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/get.sh | bash"
+  lang="$(sed -n 's/^LANGUAGE="\(.*\)"$/\1/p' "${XDG_CONFIG_HOME:-$HOME/.config}/workdeck/settings.conf" 2>/dev/null | head -1)"
+  case "${WORKDECK_LANG:-${lang:-${LC_ALL:-${LC_MESSAGES:-${LANG:-}}}}}" in
+    pt*) echo "o código do workdeck não está em ${LIB%/bin}. Instale de novo:" ;;
+    *) echo "the workdeck code is not in ${LIB%/bin}. Install it again:" ;;
+  esac
+  echo "curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/get.sh | bash"
   exit 1
 fi
 . "$LIB/../lib/common.sh"
@@ -76,11 +80,16 @@ cache_set() {
   { grep -v "^$1=" "$UPDATE_CACHE" 2>/dev/null || true; echo "$1=$2"; } > "$UPDATE_CACHE.tmp" && mv "$UPDATE_CACHE.tmp" "$UPDATE_CACHE"
 }
 
+
 release_notes() {
   local c="" x=""
   if [ -t 1 ]; then c=$'\033[38;5;183m'; x=$'\033[0m'; fi
   git -C "$CODE" show "$1:CHANGELOG.md" 2>/dev/null \
-    | awk -v v="## $1" '$0 == v {f = 1; next} /^## / {f = 0} f' | sed '/^[[:space:]]*$/d' | head -8 \
+    | awk -v v="## $1" -v lang="### $(msg changelog_heading)" '
+        $0 == v { f = 1; next }
+        /^## / { f = 0 }
+        f && /^### / { split_lang = 1; keep = ($0 == lang); next }
+        f && (!split_lang || keep)' | sed '/^[[:space:]]*$/d' | head -8 \
     | sed "s/^- /    • /; s/\`\([^\`]*\)\`/$c\\1$x/g"
 }
 
@@ -102,12 +111,12 @@ check_in_background() {
 update() {
   local ask="$1" latest current r
   if [ ! -d "$CODE/.git" ]; then
-    echo "não achei a cópia do workdeck em $(short_path "$CODE")."
-    echo "rode o ./install.sh de um clone do repositório uma vez, e o work update passa a funcionar."
+    msgln update_no_copy "$(short_path "$CODE")"
+    msgln update_no_copy_hint
     return 1
   fi
   if ! quiet_git fetch -q --tags --force --prune --prune-tags origin 2>/dev/null; then
-    echo "não consegui falar com o repositório do workdeck; tente de novo mais tarde."
+    msgln update_unreachable
     return 1
   fi
   latest="$(git -C "$CODE" tag -l 'v*' | latest_version)"
@@ -115,31 +124,31 @@ update() {
   cache_set checked "$(date +%s)"
   cache_set latest "$latest"
   if [ -z "$latest" ]; then
-    echo "ainda não há versão publicada do workdeck."
+    msgln update_none_published
     return 0
   fi
   if ! is_newer "$latest" "$current"; then
-    echo "você está na $current, a mais nova."
+    msgln update_up_to_date "$current"
     return 0
   fi
   local t="" d="" v="" x=""
   if [ -t 1 ]; then t=$'\033[1;38;5;183m'; d=$'\033[2m'; v=$'\033[32m'; x=$'\033[0m'; fi
-  printf '\n  %sworkdeck%s  %s%s%s → %s%s%s  %suma versão nova%s\n\n' \
-    "$t" "$x" "$d" "${current:-sem versão}" "$x" "$v" "$latest" "$x" "$d" "$x"
-  printf '  %sO que mudou%s\n' "$t" "$x"
+  printf '\n  %sworkdeck%s  %s%s%s → %s%s%s  %s%s%s\n\n' \
+    "$t" "$x" "$d" "${current:-$(msg update_no_version)}" "$x" "$v" "$latest" "$x" "$d" "$(msg update_new_version)" "$x"
+  printf '  %s%s%s\n' "$t" "$(msg update_changes)" "$x"
   release_notes "$latest"
   echo
   if [ "$ask" = 1 ]; then
-    printf '  Atualizar agora? [S/n] '
+    printf '  %s' "$(msg update_ask)"
     read -r r || r=n
     case "${r:-s}" in
       s|S|y|Y) ;;
-      *) cache_set skipped "$latest"; printf '  %studo bem; quando quiser: work update%s\n\n' "$d" "$x"; return 0 ;;
+      *) cache_set skipped "$latest"; printf '  %s%s%s\n\n' "$d" "$(msg update_later)" "$x"; return 0 ;;
     esac
   fi
   git -C "$CODE" checkout -q "$latest"
   WORKDECK_UPDATING=1 bash "$CODE/install.sh" --yes --no-deps
-  printf '\n  %s✓ workdeck atualizado para %s%s\n\n' "$v" "$latest" "$x"
+  printf '\n  %s%s%s\n\n' "$v" "$(msg update_done "$latest")" "$x"
 }
 
 offer_update() {
@@ -163,7 +172,7 @@ configured_review_command() {
     /*[!A-Za-z0-9._:-]*|/) ;;
     /*) REVIEW_COMMAND="$value"; return 0 ;;
   esac
-  [ -z "$value" ] || REVIEW_WARNING="ignorei o REVIEW_COMMAND de $(short_path "$file"): no projeto, só vale um comando de barra sem argumentos, como /bmad-code-review. Para mais que isso, use REVIEW_COMMAND no ~/.config/workdeck/settings.conf."
+  [ -z "$value" ] || REVIEW_WARNING="$(msg review_command_ignored "$(short_path "$file")")"
   REVIEW_COMMAND="$(setting_get REVIEW_COMMAND)"
 }
 
@@ -192,21 +201,21 @@ review_in_chat() {
     return 1
   fi
   case "$cmd" in
-    /code-review*) [ -z "$extra" ] || note="o review.md não vai para o /code-review; ponha essas regras no CLAUDE.md do projeto, que ele segue." ;;
+    /code-review*) [ -z "$extra" ] || note="$(msg review_md_ignored)" ;;
   esac
   if [ "$agent" = claude ]; then
     case "$("$LIB/workdeck-agent" --claude-state "$pane")" in
-      busy) tell "o claude ainda está trabalhando; rode o work review quando ele terminar."; return 0 ;;
-      blocked) tell "o chat do claude não está livre: responda a pergunta que estiver aberta ou apague o que estiver digitado, e rode o work review de novo."; return 0 ;;
+      busy) tell "$(msg review_claude_busy)"; return 0 ;;
+      blocked) tell "$(msg review_claude_blocked)"; return 0 ;;
     esac
     if "$LIB/workdeck-agent" --submit "$pane" "$cmd"; then
-      tell ${REVIEW_WARNING:+"$REVIEW_WARNING"} "o review começou no chat do claude: $cmd" ${note:+"$note"}
+      tell ${REVIEW_WARNING:+"$REVIEW_WARNING"} "$(msg review_started "$cmd")" ${note:+"$note"}
       return 0
     fi
   else
     "$LIB/workdeck-agent" --send "$pane" "$cmd"
   fi
-  tell ${REVIEW_WARNING:+"$REVIEW_WARNING"} "colei no chat do $agent: $cmd" "confira e aperte Enter lá para começar o review." ${note:+"$note"}
+  tell ${REVIEW_WARNING:+"$REVIEW_WARNING"} "$(msg review_pasted "$agent" "$cmd")" "$(msg review_press_enter)" ${note:+"$note"}
   return 0
 }
 
@@ -217,32 +226,32 @@ review() {
   for arg in "$@"; do
     case "$arg" in
       --pane) use_pane=1 ;;
-      *) if [ -z "$target" ]; then target="$arg"; else echo "não conheço '$arg'. Use: work review, work review staged ou work review branch, com --pane se quiser o painel separado"; return 1; fi ;;
+      *) if [ -z "$target" ]; then target="$arg"; else msgln review_unknown "$arg"; return 1; fi ;;
     esac
   done
   target="${target:-uncommitted}"
   if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-    echo "$(short_path "$PWD") não é um repositório git, então não há o que revisar."
-    echo "Vá para a janela de um projeto (Shift+→) e rode de novo."
+    msgln review_not_git "$(short_path "$PWD")"
+    msgln review_go_to_project
     return 1
   fi
   case "$target" in
     uncommitted|"")
       if [ -z "$(git status --porcelain)" ]; then
-        if [ "$(unpushed_commits)" -gt 0 ]; then only_commits=1; else echo "nada mudou desde o último commit; não há o que revisar."; return 0; fi
+        if [ "$(unpushed_commits)" -gt 0 ]; then only_commits=1; else msgln review_nothing; return 0; fi
       fi
-      description="o que ainda não foi commitado"
-      commands="git diff HEAD, e os arquivos novos de git ls-files --others --exclude-standard" ;;
+      description="$(msg review_scope_uncommitted)"
+      commands="$(msg review_commands_uncommitted)" ;;
     staged)
-      if git diff --cached --quiet; then echo "nada no stage (git add); não há o que revisar."; return 0; fi
-      description="o que está no stage, pronto para o commit"
+      if git diff --cached --quiet; then msgln review_nothing_staged; return 0; fi
+      description="$(msg review_scope_staged)"
       commands="git diff --cached" ;;
     branch)
       base="$(git symbolic-ref -q --short refs/remotes/origin/HEAD 2>/dev/null || echo main)"
-      description="tudo o que esta branch mudou em relação a $base"
-      commands="git diff $base...HEAD, mais o que ainda não foi commitado (git diff HEAD)" ;;
+      description="$(msg review_scope_branch "$base")"
+      commands="$(msg review_commands_branch "$base")" ;;
     *)
-      echo "não conheço '$target'. Use: work review, work review staged ou work review branch, com --pane se quiser o painel separado"
+      msgln review_unknown "$target"
       return 1 ;;
   esac
   root="$(git rev-parse --show-toplevel)"
@@ -257,61 +266,19 @@ review() {
     return 0
   fi
   if [ "$only_commits" = 1 ] && [ -n "$(setting_get REVIEW_AGENT_CMD)" ]; then
-    description="os commits desta branch que ainda não subiram"
+    description="$(msg review_scope_unpushed)"
     commands="git diff @{upstream}...HEAD"
   elif [ "$only_commits" = 1 ]; then
-    echo "nada mudou desde o último commit. Os commits que ainda não subiram só entram no review do próprio agente: abra o claude nesta janela e rode de novo."
+    msgln review_only_commits
     return 0
   fi
   request="$WORKDECK_CACHE/review-request.md"
   mkdir -p "$(dirname "$request")"
   {
-    cat <<EOF
-Faça um code review desta mudança antes do commit. Seja direto: aponte o
-problema e a correção, sem elogio e sem explicação longa. Eu peço detalhes
-depois de corrigir, se precisar.
-
-O que revisar: $description, na branch $branch. Para ver a mudança: $commands.
-Leia também o código que a mudança toca (quem chama, quem é chamado, os testes).
-
-Se as suas instruções (CLAUDE.md, AGENTS.md, skills ou comandos instalados)
-apontam um agente ou skill de review, ou PRDs e stories desta mudança (o nome da
-branch costuma ter o número da tarefa), siga-os. O roteiro abaixo cobre o resto.
-
-Procure: bugs e casos de borda; segurança (segredos, entrada sem validação,
-injeção); código arriscado sem teste; desempenho com dados reais; código morto,
-duplicado ou de depuração; arquivos fora do escopo da mudança.
-
-Responda exatamente neste formato:
-
-Usei: <agente ou skill e documentos, ou "roteiro padrão">
-
-🔴 arquivo:linha — o problema, em uma frase
-   → a correção, em uma frase
-🟠 arquivo:linha — o problema, em uma frase
-   → a correção, em uma frase
-🟢 o que você conferiu e está certo, em uma linha
-
-- 🔴 bug: quebra, perde dado, abre falha de segurança ou não faz o que a
-  mudança promete. Corrigir antes do commit.
-- 🟠 atenção: funciona, mas é arriscado, lento, sem teste ou sobra. Vale
-  corrigir, pode ficar para depois.
-- 🟢 ok: no máximo três linhas, só com o que importa.
-
-Vermelhos primeiro, depois laranjas. Não invente problema: sem nada a apontar,
-responda só com a linha "Usei" e um 🟢. Termine com uma linha de veredito:
-
-🟢 pode commitar
-🟠 pode commitar; os laranjas ficam para depois
-🔴 corrija os vermelhos antes do commit
-
-Se esta conversa já tem uma revisão anterior desta branch, comece a lista com
-"🟢 corrigido: …" para o que foi resolvido e mantenha o que continua aberto.
-
-Não altere arquivos e não faça commit: só revise. Responda em português.
-EOF
+    msg review_request "$description" "$branch" "$commands"
+    echo
     if [ -n "$extra" ]; then
-      printf '\nInstruções de quem pediu a revisão, que valem mais que as de cima:\n%s' "$extra"
+      printf '\n%s\n%s' "$(msg review_extra)" "$extra"
     fi
   } > "$request"
   "$LIB/workdeck-agent" --request "$request" "REVIEW" "$root:$branch"
@@ -329,33 +296,33 @@ menu() {
       args+=("$mark${name//#/##}" "" "select-window -t $id")
     fi
   done < <(tmux list-windows -t "$session" -F '#{window_id}|#{window_index}|#{window_active}|#{window_name}')
-  notify="Ligar o aviso quando um agente termina"
-  [ "$(setting_get NOTIFY_AGENTS no)" = yes ] && notify="Desligar o aviso quando um agente termina"
+  notify="$(msg menu_notify_on)"
+  [ "$(setting_get NOTIFY_AGENTS no)" = yes ] && notify="$(msg menu_notify_off)"
   args+=(""
-    "Adicionar um projeto…" + "command-prompt -p 'caminho do projeto (Esc cancela):' \"run-shell \\\"work add '%%'\\\"\""
-    "Self code review da mudança" r "run-shell -c '#{pane_current_path}' 'WORKDECK_FROM_MENU=1 TMUX_PANE=#{pane_id} work review'"
+    "$(msg menu_add)" + "command-prompt -p '$(msg menu_add_prompt)' \"run-shell \\\"work add '%%'\\\"\""
+    "$(msg menu_review)" r "run-shell -c '#{pane_current_path}' 'WORKDECK_FROM_MENU=1 TMUX_PANE=#{pane_id} work review'"
     "$notify" n "run-shell \"work _notify-agents\""
-    "Atualizar o workdeck" u "display-popup -E -w 90 -h 30 \"bash -c 'work update; printf \\\"  \\\\033[2maperte qualquer tecla para fechar\\\\033[0m\\\"; read -rsn1'\""
+    "$(msg menu_update)" u "display-popup -E -w 90 -h 30 \"bash -c 'work update; printf \\\"  \\\\033[2m$(msg menu_press_key)\\\\033[0m\\\"; read -rsn1'\""
     ""
-    "Dividir a tela" v "run-shell \"work _split '#{pane_id}'\""
-    "Zoom no painel (de novo volta)" z "resize-pane -Z"
-    "Fechar este painel" x "kill-pane")
+    "$(msg menu_split)" v "run-shell \"work _split '#{pane_id}'\""
+    "$(msg menu_zoom)" z "resize-pane -Z"
+    "$(msg menu_close_pane)" x "kill-pane")
   shortcuts=(
-    "Shift ← →     projeto anterior / próximo"
-    "Shift ↑ ↓     painel anterior / próximo"
-    "Ctrl+b 1…9    vai direto para a janela"
-    "Ctrl+b d      sai e deixa a sessão rodando"
-    "mouse         clica na barra, arrasta a borda"
+    "$(msg menu_key_windows)"
+    "$(msg menu_key_panes)"
+    "$(msg menu_key_number)"
+    "$(msg menu_key_detach)"
+    "$(msg menu_key_mouse)"
   )
   if [ "$(uname -s)" = Darwin ] && [ "$(tmux display -p -c "$client" '#{client_termname}')" = xterm-kitty ]; then
-    shortcuts+=("cmd+1…9       o mesmo, sem o Ctrl+b")
+    shortcuts+=("$(msg menu_key_cmd)")
   fi
   height="$(tmux display -p -c "$client" '#{client_height}')"
   if [ "$height" -ge $((lines + ${#shortcuts[@]} + 5)) ]; then
     args+=("")
     for a in "${shortcuts[@]}"; do args+=("-$a" "" ""); done
   fi
-  [ "$height" -ge $((lines + 4)) ] && args+=("" "-q ou Esc fecha o menu" "" "")
+  [ "$height" -ge $((lines + 4)) ] && args+=("" "-$(msg menu_close_hint)" "" "")
   tmux display-menu -c "$client" -t "$pane" -x C -y C -T "#[align=centre] workdeck " "${args[@]}"
 }
 
@@ -426,7 +393,7 @@ project_layout() {
     none|agent-shell) echo "$layout" ;;
     agent-server-shell) echo agent-shell ;;
     *)
-      echo "PROJECT_LAYOUT=\"$layout\" não existe no settings.conf; use agent-shell ou none. As janelas abrem com o agente e o shell lado a lado." >&2
+      { msgln layout_invalid "$layout"; } >&2
       echo agent-shell ;;
   esac
 }
@@ -473,7 +440,7 @@ agent_panes() {
 notify_agent_done() {
   local text
   [ "$(setting_get NOTIFY_AGENTS no)" = yes ] || return 0
-  text="$(printf 'o %s terminou em %s' "$1" "$2" | tr -d '\042\134')"
+  text="$(msg agent_done "$1" "$2" | tr -d '\042\134')"
   if command -v osascript >/dev/null; then
     osascript -e "display notification \"$text\" with title \"workdeck\"" >/dev/null 2>&1 || true
   elif command -v notify-send >/dev/null; then
@@ -484,11 +451,11 @@ notify_agent_done() {
 toggle_notify_agents() {
   local message
   if [ "$(setting_get NOTIFY_AGENTS no)" = yes ]; then
-    message="aviso desligado: só a ✦ na barra marca quando um agente termina"
-    setting_set NOTIFY_AGENTS no || message="não consegui gravar em $(short_path "$WORKDECK_SETTINGS"); confira se o arquivo pode ser alterado"
+    message="$(msg notify_agents_off)"
+    setting_set NOTIFY_AGENTS no || message="$(msg settings_not_writable "$(short_path "$WORKDECK_SETTINGS")")"
   else
-    message="aviso ligado: uma notificação do sistema avisa quando um agente termina em outra janela"
-    setting_set NOTIFY_AGENTS yes || message="não consegui gravar em $(short_path "$WORKDECK_SETTINGS"); confira se o arquivo pode ser alterado"
+    message="$(msg notify_agents_on)"
+    setting_set NOTIFY_AGENTS yes || message="$(msg settings_not_writable "$(short_path "$WORKDECK_SETTINGS")")"
   fi
   if [ -n "${TMUX:-}" ]; then tmux display-message "$message"; else echo "$message"; fi
 }
@@ -630,9 +597,27 @@ apply_settings() {
     line) apply_active_pane_line ;;
     none|"") remove_active_pane_line ;;
     *)
-      printf 'workdeck: ACTIVE_PANE="%s" inválido; use none ou line\n' "$active_pane"
+      msgln active_pane_invalid "$active_pane"
       remove_active_pane_line ;;
   esac
+}
+
+panel_window() {
+  tmux list-windows -t "$SESSION" -F '#{window_id}	#{@wd_panel}	#{window_name}' 2>/dev/null |
+    awk -F'\t' '$2 == 1 { print $1; found = 1; exit } $3 == "painel" || $3 == "panel" { named = $1 } END { if (!found && named != "") print named }'
+}
+
+panel_pane() {
+  local win
+  win="$(panel_window)"
+  [ -n "$win" ] || return 0
+  tmux list-panes -t "$win" -F "#{pane_id} #{@role}" | awk -v role="$1" '$2 == role { print $1; exit }'
+}
+
+refresh_panel() {
+  local pane
+  pane="$(panel_pane PANEL)"
+  [ -z "$pane" ] || tmux respawn-pane -k -t "$pane" "work _panel" 2>/dev/null || true
 }
 
 sync_windows() {
@@ -655,9 +640,7 @@ sync_windows() {
   done
   if [ -n "$removed" ]; then
     mv "$tmp" "$CONFIG"
-    if tmux list-windows -t "$SESSION" -F '#W' | grep -qx painel; then
-      tmux respawn-pane -k -t "$SESSION:painel.{top}" "work _panel" 2>/dev/null || true
-    fi
+    refresh_panel
   else
     rm -f "$tmp"
   fi
@@ -666,7 +649,7 @@ sync_windows() {
 add_project() {
   local target="${1:-.}" d name used entry dir cmd win
   if [ ! -d "$target" ]; then
-    echo "não achei a pasta: $target"
+    msgln add_missing "$target"
     return 1
   fi
   d="$(cd "$target" && pwd)"
@@ -675,7 +658,7 @@ add_project() {
   for entry in ${windows[@]+"${windows[@]}"}; do
     IFS="|" read -r name dir cmd <<< "$entry"
     if [ -z "$cmd" ] && [ "$(expand_path "$dir")" = "$d" ]; then
-      echo "$(short_path "$d") já está no seu work, como $name"
+      msgln add_exists "$(short_path "$d")" "$name"
       return 0
     fi
     used="$used$name "
@@ -684,17 +667,15 @@ add_project() {
   case "$used" in *" $name "*) name="$(window_name_for "$(dirname "$d")")-$name" ;; esac
   mkdir -p "$(dirname "$CONFIG")"
   if [ -s "$CONFIG" ] && [ -n "$(tail -c1 "$CONFIG")" ]; then echo >> "$CONFIG"; fi
-  [ ${#windows[@]} -gt 0 ] || echo "painel|~|work-panel" >> "$CONFIG"
+  [ ${#windows[@]} -gt 0 ] || echo "$(msg window_panel)|~|work-panel" >> "$CONFIG"
   echo "$name|$(short_path "$d")" >> "$CONFIG"
-  echo "$(short_path "$d") entrou no seu work como $name"
+  msgln add_done "$(short_path "$d")" "$name"
   if command -v tmux >/dev/null && tmux has-session -t "$SESSION" 2>/dev/null; then
     win="$(tmux new-window -d -P -F '#{window_id}' -t "$SESSION:" -n "$name" -c "$d")"
     tmux set -w -t "$win" @project "$d"
     setup_project_window "$win" "$d" "$(project_layout)" "$(setting_get AGENT_CMD)"
-    if tmux list-windows -t "$SESSION" -F '#W' | grep -qx painel; then
-      tmux respawn-pane -k -t "$SESSION:painel.{top}" "work _panel" 2>/dev/null || true
-    fi
-    echo "a janela $name já está aberta na sessão $SESSION"
+    refresh_panel
+    msgln add_window_open "$name" "$SESSION"
   fi
 }
 
@@ -704,36 +685,29 @@ case "${1:-}" in
   review) shift; review "$@"; exit $? ;;
   update)
     case "${2:-}" in
-      --desligar) setting_set NOTIFY 0; echo "o work não vai mais perguntar sobre versões novas; work update continua funcionando."; exit 0 ;;
-      --ligar) setting_unset NOTIFY; echo "o work volta a avisar sobre versões novas."; exit 0 ;;
+      --off|--desligar) setting_set NOTIFY 0; msgln update_notify_off; exit 0 ;;
+      --on|--ligar) setting_unset NOTIFY; msgln update_notify_on; exit 0 ;;
       --check|--verificar) check_in_background; exit 0 ;;
     esac
     update 1; exit $? ;;
   kill)
     if tmux has-session -t "$SESSION" 2>/dev/null; then
       tmux kill-session -t "$SESSION"
-      echo "sessão $SESSION fechada"
+      msgln kill_done "$SESSION"
     else
-      echo "nenhuma sessão $SESSION aberta"
+      msgln kill_none "$SESSION"
     fi
     exit 0 ;;
   uninstall)
     shift
-    [ -f "$CODE/uninstall.sh" ] || { echo "não achei o desinstalador em $(short_path "$CODE")"; exit 1; }
+    [ -f "$CODE/uninstall.sh" ] || { msgln uninstall_missing "$(short_path "$CODE")"; exit 1; }
     case " $* " in *" --dry-run "*) exec bash "$CODE/uninstall.sh" --all "$@" ;; esac
-    echo "O work uninstall desinstala tudo o que o workdeck instalou:"
-    echo "  - os blocos do workdeck no .zshrc, no .tmux.conf e no kitty.conf"
-    echo "  - o comando work e o código em $(short_path "$CODE")"
-    echo "  - o zsh do workdeck (oh-my-zsh e zinit), a fonte e o kitty, se foi ele que instalou"
-    echo "  - a sua config em $(short_path "$(dirname "$CONFIG")"): projetos, painéis e escolhas"
-    echo
-    echo "O que já era seu antes da instalação fica. Para ver sem apagar: work uninstall --dry-run"
-    echo "Para tirar só os blocos e manter a config: bash $(short_path "$CODE")/uninstall.sh"
+    msg uninstall_intro "$(short_path "$CODE")" "$(short_path "$(dirname "$CONFIG")")" "$(short_path "$CODE")"
     echo
     if [ -t 0 ]; then
-      printf 'Desinstalar tudo? [s/N] '
+      msg uninstall_ask
       read -r r || r=n
-      case "$r" in s|S|y|Y) ;; *) echo "nada feito"; exit 0 ;; esac
+      case "$r" in s|S|y|Y) ;; *) msgln nothing_done; exit 0 ;; esac
     fi
     exec bash "$CODE/uninstall.sh" --all "$@" ;;
   _sync|sincronizar) sync_windows; exit 0 ;;
@@ -745,14 +719,9 @@ case "${1:-}" in
   _settings) apply_settings; exit 0 ;;
   _panel) shift; exec "$LIB/work-panel" "$@" ;;
   _menu) shift; menu "$@"; exit 0 ;;
+  -h|--help|help) msgln work_help; exit 0 ;;
   *)
-    echo "não conheço 'work $1'. Os comandos são:"
-    echo "  work                abre a sessão, ou volta para ela"
-    echo "  work add <pasta>    acrescenta um projeto"
-    echo "  work review         o seu agente revisa a mudança antes do commit"
-    echo "  work update         atualiza o workdeck"
-    echo "  work kill           fecha a sessão inteira"
-    echo "  work uninstall      desinstala tudo o que o workdeck instalou"
+    printf '%s %s\n' "$(msg work_unknown "$1")" "$(msg work_help)"
     exit 1 ;;
 esac
 
@@ -762,11 +731,9 @@ check_in_background
 read_config
 if ! any_project_exists; then
   if [ -t 0 ] && [ -t 1 ]; then
-    windows=("painel|~|work-panel")
+    windows=("$(msg window_panel)|~|work-panel")
   else
-    echo "Seu work ainda não tem projetos. Adicione o primeiro:"
-    echo
-    echo "  work add ~/caminho/do/projeto      (Tab completa o caminho)"
+    msgln no_projects
     exit 1
   fi
 fi
@@ -778,7 +745,7 @@ if ! tmux has-session -t "$SESSION" 2>/dev/null; then
   for entry in "${windows[@]}"; do
     IFS="|" read -r name dir cmd <<< "$entry"
     dir="$(expand_path "$dir")"
-    [ -d "$dir" ] || { echo "pulando $name: $dir não existe"; continue; }
+    [ -d "$dir" ] || { msgln skip_project "$name" "$dir"; continue; }
     case "$cmd" in work-panel|"work-panel "*) cmd="work _panel${cmd#work-panel}" ;; esac
     if [ "$first" = 1 ]; then
       size=()
@@ -799,15 +766,15 @@ if ! tmux has-session -t "$SESSION" 2>/dev/null; then
   tmux select-window -t "$SESSION:1"
 fi
 
-if tmux list-panes -t "$SESSION:painel" -F '#{@role}' 2>/dev/null | grep -qx TERMINAL; then
+if [ -n "$(panel_pane TERMINAL)" ]; then
   (
     for _ in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20; do
       sleep 0.25
       [ -n "$(tmux list-clients -t "$SESSION" 2>/dev/null)" ] && break
     done
     sleep 0.3
-    target="$(tmux list-panes -t "$SESSION:painel" -F '#{pane_id} #{@role} #{pane_height}' | awk '$2 == "TERMINAL" {print $1, $3}')"
-    [ -n "$target" ] && [ "${target#* }" -gt 8 ] && tmux resize-pane -t "${target%% *}" -y 8
+    target="$(panel_pane TERMINAL)"
+    [ -n "$target" ] && [ "$(tmux display -p -t "$target" '#{pane_height}')" -gt 8 ] && tmux resize-pane -t "$target" -y 8
   ) </dev/null >/dev/null 2>&1 &
 fi
 

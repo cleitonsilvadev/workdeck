@@ -3,6 +3,7 @@ WORKDECK_CODE="${XDG_DATA_HOME:-$HOME/.local/share}/workdeck"
 WORKDECK_CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/workdeck"
 WORKDECK_BIN="$HOME/.local/bin"
 WORKDECK_SETTINGS="$WORKDECK_CONFIG/settings.conf"
+WORKDECK_LANG_DIR="${BASH_SOURCE[0]%/*}/../lang"
 KNOWN_AGENTS="claude codex copilot aider gemini opencode cursor-agent crush goose q"
 SCREEN_BUSY_AWK='
 function is_prompt(t) {
@@ -50,7 +51,7 @@ setting_get() { config_get "$WORKDECK_SETTINGS" "$@"; }
 config_get() {
   local file="$1" line value
   shift
-  if ! line="$(LC_ALL=C tr -d '\r' < "$file" 2>/dev/null | grep -a -m1 "^$1=\".*$SETTING_LINE_END")"; then
+  if ! line="$(LC_ALL=C tr -d '\r' 2>/dev/null < "$file" | grep -a -m1 "^$1=\".*$SETTING_LINE_END")"; then
     printf '%s\n' "${2:-}"
     return 0
   fi
@@ -107,14 +108,36 @@ settings_end_with_newline() {
   fi
 }
 
+workdeck_language() {
+  local value="${WORKDECK_LANG:-}"
+  [ -n "$value" ] || value="$(setting_get LANGUAGE)"
+  [ -n "$value" ] || value="${LC_ALL:-${LC_MESSAGES:-${LANG:-}}}"
+  case "$value" in pt*) echo pt-BR ;; *) echo en ;; esac
+}
+
+load_messages() {
+  . "$WORKDECK_LANG_DIR/en.sh"
+  if [ "${1:-$(workdeck_language)}" = pt-BR ]; then . "$WORKDECK_LANG_DIR/pt-BR.sh"; fi
+  return 0
+}
+
+msgln() {
+  msg "$@"
+  echo
+}
+
+msg() {
+  local key="msg_$1"
+  shift
+  printf -- "${!key-$key}" "$@"
+}
+
 # Creates the file with its explanatory header, so the header is always the
 # first thing in it, whoever writes the first key.
 settings_ensure_header() {
   [ -f "$WORKDECK_SETTINGS" ] && return 0
   mkdir -p "$(dirname "$WORKDECK_SETTINGS")"
-  printf '%s\n' \
-    '# Configurações do workdeck. Cada linha é CHAVE="valor"; linhas com # no começo são comentários.' \
-    '# A instalação lembra aqui as suas escolhas, e você pode editar à mão.' > "$WORKDECK_SETTINGS"
+  printf '%s\n' "$(msg settings_header_1)" "$(msg settings_header_2)" > "$WORKDECK_SETTINGS"
 }
 
 # Adds a commented example for every optional key the file does not mention
@@ -123,31 +146,31 @@ settings_ensure_template() {
   settings_ensure_header
   if ! grep -aqE '^#?ACTIVE_PANE=' "$WORKDECK_SETTINGS"; then
     settings_end_with_newline
-    printf '\n%s\n%s\n%s\n' \
-      '# Destaque do painel ativo: "none" (padrão, o visual do tema) ou "line"' \
-      '# (traço fino no topo do painel ativo). Ctrl+b r aplica.' \
+    printf '\n%s\n%s\n%s\n' "$(msg settings_active_pane_1)" "$(msg settings_active_pane_2)" \
       '#ACTIVE_PANE="line"' >> "$WORKDECK_SETTINGS"
   fi
   if ! grep -aqE '^#?PROJECT_LAYOUT=' "$WORKDECK_SETTINGS"; then
     settings_end_with_newline
-    printf '\n%s\n%s\n%s\n%s\n' \
-      '# Cada janela de projeto abre com o agente (AGENT_CMD) e um shell lado a lado. No shell, o' \
-      '# SERVER_COMMAND do .workdeck/project.conf do projeto aparece digitado, sem rodar.' \
-      '# "none" abre um painel só. Vale para as janelas abertas depois de mudar.' \
+    printf '
+%s
+%s
+%s
+%s
+' "$(msg settings_layout_1)" "$(msg settings_layout_2)" "$(msg settings_layout_3)" \
       '#PROJECT_LAYOUT="none"' >> "$WORKDECK_SETTINGS"
   fi
   if ! grep -aqE '^#?REVIEW_AGENT_CMD=' "$WORKDECK_SETTINGS"; then
     settings_end_with_newline
-    printf '\n%s\n%s\n%s\n' \
-      '# Agente que faz o work review, num painel embaixo do chat. Use outro modelo ou outra IA para' \
-      '# não repetir os pontos cegos de quem escreveu o código. Vazio: o review usa o seu agente.' \
+    printf '
+%s
+%s
+%s
+' "$(msg settings_review_agent_1)" "$(msg settings_review_agent_2)" \
       '#REVIEW_AGENT_CMD="claude --model opus"' >> "$WORKDECK_SETTINGS"
   fi
   if ! grep -aqE '^#?NOTIFY_AGENTS=' "$WORKDECK_SETTINGS"; then
     settings_end_with_newline
-    printf '\n%s\n%s\n' \
-      '# Notificação do sistema quando um agente termina numa janela que você não está olhando.' \
-      '#NOTIFY_AGENTS="yes"' >> "$WORKDECK_SETTINGS"
+    printf '\n%s\n%s\n' "$(msg settings_notify_agents)" '#NOTIFY_AGENTS="yes"' >> "$WORKDECK_SETTINGS"
   fi
 }
 
@@ -228,3 +251,5 @@ migrate_legacy_config() {
   migrate_choice_files
   return 0
 }
+
+load_messages

@@ -41,7 +41,8 @@ tests/                the tests and the linter
 | What | Language |
 |---|---|
 | Code: identifiers, file names, tests, CI, comments | English |
-| What the user sees in the terminal: messages, prompts, `--help`, panel titles, `CHANGELOG.md` | Brazilian Portuguese |
+| What the user sees in the terminal: messages, prompts, `--help`, panel titles | English and Brazilian Portuguese: every message is a key in `lang/en.sh` and `lang/pt-BR.sh`, printed with `msg KEY args` |
+| Changelog | Both, in `CHANGELOG.md`: each version has a `### Português` and an `### English` section, Portuguese first |
 | README and guides | Both: `<name>.md` in English and `<name>.pt-BR.md` in Portuguese, kept in sync |
 | Commit messages | English |
 
@@ -87,7 +88,7 @@ HOME="$(mktemp -d)" ./install.sh --yes --no-deps --no-reload
 - Bash scripts with `set -euo pipefail` and small functions.
 - Everything the installer writes stays between the `# >>> workdeck >>>`
   markers and can be undone by `uninstall.sh`.
-- A change users will notice gets a line in `CHANGELOG.md`.
+- A change users will notice gets a line in both sections of its version in `CHANGELOG.md`.
 
 ## Commits
 

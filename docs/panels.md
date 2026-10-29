@@ -108,7 +108,7 @@ The default is 60 seconds. For another value, put the number of seconds at the
 end of the panel line in `~/.config/workdeck/projects.conf`:
 
 ```
-painel|~|work-panel 30
+panel|~|work-panel 30
 ```
 
 Then run `work kill` and `work` to apply it. Inside the panel, <kbd>q</kbd>
