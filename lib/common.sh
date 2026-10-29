@@ -118,6 +118,12 @@ settings_ensure_template() {
       '# do projeto) aparecem digitados, sem rodar. Vale para as janelas abertas depois de ligar.' \
       '#PROJECT_LAYOUT="agent-server-shell"' >> "$WORKDECK_SETTINGS"
   fi
+  if ! grep -aqE '^#?NOTIFY_AGENTS=' "$WORKDECK_SETTINGS"; then
+    settings_end_with_newline
+    printf '\n%s\n%s\n' \
+      '# Notificação do sistema quando um agente termina numa janela que você não está olhando.' \
+      '#NOTIFY_AGENTS="yes"' >> "$WORKDECK_SETTINGS"
+  fi
 }
 
 setting_unset() {

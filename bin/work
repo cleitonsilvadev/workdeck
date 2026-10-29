@@ -437,19 +437,152 @@ setup_project_window() {
 }
 
 add_shell_pane() {
+  tmux set -w -t "$1" @wd_panel 1
   tmux set -p -t "$1" @role "PANEL"
   tmux split-window -v -l 8 -t "$1" -c "$HOME"
   tmux set -p -t "$1" @role "TERMINAL"
 }
 
 decorate() {
-  local win ai
+  local win
   tmux list-windows -a -F '#{window_id}' 2>/dev/null | while read -r win; do
     tmux setw -u -t "$win" pane-border-status 2>/dev/null || true
-    ai="$(tmux list-panes -t "$win" -F '#{@role}' | grep -c '^AGENT\|^REVIEW' || true)"
-    if [ "$ai" -gt 0 ]; then tmux set -w -t "$win" @ai 1; else tmux set -w -u -t "$win" @ai 2>/dev/null || true; fi
   done
   return 0
+}
+
+agent_panes() {
+  local processes win pane tty agent
+  processes="$(ps -A -o tty=,comm= 2>/dev/null)"
+  tmux list-panes -a -F '#{window_id} #{pane_id} #{pane_tty}' 2>/dev/null | while read -r win pane tty; do
+    agent="$(printf '%s\n' "$processes" | awk -v t="${tty#/dev/}" -v known=" $KNOWN_AGENTS " '
+      $1 == t { n = split($2, part, "/"); name = part[n]; if (index(known, " " name " ")) { print name; exit } }')"
+    if [ -n "$agent" ]; then echo "$win $pane $agent"; fi
+  done
+  return 0
+}
+
+
+notify_agent_done() {
+  local text
+  [ "$(setting_get NOTIFY_AGENTS no)" = yes ] || return 0
+  text="$(printf 'o %s terminou em %s' "$1" "$2" | tr -d '\042\134')"
+  if command -v osascript >/dev/null; then
+    osascript -e "display notification \"$text\" with title \"workdeck\"" >/dev/null 2>&1 || true
+  elif command -v notify-send >/dev/null; then
+    notify-send workdeck "$text" >/dev/null 2>&1 || true
+  fi
+}
+
+watched_windows() {
+  tmux list-clients -F '#{client_flags} #{window_id}' 2>/dev/null | awk '$1 ~ /focused/ { print $2 }'
+}
+
+run_tmux_batch() {
+  local line args=()
+  while IFS= read -r line; do
+    [ -n "$line" ] || continue
+    [ ${#args[@]} -eq 0 ] || args+=(";")
+    eval "args+=($line)"
+  done
+  [ ${#args[@]} -eq 0 ] || tmux "${args[@]}" >/dev/null 2>&1 || true
+}
+
+refresh_stars() {
+  local watched="$1"
+  { tmux list-panes -a -F 'pane	#{window_id}	#{pane_id}	#{@wd_done}'; tmux list-windows -a -F 'window	#{window_id}		#{@agent_stars}'; } 2>/dev/null |
+    awk -F'\t' -v watched=" $watched " '
+      $1 == "pane" && $4 == "1" { if (index(watched, " " $2 " ")) seen[$3] = 1; else done[$2]++ }
+      $1 == "window" && $4 != "" { starred[$2] = $4 }
+      END {
+        for (p in seen) print "set -p -u -t " p " @wd_done"
+        for (w in done) if (starred[w] != "✦") print "set -w -t " w " @agent_stars ✦"
+        for (w in starred) if (!(w in done)) print "set -w -u -t " w " @agent_stars"
+      }' | run_tmux_batch
+  return 0
+}
+
+check_agents() {
+  local now idle agents watched dir capture=() win pane agent
+  now="$(date +%s)"
+  idle="${WORKDECK_AGENT_IDLE:-10}"
+  watched="$(watched_windows | tr '\n' ' ')"
+  agents="$(agent_panes)"
+  if [ -z "$agents" ]; then
+    refresh_stars "$watched"
+    return 1
+  fi
+  while read -r win pane agent; do
+    [ ${#capture[@]} -eq 0 ] || capture+=(";")
+    capture+=(display -p -t "$pane" "@@workdeck-pane #{pane_id}" ";" capture-pane -p -t "$pane")
+  done <<< "$agents"
+  dir="$(mktemp -d)"
+  printf '%s\n' "$agents" > "$dir/agents"
+  tmux list-panes -a -F '#{pane_id}	#{window_name}	#{@wd_working}	#{@wd_changed}	#{@wd_screen}' > "$dir/state" 2>/dev/null || true
+  tmux "${capture[@]}" > "$dir/screens" 2>/dev/null || true
+  awk -v now="$now" -v idle="$idle" -v watched=" $watched " '
+    FILENAME ~ /agents$/ { win[$2] = $1; agent[$2] = $3; order[++n] = $2; next }
+    FILENAME ~ /state$/ { split($0, f, "\t"); name[f[1]] = f[2]; working[f[1]] = f[3]; changed[f[1]] = f[4]; screen[f[1]] = f[5]; next }
+    /^@@workdeck-pane / { current = $2; next }
+    { text[current] = text[current] "\n" $0 }
+    END {
+      for (i = 1; i <= n; i++) {
+        p = order[i]; a = agent[p]
+        if (a == "claude" || a == "codex") {
+          busy = (index(tolower(text[p]), "esc to interrupt") > 0)
+        } else {
+          h = 5381; s = text[p]
+          for (j = 1; j <= length(s); j++) h = (h * 33 + index(" !\"#$%&()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}~", substr(s, j, 1))) % 2147483647
+          busy = 0
+          if (screen[p] != h "") { print "set -p -t " p " @wd_screen " h; busy = (screen[p] != "") }
+        }
+        if (busy) {
+          print "set -p -t " p " @wd_working 1"
+          print "set -p -t " p " @wd_changed " now
+          print "set -p -u -t " p " @wd_done"
+          continue
+        }
+        if (working[p] != "1" || now - changed[p] < idle) continue
+        print "set -p -u -t " p " @wd_working"
+        if (index(watched, " " win[p] " ")) continue
+        print "set -p -t " p " @wd_done 1"
+        print "NOTIFY\t" a "\t" name[p]
+      }
+    }' "$dir/agents" "$dir/state" "$dir/screens" > "$dir/actions"
+  grep -v '^NOTIFY' "$dir/actions" | run_tmux_batch
+  grep '^NOTIFY' "$dir/actions" | while IFS="$(printf '\t')" read -r _ agent name; do notify_agent_done "$agent" "$name"; done
+  rm -rf "$dir"
+  refresh_stars "$watched"
+  return 0
+}
+
+mark_seen() {
+  local win="${1:-}" pane
+  [ -n "$win" ] || return 0
+  tmux list-panes -t "$win" -F '#{pane_id}' 2>/dev/null | while read -r pane; do
+    tmux set -p -u -t "$pane" @wd_done 2>/dev/null || true
+  done
+  tmux set -w -u -t "$win" @agent_stars 2>/dev/null || true
+  return 0
+}
+
+watch_agents() {
+  local self="$$" started took pause
+  tmux set -g @wd_watcher "$self"
+  while tmux has-session 2>/dev/null && [ "$(tmux show -gqv @wd_watcher)" = "$self" ]; do
+    started="$SECONDS"
+    if check_agents; then pause=3; else pause=10; fi
+    took=$((SECONDS - started))
+    [ $((took * 3)) -le "$pause" ] || pause=$((took * 3))
+    sleep "$pause"
+  done
+}
+
+start_watcher() {
+  local pid
+  pid="$(tmux show -gqv @wd_watcher 2>/dev/null)"
+  [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null && return 0
+  tmux run-shell -b "work _watch" 2>/dev/null || true
 }
 
 apply_active_pane_line() {
@@ -472,6 +605,7 @@ remove_active_pane_line() {
 apply_settings() {
   local active_pane
   tmux show -gqv @wd_accent >/dev/null 2>&1 || return 0
+  tmux set-hook -g client-focus-in 'run-shell -b "work _seen #{window_id} >/dev/null 2>&1"' 2>/dev/null || true
   active_pane="$(setting_get ACTIVE_PANE none)"
   case "$active_pane" in
     line) apply_active_pane_line ;;
@@ -584,6 +718,9 @@ case "${1:-}" in
     fi
     exec bash "$CODE/uninstall.sh" --all "$@" ;;
   _sync|sincronizar) sync_windows; exit 0 ;;
+  _watch) watch_agents; exit 0 ;;
+  _check-agents) check_agents || true; exit 0 ;;
+  _seen) shift; mark_seen "${1:-}"; exit 0 ;;
   _split) shift; split_grid "${1:-}"; exit 0 ;;
   _settings) apply_settings; exit 0 ;;
   _panel) shift; exec "$LIB/work-panel" "$@" ;;
@@ -653,6 +790,8 @@ if tmux list-panes -t "$SESSION:painel" -F '#{@role}' 2>/dev/null | grep -qx TER
     [ -n "$target" ] && [ "${target#* }" -gt 8 ] && tmux resize-pane -t "${target%% *}" -y 8
   ) </dev/null >/dev/null 2>&1 &
 fi
+
+start_watcher
 
 if [ -n "${TMUX:-}" ]; then
   tmux switch-client -t "$SESSION"

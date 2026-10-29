@@ -53,6 +53,34 @@ Para reordenar, edite o arquivo, feche a sessão com `work kill` e abra de novo
 com `work`. As janelas são criadas na abertura da sessão; sem fechar, a sessão
 continua com a lista antiga.
 
+## Saber quando um agente termina
+
+Enquanto você trabalha numa janela, o workdeck acompanha os agentes abertos nas
+outras. Quando um agente termina, ou para para perguntar algo, a janela dele
+ganha uma ✦ na barra. Uma janela com vários agentes continua com uma
+estrela só:
+
+```
+ ❯_ work   1 painel   2 api ✦   3 web   4 mobile
+```
+
+A estrela some quando você abre a janela, ou quando todos os agentes dela
+voltam a trabalhar. A janela que você está olhando nunca é marcada.
+
+No Claude Code e no Codex, o workdeck sabe que o agente está trabalhando
+enquanto a tela dele mostra "esc to interrupt". Nos outros agentes, ele
+acompanha as mudanças na tela e marca a janela depois de 10 segundos sem
+mudança.
+
+Para receber também uma notificação do sistema ("o claude terminou em api"),
+acrescente ao `~/.config/workdeck/settings.conf`:
+
+```
+NOTIFY_AGENTS="yes"
+```
+
+Ela usa o `osascript` no macOS e o `notify-send` no Linux, quando instalado.
+
 ## Três painéis por projeto
 
 Por padrão, a janela de cada projeto abre com um shell só. Para ela já abrir

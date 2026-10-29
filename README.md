@@ -38,6 +38,7 @@ project with its own mess. workdeck puts all of it in one place.
 - **Your agent next to the code.** Works with any CLI agent: Claude Code, Codex, Copilot CLI, Aider, Gemini. None is bundled.
 - **A panel with what matters.** The branch and changes of each project, plus anything else you want to see.
 - **Review before you commit.** `work review` asks your agent for a review of the change, with its own review command or yours.
+- **Know when an agent finishes.** While you work in one window, a ✦ in the status bar marks the window whose agent finished or is waiting for you, with an optional system notification.
 - **Nothing gets lost.** Closed the terminal or lost the connection? Run `work` and everything is where you left it, agent included.
 - **Any terminal.** workdeck runs on tmux, its only dependency. kitty, Warp, iTerm2 or the terminal your system ships with: `work` works the same in all of them.
 - **Set up with one command, undone with another.** Installs tmux if it is missing, asks which terminal you use and offers its extras; `work uninstall` reverts all of it.

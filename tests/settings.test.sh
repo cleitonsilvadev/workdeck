@@ -154,12 +154,13 @@ test_template_keeps_the_users_edits() {
   settings_ensure_template
   assert_contains "$(cat "$WORKDECK_SETTINGS")" '#ACTIVE_PANE="line"' "the example is added next to other keys"
   assert_contains "$(cat "$WORKDECK_SETTINGS")" '#PROJECT_LAYOUT="agent-server-shell"' "the layout example is added"
-  write_settings 'ACTIVE_PANE="line"\nPROJECT_LAYOUT="agent-server-shell"\n'
+  assert_contains "$(cat "$WORKDECK_SETTINGS")" '#NOTIFY_AGENTS="yes"' "the notification example is added"
+  write_settings 'ACTIVE_PANE="line"\nPROJECT_LAYOUT="agent-server-shell"\nNOTIFY_AGENTS="yes"\n'
   settings_ensure_template
-  assert_equal "$(cat "$WORKDECK_SETTINGS")" "$(printf 'ACTIVE_PANE="line"\nPROJECT_LAYOUT="agent-server-shell"')" "active keys are left alone"
-  write_settings '#ACTIVE_PANE="none"\n#PROJECT_LAYOUT="none"\n'
+  assert_equal "$(cat "$WORKDECK_SETTINGS")" "$(printf 'ACTIVE_PANE="line"\nPROJECT_LAYOUT="agent-server-shell"\nNOTIFY_AGENTS="yes"')" "active keys are left alone"
+  write_settings '#ACTIVE_PANE="none"\n#PROJECT_LAYOUT="none"\n#NOTIFY_AGENTS="no"\n'
   settings_ensure_template
-  assert_equal "$(cat "$WORKDECK_SETTINGS")" "$(printf '#ACTIVE_PANE="none"\n#PROJECT_LAYOUT="none"')" "commented keys are left alone"
+  assert_equal "$(cat "$WORKDECK_SETTINGS")" "$(printf '#ACTIVE_PANE="none"\n#PROJECT_LAYOUT="none"\n#NOTIFY_AGENTS="no"')" "commented keys are left alone"
 }
 
 test_set_and_unset_write_through_a_symlinked_file() {

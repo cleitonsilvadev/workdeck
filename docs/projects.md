@@ -54,6 +54,32 @@ To reorder, edit the file, close the session with `work kill` and open it again
 with `work`. Windows are created when the session opens; without closing it,
 the session keeps the old list.
 
+## Knowing when an agent finishes
+
+While you work in one window, workdeck watches the agents open in the others.
+When an agent finishes, or stops to ask you something, its window gets a ✦ in
+the status bar. A window with several agents still shows a single star:
+
+```
+ ❯_ work   1 painel   2 api ✦   3 web   4 mobile
+```
+
+The star goes away when you open the window, or when every agent in it is
+working again. Nothing is marked for the window you are looking at.
+
+For Claude Code and Codex, workdeck knows an agent is working while its screen
+shows "esc to interrupt". For other agents, it watches the screen change and
+marks the window after 10 seconds without changes.
+
+To also get a system notification ("o claude terminou em api"), add this to
+`~/.config/workdeck/settings.conf`:
+
+```
+NOTIFY_AGENTS="yes"
+```
+
+It uses `osascript` on macOS and `notify-send` on Linux, when installed.
+
 ## Three panes per project
 
 Each project window opens with a single shell by default. To open it already

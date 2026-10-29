@@ -97,7 +97,6 @@ send_request() {
   pane="$(tmux split-window -v -l 40% ${target:+-t "$target"} ${CLAUDE_CONFIG_DIR:+-e "CLAUDE_CONFIG_DIR=$CLAUDE_CONFIG_DIR"} -P -F '#{pane_id}' -c "$PWD" "$cmd")"
   tmux set -p -t "$pane" @role "$title · $name"
   tmux set -p -t "$pane" @key "$key"
-  tmux set -w -t "$pane" @ai 1
 }
 
 send_to_pane() {

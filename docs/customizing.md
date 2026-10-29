@@ -41,6 +41,7 @@ flag such as `--theme` or `--terminal`.
 | `NOTIFY` | `0` | `0` stops the new version notice (`work update --desligar`) |
 | `ACTIVE_PANE` | `none` (default), `line` | A thin line over the active pane, in the theme accent |
 | `REVIEW_COMMAND` | a command, such as `/code-review high` | What `work review` pastes into the agent chat ([Review](review.md)) |
+| `NOTIFY_AGENTS` | `yes`, `no` (default) | A system notification when an agent finishes in a window you are not looking at ([Projects](projects.md)) |
 | `PROJECT_LAYOUT` | `none` (default), `agent-server-shell` | Opens each project window split into agent, server and shell ([Projects](projects.md)) |
 
 Only exact `KEY="value"` lines count: `KEY=value`, `KEY = "value"` and

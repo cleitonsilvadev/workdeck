@@ -34,6 +34,7 @@ projeto com o seu próprio caos. O workdeck organiza isso num só lugar.
 - **O agente ao lado do código.** Funciona com qualquer agente de CLI — Claude Code, Codex, Copilot CLI, Aider, Gemini. Nenhum vem embutido.
 - **Um painel com o que importa.** Branch e mudanças de cada projeto, e o que mais você quiser ver.
 - **Review antes do commit.** `work review` pede ao seu agente uma revisão da mudança, com o review dele ou o seu.
+- **Saiba quando um agente termina.** Enquanto você trabalha numa janela, uma ✦ na barra marca a janela cujo agente terminou ou está esperando você, com notificação do sistema opcional.
 - **Nada se perde.** Fechou o terminal ou caiu a conexão? `work` e tudo está onde estava, agente incluso.
 - **Qualquer terminal.** O workdeck roda sobre o tmux, a única dependência. kitty, Warp, iTerm2 ou o terminal que vem no sistema: o `work` funciona igual em todos.
 - **Pronto em um comando, reversível em outro.** Instala o tmux, se faltar, pergunta qual terminal você usa e oferece os extras dele; `work uninstall` desfaz tudo.
