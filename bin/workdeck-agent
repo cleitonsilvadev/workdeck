@@ -100,7 +100,21 @@ send_request() {
   tmux set -w -t "$pane" @ai 1
 }
 
+send_to_pane() {
+  printf '%s' "$2" | tmux load-buffer -b workdeck-request -
+  tmux paste-buffer -p -d -b workdeck-request -t "$1"
+  tmux select-pane -t "$1"
+}
+
 case "${1:-}" in
+  --active)
+    agent_in_window
+    exit 0
+    ;;
+  --send)
+    send_to_pane "${2:?use: workdeck-agent --send <painel> <texto>}" "${3:?use: workdeck-agent --send <painel> <texto>}"
+    exit $?
+    ;;
   --check)
     load_config
     p="$(agent_problem "$AGENT_CMD")"
