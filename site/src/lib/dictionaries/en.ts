@@ -1,0 +1,166 @@
+import { installCommand, repoUrl } from "@/lib/site"
+import type { Dictionary } from "@/lib/dictionaries/pt-BR"
+
+export const en: Dictionary = {
+  meta: {
+    title: "workdeck — a framework for working with AI agents in the terminal",
+    description:
+      "One window per project, your CLI agent beside the code, the state of your repositories and a review before every commit. In the terminal you already use, on macOS and Linux.",
+  },
+  language: { label: "Language", names: { en: "EN", "pt-BR": "PT" } },
+  nav: { how: "How it works", terminals: "Terminals", shortcuts: "Shortcuts", panel: "Panel", install: "Install" },
+  github: { stars: (n: number) => `GitHub, ${n} stars`, view: "View on GitHub", code: "code on GitHub" },
+  copy: { copy: "Copy command", copied: "Copied" },
+  hero: {
+    badge: "open source · MIT · macOS and Linux",
+    titleBefore: "Delegate to your ",
+    titleHighlight: "AI agent",
+    titleAfter: " without losing control of the code.",
+    subtitle:
+      "workdeck is a framework for working with AI coding agents in the terminal, built on tmux: one window per project, your CLI agent beside the code, the state of your repositories and a review before every commit.",
+    install: "Install",
+    notice: "The workdeck interface (CLI messages, the panel and the review) is in Brazilian Portuguese.",
+  },
+  how: {
+    eyebrow: "how it works",
+    title: "From project to review",
+    desc: "Each project is a window, the agent sits next to your shell and the review opens below it when you ask.",
+  },
+  cycle: [
+    { label: "work add ~/api", code: true, when: "once", desc: "work opens the session on the panel; work add puts the project in it, in a background window." },
+    { label: "project window", code: false, when: "always open", desc: "Shift+→ takes you there. Closed the terminal? work brings you back where you were." },
+    { label: "agent beside it", code: false, when: "writes the code", desc: "Claude Code, Codex or whatever you use." },
+    { label: "work review", code: true, when: "self code review", desc: "Self code review: the AI reviews like the person who gets paged if it breaks, points out what to fix with its severity and changes nothing." },
+  ],
+  layers: [
+    { name: "workdeck", desc: "projects, the agent beside the code, work review and the panel" },
+    { name: "tmux", desc: "sessions, windows, panes and shortcuts" },
+    { name: "terminal", desc: "whatever you already use to open tmux" },
+  ],
+  commandsSection: {
+    eyebrow: "day to day",
+    title: "Everything you type",
+    desc: "The rest is in the menu: Ctrl+b then h, inside work, with your projects, the actions and the everyday shortcuts. No aliases to memorize.",
+  },
+  commands: [
+    { cmd: "work", desc: "Opens the session, one window per project. Or returns to it." },
+    { cmd: "work add ~/project", desc: "Adds a project. Without a path, uses the current folder; Tab completes the path." },
+    { cmd: "work review", desc: "The AI does a self code review of the change in a pane below the chat. With staged or branch, the scope changes." },
+    { cmd: "work update", desc: "Shows what changed in the new version and updates. work and the panel tell you when there is one." },
+    { cmd: "work kill", desc: "Closes the whole session. The next work opens with the current project list." },
+    { cmd: "work uninstall", desc: "Uninstalls everything workdeck installed. Shows what will be removed and asks first." },
+  ],
+  terminalsSection: {
+    eyebrow: "terminals",
+    title: "Use the terminal you already have",
+    desc: "tmux is the only dependency, so work, the panel and the shortcuts behave the same in any terminal. What changes from one to another are the extras: colors, font and its own shortcuts.",
+  },
+  terminals: {
+    yes: "yes",
+    no: "no",
+    columns: [
+      { name: "kitty", hint: "set up by the installer" },
+      { name: "Warp", hint: "set up by the installer" },
+      { name: "Any other", hint: "iTerm2, Ghostty, WezTerm, the system one" },
+    ],
+    rows: [
+      { label: "work, tmux and the panel", values: [true, true, true] },
+      { label: "Theme colors in tmux", values: [true, true, true] },
+      { label: "Shift, Ctrl+b and mouse shortcuts", values: [true, true, true] },
+      { label: "Alt shortcuts on a Mac", values: ["ready", "turn on Left Option key is Meta", "set Option as Meta"] },
+      { label: "cmd shortcuts", values: [true, false, false] },
+      { label: "Theme colors in the terminal", values: ["if you accept", "copied; you pick it in Settings", "in the terminal settings"] },
+      { label: "JetBrains Mono font", values: ["if you accept", "downloaded; you pick it in Settings", "in the terminal settings"] },
+      { label: "Padding and line height", values: ["if you accept", false, false] },
+      { label: "Uninstall", values: ["removes the kitty.conf block", "removes the copied theme", "nothing to undo"] },
+    ],
+  },
+  shortcutsSection: {
+    eyebrow: "keyboard",
+    title: "Ctrl+b and one key",
+    desc: "Press Ctrl+b, release, then press the key. tmux handles it, not the terminal, and the mouse works too: click a window in the bar or drag a pane border.",
+  },
+  shortcuts: {
+    navigateTitle: "Navigate",
+    actTitle: "Act",
+    then: "then",
+    altTitle: "Prefer a single key?",
+    altText:
+      "There are direct Alt shortcuts: Alt+1…9 goes to a window, Alt+arrows switches panes and Alt+Shift+letter runs the actions. They work in any terminal. On a Mac, set Option as Meta in the terminal settings; with kitty the installer does this for you, along with cmd shortcuts, and in Warp the option is Left Option key is Meta. In kitty:",
+    navigate: [
+      { prefix: true, keys: ["h"], desc: "Opens the menu with everything" },
+      { prefix: false, keys: ["Shift", "← →"], desc: "Previous / next project" },
+      { prefix: true, keys: ["1…9"], desc: "Goes straight to window N" },
+      { prefix: false, keys: ["Shift", "↑ ↓"], desc: "Switches pane in the window" },
+      { prefix: true, keys: ["d"], desc: "Leaves the session running" },
+    ],
+    act: [
+      { prefix: true, keys: ["Enter"], desc: "Splits where it fits" },
+      { prefix: true, keys: ["v"], desc: "Splits side by side" },
+      { prefix: true, keys: ["-"], desc: "Splits below" },
+      { prefix: true, keys: ["z"], desc: "Zooms the pane, again to go back" },
+      { prefix: true, keys: ["x"], desc: "Closes the pane" },
+    ],
+  },
+  panelSection: {
+    eyebrow: "panel",
+    title: "What you want to see while the agent works",
+    desc: "Window 1 is the panel: the branch and changes of each project, plus anything else you want. Each block is an executable in ~/.config/workdeck/panels/, and whatever it prints shows up there.",
+    body: "Containers, open PRs, the CI build, today's tasks. Any language works, Bash, Python, Node or a binary, as long as it prints text. No reinstall or restart: the panel rereads the folder every cycle, every 60 seconds.",
+    token: ["A panel that talks to an API? Keep the token out of the script, in a file under ", "~/.config/workdeck/", ". That way the panel can be shared and the credentials stay yours."],
+    more: "More about panels",
+    url: `${repoUrl}/blob/main/docs/panels.md`,
+  },
+  panelRules: [
+    { code: "30-docker", desc: "The file name becomes the title: it shows up as Docker." },
+    { code: "10- 20- 30-", desc: "The order is alphabetical. A numeric prefix decides what comes first." },
+    { code: "00-", desc: "Files starting like this show up without a title, like the logo at the top." },
+    { code: "chmod -x", desc: "Only executables show up. Removing +x turns a panel off, even the built-in ones, and work update respects it." },
+  ],
+  installSection: {
+    eyebrow: "install",
+    title: "One script, and it undoes what it did",
+    desc: "One line, nothing to clone. Runs on macOS and Linux, including WSL. The installer detects the system and the package manager, installs tmux, the only dependency, if it is missing. Then it asks which terminal you use and offers its extras: for kitty and Warp, the workdeck theme and font. It does not install a terminal. After that, work update tells you about new versions and brings them in.",
+    after: ["When it finishes, open a new terminal window, or close and reopen the terminal if the installer ran inside it, to load ", "work", ". Want to read the script first? Download it with ", "-o get.sh", " instead of ", "| bash", "."],
+    uninstallTitle: "Uninstalling gives everything back",
+    uninstallText: ["Before touching a file for the first time, the installer keeps a copy and records what it did in a manifest. Your ", ".tmux.conf", " and ", ".zshrc", " come back byte for byte. To remove less, run ", "uninstall.sh", " directly, from ", "~/.local/share/workdeck", ", with ", "bash", "."],
+  },
+  install: {
+    macos: [
+      { cmd: installCommand, out: "installs tmux with brew if it is missing and asks which terminal you use" },
+      { cmd: "work", out: "opens the panel, which shows how to add your projects" },
+    ],
+    linux: [
+      { cmd: installCommand, out: "tmux with apt, dnf, pacman, zypper or apk if it is missing, and asks which terminal you use" },
+      { cmd: "work", out: "opens the panel, which shows how to add your projects" },
+    ],
+  },
+  uninstall: [
+    { cmd: "work uninstall", desc: "Uninstalls everything: blocks, code, zsh, font, the Warp theme and config. What you already had stays." },
+    { cmd: "work uninstall --dry-run", desc: "Shows what it would do, without deleting anything." },
+    { cmd: "uninstall.sh", desc: "Removes only the blocks and the scripts. Your config stays." },
+    { cmd: "uninstall.sh --restore", desc: "Restores your files to how they were before the installation." },
+  ],
+  cta: {
+    title: "Ready to use, easy to change.",
+    text: "The defaults work from the first work. Projects, panels and theme are yours to change, and work uninstall undoes everything.",
+  },
+  footer: { license: "workdeck · MIT license" },
+  demo: {
+    yourTerminal: "your terminal",
+    agentPane: "AI · claude",
+    reviewPane: "AI · review",
+    prompt: "validate the email on login",
+    reading: "reading",
+    creating: "creating",
+    editing: "editing",
+    done: "✓ done. review before committing.",
+    session: "session",
+    windows: "4 windows",
+    agentHint: "Ctrl+b v · claude in the pane beside →",
+    reviewHint: "review below the chat →",
+    reviewBelow: "← review below the agent",
+    switchHint: "goes to the api window",
+    panelReload: "the panel rereads the folder every cycle ↑",
+  },
+}

@@ -1,0 +1,76 @@
+"use client"
+
+import { motion } from "motion/react"
+import { Keyboard } from "lucide-react"
+import type { Dictionary } from "@/lib/dictionaries"
+
+function Key({ children }: { children: string }) {
+  return (
+    <motion.kbd
+      variants={{ rest: { y: 0, boxShadow: "0 3px 0 0 var(--catppuccin-color-surface0)" }, pressed: { y: 2, boxShadow: "0 1px 0 0 var(--catppuccin-color-surface0)" } }}
+      transition={{ duration: 0.12 }}
+      className="inline-flex h-7 min-w-7 items-center justify-center rounded-md border border-ctp-surface1 bg-ctp-base px-2 font-mono text-xs text-ctp-text"
+    >
+      {children}
+    </motion.kbd>
+  )
+}
+
+function Group({ title, items, then }: { title: string; items: readonly { prefix: boolean; keys: readonly string[]; desc: string }[]; then: string }) {
+  return (
+    <div className="rounded-2xl border border-border bg-ctp-mantle/70 p-2">
+      <div className="px-3 pt-2 pb-1 text-xs font-medium tracking-wider text-ctp-overlay1 uppercase">{title}</div>
+      <ul>
+        {items.map((s) => (
+          <motion.li
+            key={s.desc}
+            initial="rest"
+            animate="rest"
+            whileHover="pressed"
+            whileTap="pressed"
+            className="flex items-center justify-between gap-4 rounded-lg px-3 py-2.5 transition-colors hover:bg-ctp-surface0/50"
+          >
+            <span className="text-sm text-ctp-subtext1">{s.desc}</span>
+            <span className="flex shrink-0 items-center gap-1">
+              {s.prefix && (
+                <>
+                  <Key>Ctrl</Key>
+                  <span className="text-xs text-ctp-overlay0">+</span>
+                  <Key>b</Key>
+                  <span className="px-1 text-xs text-ctp-overlay0">{then}</span>
+                </>
+              )}
+              {s.keys.map((k, i) => (
+                <span key={k} className="flex items-center gap-1">
+                  {i > 0 && <span className="text-xs text-ctp-overlay0">+</span>}
+                  <Key>{k}</Key>
+                </span>
+              ))}
+            </span>
+          </motion.li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+export function ShortcutList({ shortcuts }: { shortcuts: Dictionary["shortcuts"] }) {
+  return (
+    <div className="grid gap-4 lg:grid-cols-2">
+      <div className="flex flex-col gap-4">
+        <Group title={shortcuts.navigateTitle} items={shortcuts.navigate} then={shortcuts.then} />
+        <div className="flex-1 rounded-2xl border border-dashed border-ctp-surface1 p-5">
+          <div className="mb-2 flex items-center gap-2 text-sm font-medium text-ctp-text">
+            <Keyboard className="size-4 text-ctp-overlay1" />
+            {shortcuts.altTitle}
+          </div>
+          <p className="text-sm leading-relaxed text-ctp-subtext0">
+            {shortcuts.altText}
+          </p>
+          <code className="mt-3 block font-mono text-xs text-ctp-mauve">cmd+1…9 · cmd+d · cmd+h</code>
+        </div>
+      </div>
+      <Group title={shortcuts.actTitle} items={shortcuts.act} then={shortcuts.then} />
+    </div>
+  )
+}

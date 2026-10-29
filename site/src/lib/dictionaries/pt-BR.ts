@@ -1,0 +1,167 @@
+import { installCommand, repoUrl } from "@/lib/site"
+
+export const ptBR = {
+  meta: {
+    title: "workdeck — framework para trabalhar com agentes de IA no terminal",
+    description:
+      "Uma janela por projeto, o agente de CLI ao lado do código, o estado dos seus repositórios e um review antes do commit. No terminal que você já usa, no macOS e no Linux.",
+  },
+  language: { label: "Idioma", names: { en: "EN", "pt-BR": "PT" } },
+  nav: { how: "Como funciona", terminals: "Terminais", shortcuts: "Atalhos", panel: "Painel", install: "Instalar" },
+  github: { stars: (n: number) => `GitHub, ${n} estrelas`, view: "Ver no GitHub", code: "código no GitHub" },
+  copy: { copy: "Copiar comando", copied: "Copiado" },
+  hero: {
+    badge: "open source · MIT · macOS e Linux",
+    titleBefore: "Delegue ao ",
+    titleHighlight: "agente de IA",
+    titleAfter: " sem perder o controle do código.",
+    subtitle:
+      "O workdeck é um framework para trabalhar com agentes de IA no terminal, construído sobre o tmux: uma janela por projeto, o agente de CLI ao lado do código, o estado dos seus repositórios e um review antes do commit.",
+    install: "Instalar",
+    notice: null as string | null,
+  },
+  how: {
+    eyebrow: "como funciona",
+    title: "Do projeto ao review",
+    desc: "Cada projeto é uma janela, o agente fica ao lado do seu shell e o review abre embaixo dele quando você pede.",
+  },
+  cycle: [
+    { label: "work add ~/api", code: true, when: "uma vez", desc: "work abre a sessão no painel; work add põe o projeto nela, numa janela em segundo plano." },
+    { label: "janela do projeto", code: false, when: "sempre aberta", desc: "Shift+→ vai até ela. Fechou o terminal? work volta onde estava." },
+    { label: "agente ao lado", code: false, when: "escreve o código", desc: "Claude Code, Codex ou o que você usar." },
+    { label: "work review", code: true, when: "self code review", desc: "Self code review: a IA revisa como quem vai ser chamado se aquilo quebrar, aponta o que corrigir com a gravidade e não mexe em nada." },
+  ],
+  layers: [
+    { name: "workdeck", desc: "projetos, agente ao lado, work review e painel" },
+    { name: "tmux", desc: "sessões, janelas, painéis e atalhos" },
+    { name: "terminal", desc: "o que você já usa para abrir o tmux" },
+  ],
+  commandsSection: {
+    eyebrow: "o dia a dia",
+    title: "Tudo o que você digita",
+    desc: "O resto está no menu: Ctrl+b e h, de dentro do work, com os seus projetos, as ações e os atalhos do dia a dia. Nada de alias para decorar.",
+  },
+  commands: [
+    { cmd: "work", desc: "Abre a sessão, uma janela por projeto. Ou volta para ela." },
+    { cmd: "work add ~/projeto", desc: "Acrescenta um projeto. Sem caminho, usa a pasta atual; Tab completa o caminho." },
+    { cmd: "work review", desc: "A IA faz um self code review da mudança num painel embaixo do chat. Com staged ou branch, muda o recorte." },
+    { cmd: "work update", desc: "Mostra o que mudou na versão nova e atualiza. O work e o painel avisam quando há uma." },
+    { cmd: "work kill", desc: "Fecha a sessão inteira. O próximo work abre com a lista de projetos atual." },
+    { cmd: "work uninstall", desc: "Desinstala tudo o que o workdeck instalou. Mostra o que vai sair e pergunta antes." },
+  ],
+  terminalsSection: {
+    eyebrow: "terminais",
+    title: "Use o terminal que você já tem",
+    desc: "A única dependência é o tmux, então o work, o painel e os atalhos funcionam igual em qualquer terminal. O que muda de um para outro são os extras: as cores, a fonte e os atalhos próprios dele.",
+  },
+  terminals: {
+    yes: "sim",
+    no: "não",
+    columns: [
+      { name: "kitty", hint: "configurado pela instalação" },
+      { name: "Warp", hint: "configurado pela instalação" },
+      { name: "Qualquer outro", hint: "iTerm2, Ghostty, WezTerm, o do sistema" },
+    ],
+    rows: [
+      { label: "work, tmux e painel", values: [true, true, true] },
+      { label: "Cores do tema no tmux", values: [true, true, true] },
+      { label: "Atalhos Shift, Ctrl+b e mouse", values: [true, true, true] },
+      { label: "Atalhos Alt no Mac", values: ["prontos", "ligar Left Option key is Meta", "ligar a Option como Meta"] },
+      { label: "Atalhos cmd", values: [true, false, false] },
+      { label: "Cores do tema no terminal", values: ["se você aceitar", "copiado; você escolhe em Settings", "nas configurações do terminal"] },
+      { label: "Fonte JetBrains Mono", values: ["se você aceitar", "baixada; você escolhe em Settings", "nas configurações do terminal"] },
+      { label: "Margem e altura de linha", values: ["se você aceitar", false, false] },
+      { label: "Desinstalar", values: ["tira o bloco do kitty.conf", "tira o tema copiado", "nada a desfazer"] },
+    ] as { label: string; values: (string | boolean)[] }[],
+  },
+  shortcutsSection: {
+    eyebrow: "teclado",
+    title: "Ctrl+b e uma tecla",
+    desc: "Aperte Ctrl+b, solte e aperte a tecla. Quem interpreta é o tmux, não o terminal, e o mouse também funciona: clique na janela na barra ou arraste a borda do painel.",
+  },
+  shortcuts: {
+    navigateTitle: "Navegar",
+    actTitle: "Agir",
+    then: "e",
+    altTitle: "Prefere uma tecla só?",
+    altText:
+      "Há atalhos diretos com Alt: Alt+1…9 vai para a janela, Alt+setas troca de painel e Alt+Shift+letra faz as ações. Funcionam em qualquer terminal. No Mac, ligue a Option como Meta nas configurações do terminal; no kitty, a instalação faz isso por você, junto com atalhos em cmd, e no Warp a opção é Left Option key is Meta. No kitty:",
+    navigate: [
+      { prefix: true, keys: ["h"], desc: "Abre o menu com tudo" },
+      { prefix: false, keys: ["Shift", "← →"], desc: "Projeto anterior / próximo" },
+      { prefix: true, keys: ["1…9"], desc: "Vai direto para a janela N" },
+      { prefix: false, keys: ["Shift", "↑ ↓"], desc: "Troca de painel na janela" },
+      { prefix: true, keys: ["d"], desc: "Sai e deixa a sessão rodando" },
+    ],
+    act: [
+      { prefix: true, keys: ["Enter"], desc: "Divide a tela onde couber" },
+      { prefix: true, keys: ["v"], desc: "Divide ao lado" },
+      { prefix: true, keys: ["-"], desc: "Divide embaixo" },
+      { prefix: true, keys: ["z"], desc: "Zoom no painel, e de novo para voltar" },
+      { prefix: true, keys: ["x"], desc: "Fecha o painel" },
+    ],
+  },
+  panelSection: {
+    eyebrow: "painel",
+    title: "O que você quer ver enquanto o agente trabalha",
+    desc: "A janela 1 é o painel: a branch e as mudanças de cada projeto, e o que mais você quiser. Cada bloco é um executável em ~/.config/workdeck/panels/, e o que ele imprimir aparece ali.",
+    body: "Containers, PRs abertos, o build do CI, as tarefas do dia. Qualquer linguagem serve, Bash, Python, Node ou um binário, desde que imprima texto. Não precisa reinstalar nem reiniciar: o painel relê a pasta a cada ciclo, de 60 em 60 segundos.",
+    token: ["Painel que fala com uma API? Deixe o token fora do script, num arquivo em ", "~/.config/workdeck/", ". Assim o painel pode ser compartilhado e as credenciais continuam só suas."],
+    more: "Mais sobre painéis",
+    url: `${repoUrl}/blob/main/docs/panels.pt-BR.md`,
+  },
+  panelRules: [
+    { code: "30-docker", desc: "O nome do arquivo vira o título: aparece como Docker." },
+    { code: "10- 20- 30-", desc: "A ordem é alfabética. Um prefixo numérico decide quem vem antes." },
+    { code: "00-", desc: "Os que começam assim aparecem sem título, como o logo do topo." },
+    { code: "chmod -x", desc: "Só aparece o que é executável. Tirar o +x desliga um painel, até os que vêm prontos, e o work update respeita." },
+  ],
+  installSection: {
+    eyebrow: "instalar",
+    title: "Um script, e ele desfaz o que fez",
+    desc: "Uma linha, sem clonar nada. Funciona no macOS e no Linux, inclusive no WSL. O instalador detecta o sistema e o gerenciador de pacotes e instala o tmux, a única dependência, se faltar. Em seguida, pergunta qual terminal você usa e oferece os extras dele: no kitty e no Warp, o tema e a fonte do workdeck. Terminal ele não instala. Depois, o work update avisa e traz as versões novas.",
+    after: ["No fim, abra uma janela nova do terminal, ou feche e abra o terminal, se a instalação rodou nele, para carregar o ", "work", ". Quer ler o script antes? Baixe com ", "-o get.sh", " em vez de ", "| bash", "."],
+    uninstallTitle: "Desinstalar devolve tudo",
+    uninstallText: ["Antes de tocar num arquivo pela primeira vez, o instalador guarda uma cópia e anota o que fez num manifesto. Seu ", ".tmux.conf", " e seu ", ".zshrc", " voltam byte a byte. Para tirar menos, use o ", "uninstall.sh", " direto, em ", "~/.local/share/workdeck", ", com ", "bash", "."],
+  },
+  install: {
+    macos: [
+      { cmd: installCommand, out: "instala o tmux pelo brew, se faltar, e pergunta qual terminal você usa" },
+      { cmd: "work", out: "abre o painel, que mostra como adicionar os seus projetos" },
+    ],
+    linux: [
+      { cmd: installCommand, out: "tmux por apt, dnf, pacman, zypper ou apk, se faltar, e pergunta qual terminal você usa" },
+      { cmd: "work", out: "abre o painel, que mostra como adicionar os seus projetos" },
+    ],
+  },
+  uninstall: [
+    { cmd: "work uninstall", desc: "Desinstala tudo: blocos, código, zsh, fonte, o tema do Warp e config. O que você já tinha fica." },
+    { cmd: "work uninstall --dry-run", desc: "Mostra o que faria, sem apagar nada." },
+    { cmd: "uninstall.sh", desc: "Tira só os blocos e os scripts. Sua config fica." },
+    { cmd: "uninstall.sh --restore", desc: "Devolve os arquivos ao estado de antes da instalação." },
+  ],
+  cta: {
+    title: "Pronto para usar, fácil de mudar.",
+    text: "Os padrões já funcionam no primeiro work. Projetos, painéis e tema são seus para trocar, e o work uninstall desfaz tudo.",
+  },
+  footer: { license: "workdeck · licença MIT" },
+  demo: {
+    yourTerminal: "seu terminal",
+    agentPane: "IA · claude",
+    reviewPane: "IA · review",
+    prompt: "valida o e-mail no login",
+    reading: "lendo",
+    creating: "criando",
+    editing: "editando",
+    done: "✓ pronto. revise antes de commitar.",
+    session: "sessão",
+    windows: "4 janelas",
+    agentHint: "Ctrl+b v · claude no painel ao lado →",
+    reviewHint: "review embaixo do chat →",
+    reviewBelow: "← review embaixo do agente",
+    switchHint: "vai para a janela api",
+    panelReload: "o painel relê a pasta a cada ciclo ↑",
+  },
+}
+
+export type Dictionary = typeof ptBR
