@@ -148,6 +148,20 @@ test_review_without_claude_explains_unpushed_commits() {
   assert_contains "$(cd "$HOME/api" && work review 2>&1)" "Os commits que ainda não subiram só entram no review do próprio agente"
 }
 
+test_review_agent_cmd_covers_unpushed_commits() {
+  install_workdeck >/dev/null || fail "install exited with an error"
+  project_with_unpushed_commit
+  echo 'REVIEW_AGENT_CMD="codex"' >> "$CONFIG/settings.conf"
+  printf '#!/bin/sh\nexec sleep 30\n' > "$BASE/bin/codex"
+  chmod +x "$BASE/bin/codex"
+  open_fake_agent claude
+  output="$(review_from_window)"
+  assert_not_contains "$output" "só entram no review do próprio agente"
+  request="$(cat "$HOME/.cache/workdeck/review-request.md")"
+  assert_contains "$request" "os commits desta branch que ainda não subiram"
+  assert_contains "$request" "git diff @{upstream}...HEAD"
+}
+
 test_review_branch_sends_the_range_to_claude() {
   install_workdeck >/dev/null || fail "install exited with an error"
   project_with_change

@@ -256,7 +256,10 @@ review() {
   if [ "$use_pane" = 0 ] && review_in_chat "$root" "$target" "$base" "$extra"; then
     return 0
   fi
-  if [ "$only_commits" = 1 ]; then
+  if [ "$only_commits" = 1 ] && [ -n "$(setting_get REVIEW_AGENT_CMD)" ]; then
+    description="os commits desta branch que ainda não subiram"
+    commands="git diff @{upstream}...HEAD"
+  elif [ "$only_commits" = 1 ]; then
     echo "nada mudou desde o último commit. Os commits que ainda não subiram só entram no review do próprio agente: abra o claude nesta janela e rode de novo."
     return 0
   fi

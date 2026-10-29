@@ -43,8 +43,9 @@ With any other agent, `work review` pastes the command without pressing Enter:
 check the chat and press Enter yourself.
 
 With nothing uncommitted, `work review` still sends `/code-review` to Claude
-when the branch has commits not pushed yet, since that review covers them. The
-separate pane only reviews uncommitted changes.
+when the branch has commits not pushed yet, since that review covers them. With
+`REVIEW_AGENT_CMD` set, the separate pane reviews those commits too; otherwise it
+only reviews uncommitted changes.
 
 ## Your own review command
 

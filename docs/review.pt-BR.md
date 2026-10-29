@@ -44,7 +44,8 @@ confira no chat e aperte Enter você.
 
 Sem nada por commitar, o `work review` ainda manda o `/code-review` para o
 Claude quando a branch tem commits que não subiram, porque esse review cobre
-esses commits. O painel separado só revisa o que não foi commitado.
+esses commits. Com o `REVIEW_AGENT_CMD` definido, o painel separado também revisa
+esses commits; sem ele, só revisa o que não foi commitado.
 
 ## O seu comando de review
 
