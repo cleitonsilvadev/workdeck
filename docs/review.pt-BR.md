@@ -64,8 +64,9 @@ argumentos, como `/bmad-code-review`: um repositório que você clonou não
 consegue pôr instruções no chat do seu agente. O seu `settings.conf` aceita
 qualquer texto, como `/code-review high`. O comando é colado como está, seja
 qual for o recorte do `work review`, em qualquer agente aberto na janela; o
-`work review staged` sempre usa o painel separado. Os arquivos são lidos, não
-executados: só a linha `REVIEW_COMMAND` conta.
+`work review staged` sempre usa o painel separado. Os arquivos são lidos, não executados, com as mesmas regras do `settings.conf`:
+vale a primeira linha `REVIEW_COMMAND="…"`, e linhas em outro formato são
+ignoradas.
 
 ## O painel separado
 

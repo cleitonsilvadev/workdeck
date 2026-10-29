@@ -64,8 +64,8 @@ arguments, such as `/bmad-code-review`: a repository you cloned cannot put
 instructions in your agent chat. Your own `settings.conf` accepts any text, such
 as `/code-review high`. The command is pasted as is, whatever the `work review`
 target, into any agent open in the window; `work review staged` always uses the
-separate pane. The files are read, not run: only the `REVIEW_COMMAND` line
-counts.
+separate pane. The files are read, not run, with the same rules as `settings.conf`: the first
+`REVIEW_COMMAND="…"` line counts, and lines in any other shape are ignored.
 
 ## The separate pane
 

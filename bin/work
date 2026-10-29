@@ -155,18 +155,10 @@ offer_update() {
   fi
 }
 
-read_review_command() {
-  local value
-  [ -f "$1" ] || return 0
-  value="$(sed -n 's/^REVIEW_COMMAND=//p' "$1" | tail -1)"
-  value="${value#\"}"; value="${value%\"}"; value="${value#\'}"; value="${value%\'}"
-  printf '%s' "$value"
-}
-
 configured_review_command() {
   local file="$1/.workdeck/review.conf" value
   REVIEW_COMMAND="" REVIEW_WARNING=""
-  value="$(read_review_command "$file")"
+  value="$(config_get "$file" REVIEW_COMMAND)"
   case "$value" in
     /*[!A-Za-z0-9._:-]*|/) ;;
     /*) REVIEW_COMMAND="$value"; return 0 ;;
@@ -397,6 +389,53 @@ split_grid() {
   esac
 }
 
+project_server_command() {
+  config_get "$1/.workdeck/project.conf" SERVER_COMMAND
+}
+
+wait_for_prompt() {
+  local n=0
+  while [ "$n" -lt 50 ]; do
+    [ "$(tmux display -p -t "$1" '#{cursor_x}' 2>/dev/null || echo 0)" -gt 0 ] && return 0
+    sleep 0.1
+    n=$((n + 1))
+  done
+  return 1
+}
+
+type_into() {
+  local text
+  text="$(printf '%s' "$2" | LC_ALL=C tr -d '\000-\037\177')"
+  [ -n "$text" ] || return 0
+  wait_for_prompt "$1" || return 0
+  sleep 0.2
+  tmux send-keys -t "$1" -l "$text"
+}
+
+project_layout() {
+  local layout
+  layout="$(setting_get PROJECT_LAYOUT none)"
+  case "$layout" in
+    none|agent-server-shell) echo "$layout" ;;
+    *)
+      echo "PROJECT_LAYOUT=\"$layout\" não existe no settings.conf; use agent-server-shell ou none. As janelas abrem com um painel só." >&2
+      echo none ;;
+  esac
+}
+
+setup_project_window() {
+  local win="$1" dir="$2" layout="$3" agent_cmd="$4" agent server
+  [ "$layout" = agent-server-shell ] || return 0
+  agent="$(tmux display -p -t "$win" '#{pane_id}')"
+  server="$(tmux split-window -d -h -P -F '#{pane_id}' -t "$agent" -c "$dir")"
+  tmux split-window -d -v -t "$server" -c "$dir"
+  tmux select-pane -t "$agent"
+  (
+    type_into "$agent" "$agent_cmd"
+    type_into "$server" "$(project_server_command "$dir")"
+  ) </dev/null >/dev/null 2>&1 &
+}
+
 add_shell_pane() {
   tmux set -p -t "$1" @role "PANEL"
   tmux split-window -v -l 8 -t "$1" -c "$HOME"
@@ -498,6 +537,7 @@ add_project() {
   if command -v tmux >/dev/null && tmux has-session -t "$SESSION" 2>/dev/null; then
     win="$(tmux new-window -d -P -F '#{window_id}' -t "$SESSION:" -n "$name" -c "$d")"
     tmux set -w -t "$win" @project "$d"
+    setup_project_window "$win" "$d" "$(project_layout)" "$(setting_get AGENT_CMD)"
     if tmux list-windows -t "$SESSION" -F '#W' | grep -qx painel; then
       tmux respawn-pane -k -t "$SESSION:painel.{top}" "work _panel" 2>/dev/null || true
     fi
@@ -575,6 +615,8 @@ if ! any_project_exists; then
 fi
 
 if ! tmux has-session -t "$SESSION" 2>/dev/null; then
+  layout="$(project_layout)"
+  agent_cmd="$(setting_get AGENT_CMD)"
   first=1
   for entry in "${windows[@]}"; do
     IFS="|" read -r name dir cmd <<< "$entry"
@@ -587,12 +629,12 @@ if ! tmux has-session -t "$SESSION" 2>/dev/null; then
         size=(-x "$cols" -y "$rows")
       fi
       win="$(tmux new-session -d -P -F '#{window_id}' -s "$SESSION" "${size[@]+"${size[@]}"}" -n "$name" -c "$dir" ${cmd:+"$cmd"})"
-      [ -n "$cmd" ] || tmux set -w -t "$win" @project "$dir"
+      [ -n "$cmd" ] || { tmux set -w -t "$win" @project "$dir"; setup_project_window "$win" "$dir" "$layout" "$agent_cmd"; }
       [ "${cmd%% *}" = work ] && add_shell_pane "$SESSION:$name"
       first=0
     else
       win="$(tmux new-window -P -F '#{window_id}' -t "$SESSION:" -n "$name" -c "$dir" ${cmd:+"$cmd"})"
-      [ -n "$cmd" ] || tmux set -w -t "$win" @project "$dir"
+      [ -n "$cmd" ] || { tmux set -w -t "$win" @project "$dir"; setup_project_window "$win" "$dir" "$layout" "$agent_cmd"; }
       [ "${cmd%% *}" = work ] && add_shell_pane "$SESSION:$name"
     fi
   done

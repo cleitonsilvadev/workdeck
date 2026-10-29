@@ -27,9 +27,12 @@ SETTING_LINE_END='"$'
 # Latin-1 editor) as binary and would print "Binary file matches" instead of the line.
 setting_has() { grep -aq "^$1=\".*$SETTING_LINE_END" "$WORKDECK_SETTINGS" 2>/dev/null; }
 
-setting_get() {
-  local line value
-  if ! line="$(grep -a -m1 "^$1=\".*$SETTING_LINE_END" "$WORKDECK_SETTINGS" 2>/dev/null)"; then
+setting_get() { config_get "$WORKDECK_SETTINGS" "$@"; }
+
+config_get() {
+  local file="$1" line value
+  shift
+  if ! line="$(tr -d '\r' < "$file" 2>/dev/null | grep -a -m1 "^$1=\".*$SETTING_LINE_END")"; then
     printf '%s\n' "${2:-}"
     return 0
   fi
@@ -106,6 +109,14 @@ settings_ensure_template() {
       '# Destaque do painel ativo: "none" (padrão, o visual do tema) ou "line"' \
       '# (traço fino no topo do painel ativo). Ctrl+b r aplica.' \
       '#ACTIVE_PANE="line"' >> "$WORKDECK_SETTINGS"
+  fi
+  if ! grep -aqE '^#?PROJECT_LAYOUT=' "$WORKDECK_SETTINGS"; then
+    settings_end_with_newline
+    printf '\n%s\n%s\n%s\n%s\n' \
+      '# Janela de projeto em três painéis: o agente (1), o servidor (2) e um shell livre (3).' \
+      '# Os comandos do agente (AGENT_CMD) e do servidor (SERVER_COMMAND em .workdeck/project.conf' \
+      '# do projeto) aparecem digitados, sem rodar. Vale para as janelas abertas depois de ligar.' \
+      '#PROJECT_LAYOUT="agent-server-shell"' >> "$WORKDECK_SETTINGS"
   fi
 }
 

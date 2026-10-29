@@ -41,6 +41,7 @@ uma flag, como `--theme` ou `--terminal`.
 | `NOTIFY` | `0` | `0` desliga o aviso de versão nova (`work update --desligar`) |
 | `ACTIVE_PANE` | `none` (padrão), `line` | Um traço fino sobre o painel ativo, na cor de destaque do tema |
 | `REVIEW_COMMAND` | um comando, como `/code-review high` | O que o `work review` cola no chat do agente ([Review](review.pt-BR.md)) |
+| `PROJECT_LAYOUT` | `none` (padrão), `agent-server-shell` | Abre a janela de cada projeto dividida em agente, servidor e shell ([Projetos](projects.pt-BR.md)) |
 
 Só valem linhas exatamente no formato `CHAVE="valor"`: `CHAVE=valor`,
 `CHAVE = "valor"` e linhas comentadas são ignoradas, e vale a primeira linha de

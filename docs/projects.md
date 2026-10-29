@@ -54,6 +54,49 @@ To reorder, edit the file, close the session with `work kill` and open it again
 with `work`. Windows are created when the session opens; without closing it,
 the session keeps the old list.
 
+## Three panes per project
+
+Each project window opens with a single shell by default. To open it already
+split into the agent, the server and a free shell, add this to
+`~/.config/workdeck/settings.conf`:
+
+```
+PROJECT_LAYOUT="agent-server-shell"
+```
+
+```
+┌──────────────┬──────────────┐
+│              │ 2 server     │
+│  1 agent     │              │
+│              ├──────────────┤
+│              │ 3 shell      │
+└──────────────┴──────────────┘
+```
+
+- **1, the agent:** the command saved as `AGENT_CMD` (such as `claude`) is typed
+  in, without running. Press Enter in the projects you are going to work on.
+  Without an `AGENT_CMD`, the pane opens as a plain shell.
+- **2, the server:** the command in the project's `.workdeck/project.conf` is
+  typed in, also without running:
+
+  ```
+  SERVER_COMMAND="npm run dev"
+  ```
+
+  The file follows the same rules as `settings.conf`: one `KEY="value"` per
+  line, comments on lines of their own. A line in any other shape, such as one
+  with a comment after the value, is ignored. Control characters are removed
+  before typing, so a value never runs on its own. Without that file, the pane
+  opens as a plain shell.
+- **3, a free shell** for git, tests and anything else.
+
+The commands are typed once the shell shows its prompt. Nothing starts on its
+own, so opening many projects does not start many agents
+or servers at once, and ports do not clash. The layout applies to windows opened
+after you turn it on: run `work kill` and `work`, or add a project with
+`work add`. <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>Enter</kbd> then adds a fourth pane
+below the agent, completing the grid.
+
 ## Another session
 
 To use a different session name: `export WORKDECK_SESSION=other`.
