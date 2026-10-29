@@ -314,7 +314,7 @@ EOF
 }
 
 menu() {
-  local client="$1" pane="$2" session id idx name active mark a height lines=8 args=() shortcuts
+  local client="$1" pane="$2" session id idx name active mark a height lines=9 args=() shortcuts notify
   session="$(tmux display -p -c "$client" '#{session_name}')"
   while IFS='|' read -r id idx active name; do
     mark="  "; [ "$active" = 1 ] && mark="● "
@@ -325,9 +325,12 @@ menu() {
       args+=("$mark${name//#/##}" "" "select-window -t $id")
     fi
   done < <(tmux list-windows -t "$session" -F '#{window_id}|#{window_index}|#{window_active}|#{window_name}')
+  notify="Ligar o aviso quando um agente termina"
+  [ "$(setting_get NOTIFY_AGENTS no)" = yes ] && notify="Desligar o aviso quando um agente termina"
   args+=(""
     "Adicionar um projeto…" + "command-prompt -p 'caminho do projeto (Esc cancela):' \"run-shell \\\"work add '%%'\\\"\""
     "Self code review da mudança" r "run-shell -c '#{pane_current_path}' 'WORKDECK_FROM_MENU=1 TMUX_PANE=#{pane_id} work review'"
+    "$notify" n "run-shell \"work _notify-agents\""
     "Atualizar o workdeck" u "display-popup -E -w 90 -h 30 \"bash -c 'work update; printf \\\"  \\\\033[2maperte qualquer tecla para fechar\\\\033[0m\\\"; read -rsn1'\""
     ""
     "Dividir a tela" v "run-shell \"work _split '#{pane_id}'\""
@@ -472,6 +475,18 @@ notify_agent_done() {
   elif command -v notify-send >/dev/null; then
     notify-send workdeck "$text" >/dev/null 2>&1 || true
   fi
+}
+
+toggle_notify_agents() {
+  local message
+  if [ "$(setting_get NOTIFY_AGENTS no)" = yes ]; then
+    message="aviso desligado: só a ✦ na barra marca quando um agente termina"
+    setting_set NOTIFY_AGENTS no || message="não consegui gravar em $(short_path "$WORKDECK_SETTINGS"); confira se o arquivo pode ser alterado"
+  else
+    message="aviso ligado: uma notificação do sistema avisa quando um agente termina em outra janela"
+    setting_set NOTIFY_AGENTS yes || message="não consegui gravar em $(short_path "$WORKDECK_SETTINGS"); confira se o arquivo pode ser alterado"
+  fi
+  if [ -n "${TMUX:-}" ]; then tmux display-message "$message"; else echo "$message"; fi
 }
 
 watched_windows() {
@@ -721,6 +736,7 @@ case "${1:-}" in
   _watch) watch_agents; exit 0 ;;
   _check-agents) check_agents || true; exit 0 ;;
   _seen) shift; mark_seen "${1:-}"; exit 0 ;;
+  _notify-agents) toggle_notify_agents; exit 0 ;;
   _split) shift; split_grid "${1:-}"; exit 0 ;;
   _settings) apply_settings; exit 0 ;;
   _panel) shift; exec "$LIB/work-panel" "$@" ;;

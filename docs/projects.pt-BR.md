@@ -74,7 +74,9 @@ ele acompanha as mudanças na tela e marca a janela depois de 10 segundos sem
 mudança.
 
 Para receber também uma notificação do sistema ("o claude terminou em api"),
-acrescente ao `~/.config/workdeck/settings.conf`:
+escolha "Ligar o aviso quando um agente termina" no menu (<kbd>Ctrl</kbd>+<kbd>b</kbd>
+<kbd>h</kbd>). O mesmo item desliga. Ele grava esta linha no
+`~/.config/workdeck/settings.conf`, que você também pode escrever à mão:
 
 ```
 NOTIFY_AGENTS="yes"

@@ -72,8 +72,10 @@ line near the message field shows "esc to interrupt"; the same words in the
 conversation do not count. For other agents, it watches the screen change and
 marks the window after 10 seconds without changes.
 
-To also get a system notification ("o claude terminou em api"), add this to
-`~/.config/workdeck/settings.conf`:
+To also get a system notification ("o claude terminou em api"), choose
+"Ligar o aviso quando um agente termina" in the menu (<kbd>Ctrl</kbd>+<kbd>b</kbd>
+<kbd>h</kbd>). The same item turns it off. It saves this line in
+`~/.config/workdeck/settings.conf`, which you can also write by hand:
 
 ```
 NOTIFY_AGENTS="yes"

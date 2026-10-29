@@ -119,3 +119,16 @@ test_project_layout_applies_to_work_add_in_an_open_session() {
   work add "$HOME/api" >/dev/null || fail "work add exited with an error"
   wait_for sh -c "[ \"\$(tmux list-panes -t work:api 2>/dev/null | wc -l | tr -d ' ')\" = 3 ]" || fail "the new window did not get three panes"
 }
+
+test_menu_toggles_the_agent_notification() {
+  install_workdeck >/dev/null || fail "install exited with an error"
+  open_work_in_terminal work
+  wait_for sh -c "tmux list-clients -t work | grep -q ." || fail "no terminal attached to the session"
+  client="$(tmux list-clients -t work -F '#{client_name}' | head -1)"
+  pane="$(tmux display -p -t work:painel '#{pane_id}')"
+  WD_MENU_LOG="$BASE/menu" work _menu "$client" "$pane"
+  assert_contains "$(cat "$BASE/menu")" "Ligar o aviso quando um agente termina"
+  echo 'NOTIFY_AGENTS="yes"' >> "$CONFIG/settings.conf"
+  WD_MENU_LOG="$BASE/menu" work _menu "$client" "$pane"
+  assert_contains "$(cat "$BASE/menu")" "Desligar o aviso quando um agente termina"
+}

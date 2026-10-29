@@ -196,3 +196,11 @@ test_check_without_agents_does_not_fail() {
   tmux new-session -d -s work -x 120 -y 30
   work _check-agents || fail "a check without agents exited with an error"
 }
+
+test_notify_toggle_flips_the_setting() {
+  install_workdeck >/dev/null || fail "install exited with an error"
+  assert_contains "$(work _notify-agents)" "aviso ligado" "the first toggle"
+  assert_contains "$(grep '^NOTIFY_AGENTS=' "$CONFIG/settings.conf")" 'NOTIFY_AGENTS="yes"' "the setting after turning on"
+  assert_contains "$(work _notify-agents)" "aviso desligado" "the second toggle"
+  assert_contains "$(grep '^NOTIFY_AGENTS=' "$CONFIG/settings.conf")" 'NOTIFY_AGENTS="no"' "the setting after turning off"
+}
