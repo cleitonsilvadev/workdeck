@@ -117,7 +117,7 @@ workdeck_language() {
 
 load_messages() {
   . "$WORKDECK_LANG_DIR/en.sh"
-  if [ "${1:-$(workdeck_language)}" = pt-BR ]; then . "$WORKDECK_LANG_DIR/pt-BR.sh"; fi
+  if [ "$1" = pt-BR ]; then . "$WORKDECK_LANG_DIR/pt-BR.sh"; fi
   return 0
 }
 
@@ -252,4 +252,4 @@ migrate_legacy_config() {
   return 0
 }
 
-load_messages
+load_messages "$(workdeck_language)"
