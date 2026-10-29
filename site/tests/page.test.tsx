@@ -44,7 +44,7 @@ describe("home page", () => {
 
   test("has the main heading", async () => {
     render(await page())
-    expect(screen.getByRole("heading", { level: 1 }).textContent).toContain("agente de IA")
+    expect(screen.getByRole("heading", { level: 1 }).textContent).toContain("framework de terminal para agentes de IA")
   })
 
   test("each menu link points to an existing section", async () => {
@@ -73,7 +73,7 @@ describe("home page", () => {
 
   test("in English, the heading, the menu and the Portuguese interface notice are in English", async () => {
     render(await page("en"))
-    expect(screen.getByRole("heading", { level: 1 }).textContent).toContain("AI agent")
+    expect(screen.getByRole("heading", { level: 1 }).textContent).toContain("terminal framework for AI agents")
     expect(within(screen.getByRole("navigation")).getByRole("link", { name: "How it works" })).toBeTruthy()
     expect(screen.getByText(/interface .* is in Brazilian Portuguese/)).toBeTruthy()
   })

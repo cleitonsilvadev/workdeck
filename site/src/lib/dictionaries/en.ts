@@ -13,11 +13,11 @@ export const en: Dictionary = {
   copy: { copy: "Copy command", copied: "Copied" },
   hero: {
     badge: "open source · MIT · macOS and Linux",
-    titleBefore: "Delegate to your ",
-    titleHighlight: "AI agent",
-    titleAfter: " without losing control of the code.",
+    titleBefore: "The terminal framework for ",
+    titleHighlight: "AI agents",
+    titleAfter: "",
     subtitle:
-      "workdeck is a framework for working with AI coding agents in the terminal, built on tmux: one window per project, your CLI agent beside the code, the state of your repositories and a review before every commit.",
+      "Delegate to your AI agent without losing control of the code. Built on tmux: one window per project, your CLI agent beside the code, the state of your repositories and a review before every commit.",
     install: "Install",
     notice: "The workdeck interface (CLI messages, the panel and the review) is in Brazilian Portuguese.",
   },

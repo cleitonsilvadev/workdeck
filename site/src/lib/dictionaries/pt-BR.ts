@@ -12,11 +12,11 @@ export const ptBR = {
   copy: { copy: "Copiar comando", copied: "Copiado" },
   hero: {
     badge: "open source · MIT · macOS e Linux",
-    titleBefore: "Delegue ao ",
-    titleHighlight: "agente de IA",
-    titleAfter: " sem perder o controle do código.",
+    titleBefore: "O framework de terminal para ",
+    titleHighlight: "agentes de IA",
+    titleAfter: "",
     subtitle:
-      "O workdeck é um framework para trabalhar com agentes de IA no terminal, construído sobre o tmux: uma janela por projeto, o agente de CLI ao lado do código, o estado dos seus repositórios e um review antes do commit.",
+      "Delegue ao agente de IA sem perder o controle do código. Construído sobre o tmux: uma janela por projeto, o agente de CLI ao lado do código, o estado dos seus repositórios e um review antes do commit.",
     install: "Instalar",
     notice: null as string | null,
   },
