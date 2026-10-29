@@ -3,6 +3,10 @@
 O `work update` mostra o trecho da versão nova antes de perguntar se quer
 atualizar. Cada versão é uma tag `vX.Y.Z`.
 
+## v1.3.1
+
+- Correção: no macOS, se o `settings.conf` tivesse um comentário salvo com acentos em Latin-1 (por um editor antigo, por exemplo), nenhuma escolha era lida e o workdeck voltava aos padrões. Agora o arquivo é lido normalmente.
+
 ## v1.3.0
 
 - Novo `PROJECT_LAYOUT="agent-server-shell"` no `settings.conf`: a janela de cada projeto já abre em três painéis, com o agente à esquerda, o servidor em cima à direita e um shell livre embaixo. O comando do agente (`AGENT_CMD`) e o do servidor (`SERVER_COMMAND` no `.workdeck/project.conf` do projeto) aparecem digitados, sem rodar: você aperta Enter onde for trabalhar. Vem desligado e vale para as janelas abertas depois de ligar.
