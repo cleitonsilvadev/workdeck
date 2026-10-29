@@ -6,6 +6,18 @@ se quer atualizar. Cada versão é uma tag `vX.Y.Z`.
 `work update` shows the section of the new version in your language before
 asking whether to update. Each version is a `vX.Y.Z` tag.
 
+## v2.0.0
+
+### Português
+
+- O workdeck passa a rodar só no macOS. No Linux, a instalação nova para antes de gravar qualquer coisa, tanto pelo `get.sh` quanto pelo `install.sh`. No Windows, ela também para, sem mais apontar para o WSL.
+- Quem já instalou no Linux continua usando e recebendo atualizações, com um aviso na instalação de que o Linux não tem mais suporte: sem testes nem correções específicas.
+
+### English
+
+- workdeck now runs only on macOS. On Linux, a new install stops before writing anything, through `get.sh` and through `install.sh`. On Windows it stops as well, and no longer points to WSL.
+- Existing Linux installs keep working and getting updates, with a notice during the install that Linux is no longer supported: no Linux testing or fixes.
+
 ## v1.6.0
 
 ### Português
