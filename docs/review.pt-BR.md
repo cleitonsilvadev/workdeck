@@ -2,18 +2,67 @@
 
 # Self code review
 
-Um review antes do commit: a sua IA lê a mudança e o código em volta e revisa
-como a pessoa sênior que vai ser chamada se aquilo quebrar.
+Um review antes do commit. O `work review` pede ao agente que você já tem aberto
+uma revisão da mudança, usando o melhor review que ele tiver.
 
 ```bash
-work review            # o que ainda não foi commitado
-work review staged     # só o que está no stage (git add)
+work review            # o que ainda não foi commitado (no Claude Code, também os commits da branch que ainda não subiram)
 work review branch     # tudo o que a branch mudou em relação à principal
+work review staged     # só o que está no stage (git add), no painel separado
+work review --pane     # força o painel separado, descrito abaixo
 ```
 
-## O que ela devolve
+## Qual review roda
 
-Uma lista curta, uma bolinha por achado, sem explicação longa:
+O `work review` procura o agente aberto num painel da janela atual e usa a
+primeira opção que se aplica:
+
+| | Quando | O que acontece |
+|---|---|---|
+| 1 | O projeto ou a sua config define um comando de review | Esse comando é colado no chat do agente |
+| 2 | O agente é o Claude Code | O `/code-review` é colado no chat; o `work review branch` cola `/code-review main...HEAD` |
+| 3 | Qualquer outro caso | O pedido de review do workdeck abre num painel separado |
+
+Nos casos 1 e 2, o review roda no chat que você já está usando, e o agente que
+escreveu o código está ali para corrigir o que aparecer. O Claude Code roda o
+`/code-review` como um subagente em segundo plano, com contexto próprio, então
+o review não herda a conversa que escreveu o código. Os achados chegam no chat
+quando ele termina.
+
+O `work review` cola o comando, mas não aperta Enter: confira no chat e aperte
+Enter você. Assim ele nunca responde a uma pergunta que o agente esteja fazendo,
+como um pedido de permissão. Se você estava digitando no chat, o comando entra
+junto do que você escreveu; rode com o campo do chat vazio.
+
+## O seu comando de review
+
+Para usar o review de um método como o
+[BMAD](https://github.com/bmad-code-org/BMAD-METHOD) ou de uma skill sua, defina
+o comando numa linha `REVIEW_COMMAND`:
+
+```bash
+REVIEW_COMMAND="/bmad-code-review"
+```
+
+- em `.workdeck/review.conf` dentro do projeto, vale só nele;
+- em `~/.config/workdeck/settings.conf`, vale para todos os projetos.
+
+O arquivo do projeto tem prioridade, mas só aceita um comando de barra sem
+argumentos, como `/bmad-code-review`: um repositório que você clonou não
+consegue pôr instruções no chat do seu agente. O seu `settings.conf` aceita
+qualquer texto, como `/code-review high`. O comando é colado como está, seja
+qual for o recorte do `work review`, em qualquer agente aberto na janela; o
+`work review staged` sempre usa o painel separado. Os arquivos são lidos, não
+executados: só a linha `REVIEW_COMMAND` conta.
+
+## O painel separado
+
+Com `--pane`, com `staged`, ou quando nenhuma opção acima se aplica, o
+`work review` abre o pedido de review do workdeck num painel embaixo do chat da
+sua IA (ou do painel em que você está). Rodar de novo manda o pedido para o
+mesmo painel.
+
+A resposta é uma lista curta, uma bolinha por achado:
 
 ```
 Usei: roteiro padrão
@@ -34,49 +83,28 @@ Usei: roteiro padrão
 | 🟢 | Ok: o que foi conferido e está certo | Nada |
 
 A última linha é o veredito: 🟢 pode commitar, 🟠 pode commitar e deixar os
-laranjas para depois, ou 🔴 corrigir os vermelhos antes. Para entender um
-achado em detalhe, pergunte na própria conversa do review, depois de corrigir.
+laranjas para depois, ou 🔴 corrigir os vermelhos antes.
 
-Ela procura bugs e casos de borda, falhas de segurança (segredos, entrada sem
-validação, injeção), código arriscado sem teste, lentidão com dados reais,
-código morto ou de depuração e arquivos fora do escopo. Não altera nada: só
-revisa.
-
-## Onde ele roda
-
-O review abre num painel embaixo do chat da sua IA (ou do painel em que você
-está), separado da conversa que escreveu o código. Rodar de novo manda o pedido
-para o mesmo painel.
-
-Com o `claude`, cada branch tem uma sessão de review só: o `work review` retoma
-a mesma conversa (`claude --resume`) em vez de criar uma por vez, e o `/resume`
-não enche de reviews. Na conversa retomada, o que foi resolvido aparece como
-`🟢 corrigido`, e o que continua aberto fica na lista.
-
-Com `claude`, `codex` e `gemini`, o pedido entra direto na conversa. Com outra
-IA, ele vai para a área de transferência e para
+Com o `claude`, cada branch tem uma sessão de review só no painel: o
+`work review` retoma a mesma conversa (`claude --resume`) em vez de criar uma
+por vez. Com `claude`, `codex` e `gemini`, o pedido entra direto na conversa.
+Com outra IA, ele vai para a área de transferência e para
 `~/.cache/workdeck/review-request.md`, para colar.
 
-Qual IA é usada: a que estiver aberta num painel da janela. Se não houver
-nenhuma, a escolhida na instalação, guardada como `AGENT_CMD` em `~/.config/workdeck/settings.conf`.
+Qual IA o painel usa: a que estiver aberta na janela. Se não houver nenhuma, a
+escolhida na instalação, guardada como `AGENT_CMD` em `~/.config/workdeck/settings.conf`.
 
-## O seu fluxo de review
+## Instruções extras
 
-O pedido manda a IA usar o agente de review e os PRDs ou stories que as
-instruções dela apontam (`CLAUDE.md`, `AGENTS.md`, skills) — como o review do
-[BMAD](https://github.com/bmad-code-org/BMAD-METHOD) ou uma skill própria — e
-dizer na primeira linha qual usou. Sem nada configurado, ela faz o review
-padrão descrito acima.
+Para acrescentar algo ao pedido de review do workdeck, como a branch base ou a
+skill preferida, escreva em:
 
-## Personalizar
+- `~/.config/workdeck/review.md`, vale para todos os projetos;
+- `.workdeck/review.md` dentro do projeto, vale só nele.
 
-Para acrescentar algo a todo review, como a branch base ou a skill preferida,
-escreva em:
+O texto vai no fim do pedido e tem prioridade sobre as instruções padrão. Ele
+só vale para o painel separado: o `/code-review` segue o `CLAUDE.md` do
+projeto, então ponha as regras dele lá.
 
-- `~/.config/workdeck/review.pt-BR.md` — vale para todos os projetos;
-- `.workdeck/review.pt-BR.md` dentro do projeto — vale só nele.
-
-O texto vai no fim do pedido e tem prioridade sobre as instruções padrão.
-
-A ideia vem do passo de revisão do
+O review do painel separado vem do passo de revisão do
 [ponytail](https://github.com/dietrichgebert/ponytail).

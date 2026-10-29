@@ -37,7 +37,7 @@ project with its own mess. workdeck puts all of it in one place.
 - **One window per project.** `work` opens all of them at once; <kbd>Shift</kbd>+<kbd>←</kbd> <kbd>→</kbd> switches between them.
 - **Your agent next to the code.** Works with any CLI agent: Claude Code, Codex, Copilot CLI, Aider, Gemini. None is bundled.
 - **A panel with what matters.** The branch and changes of each project, plus anything else you want to see.
-- **Review before you commit.** `work review` asks your AI to review the change, in a pane separate from the conversation that wrote the code.
+- **Review before you commit.** `work review` asks your agent for a review of the change, with its own review command or yours.
 - **Nothing gets lost.** Closed the terminal or lost the connection? Run `work` and everything is where you left it, agent included.
 - **Any terminal.** workdeck runs on tmux, its only dependency. kitty, Warp, iTerm2 or the terminal your system ships with: `work` works the same in all of them.
 - **Set up with one command, undone with another.** Installs tmux if it is missing, asks which terminal you use and offers its extras; `work uninstall` reverts all of it.
@@ -138,7 +138,7 @@ work review
 |---|---|
 | `work` | Opens the session, or returns to it |
 | `work add [path]` | Adds a project as a window |
-| `work review [staged\|branch]` | Your AI reviews the change before the commit |
+| `work review [branch\|staged] [--pane]` | Your agent reviews the change before the commit |
 | `work update` | Shows what changed in the new version and updates |
 | `work kill` | Closes the whole session |
 | `work uninstall` | Removes everything workdeck installed |
@@ -163,25 +163,20 @@ too. Every shortcut, including the single-key Alt ones, is in
 
 ### Self code review
 
-`work review` sends the change to your AI for review before the commit, and
-the answer comes back short, one colored dot per finding:
+`work review` asks the agent open in the window to review the change before the
+commit, using the best review it has:
 
-```
-🔴 src/api/orders.ts:42 — the full token is written to the log
-   → log only the user id
-🟠 src/list.tsx:18 — one query per item inside the map
-   → fetch everything once before the map
+- **Your review command**, such as a [BMAD](https://github.com/bmad-code-org/BMAD-METHOD)
+  review, when the project sets one in `.workdeck/review.conf`.
+- **The agent's own review**: with Claude Code, `work review` pastes
+  `/code-review` into the chat you are using; you press Enter, and it runs as a
+  subagent with its own context, with the findings showing up there for the
+  agent to fix.
+- **The workdeck review request** in a separate pane, for other agents or with
+  `work review --pane`. It answers with one colored dot per finding: 🔴 a bug
+  to fix before the commit, 🟠 attention that can wait, 🟢 fine.
 
-🔴 fix the red items before committing
-```
-
-🔴 is a bug, to fix before the commit; 🟠 needs attention and can wait; 🟢 is
-fine. The AI only reviews; it does not change anything. The review itself is
-written in Portuguese.
-
-The review uses the agent and standards your project instructions point to
-(`CLAUDE.md`, `AGENTS.md`, skills). With Claude Code, each branch keeps a
-single review conversation that remembers what was already pointed out.
+The review only reports; it does not change anything.
 [How it works and how to customize it →](docs/review.md)
 
 ### Customizable panel

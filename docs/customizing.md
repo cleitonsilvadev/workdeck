@@ -13,7 +13,8 @@ Almost everything in workdeck is meant to be changed.
 | The active pane highlight | `ACTIVE_PANE="line"` in `~/.config/workdeck/settings.conf` | <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>r</kbd> |
 | The AI agent, terminal and other saved choices | `~/.config/workdeck/settings.conf` | run the installer again |
 | What the panel shows | `~/.config/workdeck/panels/` | nothing, it rereads on its own |
-| What every review asks for | `~/.config/workdeck/review.md` or `.workdeck/review.md` | — |
+| Which review `work review` runs | `REVIEW_COMMAND` in `~/.config/workdeck/settings.conf` or `.workdeck/review.conf` | — |
+| What the workdeck review request asks for | `~/.config/workdeck/review.md` or `.workdeck/review.md` | — |
 | The oh-my-zsh theme | `export WORKDECK_ZSH_THEME=<theme>` in `.zshrc` | reopen the terminal |
 | The session name | `export WORKDECK_SESSION=other` | — |
 | Something not listed here | a fork, with your command in `bin/work` | `./install.sh` in the fork |
@@ -39,6 +40,7 @@ flag such as `--theme` or `--terminal`.
 | `ZSH` | `yes`, `no` | The workdeck zsh |
 | `NOTIFY` | `0` | `0` stops the new version notice (`work update --desligar`) |
 | `ACTIVE_PANE` | `none` (default), `line` | A thin line over the active pane, in the theme accent |
+| `REVIEW_COMMAND` | a command, such as `/code-review high` | What `work review` pastes into the agent chat ([Review](review.md)) |
 
 Only exact `KEY="value"` lines count: `KEY=value`, `KEY = "value"` and
 commented lines are ignored, and the first line of a key wins. Older versions

@@ -33,7 +33,7 @@ projeto com o seu próprio caos. O workdeck organiza isso num só lugar.
 - **Uma janela por projeto.** `work` abre todos de uma vez; <kbd>Shift</kbd>+<kbd>←</kbd> <kbd>→</kbd> troca entre eles.
 - **O agente ao lado do código.** Funciona com qualquer agente de CLI — Claude Code, Codex, Copilot CLI, Aider, Gemini. Nenhum vem embutido.
 - **Um painel com o que importa.** Branch e mudanças de cada projeto, e o que mais você quiser ver.
-- **Review antes do commit.** `work review` pede à sua IA uma revisão da mudança, num painel separado da conversa que escreveu o código.
+- **Review antes do commit.** `work review` pede ao seu agente uma revisão da mudança, com o review dele ou o seu.
 - **Nada se perde.** Fechou o terminal ou caiu a conexão? `work` e tudo está onde estava, agente incluso.
 - **Qualquer terminal.** O workdeck roda sobre o tmux, a única dependência. kitty, Warp, iTerm2 ou o terminal que vem no sistema: o `work` funciona igual em todos.
 - **Pronto em um comando, reversível em outro.** Instala o tmux, se faltar, pergunta qual terminal você usa e oferece os extras dele; `work uninstall` desfaz tudo.
@@ -134,7 +134,7 @@ work review
 |---|---|
 | `work` | Abre a sessão, ou volta para ela |
 | `work add [caminho]` | Acrescenta um projeto como janela |
-| `work review [staged\|branch]` | A IA revisa a mudança antes do commit |
+| `work review [branch\|staged] [--pane]` | O seu agente revisa a mudança antes do commit |
 | `work update` | Mostra o que mudou na versão nova e atualiza |
 | `work kill` | Fecha a sessão inteira |
 | `work uninstall` | Desinstala tudo o que o workdeck instalou |
@@ -159,24 +159,20 @@ funciona. Todos os atalhos, inclusive os de uma tecla com Alt, estão em
 
 ### Self code review
 
-`work review` manda a mudança para a sua IA revisar antes do commit, e a
-resposta vem direta, uma bolinha por achado:
+O `work review` pede ao agente aberto na janela uma revisão da mudança antes do
+commit, usando o melhor review que ele tiver:
 
-```
-🔴 src/api/pedidos.ts:42 — o token vai inteiro para o log
-   → logar só o id do usuário
-🟠 src/lista.tsx:18 — uma consulta por item dentro do map
-   → buscar todos de uma vez antes do map
+- **O seu comando de review**, como o do [BMAD](https://github.com/bmad-code-org/BMAD-METHOD),
+  quando o projeto define um em `.workdeck/review.conf`.
+- **O review do próprio agente**: no Claude Code, o `work review` cola o
+  `/code-review` no chat que você está usando; você aperta Enter, e ele roda
+  como um subagente com contexto próprio, com os achados aparecendo ali para o
+  agente corrigir.
+- **O pedido de review do workdeck** num painel separado, para outros agentes ou
+  com `work review --pane`. A resposta vem com uma bolinha por achado: 🔴 bug
+  para corrigir antes do commit, 🟠 atenção que pode ficar para depois, 🟢 ok.
 
-🔴 corrija os vermelhos antes do commit
-```
-
-🔴 é bug, para corrigir antes do commit; 🟠 é atenção, pode ficar para depois;
-🟢 está ok. A IA só revisa, não altera nada.
-
-O review usa o agente e os padrões que as instruções do projeto apontam
-(`CLAUDE.md`, `AGENTS.md`, skills). Com o Claude Code, cada branch mantém uma
-única conversa de review, que lembra o que já foi apontado.
+O review só aponta; não altera nada.
 [Como funciona e como personalizar →](docs/review.pt-BR.md)
 
 ### Painel personalizável

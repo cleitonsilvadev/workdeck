@@ -13,7 +13,8 @@ Quase tudo no workdeck é para ser trocado.
 | O destaque do painel ativo | `ACTIVE_PANE="line"` em `~/.config/workdeck/settings.conf` | <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>r</kbd> |
 | O agente de IA, o terminal e as outras escolhas salvas | `~/.config/workdeck/settings.conf` | rode a instalação de novo |
 | O que aparece no painel | `~/.config/workdeck/panels/` | nada, ele relê sozinho |
-| O que todo review pede | `~/.config/workdeck/review.pt-BR.md` ou `.workdeck/review.pt-BR.md` | — |
+| Qual review o `work review` roda | `REVIEW_COMMAND` no `~/.config/workdeck/settings.conf` ou `.workdeck/review.conf` | — |
+| O que o pedido de review do workdeck pede | `~/.config/workdeck/review.md` ou `.workdeck/review.md` | — |
 | O tema do oh-my-zsh | `export WORKDECK_ZSH_THEME=<tema>` no `.zshrc` | reabra o terminal |
 | O nome da sessão | `export WORKDECK_SESSION=outro` | — |
 | Algo que não existe aqui | um fork, com o seu comando no `bin/work` | `./install.sh` no fork |
@@ -39,6 +40,7 @@ uma flag, como `--theme` ou `--terminal`.
 | `ZSH` | `yes`, `no` | O zsh do workdeck |
 | `NOTIFY` | `0` | `0` desliga o aviso de versão nova (`work update --desligar`) |
 | `ACTIVE_PANE` | `none` (padrão), `line` | Um traço fino sobre o painel ativo, na cor de destaque do tema |
+| `REVIEW_COMMAND` | um comando, como `/code-review high` | O que o `work review` cola no chat do agente ([Review](review.pt-BR.md)) |
 
 Só valem linhas exatamente no formato `CHAVE="valor"`: `CHAVE=valor`,
 `CHAVE = "valor"` e linhas comentadas são ignoradas, e vale a primeira linha de
