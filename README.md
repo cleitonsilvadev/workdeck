@@ -249,6 +249,19 @@ before the installation. [Details →](docs/installation.md#uninstalling)
 
 ## Philosophy
 
+workdeck is for working with **CLI AI agents** (Claude Code, Codex, Gemini CLI,
+Aider…) in the terminal. It organizes everything around the agent and replaces
+none of it. Every feature serves one flow:
+
+- **Project:** one window per project, back as you left it after closing the
+  terminal.
+- **Agent:** the agent next to the shell, the ✦ and the alert when it finishes,
+  and the panel with the state of everything.
+- **Review:** `work review` before the commit, with your own agent.
+
+It is not an editor or IDE extension, not a terminal and not an AI agent.
+tmux is the engine underneath, and kitty gives the best experience.
+
 workdeck is a starting point. It provides the structure (session, windows,
 panel, review) and leaves the rest to you: your projects, your panels, your
 agent. Everything lives in plain text files, and everything it writes can be

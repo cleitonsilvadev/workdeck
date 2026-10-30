@@ -246,6 +246,19 @@ exato de antes da instalação. [Detalhes →](docs/installation.pt-BR.md#desins
 
 ## Filosofia
 
+O workdeck é para trabalhar com **agentes de IA de linha de comando** (Claude
+Code, Codex, Gemini CLI, Aider…) no terminal. Ele organiza tudo em volta do
+agente e não substitui nenhum. Cada recurso serve a um fluxo:
+
+- **Projeto:** uma janela por projeto, que volta como estava depois de fechar o
+  terminal.
+- **Agente:** o agente ao lado do shell, a ✦ e o aviso quando ele termina, e o
+  painel com o estado de tudo.
+- **Review:** o `work review` antes do commit, com o seu próprio agente.
+
+Ele não é extensão de editor ou IDE, não é um terminal e não é um agente de IA.
+O tmux é o motor por baixo, e o kitty dá a melhor experiência.
+
 O workdeck é um ponto de partida. Ele traz a estrutura — sessão, janelas,
 painel, review — e deixa o resto com você: os seus projetos, os seus painéis, o
 seu agente. Tudo fica em arquivos de texto simples, e tudo o que ele escreve
