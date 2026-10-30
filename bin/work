@@ -663,7 +663,12 @@ drop_window() {
   [ -n "$current" ] && [ -n "$target" ] && [ "$current" != "$target" ] || return 0
   tmux swap-window -s "$current" -t "$target"
   tmux select-window -t "$current"
+  tmux set -w -t "$current" @wd_moved 2 \; refresh-client -S -t "$client" 2>/dev/null || true
   save_window_order
+  sleep 0.25
+  tmux set -w -t "$current" @wd_moved 1 \; refresh-client -S -t "$client" 2>/dev/null || true
+  sleep 0.35
+  tmux set -w -u -t "$current" @wd_moved \; refresh-client -S -t "$client" 2>/dev/null || true
 }
 
 keep_panel_first() {
