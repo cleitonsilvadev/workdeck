@@ -6,6 +6,18 @@ se quer atualizar. Cada versão é uma tag `vX.Y.Z`.
 `work update` shows the section of the new version in your language before
 asking whether to update. Each version is a `vX.Y.Z` tag.
 
+## v2.5.3
+
+### Português
+
+- Arrastar uma aba para cima do painel, ou arrastar o próprio painel, não faz mais nada parecer quebrado: nada se move e aparece um aviso de que o painel fica sempre em primeiro.
+- A instalação pergunta menos. Se o oh-my-zsh já está na sua máquina, ela não oferece o zsh do workdeck. Se você já tem a fonte JetBrains Mono, a pergunta do visual fala só do tema.
+
+### English
+
+- Dragging a tab onto the panel, or dragging the panel itself, no longer looks broken: nothing moves and a message says the panel always stays first.
+- The install asks less. If oh-my-zsh is already on your machine, it does not offer the workdeck zsh. If you already have the JetBrains Mono font, the visual question is only about the theme.
+
 ## v2.5.2
 
 ### Português
