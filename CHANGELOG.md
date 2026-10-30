@@ -6,6 +6,22 @@ se quer atualizar. Cada versão é uma tag `vX.Y.Z`.
 `work update` shows the section of the new version in your language before
 asking whether to update. Each version is a `vX.Y.Z` tag.
 
+## v2.1.0
+
+### Português
+
+- O Linux volta a ser suportado: a instalação nova no Linux funciona de novo, como antes da v2.0.0.
+- Se o terminal escolhido ainda não está instalado, a instalação grava a configuração dele mesmo assim e mostra onde baixar. Quando você instala o kitty, ele já abre com os atalhos do workdeck; antes, era preciso rodar a instalação de novo.
+- A pergunta do terminal explica o que cada opção ganha, e "outro" virou "Terminal padrão": o Terminal do macOS, o do Linux ou qualquer outro.
+- O fim da instalação só pede para fechar e abrir o terminal quando algo novo precisa ser carregado, como o zsh do workdeck ou o comando `work` no PATH.
+
+### English
+
+- Linux is supported again: new installs on Linux work, as before v2.0.0.
+- If the terminal you chose is not installed yet, the installer writes its configuration anyway and tells you where to download it. When you install kitty, it opens with the workdeck shortcuts; before, you had to run the installer again.
+- The terminal question explains what each option gives you, and "other" is now "Default terminal": the macOS one, the Linux one or any other.
+- The end of the install only asks you to close and reopen the terminal when something new needs to load, such as the workdeck zsh or the `work` command in the PATH.
+
 ## v2.0.0
 
 ### Português
