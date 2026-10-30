@@ -61,14 +61,14 @@ export const en: Dictionary = {
     columns: [
       { name: "kitty", hint: "set up by the installer" },
       { name: "Warp", hint: "set up by the installer" },
-      { name: "Any other", hint: "iTerm2, Ghostty, WezTerm, the system one" },
+      { name: "Default terminal", hint: "the macOS or Linux one, iTerm2, Ghostty, WezTerm…" },
     ],
     rows: [
       { label: "work, tmux and the panel", values: [true, true, true] },
       { label: "Theme colors in tmux", values: [true, true, true] },
       { label: "Shift, Ctrl+b and mouse shortcuts", values: [true, true, true] },
       { label: "Alt shortcuts on a Mac", values: ["ready", "turn on Left Option key is Meta", "set Option as Meta"] },
-      { label: "cmd shortcuts", values: [true, false, false] },
+      { label: "Cmd shortcuts (Mac)", values: [true, false, false] },
       { label: "Theme colors in the terminal", values: ["if you accept", "copied; you pick it in Settings", "in the terminal settings"] },
       { label: "JetBrains Mono font", values: ["if you accept", "downloaded; you pick it in Settings", "in the terminal settings"] },
       { label: "Padding and line height", values: ["if you accept", false, false] },

@@ -60,14 +60,14 @@ export const ptBR = {
     columns: [
       { name: "kitty", hint: "configurado pela instalação" },
       { name: "Warp", hint: "configurado pela instalação" },
-      { name: "Qualquer outro", hint: "iTerm2, Ghostty, WezTerm, o do sistema" },
+      { name: "Terminal padrão", hint: "o do macOS ou do Linux, iTerm2, Ghostty, WezTerm…" },
     ],
     rows: [
       { label: "work, tmux e painel", values: [true, true, true] },
       { label: "Cores do tema no tmux", values: [true, true, true] },
       { label: "Atalhos Shift, Ctrl+b e mouse", values: [true, true, true] },
       { label: "Atalhos Alt no Mac", values: ["prontos", "ligar Left Option key is Meta", "ligar a Option como Meta"] },
-      { label: "Atalhos cmd", values: [true, false, false] },
+      { label: "Atalhos Cmd (Mac)", values: [true, false, false] },
       { label: "Cores do tema no terminal", values: ["se você aceitar", "copiado; você escolhe em Settings", "nas configurações do terminal"] },
       { label: "Fonte JetBrains Mono", values: ["se você aceitar", "baixada; você escolhe em Settings", "nas configurações do terminal"] },
       { label: "Margem e altura de linha", values: ["se você aceitar", false, false] },
