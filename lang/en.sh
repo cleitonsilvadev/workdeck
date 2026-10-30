@@ -74,7 +74,7 @@ msg_no_projects="Your work has no projects yet. Add the first one:
   work add ~/path/to/project      (Tab completes the path)"
 msg_skip_project="skipping %s: %s does not exist"
 
-msg_install_help="workdeck installer. macOS.
+msg_install_help="workdeck installer. macOS and Linux.
 
   ./install.sh                      installs with the default theme
   ./install.sh --lang pt-BR         picks the language (en or pt-BR) without asking
@@ -220,6 +220,7 @@ msg_install_navigation="  To move around: Shift+← / Shift+→ switches windows
   panes, and Ctrl+b then 1…9 goes straight to a window. Clicking the bar works
   too.
   Help at any time: Ctrl+b then h inside work."
+msg_install_windows="workdeck runs on macOS and Linux. On Windows, use it through WSL: open the WSL Ubuntu and run the installer from there."
 msg_install_ask_language="Which language should workdeck use for its messages?"
 
 msg_review_command_ignored="ignored the REVIEW_COMMAND in %s: in a project, only a slash command without arguments works, such as /bmad-code-review. For more than that, use REVIEW_COMMAND in ~/.config/workdeck/settings.conf."
@@ -333,5 +334,3 @@ msg_changelog_heading="English"
 msg_settings_review_agent_1="# Agent that runs work review, in a pane below the chat. Use another model or another AI so"
 msg_settings_review_agent_2="# the review does not repeat the blind spots of whoever wrote the code. Empty: your agent reviews."
 msg_review_scope_unpushed="the commits of this branch that were not pushed yet"
-msg_install_macos_only="workdeck runs only on macOS. The installer stopped before writing anything."
-msg_install_linux_unsupported="Linux is no longer supported: this install keeps working and getting updates, but without Linux testing or fixes"

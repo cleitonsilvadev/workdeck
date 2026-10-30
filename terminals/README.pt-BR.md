@@ -42,9 +42,10 @@ Sem o visual, o kitty fica com o tema e a fonte dele. Se uma versão antiga do
 workdeck já tinha posto o tema e a fonte no seu `kitty.conf`, a atualização
 mantém os dois e salva isso como a sua escolha.
 
-A instalação encontra o kitty em `/Applications`, em `~/Applications` ou no
-`PATH`. O que você escreveu fora dos marcadores `# >>> workdeck >>>` não muda,
-e o desinstalador tira só o bloco. O kitty continua instalado.
+A instalação encontra o kitty em `/Applications` ou `~/Applications` (Mac), em
+`~/.local/kitty.app` (Linux) ou no `PATH`. O que você escreveu fora dos
+marcadores `# >>> workdeck >>>` não muda, e o desinstalador tira só o bloco. O
+kitty continua instalado.
 
 ## Warp
 
@@ -58,6 +59,7 @@ Warp e baixa a fonte JetBrains Mono:
 | Sistema | Onde o tema fica |
 |---|---|
 | macOS | `~/.warp/themes/workdeck-<tema>.yaml` |
+| Linux | `~/.local/share/warp-terminal/themes/workdeck-<tema>.yaml` |
 
 O Warp não troca de tema nem de fonte por arquivo, então o último passo é seu:
 

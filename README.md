@@ -18,6 +18,7 @@ closing the terminal.
 
 [![CI](https://github.com/thiagofeliperibeiro/workdeck/actions/workflows/ci.yml/badge.svg)](https://github.com/thiagofeliperibeiro/workdeck/actions/workflows/ci.yml)
 ![macOS](https://img.shields.io/badge/macOS-supported-555?logo=apple)
+![Linux](https://img.shields.io/badge/Linux-supported-555?logo=linux&logoColor=white)
 ![MIT License](https://img.shields.io/badge/license-MIT-555)
 
 </div>
@@ -80,7 +81,8 @@ work add ~/api  →  project window  →  agent beside it  →  work review  →
 curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/get.sh | bash
 ```
 
-Runs on macOS. The installer installs tmux with Homebrew if it is missing, asks which terminal you use
+Runs on macOS and Linux (including WSL). The installer detects the system,
+installs tmux if it is missing, asks which terminal you use
 ([kitty](https://sw.kovidgoyal.net/kitty/), [Warp](https://www.warp.dev/) or
 another one) and configures everything. You install the terminal yourself; the
 workdeck theme and font in it are optional. Nothing is overwritten: what it

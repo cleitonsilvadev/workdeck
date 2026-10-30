@@ -24,8 +24,6 @@ Use these rules to decide whether something belongs in workdeck:
    another terminal as the exception.
 4. It is reversible: the installer only adds marked blocks and recorded files, and
    `work uninstall` removes them.
-5. It runs on macOS only. New installs on Linux and Windows stop at the guard in `install.sh` and
-   `get.sh`; Linux installs made before v2.0.0 keep updating, without Linux testing or fixes.
 
 ## The site
 

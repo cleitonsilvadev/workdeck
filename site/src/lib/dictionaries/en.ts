@@ -5,14 +5,14 @@ export const en: Dictionary = {
   meta: {
     title: "workdeck — a framework for working with AI agents in the terminal",
     description:
-      "One window per project, your CLI agent beside the code, the state of your repositories and a review before every commit. In the terminal you already use, on macOS.",
+      "One window per project, your CLI agent beside the code, the state of your repositories and a review before every commit. In the terminal you already use, on macOS and Linux.",
   },
   language: { label: "Language", names: { en: "EN", "pt-BR": "PT" } },
   nav: { how: "How it works", terminals: "Terminals", shortcuts: "Shortcuts", panel: "Panel", install: "Install" },
   github: { stars: (n: number) => `GitHub, ${n} stars`, view: "View on GitHub", code: "code on GitHub" },
   copy: { copy: "Copy command", copied: "Copied" },
   hero: {
-    badge: "open source · MIT · macOS",
+    badge: "open source · MIT · macOS and Linux",
     titleBefore: "The terminal framework for ",
     titleHighlight: "AI agents",
     titleAfter: "",
@@ -120,7 +120,7 @@ export const en: Dictionary = {
   installSection: {
     eyebrow: "install",
     title: "One script, and it undoes what it did",
-    desc: "One line, nothing to clone. Runs on macOS. The installer installs tmux, the only dependency, with Homebrew if it is missing. Then it asks which terminal you use and offers its extras: for kitty and Warp, the workdeck theme and font. It does not install a terminal. After that, work update tells you about new versions and brings them in.",
+    desc: "One line, nothing to clone. Runs on macOS and Linux, including WSL. The installer detects the system and the package manager, installs tmux, the only dependency, if it is missing. Then it asks which terminal you use and offers its extras: for kitty and Warp, the workdeck theme and font. It does not install a terminal. After that, work update tells you about new versions and brings them in.",
     after: ["When it finishes, open a new terminal window, or close and reopen the terminal if the installer ran inside it, to load ", "work", ". Want to read the script first? Download it with ", "-o get.sh", " instead of ", "| bash", "."],
     uninstallTitle: "Uninstalling gives everything back",
     uninstallText: ["Before touching a file for the first time, the installer keeps a copy and records what it did in a manifest. Your ", ".tmux.conf", " and ", ".zshrc", " come back byte for byte. To remove less, run ", "uninstall.sh", " directly, from ", "~/.local/share/workdeck", ", with ", "bash", "."],
@@ -128,6 +128,10 @@ export const en: Dictionary = {
   install: {
     macos: [
       { cmd: installCommand, out: "installs tmux with brew if it is missing and asks which terminal you use" },
+      { cmd: "work", out: "opens the panel, which shows how to add your projects" },
+    ],
+    linux: [
+      { cmd: installCommand, out: "tmux with apt, dnf, pacman, zypper or apk if it is missing, and asks which terminal you use" },
       { cmd: "work", out: "opens the panel, which shows how to add your projects" },
     ],
   },

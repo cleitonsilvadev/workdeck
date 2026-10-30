@@ -43,9 +43,10 @@ Without the look, kitty keeps its own theme and font. If an older workdeck
 version already wrote the theme and font to your `kitty.conf`, the update keeps
 them and saves that as your choice.
 
-The installer finds kitty in `/Applications`, in `~/Applications` or in the
-`PATH`. What you wrote outside the `# >>> workdeck >>>` markers does not change,
-and the uninstaller removes only the block. kitty itself stays installed.
+The installer finds kitty in `/Applications` or `~/Applications` (Mac), in
+`~/.local/kitty.app` (Linux) or in the `PATH`. What you wrote outside the
+`# >>> workdeck >>>` markers does not change, and the uninstaller removes only
+the block. kitty itself stays installed.
 
 ## Warp
 
@@ -60,6 +61,7 @@ and downloads the JetBrains Mono font:
 | System | Where the theme goes |
 |---|---|
 | macOS | `~/.warp/themes/workdeck-<theme>.yaml` |
+| Linux | `~/.local/share/warp-terminal/themes/workdeck-<theme>.yaml` |
 
 Warp does not switch theme or font from a file, so the last step is yours:
 

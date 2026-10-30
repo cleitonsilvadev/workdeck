@@ -17,7 +17,6 @@ WARP_DOWNLOAD="https://www.warp.dev/download"
 THEME=""
 LANGUAGE=""
 LANGUAGE_REQUESTED=""
-LINUX_LEGACY=0
 WANT_ZSH=0
 TERMINAL=""
 TERMINAL_REQUESTED=""
@@ -999,24 +998,16 @@ next_step() {
   fi
 }
 
-refuse_unsupported_system() {
+refuse_windows() {
   case "$(uname -s)" in
-    Darwin) ;;
-    Linux)
-      if [ -f "$MANIFEST" ]; then
-        LINUX_LEGACY=1
-      else
-        msgln install_macos_only
-        exit 1
-      fi ;;
-    *)
-      msgln install_macos_only
+    MINGW*|MSYS*|CYGWIN*|*_NT*|Windows*)
+      msgln install_windows
       exit 1 ;;
   esac
 }
 
 main() {
-  refuse_unsupported_system
+  refuse_windows
   parse_options "$@"
   setup_output
   choose_language
@@ -1025,7 +1016,6 @@ main() {
   choose_theme
   detect_system
   show_header
-  [ "$LINUX_LEGACY" = 0 ] || warn "$(msg install_linux_unsupported)"
   install_dependencies
   install_scripts
   install_config

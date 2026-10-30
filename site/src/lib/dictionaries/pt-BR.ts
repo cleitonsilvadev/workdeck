@@ -4,14 +4,14 @@ export const ptBR = {
   meta: {
     title: "workdeck — framework para trabalhar com agentes de IA no terminal",
     description:
-      "Uma janela por projeto, o agente de CLI ao lado do código, o estado dos seus repositórios e um review antes do commit. No terminal que você já usa, no macOS.",
+      "Uma janela por projeto, o agente de CLI ao lado do código, o estado dos seus repositórios e um review antes do commit. No terminal que você já usa, no macOS e no Linux.",
   },
   language: { label: "Idioma", names: { en: "EN", "pt-BR": "PT" } },
   nav: { how: "Como funciona", terminals: "Terminais", shortcuts: "Atalhos", panel: "Painel", install: "Instalar" },
   github: { stars: (n: number) => `GitHub, ${n} estrelas`, view: "Ver no GitHub", code: "código no GitHub" },
   copy: { copy: "Copiar comando", copied: "Copiado" },
   hero: {
-    badge: "open source · MIT · macOS",
+    badge: "open source · MIT · macOS e Linux",
     titleBefore: "O framework de terminal para ",
     titleHighlight: "agentes de IA",
     titleAfter: "",
@@ -119,7 +119,7 @@ export const ptBR = {
   installSection: {
     eyebrow: "instalar",
     title: "Um script, e ele desfaz o que fez",
-    desc: "Uma linha, sem clonar nada. Funciona no macOS. O instalador instala o tmux, a única dependência, pelo Homebrew, se faltar. Em seguida, pergunta qual terminal você usa e oferece os extras dele: no kitty e no Warp, o tema e a fonte do workdeck. Terminal ele não instala. Depois, o work update avisa e traz as versões novas.",
+    desc: "Uma linha, sem clonar nada. Funciona no macOS e no Linux, inclusive no WSL. O instalador detecta o sistema e o gerenciador de pacotes e instala o tmux, a única dependência, se faltar. Em seguida, pergunta qual terminal você usa e oferece os extras dele: no kitty e no Warp, o tema e a fonte do workdeck. Terminal ele não instala. Depois, o work update avisa e traz as versões novas.",
     after: ["No fim, abra uma janela nova do terminal, ou feche e abra o terminal, se a instalação rodou nele, para carregar o ", "work", ". Quer ler o script antes? Baixe com ", "-o get.sh", " em vez de ", "| bash", "."],
     uninstallTitle: "Desinstalar devolve tudo",
     uninstallText: ["Antes de tocar num arquivo pela primeira vez, o instalador guarda uma cópia e anota o que fez num manifesto. Seu ", ".tmux.conf", " e seu ", ".zshrc", " voltam byte a byte. Para tirar menos, use o ", "uninstall.sh", " direto, em ", "~/.local/share/workdeck", ", com ", "bash", "."],
@@ -127,6 +127,10 @@ export const ptBR = {
   install: {
     macos: [
       { cmd: installCommand, out: "instala o tmux pelo brew, se faltar, e pergunta qual terminal você usa" },
+      { cmd: "work", out: "abre o painel, que mostra como adicionar os seus projetos" },
+    ],
+    linux: [
+      { cmd: installCommand, out: "tmux por apt, dnf, pacman, zypper ou apk, se faltar, e pergunta qual terminal você usa" },
       { cmd: "work", out: "abre o painel, que mostra como adicionar os seus projetos" },
     ],
   },
