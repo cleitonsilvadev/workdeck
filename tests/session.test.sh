@@ -132,3 +132,30 @@ test_menu_toggles_the_agent_notification() {
   WD_MENU_LOG="$BASE/menu" work _menu "$client" "$pane"
   assert_contains "$(cat "$BASE/menu")" "Desligar o aviso quando um agente termina"
 }
+
+drag_session() {
+  install_workdeck >/dev/null || fail "install exited with an error"
+  mkdir -p "$HOME/api" "$HOME/web"
+  printf 'painel|~|work-panel\napi|~/api\nweb|~/web\n' > "$CONFIG/projects.conf"
+  tmux new-session -d -s work -n painel
+  tmux set -w -t work:painel @wd_panel 1
+  API_WIN="$(tmux new-window -d -P -F '#{window_id}' -t work: -n api -c "$HOME/api")"
+  tmux set -w -t "$API_WIN" @project "$HOME/api"
+  WEB_WIN="$(tmux new-window -d -P -F '#{window_id}' -t work: -n web -c "$HOME/web")"
+  tmux set -w -t "$WEB_WIN" @project "$HOME/web"
+}
+
+test_dragging_a_tab_saves_the_project_order() {
+  drag_session
+  tmux swap-window -d -s "$API_WIN" -t "$WEB_WIN"
+  work _save-order
+  assert_equal "$(tr '\n' ' ' < "$CONFIG/projects.conf")" "painel|~|work-panel web|~/web api|~/api " "projects.conf"
+}
+
+test_dragging_keeps_the_panel_first() {
+  drag_session
+  tmux swap-window -d -s work:painel -t "$API_WIN"
+  work _save-order
+  assert_equal "$(tmux list-windows -t work -F '#W' | head -1)" painel "the first window"
+  assert_equal "$(head -1 "$CONFIG/projects.conf")" "painel|~|work-panel" "the first line of projects.conf"
+}

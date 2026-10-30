@@ -657,10 +657,19 @@ refresh_panel() {
   [ -z "$pane" ] || tmux respawn-pane -k -t "$pane" "work _panel" 2>/dev/null || true
 }
 
+keep_panel_first() {
+  local win first
+  win="$(panel_window)"
+  [ -n "$win" ] || return 0
+  first="$(tmux list-windows -t "$SESSION" -F '#{window_id}' | head -1)"
+  [ "$win" = "$first" ] || tmux swap-window -d -s "$win" -t "$first"
+}
+
 save_window_order() {
   local entry name dir cmd wpanel wproject i tmp used=() ordered=()
-  [ -f "$CONFIG" ] || return 0
   tmux has-session -t "$SESSION" 2>/dev/null || return 0
+  keep_panel_first
+  [ -f "$CONFIG" ] || return 0
   read_config
   [ ${#windows[@]} -gt 0 ] || return 0
   while IFS='|' read -r wpanel wproject; do
