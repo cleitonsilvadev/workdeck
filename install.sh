@@ -752,7 +752,7 @@ install_tclock() {
       return 0
     fi
     say "$(msg install_clock_compiling)"
-    if cargo install --git "$TCLOCK_REPO" --package clock-tui --root "$HOME/.local" >> "$LOG" 2>&1; then
+    if cargo install --git "$TCLOCK_REPO" clock-tui --root "$HOME/.local" >> "$LOG" 2>&1; then
       record tclock-cargo "$BIN_DIR/tclock"
       say "$(msg install_clock_installed "$(short_path "$BIN_DIR/tclock")")"
     else

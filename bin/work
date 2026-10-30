@@ -657,6 +657,15 @@ refresh_panel() {
   [ -z "$pane" ] || tmux respawn-pane -k -t "$pane" "work _panel" 2>/dev/null || true
 }
 
+drop_window() {
+  local client="$1" target="$2" current
+  current="$(tmux display -p -c "$client" '#{window_id}' 2>/dev/null)"
+  [ -n "$current" ] && [ -n "$target" ] && [ "$current" != "$target" ] || return 0
+  tmux swap-window -s "$current" -t "$target"
+  tmux select-window -t "$current"
+  save_window_order
+}
+
 keep_panel_first() {
   local win first
   win="$(panel_window)"
@@ -786,6 +795,7 @@ case "${1:-}" in
     exec bash "$CODE/uninstall.sh" --all "$@" ;;
   _sync|sincronizar) sync_windows; exit 0 ;;
   _save-order) save_window_order; exit 0 ;;
+  _drop) shift; drop_window "${1:-}" "${2:-}"; exit 0 ;;
   _watch) watch_agents; exit 0 ;;
   _check-agents) check_agents || true; exit 0 ;;
   _seen) shift; mark_seen "${1:-}"; exit 0 ;;
