@@ -454,7 +454,7 @@ ask_visual() {
   local answer
   stop_spin
   echo
-  printf '  %s' "$(msg install_ask_visual kitty)"
+  if has_font; then printf '  %s' "$(msg install_ask_theme kitty)"; else printf '  %s' "$(msg install_ask_visual kitty)"; fi
   read -r answer || answer=n
   spin
   case "${answer:-n}" in
@@ -834,6 +834,7 @@ configure_tmux_and_terminal() {
 }
 
 has_custom_zsh() {
+  [ -d "$HOME/.oh-my-zsh" ] && ! grep -q '^omz|' "$MANIFEST" 2>/dev/null && return 0
   [ -f "$HOME/.zshrc" ] && without_block "$HOME/.zshrc" \
     | grep -qE 'zsh-autosuggestions|fast-syntax-highlighting|zsh-syntax-highlighting|zinit|oh-my-zsh|starship|powerlevel10k|p10k|spaceship|pure' && return 0
   return 1
