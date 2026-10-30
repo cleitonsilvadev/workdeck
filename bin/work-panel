@@ -58,9 +58,35 @@ draw() {
   fi
 }
 
+toml_string() {
+  local value="${1//\\/\\\\}"
+  printf '"%s"' "${value//\"/\\\"}"
+}
+
+write_tclock_config() {
+  local file="$WORKDECK_CONFIG/tclock/config.toml" panel title accent
+  accent="$(tmux show -gqv @wd_accent 2>/dev/null)"
+  mkdir -p "$(dirname "$file")"
+  {
+    # The clock takes the accent of the workdeck theme, and Shift+T stays on it.
+    [ -n "$accent" ] && printf '[default]\ncolor = %s\n\n' "$(toml_string "$accent")"
+    printf '[clock]\nshow_date = true\nwidget_themes = ["default"]\n'
+    for panel in "$PANELS"/*; do
+      [ -x "$panel" ] || continue
+      case "$(basename "$panel")" in 00-*) title="" ;; *) title="$(panel_title "$panel")" ;; esac
+      printf '\n[[clock.widgets]]\ntitle = %s\ncommand = [%s]\nrefresh_secs = %s\n' "$(toml_string "$title")" "$(toml_string "$panel")" "$INTERVAL"
+    done
+  } > "$file"
+}
+
 if [ "$ONCE" = 1 ]; then
   draw
   exit 0
+fi
+
+if [ "$(setting_get PANEL_CLOCK no)" = yes ] && [ -d "$PANELS" ] && command -v tclock >/dev/null; then
+  write_tclock_config
+  XDG_CONFIG_HOME="$WORKDECK_CONFIG" exec tclock
 fi
 
 trap 'printf "\e[?25h"; exit 0' INT TERM

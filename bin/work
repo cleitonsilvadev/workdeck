@@ -335,12 +335,7 @@ menu() {
 }
 
 terminal_shortcut_modifier() {
-  local term
-  term="$(tmux display -p -c "$1" '#{client_termname}|#{client_termtype}' 2>/dev/null)"
-  case "$term" in
-    xterm-kitty\|*|*\|*iTerm2*) ;;
-    *) return 0 ;;
-  esac
+  [ "$(tmux display -p -c "$1" '#{client_termname}' 2>/dev/null)" = xterm-kitty ] || return 0
   if [ "$(uname -s)" = Darwin ]; then echo "⌘"; else echo "Ctrl+Shift+"; fi
 }
 
@@ -471,10 +466,13 @@ agent_panes() {
 
 
 notify_agent_done() {
-  local text
+  local text kitty_tty
   [ "$(setting_get NOTIFY_AGENTS no)" = yes ] || return 0
   text="$(msg agent_done "$1" "$2" | tr -d '\042\134')"
-  if command -v osascript >/dev/null; then
+  kitty_tty="$(tmux list-clients -F '#{client_termname} #{client_tty}' 2>/dev/null | awk '$1 == "xterm-kitty" { print $2; exit }')"
+  if [ -n "$kitty_tty" ] && [ -w "$kitty_tty" ]; then
+    printf '%si=workdeck:d=0;workdeck%s%si=workdeck:p=body;%s%s' $'\033]99;' $'\033\\' $'\033]99;' "$(printf '%s' "$text" | LC_ALL=C tr -d '\000-\037')" $'\033\\' > "$kitty_tty" 2>/dev/null || true
+  elif command -v osascript >/dev/null; then
     osascript -e "display notification \"$text\" with title \"workdeck\"" >/dev/null 2>&1 || true
   elif command -v notify-send >/dev/null; then
     notify-send workdeck "$text" >/dev/null 2>&1 || true
@@ -654,6 +652,34 @@ refresh_panel() {
   [ -z "$pane" ] || tmux respawn-pane -k -t "$pane" "work _panel" 2>/dev/null || true
 }
 
+save_window_order() {
+  local entry name dir cmd wpanel wproject i tmp used=() ordered=()
+  [ -f "$CONFIG" ] || return 0
+  tmux has-session -t "$SESSION" 2>/dev/null || return 0
+  read_config
+  [ ${#windows[@]} -gt 0 ] || return 0
+  while IFS='|' read -r wpanel wproject; do
+    for ((i = 0; i < ${#windows[@]}; i++)); do
+      [ -z "${used[$i]:-}" ] || continue
+      IFS="|" read -r name dir cmd <<< "${windows[$i]}"
+      if { [ "$wpanel" = 1 ] && [ "${cmd%% *}" = work-panel ]; } || { [ -z "$cmd" ] && [ -n "$wproject" ] && [ "$(expand_path "$dir")" = "$wproject" ]; }; then
+        used[i]=1
+        ordered+=("${windows[$i]}")
+        break
+      fi
+    done
+  done < <(tmux list-windows -t "$SESSION" -F '#{@wd_panel}|#{@project}')
+  for ((i = 0; i < ${#windows[@]}; i++)); do
+    [ -n "${used[$i]:-}" ] || ordered+=("${windows[$i]}")
+  done
+  [ "${ordered[*]}" = "${windows[*]}" ] && return 0
+  tmp="$(mktemp)"
+  printf '%s\n' "${ordered[@]}" > "$tmp"
+  cat "$tmp" > "$CONFIG"
+  rm -f "$tmp"
+  refresh_panel
+}
+
 sync_windows() {
   local open entry name dir cmd d tmp removed=""
   decorate
@@ -745,6 +771,7 @@ case "${1:-}" in
     fi
     exec bash "$CODE/uninstall.sh" --all "$@" ;;
   _sync|sincronizar) sync_windows; exit 0 ;;
+  _save-order) save_window_order; exit 0 ;;
   _watch) watch_agents; exit 0 ;;
   _check-agents) check_agents || true; exit 0 ;;
   _seen) shift; mark_seen "${1:-}"; exit 0 ;;

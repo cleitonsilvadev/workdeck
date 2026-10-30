@@ -60,7 +60,8 @@ msg_uninstall_missing="não achei o desinstalador em %s"
 msg_uninstall_intro="O work uninstall desinstala tudo o que o workdeck instalou:
   - os blocos do workdeck no .zshrc, no .tmux.conf e no kitty.conf
   - o comando work e o código em %s
-  - o zsh do workdeck (oh-my-zsh e zinit), a fonte e o kitty, se foi ele que instalou
+  - o zsh do workdeck (oh-my-zsh e zinit), a fonte e o tclock, se foi ele que instalou;
+    o kitty sai só se você responder que sim
   - a sua config em %s: projetos, painéis e escolhas
 
 O que já era seu antes da instalação fica. Para ver sem apagar: work uninstall --dry-run
@@ -82,8 +83,9 @@ msg_install_help="workdeck — instalador. macOS e Linux.
   ./install.sh --zsh                instala o oh-my-zsh e o zinit sem perguntar
   ./install.sh --with ai-memory     ativa integrações opcionais (vírgula separa)
   ./install.sh --list-integrations  mostra as integrações disponíveis e sai
-  ./install.sh --terminal kitty,iterm  escolhe os terminais (kitty, iterm, warp ou other) sem perguntar
+  ./install.sh --terminal kitty     atalhos do workdeck no kitty sem perguntar (other: sem kitty)
   ./install.sh --visual             instala o tema e a fonte no terminal, sem perguntar
+  ./install.sh --clock              painel com o relógio tclock, sem perguntar (--no-clock recusa)
   ./install.sh --no-visual          no terminal, só os atalhos
   ./install.sh --yes                não pergunta nada; usa os padrões
   ./install.sh --no-deps            não instala nada pelo gerenciador de pacotes
@@ -94,7 +96,7 @@ msg_install_help="workdeck — instalador. macOS e Linux.
 nos seus arquivos fica entre marcadores >>> workdeck >>>, e o uninstall.sh
 remove exatamente esse trecho."
 msg_install_needs_value="%s precisa de um valor"
-msg_install_bad_terminal="terminal '%s' não existe. Disponíveis: kitty, iterm (só no macOS), warp, other; separe com vírgula para mais de um"
+msg_install_bad_terminal="terminal '%s' não existe. Use kitty ou other"
 msg_install_bad_lang="idioma '%s' não existe. Disponíveis: en, pt-BR"
 msg_install_unknown_option="opção desconhecida: %s"
 msg_install_not_regular="%s não é um arquivo comum; não mexi nele"
@@ -104,22 +106,13 @@ msg_install_bad_theme="tema '%s' não existe. Disponíveis:"
 msg_install_header_plain="workdeck → %s, tema %s"
 msg_install_kitty_full="kitty.conf — atalhos, tema e fonte"
 msg_install_kitty_keys="kitty.conf — atalhos"
-msg_install_other_terminal="Terminal padrão"
-msg_install_ask_terminal="Qual terminal você usa? O workdeck deixa os atalhos prontos nele, mesmo que ainda não esteja instalado."
-msg_install_terminal_kitty="atalhos do workdeck, mais os atalhos Cmd"
-msg_install_terminal_warp="atalhos do workdeck (Ctrl+b, Shift+setas, Alt); o Cmd fica com o Warp"
-msg_install_terminal_other="o Terminal do macOS ou qualquer outro; atalhos do workdeck (Ctrl+b, Shift+setas, Alt)"
+msg_install_other_terminal="outro terminal"
 msg_install_ask_number="Número (Enter para %s): "
 msg_install_ask_visual="Quer também o tema e a fonte JetBrains Mono do workdeck no %s? [s/N] "
-msg_install_dry_warp_theme="[dry-run] copiaria o tema do Warp para %s"
-msg_install_warp_theme="tema do Warp em %s"
 msg_install_kitty_missing="o kitty ainda não está instalado; os atalhos já estão no kitty.conf. Instale por %s e ele abre pronto."
 msg_install_kitty_summary_full="kitty com atalhos, tema e fonte"
 msg_install_kitty_summary_keys="kitty com atalhos"
-msg_install_warp_missing="o Warp ainda não está instalado. Instale por %s; os atalhos do workdeck funcionam nele sem ajustes."
-msg_install_warp_found="Warp encontrado: o tmux funciona com os atalhos Alt"
-msg_install_warp_summary_full="Warp com tema e fonte"
-msg_install_no_terminal_changes="terminal padrão: sem ajustes; os atalhos do workdeck funcionam nele"
+msg_install_no_terminal_changes="sem kitty: os atalhos do tmux funcionam em qualquer terminal"
 msg_install_font_present="fonte JetBrains Mono já instalada"
 msg_install_font_no_deps="fonte JetBrains Mono não instalada (--no-deps)"
 msg_install_dry_font="[dry-run] baixaria a fonte JetBrains Mono para %s"
@@ -166,19 +159,8 @@ msg_install_agent_set="agente já configurado: %s"
 msg_install_no_agent="nenhum agente de IA encontrado no PATH"
 msg_install_review_uses_open="o work review usa a IA que estiver aberta na janela"
 msg_install_no_agent_summary="nenhum no PATH; o review usa a IA aberta na janela"
-msg_install_found_agents="achei no PATH: %s"
-msg_install_found_agents_summary="achei %s; o review usa a IA aberta na janela"
-msg_install_ask_agent="Achei estes agentes de IA no seu PATH:"
-msg_install_agent_none_option="nenhum por enquanto"
-msg_install_ask_agent_number="Qual você usa? [0-%s] "
-msg_install_no_default_agent="nenhum padrão; o work review usa a IA aberta na janela"
-msg_install_no_default_agent_summary="nenhum padrão; o review usa a IA aberta na janela"
-msg_install_ask_integrations="Você usa algum destes com a IA? O workdeck mostra como ligar cada um."
-msg_install_ask_integration_numbers="Quais? Números separados por espaço, Enter para nenhum: "
 msg_install_unknown_integration="não conheço a integração '%s'"
 msg_install_integration_present="%s já está instalada"
-msg_install_ask_integration="Instalar %s? [s/N] "
-msg_install_skipped="pulada"
 msg_install_dry_integration="[dry-run] instalaria %s"
 msg_install_step_integrations="integrações"
 msg_install_integrations_before="escolhidas antes: %s; para ver de novo: rode a instalação de novo com --with <nome>"
@@ -190,15 +172,8 @@ msg_install_no="não"
 msg_install_choices="Suas escolhas, que a instalação lembra nas próximas vezes:"
 msg_install_choice_language="idioma"
 msg_install_choice_language_hint="para mudar: ./install.sh --lang en|pt-BR"
-msg_install_choice_terminal_hint="para mudar: ./install.sh --terminal kitty,iterm,warp ou other"
+msg_install_choice_terminal_hint="para mudar: ./install.sh --terminal kitty ou --terminal other"
 msg_install_choice_visual_hint="para mudar: ./install.sh --visual (tema e fonte) ou --no-visual"
-msg_install_warp_todo="No Warp, falta escolher no app:"
-msg_install_warp_theme_steps="       tema      Settings › Appearance › Themes, e escolha \"workdeck %s\"
-                 (ou \"Open theme picker\" na Command Palette). Se o tema não aparecer, espere
-                 alguns minutos ou reabra o Warp
-       fonte     Settings › Appearance › Text › Font type › JetBrains Mono"
-msg_install_warp_option_steps="       Option    Settings › Features › \"Left Option key is Meta\" (ligado). Sem isso, os
-                 atalhos Alt do tmux (Alt+1…9, Alt+↑/↓) não funcionam no Mac"
 msg_install_tmux_reloaded="tmux recarregado"
 msg_install_restart_terminal="Feche e abra o %s para carregar o zsh e o visual novos."
 msg_install_done_fancy="✓ pronto em %ss"
@@ -213,8 +188,8 @@ msg_install_open_kitty_hint="com os atalhos cmd do workdeck"
 msg_install_open_terminal_restart="feche e abra o terminal"
 msg_install_now="Agora:"
 msg_install_work_hint="abre o painel, que mostra como adicionar os projetos"
-msg_install_navigation="  Para navegar: Shift+← / Shift+→ troca de projeto, Shift+↑ / Shift+↓ troca de
-  painel e %s vai direto para um projeto. Clicar na barra também funciona.
+msg_install_navigation="  Para navegar: Shift+← / Shift+→ troca de projeto e Shift+↑ / Shift+↓ troca de
+  painel. Clicar na barra também funciona.
   Ajuda a qualquer hora: %s dentro do work."
 msg_install_windows="O workdeck roda em macOS e Linux. No Windows, use pelo WSL: abra o Ubuntu do WSL e rode a instalação de lá."
 msg_install_ask_language="Em que idioma o workdeck mostra as mensagens?"
@@ -316,8 +291,7 @@ msg_panel_tagline="terminal para agentes de IA"
 msg_panel_start="%sPara começar%s, no terminal aqui embaixo:"
 msg_panel_add_project="work add ~/projeto"
 msg_panel_add_project_hint="cada projeto vira uma janela; Tab completa o caminho"
-msg_panel_in_warp="%sNo Warp%s: o work funciona com os atalhos Alt; os atalhos cmd só valem no kitty."
-msg_panel_outside_kitty="%sFora do kitty%s: o work funciona, mas o tema, a fonte e os atalhos cmd só valem lá."
+msg_panel_outside_kitty="%sNo kitty%s, o workdeck abre direto e tem atalhos de uma letra. Aqui, use Ctrl+b h."
 msg_panel_menu_hint="%s abre o menu: projetos, agente, terminal e review"
 msg_panel_custom_hint="Para pôr o seu no painel: um executável em ~/.config/workdeck/panels/"
 msg_panel_guide="  guia: github.com/thiagofeliperibeiro/workdeck/blob/main/docs/panels.pt-BR.md"
@@ -329,11 +303,7 @@ msg_changelog_heading="Português"
 msg_settings_review_agent_1="# Agente que faz o work review, num painel embaixo do chat. Use outro modelo ou outra IA para"
 msg_settings_review_agent_2="# não repetir os pontos cegos de quem escreveu o código. Vazio: o review usa o seu agente."
 msg_review_scope_unpushed="os commits desta branch que ainda não subiram"
-msg_install_terminal_kitty_linux="atalhos do workdeck"
-msg_install_terminal_warp_linux="atalhos do workdeck (Ctrl+b, Shift+setas, Alt)"
-msg_install_terminal_other_linux="GNOME Terminal, Konsole ou qualquer outro; atalhos do workdeck (Ctrl+b, Shift+setas, Alt)"
-msg_install_other_summary="terminal padrão, sem ajustes"
-msg_install_warp_shortcuts_steps="       atalhos   Ctrl+b h abre o menu do workdeck; os atalhos Cmd continuam sendo do Warp"
+msg_install_other_summary="outro terminal, atalhos do tmux"
 msg_install_open_kitty_reload_hint="carrega os atalhos e os comandos do workdeck"
 msg_install_open_new_window="abra uma janela nova"
 msg_install_open_new_window_hint="carrega os comandos do workdeck"
@@ -341,11 +311,45 @@ msg_menu_agent="Abrir o agente num painel novo"
 msg_menu_key_terminal_1="%sH menu    %sP projeto    %sA agente    %sT terminal"
 msg_menu_key_terminal_2="%sZ zoom    %sW fechar     %sR review    %s1…9 projeto"
 msg_agent_pane_none="nenhum agente definido: rode ./install.sh --agent claude (ou o seu agente)"
-msg_install_ask_terminal_numbers="Números separados por espaço, se usar mais de um (Enter para %s): "
-msg_install_terminal_iterm="atalhos do workdeck, mais os atalhos Cmd"
-msg_install_dry_iterm="[dry-run] gravaria o profile do iTerm2 em %s"
-msg_install_iterm_profile="profile workdeck do iTerm2 em %s"
-msg_install_iterm_missing="o iTerm2 ainda não está instalado; o profile workdeck já está pronto. Instale por %s e ele aparece em Settings › Profiles."
-msg_install_iterm_summary="iTerm2 com atalhos (profile workdeck)"
-msg_install_iterm_todo="No iTerm2, falta escolher no app:"
-msg_install_iterm_profile_steps="       profile   Settings › Profiles › workdeck › Other Actions › Set as Default"
+msg_install_ask_kitty="Quer os atalhos do workdeck no kitty (⌘H menu, ⌘P projeto, ⌘R review…)?
+Se o kitty ainda não estiver instalado, a configuração já fica pronta."
+msg_install_ask_kitty_linux="Quer os atalhos do workdeck no kitty (Ctrl+Shift+H menu, Ctrl+Shift+P projeto…)?
+Se o kitty ainda não estiver instalado, a configuração já fica pronta."
+msg_install_ask_kitty_default_yes="[S/n] "
+msg_install_ask_kitty_default_no="[s/N] "
+msg_install_iterm_retired="profile workdeck do iTerm2 removido: os atalhos do workdeck agora são só do kitty"
+msg_install_agent_others="também no PATH: %s; para trocar: ./install.sh --agent <comando>"
+msg_install_agent_detected_summary="%s, detectado no PATH"
+msg_install_ask_download_kitty="O kitty ainda não está instalado. Baixar agora pelo instalador oficial (sem senha)? [S/n] "
+msg_install_kitty_downloading="baixando o kitty pelo instalador oficial…"
+msg_install_kitty_installed="kitty instalado em %s; o work uninstall pergunta antes de remover"
+msg_install_kitty_download_failed="não consegui instalar o kitty; baixe por %s, os atalhos já estão no kitty.conf"
+msg_install_kitty_present="o kitty já está instalado; abra o work nele para a melhor experiência"
+msg_install_kitty_session="o kitty abre direto no work (KITTY_OPENS_WORK=\"no\" no settings.conf desliga)"
+msg_settings_kitty_opens_work="# O kitty abre direto no work. \"no\" desliga; rode a instalação de novo para aplicar."
+msg_panel_kitty_elsewhere="Aqui, use Ctrl+b h; os atalhos do workdeck ficam no kitty."
+msg_install_quick_access_todo="Para trazer o workdeck de qualquer app com uma tecla, falta um passo:"
+msg_install_quick_access_steps="       atalho    Ajustes do Sistema › Teclado › Atalhos de Teclado › Serviços › Geral
+                 › \"Quick access to kitty\", e escolha a tecla"
+msg_install_quick_access_steps_linux="       atalho    nas configurações de teclado do sistema, ligue uma tecla ao comando
+                 kitten quick-access-terminal"
+msg_uninstall_ask_kitty="Remover o kitty também? A configuração dele já saiu. [s/N] "
+msg_uninstall_kitty_kept="o kitty continua instalado; só a configuração do workdeck saiu dele"
+msg_uninstall_kitty_removed="kitty removido de %s"
+msg_uninstall_kitty_failed="não consegui remover %s; apague à mão se quiser"
+msg_uninstall_goodbye="até breve."
+msg_install_ask_clock="Quer o painel com o relógio tclock, do Akita (o relógio no alto e os blocos do painel embaixo)? [s/N] "
+msg_install_clock_present="tclock já instalado; o painel usa ele"
+msg_install_clock_no_deps="tclock não instalado (--no-deps); o painel fica no modo de texto"
+msg_install_dry_clock="[dry-run] instalaria o tclock"
+msg_install_clock_needs_rust="o tclock no Mac precisa do Rust: rode brew install rust e a instalação de novo; até lá, o painel fica no modo de texto"
+msg_install_clock_compiling="compilando o tclock com o cargo (leva alguns minutos)…"
+msg_install_clock_downloading="baixando o tclock…"
+msg_install_clock_installed="tclock instalado em %s"
+msg_install_clock_failed="não consegui instalar o tclock (%s); o painel fica no modo de texto"
+msg_settings_panel_clock="# Painel com o relógio tclock no alto e os blocos embaixo. Precisa do tclock instalado."
+msg_install_ask_clock_mac="Quer o painel com o relógio tclock, do Akita (o relógio no alto e os blocos embaixo)?
+No Mac, ele é compilado com o Rust que você já tem e leva alguns minutos. [s/N] "
+msg_install_ask_clock_mac_no_rust="Quer o painel com o relógio tclock, do Akita (o relógio no alto e os blocos embaixo)?
+No Mac, ele precisa do Rust, que não está instalado: rode brew install rust e a
+instalação de novo para ter o relógio. [s/N] "

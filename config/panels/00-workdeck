@@ -55,8 +55,8 @@ if [ "$projects" = 0 ]; then
 fi
 
 if [ -n "${TMUX:-}" ] && [ "$(tmux display -p '#{client_termname}' 2>/dev/null)" != xterm-kitty ]; then
-  if [ -n "${WARP_CLIENT_VERSION:-}" ]; then
-    printf '%s\n\n' "$(msg panel_in_warp "$purple" "$x")"
+  if [ "$(sed -n 's/^TERMINAL="\(.*\)"$/\1/p' "$CONFIG_DIR/settings.conf" 2>/dev/null | head -1)" = kitty ]; then
+    printf '%s%s%s\n\n' "$dim" "$(msg panel_kitty_elsewhere)" "$x"
   else
     printf '%s\n\n' "$(msg panel_outside_kitty "$purple" "$x")"
   fi
@@ -64,10 +64,9 @@ fi
 
 menu_key="Ctrl+b h"
 if [ -n "${TMUX:-}" ]; then
-  case "$(tmux display -p '#{client_termname}|#{client_termtype}' 2>/dev/null)" in
-    xterm-kitty\|*|*\|*iTerm2*)
-      if [ "$(uname -s)" = Darwin ]; then menu_key="⌘H"; else menu_key="Ctrl+Shift+H"; fi ;;
-  esac
+  if [ "$(tmux display -p '#{client_termname}' 2>/dev/null)" = xterm-kitty ]; then
+    if [ "$(uname -s)" = Darwin ]; then menu_key="⌘H"; else menu_key="Ctrl+Shift+H"; fi
+  fi
 fi
 printf '%s%s%s\n' "$dim" "$(msg panel_menu_hint "$menu_key")" "$x"
 

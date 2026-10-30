@@ -11,14 +11,16 @@ BACKUPS="$CONFIG_DIR/.backups"
 MANIFEST="$CONFIG_DIR/.install-manifest"
 ZSH_PLUGINS="${XDG_DATA_HOME:-$HOME/.local/share}/workdeck-zsh"
 ZINIT_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/zinit/zinit.git"
+APPS_DIR="${WORKDECK_APPS_DIR:-/Applications}"
 KITTY_DOWNLOAD="https://sw.kovidgoyal.net/kitty/binary/"
-ITERM_DOWNLOAD="https://iterm2.com/downloads.html"
 ITERM_PROFILE="$HOME/Library/Application Support/iTerm2/DynamicProfiles/workdeck.json"
-WARP_DOWNLOAD="https://www.warp.dev/download"
+KITTY_SESSION="$WORKDECK_CONFIG/kitty-session"
 
 THEME=""
 LANGUAGE=""
 LANGUAGE_REQUESTED=""
+CLOCK_REQUESTED=""
+TCLOCK_REPO="https://github.com/akitaonrails/clock-tui"
 WANT_ZSH=0
 TERMINAL=""
 TERMINAL_REQUESTED=""
@@ -27,6 +29,7 @@ VISUAL_REQUESTED=""
 RESTART_SHELL=0
 SHELL_CHANGED=0
 KITTY_CHANGED=0
+QUICK_ACCESS=0
 BLOCK_CHANGED=0
 AGENT=""
 WITH=""
@@ -40,7 +43,6 @@ PKG_MANAGER=""
 SUDO=""
 FONTS_DIR=""
 ZSH_SUMMARY=""
-CHOSEN=0
 
 FANCY=0
 green=""; yellow=""; red=""; purple=""; dim=""; bold=""; reset=""
@@ -63,10 +65,12 @@ parse_options() {
       --list-integrations) list_integrations; exit 0 ;;
       --terminal)
         TERMINAL_REQUESTED="$(option_value "$@")"
-        TERMINAL_REQUESTED="$(normalize_terminals "$TERMINAL_REQUESTED")"
         valid_terminal "$TERMINAL_REQUESTED" || { msgln install_bad_terminal "$TERMINAL_REQUESTED"; exit 1; }
+        TERMINAL_REQUESTED="$(normalize_terminal "$TERMINAL_REQUESTED")"
         shift 2 ;;
       --visual) VISUAL_REQUESTED=yes; shift ;;
+      --clock) CLOCK_REQUESTED=yes; shift ;;
+      --no-clock) CLOCK_REQUESTED=no; shift ;;
       --no-visual) VISUAL_REQUESTED=no; shift ;;
       --no-deps) DEPS=0; shift ;;
       --zsh) WANT_ZSH=1; shift ;;
@@ -320,10 +324,23 @@ kitty_from_other_account() {
 
 kitty_installed() {
   local k
-  [ -d /Applications/kitty.app ] || [ -d "$HOME/Applications/kitty.app" ] \
+  [ -d "$APPS_DIR/kitty.app" ] || [ -d "$HOME/Applications/kitty.app" ] \
     || [ -x "$HOME/.local/kitty.app/bin/kitty" ] && return 0
   k="$(command -v kitty 2>/dev/null)" || return 1
   ! kitty_from_other_account "$k"
+}
+
+kitty_opens_work() {
+  [ "$(setting_get KITTY_OPENS_WORK yes)" = no ] && return 1
+  [ -f "$HOME/.config/kitty/kitty.conf" ] && without_block "$HOME/.config/kitty/kitty.conf" | grep -q '^[[:space:]]*startup_session' && return 1
+  return 0
+}
+
+write_kitty_session() {
+  local shell_bin="${SHELL:-/bin/zsh}"
+  [ "$DRY" = 1 ] && return 0
+  mkdir -p "$(dirname "$KITTY_SESSION")"
+  printf 'launch --title workdeck %s -lic "work; exec %s -l"\n' "$shell_bin" "$shell_bin" > "$KITTY_SESSION"
 }
 
 apply_kitty() {
@@ -333,8 +350,17 @@ apply_kitty() {
   if [ "$VISUAL" = yes ]; then
     block="$(printf '%s\n\n%s\n%s\n' "$block" "$(cat "$ROOT/terminals/kitty-visual.conf")" "$(cat "$ROOT/themes/$THEME.conf")")"
   fi
+  if kitty_opens_work; then
+    write_kitty_session
+    block="$(printf '%s\n\nstartup_session %s\n' "$block" "$KITTY_SESSION")"
+    say "$(msg install_kitty_session)"
+  fi
   write_block "$HOME/.config/kitty/kitty.conf" "$(printf '%s\n' "$block"; echo '# <<< workdeck <<<')"
   KITTY_CHANGED="$BLOCK_CHANGED"
+  if kitty_opens_work; then
+    write_block "$HOME/.config/kitty/quick-access-terminal.conf" "$(printf '%s\n' '# >>> workdeck >>>' 'edge center-sized' 'lines 40' 'columns 160' 'hide_on_focus_loss yes' 'kitty_override startup_session=none' "kitty_override shell=${SHELL:-/bin/zsh} -lic \"work; exec ${SHELL:-/bin/zsh} -l\"" '# <<< workdeck <<<')"
+    QUICK_ACCESS=1
+  fi
   if [ "$VISUAL" = yes ]; then say "$(msg install_kitty_full)"; else say "$(msg install_kitty_keys)"; fi
 }
 
@@ -345,39 +371,12 @@ kitty_block_has_visual() {
 
 in_warp() { [ -n "${WARP_CLIENT_VERSION:-}" ]; }
 
-in_iterm() { [ -n "${ITERM_SESSION_ID:-}" ] || [ "${TERM_PROGRAM:-}" = iTerm.app ]; }
-
-iterm_installed() {
-  in_iterm && return 0
-  [ -d /Applications/iTerm.app ] || [ -d "$HOME/Applications/iTerm.app" ]
-}
-
 on_macos() { [ "$(uname -s)" = Darwin ]; }
 
-has_terminal() {
-  case ",$TERMINAL," in *",$1,"*) return 0 ;; esac
-  return 1
-}
-
-normalize_terminals() {
-  local list="${1// /}" t out=""
-  for t in ${list//,/ }; do
-    case "$t" in
-      iterm2|iTerm|iTerm2) t=iterm ;;
-    esac
-    case ",$out," in *",$t,"*) continue ;; esac
-    out="${out:+$out,}$t"
-  done
-  case ",$out," in
-    ,other,) ;;
-    *,other,*) out="$(printf '%s' ",$out," | sed 's/,other,/,/; s/^,//; s/,$//')" ;;
-  esac
-  printf '%s' "$out"
-}
+uses_kitty() { [ "$TERMINAL" = kitty ]; }
 
 current_terminal_name() {
   if in_kitty; then echo kitty
-  elif in_iterm; then echo iTerm2
   elif in_warp; then echo Warp
   else echo terminal
   fi
@@ -385,7 +384,7 @@ current_terminal_name() {
 
 warp_installed() {
   in_warp && return 0
-  [ -d /Applications/Warp.app ] || [ -d "$HOME/Applications/Warp.app" ] && return 0
+  [ -d "$APPS_DIR/Warp.app" ] || [ -d "$HOME/Applications/Warp.app" ] && return 0
   command -v warp-terminal >/dev/null
 }
 
@@ -394,67 +393,40 @@ valid_terminal() {
   [ -n "$1" ] || return 1
   for t in ${1//,/ }; do
     case "$t" in
-      kitty|warp|other) ;;
-      iterm) on_macos || return 1 ;;
+      kitty|other|warp|iterm) ;;
       *) return 1 ;;
     esac
   done
   return 0
 }
-detected_terminal() {
-  in_kitty && { echo kitty; return 0; }
-  on_macos && in_iterm && { echo iterm; return 0; }
-  in_warp && { echo warp; return 0; }
-  kitty_installed && { echo kitty; return 0; }
-  on_macos && iterm_installed && { echo iterm; return 0; }
-  warp_installed && { echo warp; return 0; }
-  echo other
-}
-terminal_name() {
-  case "$1" in
-    warp) echo Warp ;;
-    iterm) echo iTerm2 ;;
-    other) msgln install_other_terminal ;;
-    *) echo "$1" ;;
+
+normalize_terminal() {
+  case ",$1," in
+    *,kitty,*) echo kitty ;;
+    ,,) ;;
+    *) echo other ;;
   esac
 }
-
+detected_terminal() {
+  if in_kitty || kitty_installed; then echo kitty; else echo other; fi
+}
 chosen_terminal_name() {
-  local t out=""
-  for t in ${TERMINAL//,/ }; do out="${out:+$out, }$(terminal_name "$t")"; done
-  printf '%s\n' "$out"
+  if uses_kitty; then echo kitty; else msgln install_other_terminal; fi
 }
-terminal_hint() {
-  if [ "$OS_NAME" = macOS ]; then msg "install_terminal_$1"; else msg "install_terminal_${1}_linux"; fi
-}
-
-terminal_option() {
-  local width
-  width=$(printf '%s' "$2" | LC_ALL=C tr -d '\200-\277' | wc -c)
-  printf '    %s) %s%*s %s%s%s\n' "$1" "$2" $((16 - width)) "" "$dim" "$3" "$reset"
-}
-
 ask_terminal() {
-  local answer options=() n e picked=""
+  local answer default=n prompt
   stop_spin
   echo
-  echo "  $(msg install_ask_terminal)"
-  options=(kitty)
-  on_macos && options+=(iterm)
-  options+=(warp other)
-  for ((n = 0; n < ${#options[@]}; n++)); do
-    terminal_option $((n + 1)) "$(terminal_name "${options[$n]}")" "$(terminal_hint "${options[$n]}")"
-  done
-  echo
-  printf '  %s' "$(msg install_ask_terminal_numbers "$(chosen_terminal_name)")"
+  [ "$TERMINAL" = kitty ] && default=s
+  if on_macos; then prompt="$(msg install_ask_kitty)"; else prompt="$(msg install_ask_kitty_linux)"; fi
+  printf '%s\n' "$prompt" | sed 's/^/  /'
+  if [ "$default" = s ]; then printf '  %s' "$(msg install_ask_kitty_default_yes)"; else printf '  %s' "$(msg install_ask_kitty_default_no)"; fi
   read -r answer || answer=""
   spin
-  for e in ${answer//,/ }; do
-    if [ "$e" -ge 1 ] 2>/dev/null && [ "$e" -le "${#options[@]}" ]; then
-      picked="${picked:+$picked,}${options[$((e - 1))]}"
-    fi
-  done
-  [ -z "$picked" ] || TERMINAL="$(normalize_terminals "$picked")"
+  case "${answer:-$default}" in
+    s|S|y|Y) TERMINAL=kitty ;;
+    *) TERMINAL=other ;;
+  esac
 }
 # A key that already holds this value is left alone, so a reinstall does not
 # rewrite the user's file.
@@ -465,7 +437,7 @@ save_choice() {
 }
 
 choose_terminal() {
-  TERMINAL="${TERMINAL_REQUESTED:-$(setting_get TERMINAL)}"
+  TERMINAL="${TERMINAL_REQUESTED:-$(normalize_terminal "$(setting_get TERMINAL)")}"
   if valid_terminal "$TERMINAL"; then
     save_choice TERMINAL "$TERMINAL"
     return 0
@@ -476,20 +448,13 @@ choose_terminal() {
   save_choice TERMINAL "$TERMINAL"
 }
 
-terminal_has_visual() { has_terminal kitty || has_terminal warp; }
-
-visual_terminal_names() {
-  local out=""
-  has_terminal kitty && out="kitty"
-  has_terminal warp && out="${out:+$out, }Warp"
-  printf '%s\n' "$out"
-}
+terminal_has_visual() { uses_kitty; }
 
 ask_visual() {
   local answer
   stop_spin
   echo
-  printf '  %s' "$(msg install_ask_visual "$(visual_terminal_names)")"
+  printf '  %s' "$(msg install_ask_visual kitty)"
   read -r answer || answer=n
   spin
   case "${answer:-n}" in
@@ -506,7 +471,7 @@ choose_visual() {
     save_choice VISUAL "$VISUAL"
     return 0
   fi
-  if has_terminal kitty && kitty_block_has_visual; then
+  if uses_kitty && kitty_block_has_visual; then
     VISUAL=yes
     save_choice VISUAL "$VISUAL"
     return 0
@@ -517,25 +482,41 @@ choose_visual() {
   save_choice VISUAL "$VISUAL"
 }
 
-warp_themes_dir() {
-  if [ "$OS_NAME" = macOS ]; then echo "$HOME/.warp/themes"
-  else echo "${XDG_DATA_HOME:-$HOME/.local/share}/warp-terminal/themes"
+offer_kitty_download() {
+  local answer app
+  if kitty_installed; then
+    in_kitty || say "$(msg install_kitty_present)"
+    return 0
   fi
-}
-
-apply_warp_theme() {
-  local dest
-  dest="$(warp_themes_dir)/workdeck-$THEME.yaml"
-  record warp-theme "$dest"
-  [ "$DRY" = 1 ] && { say "$(msg install_dry_warp_theme "$dest")"; return 0; }
-  mkdir -p "$(dirname "$dest")"
-  cp "$ROOT/themes/$THEME.warp.yaml" "$dest"
-  say "$(msg install_warp_theme "$(short_path "$dest")")"
+  if [ "$DEPS" = 0 ] || [ "$DRY" = 1 ] || ! can_ask || ! command -v curl >/dev/null; then
+    warn "$(msg install_kitty_missing "$KITTY_DOWNLOAD")"
+    return 0
+  fi
+  stop_spin
+  printf '  %s' "$(msg install_ask_download_kitty)"
+  read -r answer || answer=n
+  spin
+  case "${answer:-s}" in
+    s|S|y|Y) ;;
+    *) warn "$(msg install_kitty_missing "$KITTY_DOWNLOAD")"; return 0 ;;
+  esac
+  say "$(msg install_kitty_downloading)"
+  if curl -fsSL https://sw.kovidgoyal.net/kitty/installer.sh 2>> "$LOG" | sh /dev/stdin launch=n >> "$LOG" 2>&1; then
+    if on_macos; then app="$HOME/Applications/kitty.app"; else app="$HOME/.local/kitty.app"; fi
+    if ! on_macos && [ -x "$app/bin/kitty" ]; then
+      mkdir -p "$BIN_DIR"
+      ln -sf "$app/bin/kitty" "$app/bin/kitten" "$BIN_DIR/"
+    fi
+    record kitty "$app"
+    say "$(msg install_kitty_installed "$(short_path "$app")")"
+  else
+    warn "$(msg install_kitty_download_failed "$KITTY_DOWNLOAD")"
+  fi
 }
 
 configure_kitty() {
   apply_kitty
-  kitty_installed || warn "$(msg install_kitty_missing "$KITTY_DOWNLOAD")"
+  offer_kitty_download
   if [ "$VISUAL" = yes ]; then
     install_font
     summary "$SUMMARY · $(msg install_kitty_summary_full)"
@@ -544,47 +525,25 @@ configure_kitty() {
   summary "$SUMMARY · $(msg install_kitty_summary_keys)"
 }
 
-configure_warp() {
-  if warp_installed; then
-    say "$(msg install_warp_found)"
-  else
-    warn "$(msg install_warp_missing "$WARP_DOWNLOAD")"
+retire_iterm_profile() {
+  grep -q '^iterm-profile|' "$MANIFEST" 2>/dev/null || return 0
+  [ "$DRY" = 1 ] && return 0
+  if [ -f "$ITERM_PROFILE" ] && same_file "$ROOT/terminals/iterm2.json" "$ITERM_PROFILE"; then
+    rm -f "$ITERM_PROFILE"
+    say "$(msg install_iterm_retired)"
   fi
-  if [ "$VISUAL" = yes ]; then
-    apply_warp_theme
-    install_font
-    summary "$SUMMARY · $(msg install_warp_summary_full)"
-    return 0
-  fi
-  summary "$SUMMARY · Warp"
-}
-
-configure_iterm() {
-  record iterm-profile "$ITERM_PROFILE"
-  if [ "$DRY" = 1 ]; then
-    say "$(msg install_dry_iterm "$(short_path "$ITERM_PROFILE")")"
-  else
-    mkdir -p "$(dirname "$ITERM_PROFILE")"
-    cp "$ROOT/terminals/iterm2.json" "$ITERM_PROFILE"
-    say "$(msg install_iterm_profile "$(short_path "$ITERM_PROFILE")")"
-  fi
-  iterm_installed || warn "$(msg install_iterm_missing "$ITERM_DOWNLOAD")"
-  summary "$SUMMARY · $(msg install_iterm_summary)"
+  grep -v '^iterm-profile|' "$MANIFEST" > "$MANIFEST.tmp" && mv "$MANIFEST.tmp" "$MANIFEST"
 }
 
 configure_terminal() {
-  local t
   rm -f "$CONFIG_DIR/kitty"
-  for t in ${TERMINAL//,/ }; do
-    case "$t" in
-      kitty) configure_kitty ;;
-      iterm) configure_iterm ;;
-      warp) configure_warp ;;
-      *)
-        say "$(msg install_no_terminal_changes)"
-        summary "$SUMMARY · $(msg install_other_summary)" ;;
-    esac
-  done
+  retire_iterm_profile
+  if uses_kitty; then
+    configure_kitty
+  else
+    say "$(msg install_no_terminal_changes)"
+    summary "$SUMMARY · $(msg install_other_summary)"
+  fi
 }
 
 has_font() {
@@ -750,6 +709,79 @@ localize_panel_window() {
     && cat "$file.tmp" > "$file" && rm -f "$file.tmp"
 }
 
+choose_clock() {
+  local choice answer
+  choice="${CLOCK_REQUESTED:-$(setting_get PANEL_CLOCK)}"
+  if [ "$choice" != yes ] && [ "$choice" != no ]; then
+    choice=no
+    can_ask || return 0
+    stop_spin
+    if ! on_macos; then
+      printf '  %s' "$(msg install_ask_clock)"
+    elif command -v cargo >/dev/null; then
+      printf '%s' "$(msg install_ask_clock_mac)" | sed 's/^/  /'
+    else
+      printf '%s' "$(msg install_ask_clock_mac_no_rust)" | sed 's/^/  /'
+    fi
+    read -r answer || answer=n
+    spin
+    case "$answer" in s|S|y|Y) choice=yes ;; esac
+  fi
+  save_choice PANEL_CLOCK "$choice"
+  [ "$choice" = yes ] && install_tclock
+  return 0
+}
+
+install_tclock() {
+  local arch tmp binary
+  if command -v tclock >/dev/null; then
+    say "$(msg install_clock_present)"
+    return 0
+  fi
+  if [ "$DEPS" = 0 ]; then
+    warn "$(msg install_clock_no_deps)"
+    return 0
+  fi
+  if [ "$DRY" = 1 ]; then
+    say "$(msg install_dry_clock)"
+    return 0
+  fi
+  if on_macos; then
+    if ! command -v cargo >/dev/null; then
+      warn "$(msg install_clock_needs_rust)"
+      return 0
+    fi
+    say "$(msg install_clock_compiling)"
+    if cargo install --git "$TCLOCK_REPO" --package clock-tui --root "$HOME/.local" >> "$LOG" 2>&1; then
+      record tclock-cargo "$BIN_DIR/tclock"
+      say "$(msg install_clock_installed "$(short_path "$BIN_DIR/tclock")")"
+    else
+      warn "$(msg install_clock_failed "$TCLOCK_REPO")"
+    fi
+    return 0
+  fi
+  case "$(uname -m)" in
+    x86_64|amd64) arch=x86_64 ;;
+    aarch64|arm64) arch=aarch64 ;;
+    *) warn "$(msg install_clock_failed "$TCLOCK_REPO")"; return 0 ;;
+  esac
+  say "$(msg install_clock_downloading)"
+  tmp="$(mktemp -d)"
+  if curl -fsSL -o "$tmp/tclock.tar.gz" "$TCLOCK_REPO/releases/latest/download/clock-tui-linux-$arch.tar.gz" 2>> "$LOG" \
+     && curl -fsSL -o "$tmp/tclock.sha256" "$TCLOCK_REPO/releases/latest/download/clock-tui-linux-$arch.tar.gz.sha256" 2>> "$LOG" \
+     && [ "$(awk '{print $1}' "$tmp/tclock.sha256")" = "$( (sha256sum "$tmp/tclock.tar.gz" 2>/dev/null || shasum -a 256 "$tmp/tclock.tar.gz") | awk '{print $1}')" ] \
+     && tar -xzf "$tmp/tclock.tar.gz" -C "$tmp" >> "$LOG" 2>&1 \
+     && binary="$(find "$tmp" -type f -name tclock | head -1)" && [ -n "$binary" ]; then
+    mkdir -p "$BIN_DIR"
+    install -m 755 "$binary" "$BIN_DIR/tclock"
+    record tclock "$BIN_DIR/tclock"
+    say "$(msg install_clock_installed "$(short_path "$BIN_DIR/tclock")")"
+  else
+    warn "$(msg install_clock_failed "$TCLOCK_REPO")"
+  fi
+  rm -rf "$tmp"
+}
+
 install_config() {
   step 3 "$(msg install_step_config)"
   run mkdir -p "$CONFIG_DIR/panels"
@@ -760,6 +792,7 @@ install_config() {
     say "$(msg install_projects_hint)"
   fi
   install_panels
+  choose_clock
   if [ -d "${XDG_CONFIG_HOME:-$HOME/.config}/git-review" ]; then
     run rm -rf "${XDG_CONFIG_HOME:-$HOME/.config}/git-review"
     say "$(msg install_git_review_removed)"
@@ -899,11 +932,11 @@ configure_shell() {
 }
 
 configure_agent() {
-  local current_agent="" found=() c a i choice
+  local current_agent="" found=() c
   step 6 "$(msg install_step_agent)"
   current_agent="$(setting_get AGENT_CMD)"
   if [ -n "$AGENT" ]; then
-    run "$ROOT/bin/workdeck-agent" --set "$AGENT" && say "$(msg install_agent "$AGENT")"
+    run "$ROOT/bin/workdeck-agent" --set "$AGENT" >/dev/null && say "$(msg install_agent "$AGENT")"
     summary "$AGENT"
   elif [ -n "$current_agent" ]; then
     say "$(msg install_agent_set "$current_agent")"
@@ -916,58 +949,13 @@ configure_agent() {
       say "$(msg install_no_agent)"
       say "$(msg install_review_uses_open)"
       summary "$(msg install_no_agent_summary)"
-    elif [ "$YES" = 1 ] || [ ! -t 0 ]; then
-      say "$(msg install_found_agents "${found[*]}")"
-      say "$(msg install_review_uses_open)"
-      summary "$(msg install_found_agents_summary "${found[*]}")"
     else
-      stop_spin
-      echo
-      echo "  $(msg install_ask_agent)"
-      i=1; for a in "${found[@]}"; do echo "    $i) $a"; i=$((i+1)); done
-      echo "    0) $(msg install_agent_none_option)"
-      echo
-      printf '  %s' "$(msg install_ask_agent_number "${#found[@]}")"
-      read -r choice || choice=0
-      if [ "${choice:-0}" -ge 1 ] 2>/dev/null && [ "$choice" -le "${#found[@]}" ]; then
-        run "$ROOT/bin/workdeck-agent" --set "${found[$((choice-1))]}" >/dev/null \
-          && say "$(msg install_agent "${found[$((choice-1))]}")"
-        summary "${found[$((choice-1))]}"
-      else
-        say "$(msg install_no_default_agent)"
-        summary "$(msg install_no_default_agent_summary)"
-      fi
-      echo
+      run "$ROOT/bin/workdeck-agent" --set "${found[0]}" >/dev/null && say "$(msg install_agent "${found[0]}")"
+      [ ${#found[@]} -eq 1 ] || say "$(msg install_agent_others "${found[*]:1}")"
+      summary "$(msg install_agent_detected_summary "${found[0]}")"
     fi
   fi
   finish_step
-}
-
-ask_integrations() {
-  local available=() f n i choice e
-  for f in "$ROOT"/integrations/*.sh; do
-    [ "$(basename "$f")" = example.sh ] || available+=("$(basename "$f" .sh)")
-  done
-  [ ${#available[@]} -gt 0 ] || return 0
-  stop_spin
-  echo
-  echo "  $(msg install_ask_integrations)"
-  i=1
-  for n in "${available[@]}"; do
-    printf '    %s) %-10s %s%s%s\n' "$i" "$n" "$dim" "$(. "$ROOT/integrations/$n.sh"; describe | sed -n 2p)" "$reset"
-    i=$((i+1))
-  done
-  echo
-  printf '  %s' "$(msg install_ask_integration_numbers)"
-  read -r choice || choice=""
-  for e in ${choice//,/ }; do
-    if [ "$e" -ge 1 ] 2>/dev/null && [ "$e" -le "${#available[@]}" ]; then
-      case ",$WITH," in *",${available[$((e-1))]},"*) ;; *) WITH="${WITH:+$WITH,}${available[$((e-1))]}" ;; esac
-    fi
-  done
-  save_choice INTEGRATIONS "${WITH:-none}"
-  CHOSEN=1
-  spin
 }
 
 enable_integration() {
@@ -987,11 +975,6 @@ enable_integration() {
     echo
     describe | sed 's/^/    /'
     echo
-    if [ "$YES" = 0 ] && [ "$CHOSEN" = 0 ] && [ -t 0 ]; then
-      printf '  %s' "$(msg install_ask_integration "$title")"
-      read -r r || r=n
-      case "$r" in s|S|y|Y) ;; *) say "$(msg install_skipped)"; exit 0 ;; esac
-    fi
     [ "$DRY" = 1 ] && { say "$(msg install_dry_integration "$title")"; exit 0; }
     setup | sed 's/^/    /'
     if declare -F usage >/dev/null; then echo; usage | sed 's/^/    /'; fi
@@ -1001,9 +984,6 @@ enable_integration() {
 configure_integrations() {
   local requested=() name
   step 7 "$(msg install_step_integrations)"
-  if [ -z "$WITH" ] && ! setting_has INTEGRATIONS && can_ask; then
-    ask_integrations
-  fi
   if [ -z "$WITH" ]; then
     if setting_has INTEGRATIONS && [ "$(setting_get INTEGRATIONS)" != none ]; then
       say "$(msg install_integrations_before "$(setting_get INTEGRATIONS)")"
@@ -1040,24 +1020,6 @@ show_choices() {
   printf '                 %s\n' "$(msg install_choice_visual_hint)"
 }
 
-teach_iterm() {
-  has_terminal iterm || return 0
-  printf '\n  %s\n' "$(msg install_iterm_todo)"
-  printf '%s\n' "$(msg install_iterm_profile_steps)"
-}
-
-teach_warp() {
-  has_terminal warp || return 0
-  [ "$VISUAL" = yes ] || [ "$OS_NAME" = macOS ] || return 0
-  printf '\n  %s\n' "$(msg install_warp_todo)"
-  if [ "$VISUAL" = yes ]; then
-    printf '%s\n' "$(msg install_warp_theme_steps "$THEME")"
-  fi
-  [ "$OS_NAME" = macOS ] || return 0
-  printf '%s\n' "$(msg install_warp_option_steps)"
-  printf '%s\n' "$(msg install_warp_shortcuts_steps)"
-}
-
 finish() {
   local open_hint="" new_window=0
   if [ "$RELOAD" = 1 ] && command -v tmux >/dev/null && tmux info >/dev/null 2>&1; then
@@ -1083,9 +1045,9 @@ finish() {
     else
       open_hint="$(next_step "$(msg install_open_kitty_restart)" "$(msg install_open_kitty_reload_hint)")"
     fi
-  elif has_terminal kitty && ! in_kitty && kitty_installed && [ "$VISUAL" = yes ]; then
+  elif uses_kitty && ! in_kitty && kitty_installed && [ "$VISUAL" = yes ]; then
     open_hint="$(next_step "$(msg install_open_kitty)" "$(msg install_open_kitty_visual_hint)")"
-  elif has_terminal kitty && ! in_kitty && kitty_installed; then
+  elif uses_kitty && ! in_kitty && kitty_installed; then
     open_hint="$(next_step "$(msg install_open_kitty)" "$(msg install_open_kitty_hint)")"
   elif [ "$RESTART_SHELL" = 1 ] && in_warp; then
     open_hint="$(next_step "$(msg install_open_warp_restart)" "$(msg install_open_terminal_restart_hint)")"
@@ -1097,15 +1059,17 @@ finish() {
   printf '\n  %s\n' "$(msg install_now)"
   [ -z "$open_hint" ] || printf '       %s\n' "$open_hint"
   printf '       %s\n\n' "$(next_step work "$(msg install_work_hint)" plain)"
-  printf '%s\n' "$(msg install_navigation "$(window_key)" "$(menu_key)")"
-  teach_iterm
-  teach_warp
+  printf '%s\n' "$(msg install_navigation "$(menu_key)")"
+  if [ "$QUICK_ACCESS" = 1 ]; then
+    printf '\n  %s\n' "$(msg install_quick_access_todo)"
+    if on_macos; then printf '%s\n' "$(msg install_quick_access_steps)"; else printf '%s\n' "$(msg install_quick_access_steps_linux)"; fi
+  fi
   show_choices
 }
 
 terminal_modifier() {
-  if has_terminal iterm || { has_terminal kitty && on_macos; }; then echo "⌘"
-  elif has_terminal kitty; then echo "Ctrl+Shift+"
+  if uses_kitty && on_macos; then echo "⌘"
+  elif uses_kitty; then echo "Ctrl+Shift+"
   fi
 }
 
@@ -1113,12 +1077,6 @@ menu_key() {
   local mod
   mod="$(terminal_modifier)"
   if [ -n "$mod" ]; then echo "${mod}H"; else echo "Ctrl+b h"; fi
-}
-
-window_key() {
-  local mod
-  mod="$(terminal_modifier)"
-  if [ -n "$mod" ]; then echo "${mod}1…9"; else echo "Ctrl+b 1…9"; fi
 }
 
 next_step() {

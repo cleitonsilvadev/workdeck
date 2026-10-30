@@ -111,6 +111,23 @@ painel|~|work-panel 30
 
 Depois, `work kill` e `work` para aplicar. Dentro do painel, <kbd>q</kbd> sai.
 
+## O painel com relógio: tclock
+
+O [tclock](https://github.com/akitaonrails/clock-tui), o fork do clock-tui
+mantido pelo Fabio Akita, pode ser o painel: um relógio grande no alto e cada
+bloco do painel embaixo como widget, com as cores, atualizado no mesmo
+intervalo. O bloco do workdeck, com o logo e a versão, vem primeiro.
+
+A instalação pergunta se você quer (`--clock` responde sim, `--no-clock` não) e
+guarda `PANEL_CLOCK` no `settings.conf`. No Linux, ela baixa o binário do
+release e confere o sha256; no Mac, compila com o `cargo`, então precisa do Rust
+(`brew install rust`). Sem o tclock, o painel continua no modo de texto.
+
+O workdeck guarda a configuração dele do tclock em `~/.config/workdeck/tclock/`,
+então uma configuração sua do tclock não é tocada. Dentro do relógio,
+<kbd>z</kbd> esconde os blocos e <kbd>q</kbd> sai. O `work uninstall` remove o
+tclock só se foi o workdeck que instalou.
+
 ## Painéis que precisam de credenciais
 
 Se o painel fala com uma API — um board, um CI, um serviço interno —, não

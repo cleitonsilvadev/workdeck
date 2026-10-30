@@ -185,6 +185,14 @@ settings_ensure_template() {
 ' "$(msg settings_review_agent_1)" "$(msg settings_review_agent_2)" \
       '#REVIEW_AGENT_CMD="claude --model opus"' >> "$WORKDECK_SETTINGS"
   fi
+  if ! grep -aqE '^#?KITTY_OPENS_WORK=' "$WORKDECK_SETTINGS"; then
+    settings_end_with_newline
+    printf '\n%s\n%s\n' "$(msg settings_kitty_opens_work)" '#KITTY_OPENS_WORK="no"' >> "$WORKDECK_SETTINGS"
+  fi
+  if ! grep -aqE '^#?PANEL_CLOCK=' "$WORKDECK_SETTINGS"; then
+    settings_end_with_newline
+    printf '\n%s\n%s\n' "$(msg settings_panel_clock)" '#PANEL_CLOCK="yes"' >> "$WORKDECK_SETTINGS"
+  fi
   if ! grep -aqE '^#?NOTIFY_AGENTS=' "$WORKDECK_SETTINGS"; then
     settings_end_with_newline
     printf '\n%s\n%s\n' "$(msg settings_notify_agents)" '#NOTIFY_AGENTS="yes"' >> "$WORKDECK_SETTINGS"

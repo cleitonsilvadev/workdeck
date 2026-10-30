@@ -4,8 +4,8 @@
 #   ./uninstall.sh            remove os blocos e os scripts; mantém sua config
 #   ./uninstall.sh --restore  além disso, devolve os arquivos ao estado de antes
 #                             da instalação, usando as cópias guardadas
-#   ./uninstall.sh --all      remove tudo, inclusive ~/.config/workdeck, a fonte
-#                             e o kitty que a instalação trouxe (é o work uninstall)
+#   ./uninstall.sh --all      remove tudo, inclusive ~/.config/workdeck e a fonte,
+#                             e pergunta se o kitty sai também (é o work uninstall)
 #   ./uninstall.sh --dry-run  mostra o que faria
 #
 # Em qualquer modo ele só mexe no que instalou: arquivo alterado por você
@@ -67,14 +67,7 @@ if [ -f "$MANIFEST" ]; then
           fi
         fi
         ;;
-      kitty)
-        if [ "$ALL" = 1 ]; then
-          run rm -rf "$target"
-          say "removido ${target#"$HOME"/}"
-        else
-          say "o kitty continua em ${target#"$HOME"/}; para remover também: rm -rf $target"
-        fi
-        ;;
+      kitty) ;;
       warp-theme)
         source_file="$ROOT/themes/$(basename "$target" .yaml | sed 's/^workdeck-//').warp.yaml"
         if [ ! -f "$target" ]; then
@@ -95,6 +88,18 @@ if [ -f "$MANIFEST" ]; then
         else
           say "deixei ${target#"$HOME"/}: foi alterado depois da instalação"
         fi
+        ;;
+      tclock)
+        run rm -f "$target"
+        say "removido ${target#"$HOME"/}"
+        ;;
+      tclock-cargo)
+        if command -v cargo >/dev/null && [ "$DRY" = 0 ]; then
+          cargo uninstall --root "$HOME/.local" clock-tui >/dev/null 2>&1 || rm -f "$target"
+        else
+          run rm -f "$target"
+        fi
+        say "removido ${target#"$HOME"/}"
         ;;
       zsh)
         run rm -rf "$target"
@@ -164,6 +169,44 @@ else
   say "para apagar também:  ./uninstall.sh --all"
 fi
 
+kitty_apps() {
+  local d
+  for d in /Applications/kitty.app "$HOME/Applications/kitty.app" "$HOME/.local/kitty.app"; do
+    [ -d "$d" ] && printf '%s\n' "$d"
+  done
+  return 0
+}
+
+offer_kitty_removal() {
+  local apps answer app
+  apps="$(kitty_apps)"
+  [ -n "$apps" ] || return 0
+  if [ "$ALL" = 0 ] || [ "$DRY" = 1 ] || [ ! -t 0 ]; then
+    say "$(msg uninstall_kitty_kept)"
+    return 0
+  fi
+  echo
+  printf '%s' "$(msg uninstall_ask_kitty)"
+  read -r answer || answer=n
+  case "$answer" in
+    s|S|y|Y) ;;
+    *) say "$(msg uninstall_kitty_kept)"; return 0 ;;
+  esac
+  while IFS= read -r app; do
+    if rm -rf "$app" 2>/dev/null; then
+      say "$(msg uninstall_kitty_removed "${app/#$HOME/~}")"
+    else
+      say "$(msg uninstall_kitty_failed "${app/#$HOME/~}")"
+    fi
+  done <<< "$apps"
+  for app in "$WORKDECK_BIN/kitty" "$WORKDECK_BIN/kitten"; do
+    [ -L "$app" ] && rm -f "$app"
+  done
+  return 0
+}
+
+offer_kitty_removal
+
 echo
 echo "Reabra o terminal, ou:  tmux source-file ~/.tmux.conf"
 
@@ -171,3 +214,6 @@ if [ -n "$DELETE_CODE" ]; then
   run rm -rf "$DELETE_CODE"
   say "removido ${DELETE_CODE#"$HOME"/}"
 fi
+
+echo
+print_logo "" "" "workdeck" "$(msg uninstall_goodbye)" "" "" "" "" ""

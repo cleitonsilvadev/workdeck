@@ -33,8 +33,10 @@ uma flag, como `--theme` ou `--terminal`.
 | Chave | Valores | O que faz |
 |---|---|---|
 | `LANGUAGE` | `en`, `pt-BR` | O idioma das mensagens; sem ele, o idioma do sistema (`LANG`). Mude com `./install.sh --lang`, que também atualiza as mensagens do tmux e o nome da janela do painel |
-| `TERMINAL` | `kitty`, `warp`, `other` | O terminal cujos extras a instalação configura |
-| `VISUAL` | `yes`, `no` | O tema e a fonte do workdeck no kitty ou no Warp |
+| `TERMINAL` | `kitty`, `other` | `kitty` ganha os atalhos do workdeck e, com `VISUAL`, o visual |
+| `VISUAL` | `yes`, `no` | O tema e a fonte do workdeck no kitty |
+| `PANEL_CLOCK` | `yes`, `no` (padrão) | O painel com o relógio tclock no alto ([Painéis](panels.pt-BR.md)) |
+| `KITTY_OPENS_WORK` | `yes` (padrão), `no` | O kitty abre direto no `work`; vale ao rodar a instalação |
 | `THEME` | o nome de um tema | As cores do tmux |
 | `AGENT_CMD` | um comando | A IA que o `work review` usa quando nenhuma está aberta |
 | `INTEGRATIONS` | `none` ou uma lista | As integrações opcionais |

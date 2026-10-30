@@ -22,25 +22,22 @@ ou no Cygwin.
    `~/.config/workdeck/settings.conf`.
 2. Detecta o sistema e o gerenciador de pacotes — brew no macOS; apt, dnf,
    pacman, zypper ou apk no Linux — e instala o tmux, se faltar.
-3. Pergunta quais terminais você usa: [kitty](https://sw.kovidgoyal.net/kitty/),
-   [iTerm2](https://iterm2.com/) (Mac), [Warp](https://www.warp.dev/) ou o
-   terminal padrão (o do sistema ou qualquer outro); dá para escolher mais de
-   um. O kitty e o iTerm2 ganham os atalhos do workdeck. **O workdeck não
-   instala terminal:** se algum escolhido faltar, ele grava a configuração
-   mesmo assim e avisa onde baixar; quando você instala, o terminal já abre
-   pronto. No kitty e no Warp, uma segunda pergunta oferece o tema e a fonte
-   JetBrains Mono do workdeck. As respostas ficam em
+3. Pergunta se você quer os atalhos do workdeck no
+   [kitty](https://sw.kovidgoyal.net/kitty/), o terminal recomendado. Se o kitty
+   faltar, oferece baixar pelo instalador oficial dele (sem senha) e grava a
+   configuração de qualquer jeito. Uma segunda pergunta oferece o tema e a
+   fonte JetBrains Mono do workdeck no kitty. As respostas ficam em
    `~/.config/workdeck/settings.conf` (`TERMINAL` e `VISUAL`), e
-   `--terminal kitty,iterm` (ou `warp`, `other`) e `--visual` /
-   `--no-visual` respondem sem perguntar. Detalhes em
+   `--terminal kitty` / `--terminal other` e `--visual` / `--no-visual`
+   respondem sem perguntar. Outros terminais, como o Warp e o iTerm2, usam os
+   atalhos do tmux. Detalhes em
    [terminals/README.pt-BR.md](../terminals/README.pt-BR.md).
 4. Coloca o comando `work` em `~/.local/bin`.
 5. Escreve os blocos de configuração no `.tmux.conf` e no `.zshrc` (ou
-   `.bashrc`). O `kitty.conf` só recebe o bloco se você escolheu o kitty e ele
-   está instalado. Se você aceitou o visual no Warp, a instalação copia o tema
-   para a pasta de temas dele.
-6. Oferece o zsh do workdeck, pergunta qual é o seu agente de IA e quais
-   integrações você usa.
+   `.bashrc`), e no `kitty.conf`, se você aceitou o kitty.
+6. Oferece o zsh do workdeck e escolhe o seu agente de IA pelo `PATH`
+   (`--agent codex` define outro). As integrações só são instaladas com
+   `--with <nome>`.
 
 É idempotente: rodar de novo atualiza em vez de duplicar. Tudo o que ele
 escreve nos seus arquivos fica entre marcadores `# >>> workdeck >>>`, e o
@@ -96,7 +93,6 @@ do arquivo fica como está.
 ~/.tmux.conf                        bloco entre os marcadores
 ~/.zshrc ou ~/.bashrc               bloco entre os marcadores
 ~/.config/kitty/kitty.conf          bloco entre os marcadores, só se você escolheu o kitty
-~/.warp/themes/workdeck-*.yaml      o tema do Warp, só se você aceitou o visual (Mac)
 ~/.local/share/warp-terminal/themes/workdeck-*.yaml   o mesmo, no Linux
 ~/.oh-my-zsh, ~/.local/share/zinit  o zsh do workdeck, se você aceitou
 ```
@@ -128,10 +124,12 @@ work uninstall --dry-run    # mostra o que faria, sem apagar
 
 O `work uninstall` remove tudo o que o workdeck instalou: os blocos no
 `.zshrc`, no `.tmux.conf` e no `kitty.conf` (se ele foi escrito), o tema do
-Warp, o comando `work`, o código, o zsh do workdeck, a fonte e a config em
+Warp e o profile do iTerm2 de versões antigas, o tclock se foi o workdeck que
+instalou, o comando `work`, o código, o
+zsh do workdeck, a fonte e a config em
 `~/.config/workdeck`. O que já existia antes da instalação fica: um kitty ou um
-oh-my-zsh que você já tinha não sai. O kitty só sai se uma versão antiga do
-workdeck o instalou.
+oh-my-zsh que você já tinha não sai. Se o kitty estiver instalado, ele pergunta
+se o kitty sai também; a resposta padrão é não.
 
 Para remover menos, use o desinstalador direto:
 

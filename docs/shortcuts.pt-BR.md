@@ -2,13 +2,12 @@
 
 # Atalhos
 
-## kitty e iTerm2: os atalhos do workdeck
+## kitty: os atalhos do workdeck
 
-Se você escolheu o kitty ou o iTerm2 na instalação, o workdeck cria atalhos
-próprios nesse terminal. A letra é a mesma em todo lugar: <kbd>⌘</kbd> no Mac,
+Se você aceitou o kitty na instalação, o workdeck cria atalhos próprios nele. A letra é a mesma em todo lugar: <kbd>⌘</kbd> no Mac,
 <kbd>Ctrl</kbd>+<kbd>Shift</kbd> no kitty do Linux.
 
-| Para | macOS: kitty, iTerm2 | Linux: kitty |
+| Para | macOS | Linux |
 |---|---|---|
 | **Abrir o menu** (o resto está nele) | <kbd>⌘</kbd>+<kbd>H</kbd> | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>H</kbd> |
 | Adicionar um projeto | <kbd>⌘</kbd>+<kbd>P</kbd> | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> |
@@ -25,13 +24,10 @@ As letras foram escolhidas para lembrar: **H**elp, **P**rojeto, **A**gente,
 do Mac. Dividir de um jeito específico, renomear, sair deixando rodando,
 atualizar e o aviso do agente ficam no menu.
 
-No iTerm2, os atalhos ficam no profile **workdeck**: escolha ele como padrão em
-Settings › Profiles › Other Actions › Set as Default.
+## Qualquer outro terminal
 
-## Warp, terminal padrão e qualquer outro
-
-O Warp e o terminal do sistema não deixam o workdeck mandar teclas para o tmux,
-então ficam com os atalhos do tmux, que funcionam em qualquer terminal:
+O Warp, o iTerm2, o terminal do sistema e os outros ficam com os atalhos do
+tmux, que funcionam em qualquer terminal:
 
 | Para | Teclas |
 |---|---|
@@ -47,8 +43,10 @@ então ficam com os atalhos do tmux, que funcionam em qualquer terminal:
 
 <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>h</kbd> quer dizer: aperte
 <kbd>Ctrl</kbd>+<kbd>b</kbd>, solte e aperte a tecla. Eles também funcionam no
-kitty e no iTerm2, para quem já usa tmux. O mouse também funciona: clique numa
-janela na barra de baixo, ou num painel, e arraste a borda para redimensionar.
+kitty, para quem já usa tmux. O mouse também funciona: clique numa
+janela na barra de baixo, ou num painel, arraste a borda para redimensionar e
+arraste uma aba para reordenar os projetos; a ordem fica salva para o próximo
+`work`.
 
 No menu, cada projeto usa o número da janela como tecla. <kbd>q</kbd> ou
 <kbd>Esc</kbd> fecha.
@@ -57,8 +55,8 @@ No menu, cada projeto usa o número da janela como tecla. <kbd>q</kbd> ou
 
 <kbd>Alt</kbd>+<kbd>1</kbd>…<kbd>9</kbd> vai para a janela e
 <kbd>Alt</kbd>+<kbd>↑</kbd> / <kbd>↓</kbd> troca de painel. No Mac, eles
-precisam da Option como Meta: o kitty e o profile do iTerm2 já vêm assim; no
-Warp, ligue **Left Option key is Meta** em Settings › Features.
+precisam da Option como Meta: o kitty já vem assim; para os outros, veja
+[terminals/README.pt-BR.md](../terminals/README.pt-BR.md#qualquer-outro-terminal).
 
 ## Saber qual painel está ativo
 

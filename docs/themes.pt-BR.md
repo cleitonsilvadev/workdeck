@@ -2,8 +2,8 @@
 
 # Temas
 
-Cada tema pinta o tmux e, se você aceitar o visual na instalação, o kitty ou o
-Warp também.
+Cada tema pinta o tmux e, se você aceitar o visual na instalação, o kitty
+também. A versão de cada tema para o Warp fica em `themes/`, para usar à mão.
 
 | Tema | Fundo | Jeito |
 |---|---|---|

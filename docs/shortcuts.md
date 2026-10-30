@@ -2,13 +2,13 @@
 
 # Shortcuts
 
-## kitty and iTerm2: the workdeck shortcuts
+## kitty: the workdeck shortcuts
 
-If you chose kitty or iTerm2 at install time, workdeck sets up its own
-shortcuts in that terminal. The letter is the same everywhere: <kbd>⌘</kbd> on
+If you said yes to kitty at install time, workdeck sets up its own shortcuts in
+it. The letter is the same everywhere: <kbd>⌘</kbd> on
 a Mac, <kbd>Ctrl</kbd>+<kbd>Shift</kbd> in kitty on Linux.
 
-| To | macOS: kitty, iTerm2 | Linux: kitty |
+| To | macOS | Linux |
 |---|---|---|
 | **Open the menu** (everything else is there) | <kbd>⌘</kbd>+<kbd>H</kbd> | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>H</kbd> |
 | Add a project | <kbd>⌘</kbd>+<kbd>P</kbd> | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> |
@@ -25,13 +25,10 @@ The letters are meant to be remembered: **H**elp, **P**roject, **A**gent,
 app. Splitting a specific way, renaming, detaching, updating and the agent alert
 are in the menu.
 
-In iTerm2, the shortcuts live in the **workdeck** profile: pick it as the
-default in Settings › Profiles › Other Actions › Set as Default.
+## Any other terminal
 
-## Warp, the default terminal and any other
-
-Warp and the system terminal do not let workdeck send keys to tmux, so they
-keep the tmux shortcuts, which work in any terminal:
+Warp, iTerm2, the system terminal and the others keep the tmux shortcuts,
+which work in any terminal:
 
 | To | Keys |
 |---|---|
@@ -47,8 +44,9 @@ keep the tmux shortcuts, which work in any terminal:
 
 <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>h</kbd> means: press
 <kbd>Ctrl</kbd>+<kbd>b</kbd>, release, then the key. These also work in kitty
-and iTerm2, for whoever already uses tmux. The mouse works too: click a window
-in the bottom bar, or a pane, and drag a border to resize.
+, for whoever already uses tmux. The mouse works too: click a window
+in the bottom bar, or a pane, drag a border to resize, and drag a tab to reorder
+your projects; the order is saved for the next `work`.
 
 In the menu, each project uses its window number as the key. <kbd>q</kbd> or
 <kbd>Esc</kbd> closes it.
@@ -57,8 +55,8 @@ In the menu, each project uses its window number as the key. <kbd>q</kbd> or
 
 <kbd>Alt</kbd>+<kbd>1</kbd>…<kbd>9</kbd> goes to the window and
 <kbd>Alt</kbd>+<kbd>↑</kbd> / <kbd>↓</kbd> switches panes. On a Mac, they need
-Option as Meta: kitty and the iTerm2 profile are set up by workdeck; in Warp,
-turn on **Left Option key is Meta** in Settings › Features.
+Option as Meta: kitty is set up by workdeck; for the others, see
+[terminals/README.md](../terminals/README.md#any-other-terminal).
 
 ## Telling which pane is active
 

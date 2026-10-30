@@ -71,6 +71,7 @@ FAKE
   git_dir="$(dirname "$(command -v git)")"
   export PATH="$base/bin:$HOME/.local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$git_dir"
   export SHELL=/bin/bash TERM=xterm-256color NO_COLOR=1 WORKDECK_LANG=pt-BR
+  export WORKDECK_APPS_DIR="$base/Applications"
   export SOCKET SOCKET_HOST
   export CONFIG="$HOME/.config/workdeck"
   export CODE="$HOME/.local/share/workdeck"

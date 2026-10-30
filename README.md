@@ -42,8 +42,8 @@ project with its own mess. workdeck puts all of it in one place.
 - **Review before you commit.** `work review` asks your agent for a review of the change, with its own review command or yours.
 - **Know when an agent finishes.** While you work in one window, a ✦ in the status bar marks the window whose agent finished or is waiting for you, with an optional system notification.
 - **Nothing gets lost.** Closed the terminal or lost the connection? Run `work` and everything is where you left it, agent included.
-- **Any terminal.** workdeck runs on tmux, its only dependency. kitty, Warp, iTerm2 or the terminal your system ships with: `work` works the same in all of them.
-- **Set up with one command, undone with another.** Installs tmux if it is missing, asks which terminal you use and offers its extras; `work uninstall` reverts all of it.
+- **Any terminal, best in kitty.** workdeck runs on tmux, its only dependency, so `work` works the same in Warp, iTerm2 or the terminal your system ships with. In kitty, it also adds one-letter shortcuts.
+- **Set up with one command, undone with another.** Installs tmux if it is missing, offers the kitty shortcuts and look; `work uninstall` reverts all of it.
 
 ## How it works
 
@@ -82,10 +82,9 @@ curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/g
 ```
 
 Runs on macOS and Linux (including WSL). The installer detects the system,
-installs tmux if it is missing, asks which terminal you use
-([kitty](https://sw.kovidgoyal.net/kitty/), [Warp](https://www.warp.dev/) or
-another one) and configures everything. You install the terminal yourself; the
-workdeck theme and font in it are optional. Nothing is overwritten: what it
+installs tmux if it is missing, offers the workdeck shortcuts and look in
+[kitty](https://sw.kovidgoyal.net/kitty/) (and to download kitty, if you want)
+and configures everything. Nothing is overwritten: what it
 writes to your files stays between `# >>> workdeck >>>` markers.
 
 <details>
@@ -148,8 +147,8 @@ work review
 
 ### Shortcuts
 
-Choose kitty or iTerm2 at install time and workdeck adds its own shortcuts, one
-letter each: <kbd>⌘</kbd> on a Mac, <kbd>Ctrl</kbd>+<kbd>Shift</kbd> in kitty on
+Use [kitty](https://sw.kovidgoyal.net/kitty/) for the best experience: workdeck
+adds its own shortcuts there, one letter each: <kbd>⌘</kbd> on a Mac, <kbd>Ctrl</kbd>+<kbd>Shift</kbd> in kitty on
 Linux.
 
 | To | macOS | Linux |
@@ -162,7 +161,7 @@ Linux.
 | Zoom / close the pane | <kbd>⌘</kbd>+<kbd>Z</kbd> / <kbd>W</kbd> | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd> / <kbd>W</kbd> |
 | Run `work review` | <kbd>⌘</kbd>+<kbd>R</kbd> | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> |
 
-In Warp, the system terminal or any other, the tmux shortcuts apply:
+In Warp, iTerm2, the system terminal or any other, the tmux shortcuts apply:
 <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>h</kbd> opens the menu (press
 <kbd>Ctrl</kbd>+<kbd>b</kbd>, release, then <kbd>h</kbd>) and
 <kbd>Shift</kbd>+arrows switch projects and panes. Every shortcut is in
@@ -212,7 +211,7 @@ including the built-in ones.
 
 ### Themes
 
-Three themes, applied to tmux and, if you accept the look, to kitty or Warp: `catppuccin-mocha` (default),
+Three themes, applied to tmux and, if you accept the look, to kitty: `catppuccin-mocha` (default),
 `nord` and `min-dark`. To switch, run the installer with `--theme nord`; the
 choice is kept across updates.
 [Create your own theme →](docs/themes.md)

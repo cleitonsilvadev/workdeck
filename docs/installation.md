@@ -21,25 +21,21 @@ stops before writing anything when it runs in Git Bash, MSYS or Cygwin.
    `LANGUAGE` in `~/.config/workdeck/settings.conf`.
 2. Detects the system and the package manager (brew on macOS; apt, dnf,
    pacman, zypper or apk on Linux) and installs tmux if it is missing.
-3. Asks which terminals you use: [kitty](https://sw.kovidgoyal.net/kitty/),
-   [iTerm2](https://iterm2.com/) (Mac), [Warp](https://www.warp.dev/) or the
-   default terminal (the system one or any other); you can pick more than one.
-   kitty and iTerm2 get the workdeck shortcuts. **workdeck does not install a
-   terminal:** if one you chose is missing, it writes the configuration anyway
-   and tells you where to download it; once you install it, it opens ready. For
-   kitty and Warp, a second question offers the workdeck theme and the
-   JetBrains Mono font. The answers are saved in
-   `~/.config/workdeck/settings.conf` (`TERMINAL` and `VISUAL`), and
-   `--terminal kitty,iterm` (or `warp`, `other`) and `--visual` /
-   `--no-visual` answer without asking. Details in
-   [terminals/README.md](../terminals/README.md).
+3. Asks whether you want the workdeck shortcuts in
+   [kitty](https://sw.kovidgoyal.net/kitty/), the recommended terminal. If kitty
+   is missing, it offers to download it with kitty's official installer (no
+   password), and writes the configuration either way. A second question offers
+   the workdeck theme and the JetBrains Mono font in kitty. The answers are
+   saved in `~/.config/workdeck/settings.conf` (`TERMINAL` and `VISUAL`), and
+   `--terminal kitty` / `--terminal other` and `--visual` / `--no-visual`
+   answer without asking. Other terminals, such as Warp or iTerm2, use the tmux
+   shortcuts. Details in [terminals/README.md](../terminals/README.md).
 4. Puts the `work` command in `~/.local/bin`.
 5. Writes the configuration blocks to `.tmux.conf` and `.zshrc` (or
-   `.bashrc`). `kitty.conf` only gets its block if you chose kitty and it is
-   installed. If you accepted the look in Warp, the installer copies the theme
-   to the Warp themes folder.
-6. Offers the workdeck zsh setup and asks which AI agent and which
-   integrations you use.
+   `.bashrc`), and to `kitty.conf` if you said yes to kitty.
+6. Offers the workdeck zsh setup and picks your AI agent from the `PATH`
+   (`--agent codex` sets another). Integrations are only installed with
+   `--with <name>`.
 
 It is idempotent: running it again updates instead of duplicating. Everything
 it writes to your files stays between `# >>> workdeck >>>` markers, and the
@@ -96,7 +92,6 @@ rest of the file stays as it is.
 ~/.tmux.conf                        block between the markers
 ~/.zshrc or ~/.bashrc               block between the markers
 ~/.config/kitty/kitty.conf          block between the markers, only if you chose kitty
-~/.warp/themes/workdeck-*.yaml      the Warp theme, only if you accepted the look (Mac)
 ~/.local/share/warp-terminal/themes/workdeck-*.yaml   the same, on Linux
 ~/.oh-my-zsh, ~/.local/share/zinit  the workdeck zsh setup, if you accepted it
 ```
@@ -128,11 +123,12 @@ work uninstall --dry-run    # shows what it would do, without deleting
 ```
 
 `work uninstall` removes everything workdeck installed: the blocks in
-`.zshrc`, `.tmux.conf` and `kitty.conf` (if it was written), the Warp theme,
+`.zshrc`, `.tmux.conf` and `kitty.conf` (if it was written), the Warp theme and
+iTerm2 profile from older versions, tclock if workdeck installed it,
 the `work` command, the code, the workdeck zsh setup, the font and the config
 in `~/.config/workdeck`. What existed before the installation stays: a kitty or
-oh-my-zsh you already had is not removed. kitty is only removed if an older
-workdeck version installed it.
+oh-my-zsh you already had is not removed. If kitty is installed, it asks whether
+to remove it too; the default answer is no.
 
 To remove less, run the uninstaller directly:
 

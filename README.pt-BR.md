@@ -40,8 +40,8 @@ projeto com o seu próprio caos. O workdeck organiza isso num só lugar.
 - **Review antes do commit.** `work review` pede ao seu agente uma revisão da mudança, com o review dele ou o seu.
 - **Saiba quando um agente termina.** Enquanto você trabalha numa janela, uma ✦ na barra marca a janela cujo agente terminou ou está esperando você, com notificação do sistema opcional.
 - **Nada se perde.** Fechou o terminal ou caiu a conexão? `work` e tudo está onde estava, agente incluso.
-- **Qualquer terminal.** O workdeck roda sobre o tmux, a única dependência. kitty, Warp, iTerm2 ou o terminal que vem no sistema: o `work` funciona igual em todos.
-- **Pronto em um comando, reversível em outro.** Instala o tmux, se faltar, pergunta qual terminal você usa e oferece os extras dele; `work uninstall` desfaz tudo.
+- **Qualquer terminal, melhor no kitty.** O workdeck roda sobre o tmux, a única dependência, então o `work` funciona igual no Warp, no iTerm2 ou no terminal que vem no sistema. No kitty, ele ainda cria atalhos de uma letra.
+- **Pronto em um comando, reversível em outro.** Instala o tmux, se faltar, oferece os atalhos e o visual no kitty; `work uninstall` desfaz tudo.
 
 ## Como funciona
 
@@ -80,10 +80,9 @@ curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/g
 ```
 
 Funciona no macOS e no Linux (inclusive WSL). O instalador detecta o sistema,
-instala o tmux, se faltar, pergunta qual terminal você usa
-([kitty](https://sw.kovidgoyal.net/kitty/), [Warp](https://www.warp.dev/) ou
-outro) e configura tudo. O terminal você instala por conta própria; o tema e a
-fonte do workdeck nele são opcionais. Nada é sobrescrito: o que ele escreve nos
+instala o tmux, se faltar, oferece os atalhos e o visual do workdeck no
+[kitty](https://sw.kovidgoyal.net/kitty/) (e baixar o kitty, se você quiser) e
+configura tudo. Nada é sobrescrito: o que ele escreve nos
 seus arquivos fica entre marcadores `# >>> workdeck >>>`.
 
 <details>
@@ -146,8 +145,8 @@ work review
 
 ### Atalhos
 
-Escolha o kitty ou o iTerm2 na instalação e o workdeck cria atalhos próprios,
-uma letra cada: <kbd>⌘</kbd> no Mac, <kbd>Ctrl</kbd>+<kbd>Shift</kbd> no kitty do
+Use o [kitty](https://sw.kovidgoyal.net/kitty/) para a melhor experiência: o
+workdeck cria atalhos próprios nele, uma letra cada: <kbd>⌘</kbd> no Mac, <kbd>Ctrl</kbd>+<kbd>Shift</kbd> no kitty do
 Linux.
 
 | Para | macOS | Linux |
@@ -160,7 +159,7 @@ Linux.
 | Zoom / fechar o painel | <kbd>⌘</kbd>+<kbd>Z</kbd> / <kbd>W</kbd> | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd> / <kbd>W</kbd> |
 | Rodar o `work review` | <kbd>⌘</kbd>+<kbd>R</kbd> | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> |
 
-No Warp, no terminal do sistema ou em qualquer outro, valem os atalhos do tmux:
+No Warp, no iTerm2, no terminal do sistema ou em qualquer outro, valem os atalhos do tmux:
 <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>h</kbd> abre o menu (aperte
 <kbd>Ctrl</kbd>+<kbd>b</kbd>, solte e aperte <kbd>h</kbd>) e
 <kbd>Shift</kbd>+setas trocam de projeto e de painel. Todos os atalhos estão em
@@ -209,7 +208,7 @@ inclusive os que vêm prontos.
 
 ### Temas
 
-Três temas, aplicados ao tmux e, se você aceitar o visual, ao kitty ou ao Warp: `catppuccin-mocha` (padrão),
+Três temas, aplicados ao tmux e, se você aceitar o visual, ao kitty: `catppuccin-mocha` (padrão),
 `nord` e `min-dark`. Para trocar, rode a instalação com `--theme nord`; a
 escolha fica salva para as próximas atualizações.
 [Criar o seu tema →](docs/themes.pt-BR.md)

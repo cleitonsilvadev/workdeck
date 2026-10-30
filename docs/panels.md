@@ -114,6 +114,23 @@ panel|~|work-panel 30
 Then run `work kill` and `work` to apply it. Inside the panel, <kbd>q</kbd>
 quits.
 
+## The panel with a clock: tclock
+
+[tclock](https://github.com/akitaonrails/clock-tui), Fabio Akita's fork of
+clock-tui, can be the panel: a large clock at the top and every panel block
+below it as a widget, with its colors, refreshed on the same interval. The
+workdeck block, with the logo and the version, comes first.
+
+The installer asks whether you want it (`--clock` answers yes, `--no-clock`
+no) and saves `PANEL_CLOCK` in `settings.conf`. On Linux it downloads the
+release binary and checks its sha256; on a Mac it builds it with `cargo`, so it
+needs Rust (`brew install rust`). Without tclock, the panel stays in text mode.
+
+workdeck keeps its own tclock config in `~/.config/workdeck/tclock/`, so a
+tclock config of yours is not touched. Inside the clock, <kbd>z</kbd> hides the
+blocks and <kbd>q</kbd> quits. `work uninstall` removes tclock only if workdeck
+installed it.
+
 ## Panels that need credentials
 
 If the panel talks to an API (a board, a CI, an internal service), do not put a

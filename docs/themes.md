@@ -2,8 +2,8 @@
 
 # Themes
 
-Each theme colors tmux and, if you accept the look at install time, kitty or
-Warp too.
+Each theme colors tmux and, if you accept the look at install time, kitty too.
+The Warp version of each theme stays in `themes/` for manual use.
 
 | Theme | Background | Character |
 |---|---|---|

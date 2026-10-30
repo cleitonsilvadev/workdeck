@@ -2,108 +2,75 @@
 
 # Terminals
 
-tmux is the only dependency, so `work`, the panel and the shortcuts behave the
-same in any terminal. What changes from one terminal to another are the extras:
-the colors, the font and the terminal's own shortcuts.
+tmux is the only dependency, so `work`, the panel, the review and the tmux
+shortcuts behave the same in any terminal. For the best experience, use
+[kitty](https://sw.kovidgoyal.net/kitty/): it is the terminal where workdeck
+adds its own shortcuts and, if you want, its theme and font.
 
-The installer asks which terminals you use (kitty, iTerm2 on a Mac, Warp or the
-default terminal, which covers the system one and any other; you can pick more
-than one) and sets up the extras each one supports.
-**It does not install a terminal:** if the one you chose is missing, it writes
-the configuration anyway and tells you where to download it, so the terminal
-opens ready once you install it. To answer without the question, use
-`--terminal kitty`, `--terminal kitty,iterm`, `--terminal warp` or
-`--terminal other`; the choice is saved
-in `~/.config/workdeck/settings.conf` (`TERMINAL`).
+## kitty, recommended
 
-For kitty and Warp, a second question offers the workdeck **look**: the theme
-and the JetBrains Mono font, downloaded from the official releases without sudo.
-The default answer is no (Enter declines). `--visual` accepts without asking and
-`--no-visual` declines; the answer is saved in `~/.config/workdeck/settings.conf` (`VISUAL`).
+The installer asks whether you want the workdeck shortcuts in kitty. If kitty is
+not installed yet, it offers to download it with kitty's official installer,
+which needs no password. You can also say no and install it later: the
+configuration is written anyway, so kitty opens ready. To answer without the
+question, use `--terminal kitty` or `--terminal other`; the choice is saved in
+`~/.config/workdeck/settings.conf` (`TERMINAL`).
 
-## kitty
+The installer adds a block to your `~/.config/kitty/kitty.conf` with:
 
-With kitty chosen, the installer adds a block to your
-`~/.config/kitty/kitty.conf`, even before kitty is installed, with:
-
+- **kitty opens straight into `work`.** The first window of kitty starts the
+  workdeck session, so kitty works as the workdeck app; new windows (`⌘N`) open
+  a plain shell, and leaving with <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>d</kbd>
+  leaves a shell in the window. `KITTY_OPENS_WORK="no"` in `settings.conf`
+  turns it off on the next install run, and a `startup_session` of your own in
+  `kitty.conf` always wins.
+- **A global key for workdeck.** kitty's quick access window is set to open
+  `work`, so one key brings workdeck up over any app. On a Mac, pick the key
+  once in System Settings › Keyboard › Keyboard Shortcuts › Services › General
+  › "Quick access to kitty"; on Linux, bind `kitten quick-access-terminal` in
+  the system keyboard settings. The config lives in a marked block in
+  `~/.config/kitty/quick-access-terminal.conf`.
+- **Agent alerts through kitty.** With `NOTIFY_AGENTS="yes"`, the alert that an
+  agent finished comes from kitty, and clicking it brings kitty to the front.
 - **The workdeck shortcuts**, <kbd>⌘</kbd> on a Mac and
   <kbd>Ctrl</kbd>+<kbd>Shift</kbd> on Linux: H menu, P add a project, 1…9 go to
-  a project, A agent, T terminal, Z zoom, W close,
-  R review. The full table is in [docs/shortcuts.md](../docs/shortcuts.md).
+  a project, A agent, T terminal, Z zoom, W close, R review. The full table is
+  in [docs/shortcuts.md](../docs/shortcuts.md).
 - **Option as Alt** on a Mac, for the direct Alt shortcuts.
-- **Shift+Enter** is sent in the extended format, so agents such as Claude Code
-  get a new line instead of a submit. It only applies while tmux runs in the
-  window, so a plain shell is not affected.
+- **Shift+Enter** in the extended format, so agents such as Claude Code get a
+  new line instead of a submit. It only applies while tmux runs in the window.
 
-If you accept the look, the same block also gets:
+A second question offers the workdeck **look** in kitty: the theme (`--theme`,
+the same as the tmux status bar), the JetBrains Mono font and 8 points of
+padding. `--visual` accepts without asking and `--no-visual` declines; the
+answer is saved as `VISUAL`.
 
-- **Theme** from workdeck (`--theme`), the same as the tmux status bar.
-- **Font** JetBrains Mono, with slightly larger line spacing.
-- **Padding** of 8 points between the text and the window edge. With the
-  theme, the kitty background matches the tmux background and the padding
-  blends into it.
+`work uninstall` removes only the block: what you wrote outside the
+`# >>> workdeck >>>` markers stays. It then asks whether to remove kitty too;
+the default answer is no.
 
-Without the look, kitty keeps its own theme and font. If an older workdeck
-version already wrote the theme and font to your `kitty.conf`, the update keeps
-them and saves that as your choice.
+## Any other terminal
 
-The installer finds kitty in `/Applications` or `~/Applications` (Mac), in
-`~/.local/kitty.app` (Linux) or in the `PATH`. What you wrote outside the
-`# >>> workdeck >>>` markers does not change, and the uninstaller removes only
-the block. kitty itself stays installed.
+Warp, iTerm2, the macOS Terminal, Ghostty, WezTerm or an SSH connection: `work`
+opens the same way, with the tmux shortcuts.
 
-## iTerm2
-
-On a Mac, with iTerm2 chosen, the installer writes a **workdeck** profile to
-`~/Library/Application Support/iTerm2/DynamicProfiles/workdeck.json`, even
-before iTerm2 is installed. It has the same workdeck shortcuts as kitty, with
-<kbd>⌘</kbd>, and the left Option key as Meta for the Alt shortcuts.
-
-iTerm2 does not switch to a new profile on its own. Pick it once in Settings ›
-Profiles › workdeck › Other Actions › Set as Default; the installer reminds you
-at the end. `work uninstall` removes the profile, unless you edited it.
-
-## Warp
-
-With [Warp](https://www.warp.dev/) chosen, the installer checks that it is
-installed. `work` opens and tmux does the rest: the Alt shortcuts and the status
-bar work as usual. The panel recognizes Warp through the `WARP_CLIENT_VERSION`
-variable.
-
-If you accept the look, the installer copies the theme to the Warp themes folder
-and downloads the JetBrains Mono font:
-
-| System | Where the theme goes |
+| To | Keys |
 |---|---|
-| macOS | `~/.warp/themes/workdeck-<theme>.yaml` |
-| Linux | `~/.local/share/warp-terminal/themes/workdeck-<theme>.yaml` |
+| Open the menu | <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>h</kbd> |
+| Previous / next project | <kbd>Shift</kbd>+<kbd>←</kbd> / <kbd>→</kbd> |
+| Previous / next pane | <kbd>Shift</kbd>+<kbd>↑</kbd> / <kbd>↓</kbd> |
+| Go to window N | <kbd>Alt</kbd>+<kbd>1</kbd>…<kbd>9</kbd> |
 
-Warp does not switch theme or font from a file, so the last step is yours:
+On a Mac, the Alt shortcuts need Option as Meta in the terminal settings:
 
-- **Theme.** In **Settings › Appearance › Themes**, pick `workdeck <theme>`. You
-  can also search for "Open theme picker" in the Command Palette. Warp may take a
-  few minutes to notice the new folder; reopening the app fixes it.
-- **Font.** In **Settings › Appearance › Text › Font type**, pick JetBrains Mono.
-- **Option as Alt (Mac only).** The tmux Alt shortcuts (`Alt+1…9`, `Alt+↑/↓`)
-  only work when Option is treated as Alt. In **Settings › Features**, turn on
-  **Left Option key is Meta**. The installer does not turn it on for you, because
-  Warp keeps this option in its own `settings.toml` and rewrites it.
+- **iTerm2:** Settings › Profiles › Keys › Left Option key › Esc+.
+- **Terminal:** Settings › Profiles › Keyboard › Use Option as Meta key.
+- **Warp:** Settings › Features › Left Option key is Meta.
 
-What does **not** come to Warp: the workdeck shortcuts. Warp's `keybindings.yaml`
-only binds keys to Warp's own actions and has no action to send text, which is
-what turns the workdeck shortcuts into tmux keys. In Warp, use
-<kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>h</kbd> for the menu.
+The theme and the font are set in the terminal itself. For Warp, the workdeck
+themes are in `themes/<theme>.warp.yaml`: copy one to `~/.warp/themes/` and
+pick it in Settings › Appearance › Themes.
 
-`work uninstall` removes the copied theme, unless you edited it.
-
-If you attach from another terminal to a tmux session started in Warp, the
-`WARP_CLIENT_VERSION` variable stays in the tmux environment and the panel shows
-the Warp notice.
-
-## Default terminal
-
-Ghostty, WezTerm, the terminal that ships with your system or an SSH connection:
-`work` opens the same way, with the tmux shortcuts (<kbd>Ctrl</kbd>+<kbd>b</kbd>
-<kbd>h</kbd> for the menu, <kbd>Shift</kbd>+arrows to move). On a
-Mac, set Option as Meta in the terminal settings to use the Alt shortcuts. The
-theme and the font, if you want them, are set in the terminal itself.
+Older versions copied the Warp theme and wrote an iTerm2 profile;
+`work update` removes the iTerm2 profile, and `work uninstall` removes both,
+unless you edited them.
