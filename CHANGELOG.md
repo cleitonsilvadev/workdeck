@@ -6,6 +6,16 @@ se quer atualizar. Cada versão é uma tag `vX.Y.Z`.
 `work update` shows the section of the new version in your language before
 asking whether to update. Each version is a `vX.Y.Z` tag.
 
+## v2.5.2
+
+### Português
+
+- O painel com o relógio ficou mais organizado: os seus projetos no meio, e o workdeck numa faixa de uma linha embaixo, com a versão e os atalhos principais. Saíram o logo, a frase e as dicas que se espalhavam pela tela. O painel sem relógio continua igual.
+
+### English
+
+- The panel with the clock is tidier: your projects in the middle, and workdeck in a one-line strip at the bottom with the version and the main shortcuts. The logo, the tagline and the scattered hints are gone. The panel without the clock stays the same.
+
 ## v2.5.1
 
 ### Português
