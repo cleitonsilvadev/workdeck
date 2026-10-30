@@ -54,10 +54,16 @@ next install or update.
 ## Tests
 
 ```bash
-./tests/run.sh          # all of them
-./tests/run.sh theme    # only those with "theme" in the name
-./tests/lint.sh         # shellcheck on every script
+./tests/run.sh             # all of them
+./tests/run.sh --changed   # only the test files related to what you changed
+./tests/run.sh theme       # only those with "theme" in the name
+./tests/lint.sh            # shellcheck on every script
 ```
+
+Tests run in parallel, one per CPU up to 8 (`--jobs N` or `WORKDECK_TEST_JOBS`
+changes it). Tests that commit or tag in the shared test repository run alone,
+after the others. `--changed` is for day-to-day work; CI always runs the whole
+suite.
 
 The tests need `tmux` and `git`, and the linter needs `shellcheck`. Nothing
 touches your machine: each test runs in a throwaway HOME, with tmux on an
