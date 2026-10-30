@@ -6,6 +6,28 @@ se quer atualizar. Cada versão é uma tag `vX.Y.Z`.
 `work update` shows the section of the new version in your language before
 asking whether to update. Each version is a `vX.Y.Z` tag.
 
+## v2.3.0
+
+### Português
+
+- O painel pode ser o relógio tclock, do Akita: o relógio grande no alto e os blocos do painel, com o logo do workdeck primeiro, embaixo como widgets. A instalação pergunta se você quer (`--clock`); no Linux baixa o binário, no Mac compila com o `cargo`. Sem ele, o painel continua como antes.
+- Arraste uma aba na barra de baixo para trocar a ordem dos projetos. A ordem nova fica salva no `projects.conf` e vale na próxima vez que o `work` abrir.
+- No kitty, uma tecla global traz o workdeck por cima de qualquer app, pela janela de acesso rápido do kitty (você escolhe a tecla uma vez nos Ajustes do Sistema; a instalação mostra onde). O aviso de agente terminou também sai pelo kitty, e clicar nele traz o kitty para a frente.
+- O kitty vira o app do workdeck: ao abrir, ele já entra no `work`. Janelas novas abrem um shell comum, e `KITTY_OPENS_WORK="no"` no `settings.conf` desliga. Nos outros terminais, o painel lembra que no kitty a experiência é mais completa.
+- O kitty é o terminal recomendado, e os atalhos do workdeck (`⌘H`, `⌘P`, `⌘R`…) ficam só nele. A instalação pergunta se você quer os atalhos no kitty e, se ele ainda não estiver instalado, oferece baixar pelo instalador oficial, sem senha. O `work uninstall` tira a configuração dele e pergunta se o kitty sai também, com não como resposta padrão; no fim, mostra o logo e um até breve.
+- Saíram as opções iTerm2 e Warp da instalação. Nesses terminais, e em qualquer outro, valem os atalhos do tmux (`Ctrl+b h`, `Shift+setas`). O `work update` remove o profile do iTerm2 que a v2.2.0 criou, se você não o editou.
+- A instalação não pergunta mais qual agente de IA você usa: ela escolhe o que achar no PATH (`--agent` troca). As integrações também saíram das perguntas e continuam disponíveis com `--with`.
+
+### English
+
+- The panel can be Akita's tclock clock: a large clock on top and the panel blocks, with the workdeck logo first, below as widgets. The installer asks whether you want it (`--clock`); on Linux it downloads the binary, on a Mac it builds it with `cargo`. Without it, the panel stays as before.
+- Drag a tab in the bottom bar to reorder your projects. The new order is saved to `projects.conf` and applies the next time `work` opens.
+- In kitty, one global key brings workdeck up over any app, through kitty's quick access window (you pick the key once in System Settings; the installer shows where). The agent-finished alert also comes from kitty, and clicking it brings kitty to the front.
+- kitty becomes the workdeck app: when it opens, it goes straight into `work`. New windows open a plain shell, and `KITTY_OPENS_WORK="no"` in `settings.conf` turns it off. In other terminals, the panel mentions that kitty gives the fuller experience.
+- kitty is the recommended terminal, and the workdeck shortcuts (`⌘H`, `⌘P`, `⌘R`…) live only there. The installer asks whether you want the shortcuts in kitty and, if it is not installed yet, offers to download it with the official installer, without a password. `work uninstall` removes its configuration and asks whether kitty goes too, with no as the default answer; at the end, it shows the logo and a goodbye.
+- The iTerm2 and Warp options are gone from the installer. In those terminals, and any other, the tmux shortcuts apply (`Ctrl+b h`, `Shift+arrows`). `work update` removes the iTerm2 profile v2.2.0 created, unless you edited it.
+- The installer no longer asks which AI agent you use: it picks the one it finds in the PATH (`--agent` changes it). The integrations left the questions too and stay available with `--with`.
+
 ## v2.2.0
 
 ### Português
