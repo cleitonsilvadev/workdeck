@@ -6,6 +6,16 @@ se quer atualizar. Cada versão é uma tag `vX.Y.Z`.
 `work update` shows the section of the new version in your language before
 asking whether to update. Each version is a `vX.Y.Z` tag.
 
+## v2.4.1
+
+### Português
+
+- Correção: arrastar a aba do painel, ou soltar outra aba em cima dele, tirava o painel da posição 1. Agora ele fica sempre em primeiro, e só os projetos trocam de lugar.
+
+### English
+
+- Fix: dragging the panel tab, or dropping another tab on it, moved the panel out of position 1. It now always stays first, and only the projects move.
+
 ## v2.4.0
 
 ### Português
