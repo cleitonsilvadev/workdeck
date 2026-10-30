@@ -6,6 +6,16 @@ se quer atualizar. Cada versão é uma tag `vX.Y.Z`.
 `work update` shows the section of the new version in your language before
 asking whether to update. Each version is a `vX.Y.Z` tag.
 
+## v2.5.0
+
+### Português
+
+- Ao soltar uma aba arrastada, ela acende na cor de destaque e volta ao normal em seguida, para você ver onde ela pousou. Rode `Ctrl+b r` depois de atualizar.
+
+### English
+
+- When you drop a dragged tab, it lights up in the accent color and fades back, so you see where it landed. Run `Ctrl+b r` after updating.
+
 ## v2.4.2
 
 ### Português
