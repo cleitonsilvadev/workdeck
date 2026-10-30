@@ -2,81 +2,42 @@
 
 # Self code review
 
-Um review antes do commit. O `work review` pede ao agente que você já tem aberto
-uma revisão da mudança, usando o melhor review que ele tiver.
+Um review antes do commit. O `work review` abre um painel separado, embaixo do
+chat da sua IA, com um agente que começa do zero: ele lê só a mudança e o código
+em volta, e não a conversa que escreveu o código.
 
 ```bash
-work review            # o que ainda não foi commitado (no Claude Code, também os commits da branch que ainda não subiram)
+work review            # o que ainda não foi commitado, ou os commits que ainda não subiram
 work review branch     # tudo o que a branch mudou em relação à principal
-work review staged     # só o que está no stage (git add), no painel separado
-work review --pane     # força o painel separado, descrito abaixo
+work review staged     # só o que está no stage (git add)
+work review --chat     # o review rápido, no chat que você já está usando
 ```
 
-## Qual review roda
+No kitty, <kbd>⌘</kbd>+<kbd>R</kbd> roda o `work review`, e o menu também tem.
 
-O `work review` procura o agente aberto num painel da janela atual e usa a
-primeira opção que se aplica:
+## Por que um painel separado
 
-| | Quando | O que acontece |
-|---|---|---|
-| 1 | O projeto ou a sua config define um comando de review | Esse comando é colado no chat do agente |
-| 2 | O agente é o Claude Code | O `/code-review` é colado no chat; o `work review branch` cola `/code-review main...HEAD` |
-| 3 | Qualquer outro caso | O pedido de review do workdeck abre num painel separado |
-
-Nos casos 1 e 2, o review roda no chat que você já está usando, e o agente que
-escreveu o código está ali para corrigir o que aparecer. O Claude Code roda o
-`/code-review` como um subagente em segundo plano, com contexto próprio, então
-o review não herda a conversa que escreveu o código. Os achados chegam no chat
-quando ele termina.
-
-O review é para quando o agente terminou. No Claude Code, o `work review` lê a
-tela do chat antes:
-
-| O chat do Claude | O que o `work review` faz |
-|---|---|
-| Parado, com o campo vazio | Manda o comando e o review começa na hora |
-| Ainda trabalhando | Não manda nada e pede para rodar de novo quando o Claude terminar |
-| Com uma pergunta aberta, como um pedido de permissão | Não manda nada, para nunca responder a pergunta por você |
-| Com uma mensagem sua pela metade | Não manda nada, para nunca enviar a sua mensagem incompleta |
-
-Com qualquer outro agente, o `work review` cola o comando sem apertar Enter:
-confira no chat e aperte Enter você.
-
-Sem nada por commitar, o `work review` ainda manda o `/code-review` para o
-Claude quando a branch tem commits que não subiram, porque esse review cobre
-esses commits. Com o `REVIEW_AGENT_CMD` definido, o painel separado também revisa
-esses commits; sem ele, só revisa o que não foi commitado.
-
-## O seu comando de review
-
-Para usar o review de um método como o
-[BMAD](https://github.com/bmad-code-org/BMAD-METHOD) ou de uma skill sua, defina
-o comando numa linha `REVIEW_COMMAND`:
+Um review no mesmo chat divide a conversa e o modelo com quem escreveu o código,
+então tende a concordar com as escolhas já feitas e a deixar passar as mesmas
+coisas. No painel separado, o revisor começa limpo e, com o `REVIEW_AGENT_CMD`,
+pode até ser outro modelo ou outra IA:
 
 ```bash
-REVIEW_COMMAND="/bmad-code-review"
+REVIEW_AGENT_CMD="claude --model opus"
 ```
 
-- em `.workdeck/review.conf` dentro do projeto, vale só nele;
-- em `~/.config/workdeck/settings.conf`, vale para todos os projetos.
-
-O arquivo do projeto tem prioridade, mas só aceita um comando de barra sem
-argumentos, como `/bmad-code-review`: um repositório que você clonou não
-consegue pôr instruções no chat do seu agente. O seu `settings.conf` aceita
-qualquer texto, como `/code-review high`. O comando é colado como está, seja
-qual for o recorte do `work review`, em qualquer agente aberto na janela; o
-`work review staged` sempre usa o painel separado. Os arquivos são lidos, não executados, com as mesmas regras do `settings.conf`:
-vale a primeira linha `REVIEW_COMMAND="…"`, e linhas em outro formato são
-ignoradas.
+O custo é um passo: você leva os achados de volta ao chat do agente para
+corrigir. Numa mudança pequena, em que a rapidez pesa mais, o
+`work review --chat` faz o review no chat que você está usando.
 
 ## O painel separado
 
-Com `--pane`, com `staged`, com o `REVIEW_AGENT_CMD` definido, ou quando nenhuma
-opção acima se aplica, o `work review` abre o pedido de review do workdeck num
-painel embaixo do chat da sua IA (ou do painel em que você está). Rodar de novo
-manda o pedido para o mesmo painel.
+O `work review` abre o pedido de review do workdeck num painel embaixo do chat
+da sua IA (ou do painel em que você está). Rodar de novo manda o pedido para o
+mesmo painel.
 
-A resposta é uma lista curta, uma bolinha por achado:
+A resposta é uma lista curta, uma bolinha por achado, no idioma que você
+escolheu na instalação:
 
 ```
 Usei: roteiro padrão
@@ -107,16 +68,45 @@ Com outra IA, ele vai para a área de transferência e para
 
 Qual IA o review usa: a do `REVIEW_AGENT_CMD` no `~/.config/workdeck/settings.conf`,
 quando definido. Senão, a que estiver aberta na janela e, se não houver nenhuma,
-a escolhida na instalação, guardada como `AGENT_CMD`.
+a encontrada na instalação, guardada como `AGENT_CMD`.
 
-Outro modelo ou outra IA no review evita repetir os pontos cegos de quem escreveu
-o código: agentes do mesmo modelo tendem a errar do mesmo jeito e a concordar
-entre si. Com ele definido, todo `work review` roda no painel separado com esse
-agente, mesmo com o Claude Code aberto:
+## O seu comando de review
+
+Para usar o review de um método como o
+[BMAD](https://github.com/bmad-code-org/BMAD-METHOD) ou uma skill sua, defina o
+comando numa linha `REVIEW_COMMAND`:
 
 ```bash
-REVIEW_AGENT_CMD="claude --model opus"
+REVIEW_COMMAND="/bmad-code-review"
 ```
+
+- em `.workdeck/review.conf` dentro do projeto, só para aquele projeto;
+- em `~/.config/workdeck/settings.conf`, para todos.
+
+O comando vira a primeira mensagem do agente no painel separado, no lugar do
+pedido do workdeck. Com `--chat`, ele é colado no chat que você está usando. O
+arquivo do projeto vale mais, mas só aceita um comando de barra sem argumentos,
+como `/bmad-code-review`: um repositório que você clonou não consegue pôr
+instruções no seu agente. O seu `settings.conf` aceita qualquer texto, como
+`/code-review high`. Os arquivos são lidos, não executados, com as mesmas regras
+do `settings.conf`.
+
+## O review no chat
+
+O `work review --chat` manda o review para o agente aberto na janela: o seu
+`REVIEW_COMMAND`, ou o `/code-review` no Claude Code (`/code-review main...HEAD`
+com `branch`). No Claude Code, ele lê a tela do chat antes:
+
+| O chat do Claude | O que o `work review --chat` faz |
+|---|---|
+| Parado, com o campo vazio | Manda o comando e o review começa na hora |
+| Ainda trabalhando | Não manda nada e pede para rodar de novo quando o Claude terminar |
+| Com uma pergunta, como um pedido de permissão | Não manda nada, para nunca responder a pergunta por você |
+| Com uma mensagem que você estava digitando | Não manda nada, para nunca enviar a sua mensagem pela metade |
+
+Com outro agente, ele cola o comando sem apertar Enter: confira o chat e aperte
+Enter você mesmo. Quando o chat não pode receber o review (sem agente aberto,
+`staged` ou com o `REVIEW_AGENT_CMD` definido), ele cai no painel separado.
 
 ## Instruções extras
 

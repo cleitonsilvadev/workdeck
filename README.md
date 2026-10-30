@@ -48,20 +48,20 @@ project with its own mess. workdeck puts all of it in one place.
 ## How it works
 
 Each project is a window. Inside it, the agent sits next to your shell. When the
-agent finishes, `work review` in the shell starts the review in the agent chat:
+agent finishes, `work review` opens the review in a pane below, with a fresh
+agent:
 
 ```
 ┌─ your terminal ──────────────────────────────────────────────┐
 │                               │                              │
 │  your AI agent                │  your shell                  │
 │  (claude, codex…)             │  git, tests, server          │
-│                               │                              │
-│  › /code-review               │  $ work review               │
-│    the agent reviews the      │                              │
-│    change in the same chat    │                              │
-│                               │                              │
+│                               │  $ work review               │
 ├──────────────────────────────────────────────────────────────┤
-│ 1 painel  2 api  3 web  4 mobile                 Shift+← →   │
+│  review · a fresh agent, no shared chat                      │
+│  ● src/api.ts:42 — the token goes to the log                 │
+├──────────────────────────────────────────────────────────────┤
+│ 1 panel  2 api  3 web  4 mobile                 Shift+← →    │
 └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -140,7 +140,7 @@ work review
 |---|---|
 | `work` | Opens the session, or returns to it |
 | `work add [path]` | Adds a project as a window |
-| `work review [branch\|staged] [--pane]` | Your agent reviews the change before the commit |
+| `work review [branch\|staged] [--chat]` | A fresh agent reviews the change in a separate pane before the commit |
 | `work update` | Shows what changed in the new version and updates |
 | `work kill` | Closes the whole session |
 | `work uninstall` | Removes everything workdeck installed |
@@ -169,18 +169,17 @@ In Warp, iTerm2, the system terminal or any other, the tmux shortcuts apply:
 
 ### Self code review
 
-`work review` asks the agent open in the window to review the change before the
-commit, using the best review it has:
+When the agent finishes, `work review` (or <kbd>⌘</kbd>+<kbd>R</kbd> in kitty)
+opens a separate pane with an agent that starts from scratch: it reads only the
+change and the code around it, not the conversation that wrote it, so it does
+not repeat the same blind spots. With `REVIEW_AGENT_CMD`, it can be another
+model or another AI.
 
-- **Your review command**, such as a [BMAD](https://github.com/bmad-code-org/BMAD-METHOD)
-  review, when the project sets one in `.workdeck/review.conf`.
-- **The agent's own review**: with Claude Code, once the agent has finished,
-  `work review` starts `/code-review` in the chat you are using. It runs as a
-  subagent with its own context, and the findings show up there for the agent
-  to fix.
-- **The workdeck review request** in a separate pane, for other agents or with
-  `work review --pane`. It answers with one colored dot per finding: 🔴 a bug
-  to fix before the commit, 🟠 attention that can wait, 🟢 fine.
+It answers with one colored dot per finding: 🔴 a bug to fix before the commit,
+🟠 attention that can wait, 🟢 fine. Your own review command, such as a
+[BMAD](https://github.com/bmad-code-org/BMAD-METHOD) review, can run there
+instead, and `work review --chat` runs a quick review in the chat you are
+already using.
 
 The review only reports; it does not change anything.
 [How it works and how to customize it →](docs/review.md)

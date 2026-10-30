@@ -50,7 +50,7 @@ open_fake_agent() {
 }
 
 review_from_window() {
-  (cd "$HOME/api" && TMUX="$SOCKET,0,0" TMUX_PANE="$AGENT_PANE" work review "$@" 2>&1)
+  (cd "$HOME/api" && TMUX="$SOCKET,0,0" TMUX_PANE="$AGENT_PANE" work review --chat "$@" 2>&1)
 }
 
 agent_screen() {
@@ -142,10 +142,31 @@ test_review_covers_unpushed_commits_with_claude() {
   assert_contains "$(review_from_window)" "o review começou no chat do claude: /code-review"
 }
 
-test_review_without_claude_explains_unpushed_commits() {
+test_review_without_claude_covers_unpushed_commits_in_a_pane() {
   install_workdeck >/dev/null || fail "install exited with an error"
   project_with_unpushed_commit
-  assert_contains "$(cd "$HOME/api" && work review 2>&1)" "Os commits que ainda não subiram só entram no review do próprio agente"
+  (cd "$HOME/api" && work review >/dev/null 2>&1)
+  request="$(cat "$HOME/.cache/workdeck/review-request.md")"
+  assert_contains "$request" "os commits desta branch que ainda não subiram"
+}
+
+test_review_opens_a_separate_pane_by_default() {
+  install_workdeck >/dev/null || fail "install exited with an error"
+  project_with_change
+  open_fake_agent claude
+  (cd "$HOME/api" && TMUX="$SOCKET,0,0" TMUX_PANE="$AGENT_PANE" work review >/dev/null 2>&1)
+  assert "the review request was written" test -s "$HOME/.cache/workdeck/review-request.md"
+  sleep 0.5
+  assert_equal "$(times_on_screen /code-review)" 0 "the command in the agent chat"
+}
+
+test_review_command_goes_to_the_separate_pane() {
+  install_workdeck >/dev/null || fail "install exited with an error"
+  project_with_change
+  mkdir -p "$HOME/api/.workdeck"
+  echo 'REVIEW_COMMAND="/bmad-code-review"' > "$HOME/api/.workdeck/review.conf"
+  (cd "$HOME/api" && work review >/dev/null 2>&1)
+  assert_equal "$(cat "$HOME/.cache/workdeck/review-request.md")" "/bmad-code-review" "the request sent to the review pane"
 }
 
 test_review_agent_cmd_covers_unpushed_commits() {
@@ -211,7 +232,7 @@ test_review_from_the_menu_reaches_the_open_claude() {
   install_workdeck >/dev/null || fail "install exited with an error"
   project_with_change
   open_fake_agent claude
-  tmux run-shell -t "$AGENT_PANE" -c "$HOME/api" 'WORKDECK_FROM_MENU=1 TMUX_PANE=#{pane_id} work review' >/dev/null 2>&1
+  tmux run-shell -t "$AGENT_PANE" -c "$HOME/api" 'WORKDECK_FROM_MENU=1 TMUX_PANE=#{pane_id} work review --chat' >/dev/null 2>&1
   wait_on_screen /code-review
   assert_equal "$(tmux display -p -t "$AGENT_PANE" '#{pane_in_mode}')" 0 "the chat pane is not covered by tmux output"
 }

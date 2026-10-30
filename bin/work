@@ -222,10 +222,11 @@ review_in_chat() {
 unpushed_commits() { git rev-list --count '@{upstream}..HEAD' 2>/dev/null || echo 0; }
 
 review() {
-  local target="" use_pane=0 only_commits=0 arg base="" description commands request root branch extra f
+  local target="" use_pane=1 only_commits=0 arg base="" description commands request root branch extra f
   for arg in "$@"; do
     case "$arg" in
       --pane) use_pane=1 ;;
+      --chat) use_pane=0 ;;
       *) if [ -z "$target" ]; then target="$arg"; else msgln review_unknown "$arg"; return 1; fi ;;
     esac
   done
@@ -265,15 +266,19 @@ review() {
   if [ "$use_pane" = 0 ] && review_in_chat "$root" "$target" "$base" "$extra"; then
     return 0
   fi
-  if [ "$only_commits" = 1 ] && [ -n "$(setting_get REVIEW_AGENT_CMD)" ]; then
+  if [ "$only_commits" = 1 ]; then
     description="$(msg review_scope_unpushed)"
     commands="git diff @{upstream}...HEAD"
-  elif [ "$only_commits" = 1 ]; then
-    msgln review_only_commits
-    return 0
   fi
   request="$WORKDECK_CACHE/review-request.md"
   mkdir -p "$(dirname "$request")"
+  configured_review_command "$root"
+  [ "$use_pane" = 0 ] || [ -z "$REVIEW_WARNING" ] || tell "$REVIEW_WARNING"
+  if [ -n "$REVIEW_COMMAND" ] && [ "$target" != staged ]; then
+    printf '%s\n' "$REVIEW_COMMAND" > "$request"
+    "$LIB/workdeck-agent" --request "$request" "REVIEW" "$root:$branch"
+    return $?
+  fi
   {
     msg review_request "$description" "$branch" "$commands"
     echo

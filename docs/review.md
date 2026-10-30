@@ -2,92 +2,52 @@
 
 # Self code review
 
-A review before the commit. `work review` asks the agent you already have open
-to review the change, using the best review available to it.
+A review before the commit. `work review` opens a separate pane, below your AI
+chat, with an agent that starts from scratch: it reads only the change and the
+code around it, not the conversation that wrote it.
 
 ```bash
-work review            # what is not committed yet (with Claude Code, also the branch commits not pushed yet)
+work review            # what is not committed yet, or the commits not pushed yet
 work review branch     # everything the branch changed compared to the main branch
-work review staged     # only what is staged (git add), in the separate pane
-work review --pane     # forces the separate pane, described below
+work review staged     # only what is staged (git add)
+work review --chat     # the quick review, in the chat you are already using
 ```
 
-## Which review runs
+In kitty, <kbd>⌘</kbd>+<kbd>R</kbd> runs `work review`, and the menu has it too.
 
-`work review` looks for the agent open in a pane of the current window and
-picks the first option that applies:
+## Why a separate pane
 
-| | When | What happens |
-|---|---|---|
-| 1 | The project or your config sets a review command | That command is pasted into the agent chat |
-| 2 | The agent is Claude Code | `/code-review` is pasted into the chat; `work review branch` pastes `/code-review main...HEAD` |
-| 3 | Any other case | The workdeck review request opens in a separate pane |
-
-In cases 1 and 2 the review runs in the chat you are already using, so the
-agent that wrote the code is right there to fix what the review finds. Claude
-Code runs `/code-review` as a background subagent with its own context, so the
-review does not inherit the conversation that wrote the code. Its findings show
-up in the chat when it finishes.
-
-The review is meant for when the agent has finished. With Claude Code,
-`work review` reads the chat screen first:
-
-| The Claude chat | What `work review` does |
-|---|---|
-| Idle, with an empty prompt | Sends the command and the review starts right away |
-| Still working | Sends nothing and asks you to run it again when Claude finishes |
-| Showing a question, such as a permission request | Sends nothing, so it never answers the question for you |
-| Holding a message you were typing | Sends nothing, so it never sends your message half written |
-
-With any other agent, `work review` pastes the command without pressing Enter:
-check the chat and press Enter yourself.
-
-With nothing uncommitted, `work review` still sends `/code-review` to Claude
-when the branch has commits not pushed yet, since that review covers them. With
-`REVIEW_AGENT_CMD` set, the separate pane reviews those commits too; otherwise it
-only reviews uncommitted changes.
-
-## Your own review command
-
-To use the review of a method such as
-[BMAD](https://github.com/bmad-code-org/BMAD-METHOD) or a skill of your own, set
-the command as a `REVIEW_COMMAND` line:
+A review in the same chat shares the conversation and the model that wrote the
+code, so it tends to agree with the choices already made and to miss the same
+things. In the separate pane, the reviewer starts clean, and with
+`REVIEW_AGENT_CMD` it can even be another model or another AI:
 
 ```bash
-REVIEW_COMMAND="/bmad-code-review"
+REVIEW_AGENT_CMD="claude --model opus"
 ```
 
-- in `.workdeck/review.conf` inside the project, for that project only;
-- in `~/.config/workdeck/settings.conf`, for all projects.
-
-The project file takes precedence, but it only accepts a slash command without
-arguments, such as `/bmad-code-review`: a repository you cloned cannot put
-instructions in your agent chat. Your own `settings.conf` accepts any text, such
-as `/code-review high`. The command is pasted as is, whatever the `work review`
-target, into any agent open in the window; `work review staged` always uses the
-separate pane. The files are read, not run, with the same rules as `settings.conf`: the first
-`REVIEW_COMMAND="…"` line counts, and lines in any other shape are ignored.
+The price is one step: you take the findings back to the agent chat to fix
+them. For a small change where speed matters more, `work review --chat` runs the
+review in the chat you are using.
 
 ## The separate pane
 
-With `--pane`, with `staged`, with `REVIEW_AGENT_CMD` set, or when no option
-above applies, `work review` opens the workdeck review request in a pane below
-your AI chat (or below the pane you are in). Running it again sends the request
-to the same pane.
+`work review` opens the workdeck review request in a pane below your AI chat (or
+below the pane you are in). Running it again sends the request to the same pane.
 
-The answer is a short list, one colored dot per finding. The request is written
-in Portuguese, like the rest of the workdeck interface:
+The answer is a short list, one colored dot per finding, in the language you
+chose at install:
 
 ```
-Usei: roteiro padrão
+Used: default checklist
 
-🔴 src/api/pedidos.ts:42 — o token vai inteiro para o log
-   → logar só o id do usuário
-🟠 src/lista.tsx:18 — uma consulta por item dentro do map
-   → buscar todos de uma vez antes do map
-🟢 os testes cobrem o caso novo
+🔴 src/api/orders.ts:42 — the whole token goes to the log
+   → log only the user id
+🟠 src/list.tsx:18 — one query per item inside the map
+   → fetch them all before the map
+🟢 the tests cover the new case
 
-🔴 corrija os vermelhos antes do commit
+🔴 fix the reds before the commit
 ```
 
 | | Means | What to do |
@@ -107,16 +67,46 @@ the conversation. With another AI, it goes to the clipboard and to
 
 Which AI the review uses: `REVIEW_AGENT_CMD` in `~/.config/workdeck/settings.conf`,
 when set. Otherwise the one open in the window, and if there is none, the one
-chosen during installation, stored as `AGENT_CMD`.
+found at install, stored as `AGENT_CMD`.
 
-A different model or AI for the review avoids repeating the blind spots of the
-one that wrote the code: agents built on the same model tend to make the same
-mistakes and to agree with each other. Set it once, and every `work review`
-runs in the separate pane with that agent, even with Claude Code open:
+## Your own review command
+
+To use the review of a method such as
+[BMAD](https://github.com/bmad-code-org/BMAD-METHOD) or a skill of your own, set
+the command as a `REVIEW_COMMAND` line:
 
 ```bash
-REVIEW_AGENT_CMD="claude --model opus"
+REVIEW_COMMAND="/bmad-code-review"
 ```
+
+- in `.workdeck/review.conf` inside the project, for that project only;
+- in `~/.config/workdeck/settings.conf`, for all projects.
+
+The command becomes the first message of the agent in the separate pane, instead
+of the workdeck request. With `--chat`, it is pasted into the chat you are using.
+The project file takes precedence, but it only accepts a slash command without
+arguments, such as `/bmad-code-review`: a repository you cloned cannot put
+instructions in your agent. Your own `settings.conf` accepts any text, such as
+`/code-review high`. The files are read, not run, with the same rules as
+`settings.conf`.
+
+## The review in the chat
+
+`work review --chat` sends the review to the agent open in the window instead:
+your `REVIEW_COMMAND`, or `/code-review` with Claude Code
+(`/code-review main...HEAD` with `branch`). With Claude Code, it reads the chat
+screen first:
+
+| The Claude chat | What `work review --chat` does |
+|---|---|
+| Idle, with an empty prompt | Sends the command and the review starts right away |
+| Still working | Sends nothing and asks you to run it again when Claude finishes |
+| Showing a question, such as a permission request | Sends nothing, so it never answers the question for you |
+| Holding a message you were typing | Sends nothing, so it never sends your message half written |
+
+With any other agent, it pastes the command without pressing Enter: check the
+chat and press Enter yourself. When the chat cannot take the review (no agent
+open, `staged`, or `REVIEW_AGENT_CMD` set), it falls back to the separate pane.
 
 ## Extra instructions
 
