@@ -101,9 +101,8 @@ que abre a sessão abre todos os seus projetos assim.
 └──────────────┴──────────────┘
 ```
 
-- **1, o agente:** o comando guardado em `AGENT_CMD` (como `claude`) aparece
-  digitado, sem rodar. Aperte Enter nos projetos em que for trabalhar. Sem
-  `AGENT_CMD`, o painel abre como um shell comum.
+- **1, o agente:** um shell comum, pronto para você abrir o agente (como
+  `claude`) nos projetos em que for trabalhar.
 - **2, o shell:** para git, testes e o servidor. O comando do
   `.workdeck/project.conf` do projeto aparece digitado, também sem rodar:
 
@@ -117,7 +116,7 @@ que abre a sessão abre todos os seus projetos assim.
   removidos antes de digitar, então um valor nunca roda sozinho. Sem esse
   arquivo, o painel abre como um shell comum.
 
-Os comandos são digitados quando o shell mostra o prompt. Nada sobe sozinho,
+O comando do servidor é digitado quando o shell mostra o prompt. Nada sobe sozinho,
 então abrir muitos projetos não liga vários agentes nem servidores ao mesmo
 tempo, e as portas não entram em conflito. <kbd>Ctrl</kbd>+<kbd>b</kbd>
 <kbd>Enter</kbd> divide mais a janela quando você precisar de mais painéis.

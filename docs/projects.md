@@ -100,9 +100,8 @@ Each project window opens with the agent and a shell side by side. Every
 └──────────────┴──────────────┘
 ```
 
-- **1, the agent:** the command saved as `AGENT_CMD` (such as `claude`) is typed
-  in, without running. Press Enter in the projects you are going to work on.
-  Without an `AGENT_CMD`, the pane opens as a plain shell.
+- **1, the agent:** a plain shell, ready for you to start the agent (such as
+  `claude`) in the projects you are going to work on.
 - **2, the shell:** for git, tests and the server. The command in the project's
   `.workdeck/project.conf` is typed in, also without running:
 
@@ -116,7 +115,7 @@ Each project window opens with the agent and a shell side by side. Every
   before typing, so a value never runs on its own. Without that file, the pane
   opens as a plain shell.
 
-The commands are typed once the shell shows its prompt. Nothing starts on its
+The server command is typed once the shell shows its prompt. Nothing starts on its
 own, so opening many projects does not start many agents or servers at once,
 and ports do not clash. <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>Enter</kbd> splits the
 window further when you need more panes.

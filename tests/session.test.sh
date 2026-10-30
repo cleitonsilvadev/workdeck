@@ -43,7 +43,7 @@ project_with_server_command() {
   echo 'SERVER_COMMAND="echo servidor-no-ar"' > "$HOME/api/.workdeck/project.conf"
 }
 
-test_project_layout_opens_two_panes_side_by_side_with_typed_commands() {
+test_project_layout_types_only_the_server_command() {
   install_workdeck >/dev/null || fail "install exited with an error"
   echo 'AGENT_CMD="echo agente-no-ar"' >> "$CONFIG/settings.conf"
   project_with_server_command
@@ -57,10 +57,9 @@ test_project_layout_opens_two_panes_side_by_side_with_typed_commands() {
   server="$(printf '%s\n' "$panes" | awk -F'[ ,]' '$1 > 0 && $2 == 0 {print $3}')"
   assert "the agent pane is on the left" test -n "$agent"
   assert "the shell pane is on the right" test -n "$server"
-  wait_for sh -c "tmux capture-pane -p -t '$agent' | grep -q 'echo agente-no-ar'" || fail "the agent command was not typed: $(tmux capture-pane -p -t "$agent")"
   wait_for sh -c "tmux capture-pane -p -t '$server' | grep -q 'echo servidor-no-ar'" || fail "the server command was not typed: $(tmux capture-pane -p -t "$server")"
   sleep 1.5
-  assert_equal "$(tmux capture-pane -p -t "$agent" | grep -cx 'agente-no-ar' || true)" 0 "the agent command ran"
+  assert_equal "$(tmux capture-pane -p -t "$agent" | grep -c 'agente-no-ar' || true)" 0 "the agent command was typed"
   assert_equal "$(tmux capture-pane -p -t "$server" | grep -cx 'servidor-no-ar' || true)" 0 "the server command ran"
 }
 

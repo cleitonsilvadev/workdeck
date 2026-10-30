@@ -432,15 +432,12 @@ project_layout() {
 }
 
 setup_project_window() {
-  local win="$1" dir="$2" layout="$3" agent_cmd="$4" agent server
+  local win="$1" dir="$2" layout="$3" agent server
   [ "$layout" = agent-shell ] || return 0
   agent="$(tmux display -p -t "$win" '#{pane_id}')"
   server="$(tmux split-window -d -h -P -F '#{pane_id}' -t "$agent" -c "$dir")"
   tmux select-pane -t "$agent"
-  (
-    type_into "$agent" "$agent_cmd"
-    type_into "$server" "$(project_server_command "$dir")"
-  ) </dev/null >/dev/null 2>&1 &
+  type_into "$server" "$(project_server_command "$dir")" </dev/null >/dev/null 2>&1 &
 }
 
 add_shell_pane() {
@@ -764,7 +761,7 @@ add_project() {
   if command -v tmux >/dev/null && tmux has-session -t "$SESSION" 2>/dev/null; then
     win="$(tmux new-window -d -P -F '#{window_id}' -t "$SESSION:" -n "$name" -c "$d")"
     tmux set -w -t "$win" @project "$d"
-    setup_project_window "$win" "$d" "$(project_layout)" "$(setting_get AGENT_CMD)"
+    setup_project_window "$win" "$d" "$(project_layout)"
     refresh_panel
     msgln add_window_open "$name" "$SESSION"
   fi
@@ -834,7 +831,6 @@ fi
 
 if ! tmux has-session -t "$SESSION" 2>/dev/null; then
   layout="$(project_layout)"
-  agent_cmd="$(setting_get AGENT_CMD)"
   first=1
   for entry in "${windows[@]}"; do
     IFS="|" read -r name dir cmd <<< "$entry"
@@ -847,12 +843,12 @@ if ! tmux has-session -t "$SESSION" 2>/dev/null; then
         size=(-x "$cols" -y "$rows")
       fi
       win="$(tmux new-session -d -P -F '#{window_id}' -s "$SESSION" "${size[@]+"${size[@]}"}" -n "$name" -c "$dir" ${cmd:+"$cmd"})"
-      [ -n "$cmd" ] || { tmux set -w -t "$win" @project "$dir"; setup_project_window "$win" "$dir" "$layout" "$agent_cmd"; }
+      [ -n "$cmd" ] || { tmux set -w -t "$win" @project "$dir"; setup_project_window "$win" "$dir" "$layout"; }
       [ "${cmd%% *}" = work ] && add_shell_pane "$SESSION:$name"
       first=0
     else
       win="$(tmux new-window -P -F '#{window_id}' -t "$SESSION:" -n "$name" -c "$dir" ${cmd:+"$cmd"})"
-      [ -n "$cmd" ] || { tmux set -w -t "$win" @project "$dir"; setup_project_window "$win" "$dir" "$layout" "$agent_cmd"; }
+      [ -n "$cmd" ] || { tmux set -w -t "$win" @project "$dir"; setup_project_window "$win" "$dir" "$layout"; }
       [ "${cmd%% *}" = work ] && add_shell_pane "$SESSION:$name"
     fi
   done
