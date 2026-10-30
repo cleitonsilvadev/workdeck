@@ -20,6 +20,7 @@ RESTORE=0
 ALL=0
 DRY=0
 DELETE_CODE=""
+ITERM_TEMPLATE_SUM="$(cksum < "$ROOT/terminals/iterm2.json" 2>/dev/null || true)"
 
 for arg in "$@"; do
   case "$arg" in
@@ -79,6 +80,16 @@ if [ -f "$MANIFEST" ]; then
         if [ ! -f "$target" ]; then
           :
         elif [ -f "$source_file" ] && same_file "$source_file" "$target"; then
+          run rm -f "$target"
+          say "removido ${target#"$HOME"/}"
+        else
+          say "deixei ${target#"$HOME"/}: foi alterado depois da instalação"
+        fi
+        ;;
+      iterm-profile)
+        if [ ! -f "$target" ]; then
+          :
+        elif [ -n "$ITERM_TEMPLATE_SUM" ] && [ "$(cksum < "$target")" = "$ITERM_TEMPLATE_SUM" ]; then
           run rm -f "$target"
           say "removido ${target#"$HOME"/}"
         else

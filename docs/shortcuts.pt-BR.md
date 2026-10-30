@@ -2,52 +2,63 @@
 
 # Atalhos
 
-## O dia a dia
+## kitty e iTerm2: os atalhos do workdeck
+
+Se você escolheu o kitty ou o iTerm2 na instalação, o workdeck cria atalhos
+próprios nesse terminal. A letra é a mesma em todo lugar: <kbd>⌘</kbd> no Mac,
+<kbd>Ctrl</kbd>+<kbd>Shift</kbd> no kitty do Linux.
+
+| Para | macOS: kitty, iTerm2 | Linux: kitty |
+|---|---|---|
+| **Abrir o menu** (o resto está nele) | <kbd>⌘</kbd>+<kbd>H</kbd> | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>H</kbd> |
+| Adicionar um projeto | <kbd>⌘</kbd>+<kbd>P</kbd> | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> |
+| Ir para o projeto 1…9 | <kbd>⌘</kbd>+<kbd>1</kbd>…<kbd>9</kbd> | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>1</kbd>…<kbd>9</kbd> |
+| Projeto anterior / próximo | <kbd>Shift</kbd>+<kbd>←</kbd> / <kbd>→</kbd> | <kbd>Shift</kbd>+<kbd>←</kbd> / <kbd>→</kbd> |
+| Abrir o agente num painel novo | <kbd>⌘</kbd>+<kbd>A</kbd> | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>A</kbd> |
+| Abrir um terminal num painel novo (2, 3 e depois 4 painéis em grade) | <kbd>⌘</kbd>+<kbd>T</kbd> | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd> |
+| Zoom no painel, e de novo para voltar | <kbd>⌘</kbd>+<kbd>Z</kbd> | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd> |
+| Fechar o painel | <kbd>⌘</kbd>+<kbd>W</kbd> | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>W</kbd> |
+| Rodar o `work review` | <kbd>⌘</kbd>+<kbd>R</kbd> | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> |
+
+As letras foram escolhidas para lembrar: **H**elp, **P**rojeto, **A**gente,
+**T**erminal, **Z**oom, **R**eview, e <kbd>W</kbd> fecha, como em qualquer app
+do Mac. Dividir de um jeito específico, renomear, sair deixando rodando,
+atualizar e o aviso do agente ficam no menu.
+
+No iTerm2, os atalhos ficam no profile **workdeck**: escolha ele como padrão em
+Settings › Profiles › Other Actions › Set as Default.
+
+## Warp, terminal padrão e qualquer outro
+
+O Warp e o terminal do sistema não deixam o workdeck mandar teclas para o tmux,
+então ficam com os atalhos do tmux, que funcionam em qualquer terminal:
 
 | Para | Teclas |
 |---|---|
-| **Abrir o menu** (projetos, review, dividir…) | <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>h</kbd> |
+| **Abrir o menu** | <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>h</kbd> |
 | Projeto anterior / próximo | <kbd>Shift</kbd>+<kbd>←</kbd> / <kbd>→</kbd> |
-| Ir direto para a janela N | <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>1</kbd>…<kbd>9</kbd> |
-| Dividir a tela em grade: ao lado, depois embaixo do da direita, depois embaixo do da esquerda | <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>Enter</kbd> |
-| Escolher o sentido: ao lado / embaixo | <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>v</kbd> / <kbd>-</kbd> |
 | Painel anterior / próximo | <kbd>Shift</kbd>+<kbd>↑</kbd> / <kbd>↓</kbd> |
-| Zoom no painel, e de novo para voltar | <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>z</kbd> |
+| Ir para a janela N | <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>1</kbd>…<kbd>9</kbd> |
+| Abrir um terminal em grade | <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>g</kbd> (ou <kbd>Enter</kbd>) |
+| Dividir ao lado / embaixo | <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>v</kbd> / <kbd>-</kbd> |
+| Zoom no painel | <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>z</kbd> |
 | Fechar o painel | <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>x</kbd> |
 | Sair e deixar a sessão rodando | <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>d</kbd> |
 
 <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>h</kbd> quer dizer: aperte
-<kbd>Ctrl</kbd>+<kbd>b</kbd>, solte, e depois a tecla. O mouse também funciona:
-clique na janela na barra de baixo, ou num painel, e arraste a borda para mudar
-o tamanho.
+<kbd>Ctrl</kbd>+<kbd>b</kbd>, solte e aperte a tecla. Eles também funcionam no
+kitty e no iTerm2, para quem já usa tmux. O mouse também funciona: clique numa
+janela na barra de baixo, ou num painel, e arraste a borda para redimensionar.
 
-No menu, cada projeto tem o número da janela como tecla (apertar <kbd>2</kbd>
-vai direto para o segundo). <kbd>q</kbd> ou <kbd>Esc</kbd> fecha o menu.
+No menu, cada projeto usa o número da janela como tecla. <kbd>q</kbd> ou
+<kbd>Esc</kbd> fecha.
 
-Só as teclas do workdeck funcionam depois do <kbd>Ctrl</kbd>+<kbd>b</kbd>; uma
-fora da lista mostra "tecla sem uso no workdeck — Ctrl+b h abre o menu".
+### Com Alt, em qualquer terminal
 
-## Atalhos de uma tecla, com Alt
-
-- <kbd>Alt</kbd>+<kbd>1</kbd>…<kbd>9</kbd> vai para a janela.
-- <kbd>Alt</kbd>+<kbd>↑</kbd> / <kbd>↓</kbd> troca de painel. <kbd>Alt</kbd>+<kbd>←</kbd> /
-  <kbd>→</kbd> ficam livres para andar por palavras no shell e nos agentes.
-- <kbd>Alt</kbd>+<kbd>Shift</kbd>+letra faz as ações: <kbd>D</kbd> divide ao
-  lado, <kbd>S</kbd> embaixo, <kbd>Z</kbd> zoom, <kbd>X</kbd> fecha,
-  <kbd>T</kbd> abre uma janela, <kbd>R</kbd> renomeia a janela, <kbd>E</kbd> sai
-  da sessão sem fechar.
-
-Eles funcionam em qualquer terminal. No Mac, ligue a Option como Meta nas
-configurações do terminal; com o kitty escolhido na instalação, o workdeck faz
-isso por você, e no Warp a opção é **Left Option key is Meta**. As ações usam Shift porque `Alt`+letra minúscula é do readline
-(andar e apagar palavras na linha de comando).
-
-## Extras do terminal
-
-Todos os atalhos acima são do tmux e funcionam em qualquer terminal. Com o
-kitty escolhido na instalação, você ganha também atalhos em `cmd` no Mac
-(`cmd+1…9` vai para a janela, `cmd+d` divide ao lado, `cmd+h` abre o menu). O
-que cada terminal ganha está em [terminals/README.pt-BR.md](../terminals/README.pt-BR.md).
+<kbd>Alt</kbd>+<kbd>1</kbd>…<kbd>9</kbd> vai para a janela e
+<kbd>Alt</kbd>+<kbd>↑</kbd> / <kbd>↓</kbd> troca de painel. No Mac, eles
+precisam da Option como Meta: o kitty e o profile do iTerm2 já vêm assim; no
+Warp, ligue **Left Option key is Meta** em Settings › Features.
 
 ## Saber qual painel está ativo
 

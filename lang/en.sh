@@ -35,7 +35,7 @@ msg_menu_notify_on="Turn on the alert when an agent finishes"
 msg_menu_notify_off="Turn off the alert when an agent finishes"
 msg_menu_update="Update workdeck"
 msg_menu_press_key="press any key to close"
-msg_menu_split="Split the screen"
+msg_menu_split="Open a terminal in a new pane"
 msg_menu_zoom="Zoom the pane (again to undo)"
 msg_menu_close_pane="Close this pane"
 msg_menu_key_windows="Shift ← →     previous / next project"
@@ -43,7 +43,6 @@ msg_menu_key_panes="Shift ↑ ↓     previous / next pane"
 msg_menu_key_number="Ctrl+b 1…9    goes straight to a window"
 msg_menu_key_detach="Ctrl+b d      leaves, the session keeps running"
 msg_menu_key_mouse="mouse         click the bar, drag the border"
-msg_menu_key_cmd="cmd+1…9       the same, without Ctrl+b"
 msg_menu_close_hint="q or Esc closes the menu"
 msg_layout_invalid="PROJECT_LAYOUT=\"%s\" does not exist in settings.conf; use agent-shell or none. Windows open with the agent and the shell side by side."
 msg_active_pane_invalid="workdeck: ACTIVE_PANE=\"%s\" is invalid; use none or line"
@@ -83,7 +82,7 @@ msg_install_help="workdeck installer. macOS and Linux.
   ./install.sh --zsh                installs oh-my-zsh and zinit without asking
   ./install.sh --with ai-memory     turns on optional integrations (comma separated)
   ./install.sh --list-integrations  lists the available integrations and exits
-  ./install.sh --terminal warp      picks the terminal (kitty, warp or other) without asking
+  ./install.sh --terminal kitty,iterm  picks the terminals (kitty, iterm, warp or other) without asking
   ./install.sh --visual             installs the theme and font in the terminal, without asking
   ./install.sh --no-visual          only the shortcuts in the terminal
   ./install.sh --yes                asks nothing; uses the defaults
@@ -95,7 +94,7 @@ It is idempotent: running it again updates instead of duplicating. What it
 writes to your files sits between >>> workdeck >>> markers, and uninstall.sh
 removes exactly that block."
 msg_install_needs_value="%s needs a value"
-msg_install_bad_terminal="terminal '%s' does not exist. Available: kitty, warp, other"
+msg_install_bad_terminal="terminal '%s' does not exist. Available: kitty, iterm (macOS only), warp, other; separate with commas for more than one"
 msg_install_bad_lang="language '%s' does not exist. Available: en, pt-BR"
 msg_install_unknown_option="unknown option: %s"
 msg_install_not_regular="%s is not a regular file; left it alone"
@@ -191,7 +190,7 @@ msg_install_no="no"
 msg_install_choices="Your choices, which the installer remembers next time:"
 msg_install_choice_language="language"
 msg_install_choice_language_hint="to change: ./install.sh --lang en|pt-BR"
-msg_install_choice_terminal_hint="to change: ./install.sh --terminal kitty|warp|other"
+msg_install_choice_terminal_hint="to change: ./install.sh --terminal kitty,iterm,warp or other"
 msg_install_choice_visual_hint="to change: ./install.sh --visual (theme and font) or --no-visual"
 msg_install_warp_todo="In Warp, a few choices are left in the app:"
 msg_install_warp_theme_steps="       theme     Settings › Appearance › Themes, and pick \"workdeck %s\"
@@ -214,10 +213,9 @@ msg_install_open_kitty_hint="with the workdeck cmd shortcuts"
 msg_install_open_terminal_restart="close and reopen the terminal"
 msg_install_now="Next:"
 msg_install_work_hint="opens the panel, which shows how to add your projects"
-msg_install_navigation="  To move around: Shift+← / Shift+→ switches windows, Shift+↑ / Shift+↓ switches
-  panes, and Ctrl+b then 1…9 goes straight to a window. Clicking the bar works
-  too.
-  Help at any time: Ctrl+b then h inside work."
+msg_install_navigation="  To move around: Shift+← / Shift+→ switches projects, Shift+↑ / Shift+↓ switches
+  panes and %s goes straight to a project. Clicking the bar works too.
+  Help at any time: %s inside work."
 msg_install_windows="workdeck runs on macOS and Linux. On Windows, use it through WSL: open the WSL Ubuntu and run the installer from there."
 msg_install_ask_language="Which language should workdeck use for its messages?"
 
@@ -321,7 +319,7 @@ msg_panel_add_project="work add ~/project"
 msg_panel_add_project_hint="each project becomes a window; Tab completes the path"
 msg_panel_in_warp="%sIn Warp%s: work runs with the Alt shortcuts; the cmd shortcuts only work in kitty."
 msg_panel_outside_kitty="%sOutside kitty%s: work runs, but the theme, the font and the cmd shortcuts only apply there."
-msg_panel_menu_hint="Ctrl+b h opens the menu: projects, review, split the screen"
+msg_panel_menu_hint="%s opens the menu: projects, agent, terminal and review"
 msg_panel_custom_hint="To add yours to the panel: an executable in ~/.config/workdeck/panels/"
 msg_panel_guide="  guide: github.com/thiagofeliperibeiro/workdeck/blob/main/docs/panels.md"
 
@@ -340,3 +338,15 @@ msg_install_warp_shortcuts_steps="       shortcuts Ctrl+b h opens the workdeck m
 msg_install_open_kitty_reload_hint="loads the workdeck shortcuts and commands"
 msg_install_open_new_window="open a new window"
 msg_install_open_new_window_hint="loads the workdeck commands"
+msg_menu_agent="Open the agent in a new pane"
+msg_menu_key_terminal_1="%sH menu    %sP project    %sA agent    %sT terminal"
+msg_menu_key_terminal_2="%sZ zoom    %sW close      %sR review   %s1…9 project"
+msg_agent_pane_none="no agent set: run ./install.sh --agent claude (or your agent)"
+msg_install_ask_terminal_numbers="Numbers separated by spaces, if you use more than one (Enter for %s): "
+msg_install_terminal_iterm="workdeck shortcuts, plus the Cmd shortcuts"
+msg_install_dry_iterm="[dry-run] would write the iTerm2 profile to %s"
+msg_install_iterm_profile="iTerm2 workdeck profile in %s"
+msg_install_iterm_missing="iTerm2 is not installed yet; the workdeck profile is ready. Install it from %s and it shows up in Settings › Profiles."
+msg_install_iterm_summary="iTerm2 with shortcuts (workdeck profile)"
+msg_install_iterm_todo="In iTerm2, one choice is left in the app:"
+msg_install_iterm_profile_steps="       profile   Settings › Profiles › workdeck › Other Actions › Set as Default"

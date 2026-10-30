@@ -6,10 +6,12 @@ A única dependência é o tmux, então o `work`, o painel e os atalhos funciona
 igual em qualquer terminal. O que muda de um terminal para outro são os extras:
 as cores, a fonte e os atalhos próprios dele.
 
-A instalação pergunta qual terminal você usa (kitty, Warp ou o terminal padrão,
-que cobre o do sistema e qualquer outro) e configura os extras que ele aceita.
+A instalação pergunta quais terminais você usa (kitty, iTerm2 no Mac, Warp ou o
+terminal padrão, que cobre o do sistema e qualquer outro; dá para escolher mais
+de um) e configura os extras que cada um aceita.
 **Ela não instala terminal:** se o escolhido faltar, grava a configuração mesmo
-assim e diz onde baixar, para o terminal já abrir pronto quando você instalar. Para responder sem a pergunta, use `--terminal kitty`,
+assim e diz onde baixar, para o terminal já abrir pronto quando você instalar.
+Para responder sem a pergunta, use `--terminal kitty`, `--terminal kitty,iterm`,
 `--terminal warp` ou `--terminal other`; a escolha fica salva em
 `~/.config/workdeck/settings.conf` (`TERMINAL`).
 
@@ -20,13 +22,15 @@ resposta padrão é não (Enter recusa). `--visual` aceita sem perguntar e
 
 ## kitty
 
-Com o kitty escolhido e instalado, a instalação acrescenta um bloco ao seu
-`~/.config/kitty/kitty.conf` com os atalhos:
+Com o kitty escolhido, a instalação acrescenta um bloco ao seu
+`~/.config/kitty/kitty.conf`, mesmo antes de o kitty estar instalado, com:
 
+- **Os atalhos do workdeck**, <kbd>⌘</kbd> no Mac e
+  <kbd>Ctrl</kbd>+<kbd>Shift</kbd> no Linux: H menu, P adicionar projeto, 1…9
+  ir para o projeto, A agente, T terminal, Z zoom,
+  W fechar, R review. A tabela completa está em
+  [docs/shortcuts.pt-BR.md](../docs/shortcuts.pt-BR.md).
 - **Option como Alt** no Mac, para os atalhos diretos com Alt.
-- **cmd** no Mac: `cmd+h` abre o menu, `cmd+enter` divide a tela, `cmd+1…9`
-  vai para a janela, `cmd+d` / `cmd+shift+d` divide ao lado / embaixo,
-  `cmd+shift+enter` dá zoom, `cmd+shift+w` fecha o painel.
 - **Shift+Enter** é enviado no formato estendido, para que agentes como o
   Claude Code pulem a linha em vez de enviar a mensagem. Só vale enquanto o
   tmux roda na janela, então um shell comum não é afetado.
@@ -46,6 +50,17 @@ A instalação encontra o kitty em `/Applications` ou `~/Applications` (Mac), em
 `~/.local/kitty.app` (Linux) ou no `PATH`. O que você escreveu fora dos
 marcadores `# >>> workdeck >>>` não muda, e o desinstalador tira só o bloco. O
 kitty continua instalado.
+
+## iTerm2
+
+No Mac, com o iTerm2 escolhido, a instalação grava um profile **workdeck** em
+`~/Library/Application Support/iTerm2/DynamicProfiles/workdeck.json`, mesmo
+antes de o iTerm2 estar instalado. Ele tem os mesmos atalhos do workdeck do
+kitty, com <kbd>⌘</kbd>, e a Option esquerda como Meta para os atalhos Alt.
+
+O iTerm2 não troca de profile sozinho. Escolha uma vez em Settings › Profiles ›
+workdeck › Other Actions › Set as Default; a instalação lembra disso no fim. O
+`work uninstall` remove o profile, a não ser que você o tenha editado.
 
 ## Warp
 
@@ -74,9 +89,10 @@ O Warp não troca de tema nem de fonte por arquivo, então o último passo é se
   isso por você, porque o Warp guarda essa opção no `settings.toml` dele e o
   reescreve.
 
-O que **não** vem para o Warp: os atalhos `cmd`. O `keybindings.yaml` do Warp só
+O que **não** vem para o Warp: os atalhos do workdeck. O `keybindings.yaml` do Warp só
 liga teclas a ações do próprio Warp e não tem uma ação de enviar texto, que é o
-que traduz `cmd+1…9` e companhia para o prefixo do tmux.
+que traduz os atalhos do workdeck para teclas do tmux. No Warp, use
+<kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>h</kbd> para o menu.
 
 O `work uninstall` remove o tema copiado, a não ser que você o tenha editado.
 
@@ -84,9 +100,10 @@ Se você abrir de outro terminal uma sessão do tmux iniciada no Warp, a variáv
 `WARP_CLIENT_VERSION` continua no ambiente do tmux e o painel mostra o aviso do
 Warp.
 
-## Qualquer outro terminal
+## Terminal padrão
 
-iTerm2, Ghostty, WezTerm, o terminal que vem no sistema ou uma conexão por SSH:
-o `work` abre do mesmo jeito, porque os atalhos são do tmux. No Mac, ligue a
+Ghostty, WezTerm, o terminal que vem no sistema ou uma conexão por SSH: o `work`
+abre do mesmo jeito, com os atalhos do tmux (<kbd>Ctrl</kbd>+<kbd>b</kbd>
+<kbd>h</kbd> para o menu, <kbd>Shift</kbd>+setas para navegar). No Mac, ligue a
 Option como Meta nas configurações do terminal para usar os atalhos Alt. O tema
 e a fonte, se você quiser, são configurados no próprio terminal.

@@ -12,6 +12,8 @@ MANIFEST="$CONFIG_DIR/.install-manifest"
 ZSH_PLUGINS="${XDG_DATA_HOME:-$HOME/.local/share}/workdeck-zsh"
 ZINIT_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/zinit/zinit.git"
 KITTY_DOWNLOAD="https://sw.kovidgoyal.net/kitty/binary/"
+ITERM_DOWNLOAD="https://iterm2.com/downloads.html"
+ITERM_PROFILE="$HOME/Library/Application Support/iTerm2/DynamicProfiles/workdeck.json"
 WARP_DOWNLOAD="https://www.warp.dev/download"
 
 THEME=""
@@ -44,7 +46,7 @@ FANCY=0
 green=""; yellow=""; red=""; purple=""; dim=""; bold=""; reset=""
 LOG=""
 UPDATING="${WORKDECK_UPDATING:-${WORKDECK_ATUALIZANDO:-}}"
-STEP=""; SUMMARY=""; WARNINGS=(); SPINNER=""
+STEP=""; STEP_NUMBER=0; SUMMARY=""; WARNINGS=(); SPINNER=""; STATUS_FILE=""
 
 parse_options() {
   while [ $# -gt 0 ]; do
@@ -61,6 +63,7 @@ parse_options() {
       --list-integrations) list_integrations; exit 0 ;;
       --terminal)
         TERMINAL_REQUESTED="$(option_value "$@")"
+        TERMINAL_REQUESTED="$(normalize_terminals "$TERMINAL_REQUESTED")"
         valid_terminal "$TERMINAL_REQUESTED" || { msgln install_bad_terminal "$TERMINAL_REQUESTED"; exit 1; }
         shift 2 ;;
       --visual) VISUAL_REQUESTED=yes; shift ;;
@@ -176,7 +179,12 @@ can_ask() {
 }
 
 say() {
-  if [ "$FANCY" = 1 ]; then printf '%s\n' "$*" >> "$LOG"; else printf '  %s\n' "$*"; fi
+  if [ "$FANCY" = 1 ]; then
+    printf '%s\n' "$*" >> "$LOG"
+    printf '%s' "$*" > "$STATUS_FILE"
+  else
+    printf '  %s\n' "$*"
+  fi
 }
 warn() {
   [ "$FANCY" = 1 ] && WARNINGS+=("$*")
@@ -190,10 +198,15 @@ run() {
 
 spin() {
   [ "$FANCY" = 1 ] || return 0
+  : > "$STATUS_FILE"
   (
     frames=(⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏); i=0
+    cols="$(tput cols 2>/dev/null || echo 80)"
+    room=$((cols - 30))
     while :; do
-      printf '\r  %s%s%s %s' "$purple" "${frames[$((i % 10))]}" "$reset" "$STEP"
+      status="$(cat "$STATUS_FILE" 2>/dev/null)"
+      [ "${#status}" -le "$room" ] || status="${status:0:$((room - 1))}…"
+      printf '\r\033[K  %s%s%s %s %s%s/7  %s%s' "$purple" "${frames[$((i % 10))]}" "$reset" "$STEP" "$dim" "$STEP_NUMBER" "$status" "$reset"
       i=$((i + 1)); sleep 0.08
     done
   ) &
@@ -209,7 +222,7 @@ stop_spin() {
   return 0
 }
 step() {
-  STEP="$2"; SUMMARY=""; WARNINGS=()
+  STEP="$2"; STEP_NUMBER="$1"; SUMMARY=""; WARNINGS=()
   if [ "$FANCY" = 1 ]; then spin; else echo "[$1/7] $2"; fi
 }
 finish_step() {
@@ -219,7 +232,7 @@ finish_step() {
     mark="${green}✓${reset}"
     [ ${#WARNINGS[@]} -gt 0 ] && mark="${yellow}!${reset}"
     width=$(printf '%s' "$STEP" | LC_ALL=C tr -d '\200-\277' | wc -c)
-    printf '  %s %s%*s %s%s%s\n' "$mark" "$STEP" $((14 - width)) "" "$dim" "$SUMMARY" "$reset"
+    printf '  %s %s%*s %s%s%s\n' "$mark" "$STEP" $((16 - width)) "" "$dim" "$SUMMARY" "$reset"
     for a in ${WARNINGS[@]+"${WARNINGS[@]}"}; do printf '      %s%s%s\n' "$yellow" "$a" "$reset"; done
   else
     echo
@@ -234,7 +247,7 @@ on_exit() {
     tail -n 15 "$LOG" | sed 's/^/      /'
   fi
   [ "$FANCY" = 1 ] && printf '\033[?25h'
-  rm -f "$LOG"
+  rm -f "$LOG" "$STATUS_FILE"
 }
 
 setup_output() {
@@ -244,6 +257,7 @@ setup_output() {
     dim=$'\033[2m'; bold=$'\033[1m'; reset=$'\033[0m'
   fi
   LOG="$(mktemp)"
+  STATUS_FILE="$(mktemp)"
   trap on_exit EXIT
   if [ "$FANCY" = 1 ]; then exec 2>>"$LOG"; fi
 }
@@ -286,7 +300,7 @@ show_header() {
     if [ -n "$UPDATING" ]; then
       printf '\033[?25l'
     else
-      printf '\033[?25l\n  %sworkdeck%s %s· %s · %s%s\n\n' "$bold" "$reset" "$dim" "$OS_NAME" "$THEME" "$reset"
+      printf '\033[?25l\n  %sworkdeck%s %s%s%s · %s%s\n\n' "$bold" "$reset" "$dim" "${VERSION:+$VERSION · }" "$OS_NAME" "$THEME" "$reset"
     fi
   else
     msgln install_header_plain "$OS_NAME" "$THEME"
@@ -315,7 +329,7 @@ kitty_installed() {
 apply_kitty() {
   local block
   block="$(sed '$d' "$ROOT/terminals/kitty.conf" | sed '/^# The theme is appended here/d')"
-  [ "$OS_NAME" = macOS ] || block="$(printf '%s\n' "$block" | grep -v '^map cmd\|^macos_')"
+  [ "$OS_NAME" = macOS ] || block="$(printf '%s\n' "$block" | grep -v '^macos_' | sed 's/^map cmd+\([^ ]*\)/map ctrl+shift+\1/')"
   if [ "$VISUAL" = yes ]; then
     block="$(printf '%s\n\n%s\n%s\n' "$block" "$(cat "$ROOT/terminals/kitty-visual.conf")" "$(cat "$ROOT/themes/$THEME.conf")")"
   fi
@@ -331,8 +345,39 @@ kitty_block_has_visual() {
 
 in_warp() { [ -n "${WARP_CLIENT_VERSION:-}" ]; }
 
+in_iterm() { [ -n "${ITERM_SESSION_ID:-}" ] || [ "${TERM_PROGRAM:-}" = iTerm.app ]; }
+
+iterm_installed() {
+  in_iterm && return 0
+  [ -d /Applications/iTerm.app ] || [ -d "$HOME/Applications/iTerm.app" ]
+}
+
+on_macos() { [ "$(uname -s)" = Darwin ]; }
+
+has_terminal() {
+  case ",$TERMINAL," in *",$1,"*) return 0 ;; esac
+  return 1
+}
+
+normalize_terminals() {
+  local list="${1// /}" t out=""
+  for t in ${list//,/ }; do
+    case "$t" in
+      iterm2|iTerm|iTerm2) t=iterm ;;
+    esac
+    case ",$out," in *",$t,"*) continue ;; esac
+    out="${out:+$out,}$t"
+  done
+  case ",$out," in
+    ,other,) ;;
+    *,other,*) out="$(printf '%s' ",$out," | sed 's/,other,/,/; s/^,//; s/,$//')" ;;
+  esac
+  printf '%s' "$out"
+}
+
 current_terminal_name() {
   if in_kitty; then echo kitty
+  elif in_iterm; then echo iTerm2
   elif in_warp; then echo Warp
   else echo terminal
   fi
@@ -345,28 +390,40 @@ warp_installed() {
 }
 
 valid_terminal() {
-  case "$1" in
-    kitty|warp|other) return 0 ;;
-    *) return 1 ;;
-  esac
+  local t
+  [ -n "$1" ] || return 1
+  for t in ${1//,/ }; do
+    case "$t" in
+      kitty|warp|other) ;;
+      iterm) on_macos || return 1 ;;
+      *) return 1 ;;
+    esac
+  done
+  return 0
 }
-
 detected_terminal() {
   in_kitty && { echo kitty; return 0; }
+  on_macos && in_iterm && { echo iterm; return 0; }
   in_warp && { echo warp; return 0; }
   kitty_installed && { echo kitty; return 0; }
+  on_macos && iterm_installed && { echo iterm; return 0; }
   warp_installed && { echo warp; return 0; }
   echo other
 }
-
-chosen_terminal_name() {
-  case "$TERMINAL" in
+terminal_name() {
+  case "$1" in
     warp) echo Warp ;;
+    iterm) echo iTerm2 ;;
     other) msgln install_other_terminal ;;
-    *) echo "$TERMINAL" ;;
+    *) echo "$1" ;;
   esac
 }
 
+chosen_terminal_name() {
+  local t out=""
+  for t in ${TERMINAL//,/ }; do out="${out:+$out, }$(terminal_name "$t")"; done
+  printf '%s\n' "$out"
+}
 terminal_hint() {
   if [ "$OS_NAME" = macOS ]; then msg "install_terminal_$1"; else msg "install_terminal_${1}_linux"; fi
 }
@@ -378,24 +435,27 @@ terminal_option() {
 }
 
 ask_terminal() {
-  local answer
+  local answer options=() n e picked=""
   stop_spin
   echo
   echo "  $(msg install_ask_terminal)"
-  terminal_option 1 kitty "$(terminal_hint kitty)"
-  terminal_option 2 Warp "$(terminal_hint warp)"
-  terminal_option 3 "$(msg install_other_terminal)" "$(terminal_hint other)"
+  options=(kitty)
+  on_macos && options+=(iterm)
+  options+=(warp other)
+  for ((n = 0; n < ${#options[@]}; n++)); do
+    terminal_option $((n + 1)) "$(terminal_name "${options[$n]}")" "$(terminal_hint "${options[$n]}")"
+  done
   echo
-  printf '  %s' "$(msg install_ask_number "$(chosen_terminal_name)")"
+  printf '  %s' "$(msg install_ask_terminal_numbers "$(chosen_terminal_name)")"
   read -r answer || answer=""
   spin
-  case "$answer" in
-    1) TERMINAL=kitty ;;
-    2) TERMINAL=warp ;;
-    3) TERMINAL=other ;;
-  esac
+  for e in ${answer//,/ }; do
+    if [ "$e" -ge 1 ] 2>/dev/null && [ "$e" -le "${#options[@]}" ]; then
+      picked="${picked:+$picked,}${options[$((e - 1))]}"
+    fi
+  done
+  [ -z "$picked" ] || TERMINAL="$(normalize_terminals "$picked")"
 }
-
 # A key that already holds this value is left alone, so a reinstall does not
 # rewrite the user's file.
 save_choice() {
@@ -416,13 +476,20 @@ choose_terminal() {
   save_choice TERMINAL "$TERMINAL"
 }
 
-terminal_has_visual() { [ "$TERMINAL" = kitty ] || [ "$TERMINAL" = warp ]; }
+terminal_has_visual() { has_terminal kitty || has_terminal warp; }
+
+visual_terminal_names() {
+  local out=""
+  has_terminal kitty && out="kitty"
+  has_terminal warp && out="${out:+$out, }Warp"
+  printf '%s\n' "$out"
+}
 
 ask_visual() {
   local answer
   stop_spin
   echo
-  printf '  %s' "$(msg install_ask_visual "$(chosen_terminal_name)")"
+  printf '  %s' "$(msg install_ask_visual "$(visual_terminal_names)")"
   read -r answer || answer=n
   spin
   case "${answer:-n}" in
@@ -439,7 +506,7 @@ choose_visual() {
     save_choice VISUAL "$VISUAL"
     return 0
   fi
-  if [ "$TERMINAL" = kitty ] && kitty_block_has_visual; then
+  if has_terminal kitty && kitty_block_has_visual; then
     VISUAL=yes
     save_choice VISUAL "$VISUAL"
     return 0
@@ -492,15 +559,32 @@ configure_warp() {
   summary "$SUMMARY · Warp"
 }
 
+configure_iterm() {
+  record iterm-profile "$ITERM_PROFILE"
+  if [ "$DRY" = 1 ]; then
+    say "$(msg install_dry_iterm "$(short_path "$ITERM_PROFILE")")"
+  else
+    mkdir -p "$(dirname "$ITERM_PROFILE")"
+    cp "$ROOT/terminals/iterm2.json" "$ITERM_PROFILE"
+    say "$(msg install_iterm_profile "$(short_path "$ITERM_PROFILE")")"
+  fi
+  iterm_installed || warn "$(msg install_iterm_missing "$ITERM_DOWNLOAD")"
+  summary "$SUMMARY · $(msg install_iterm_summary)"
+}
+
 configure_terminal() {
+  local t
   rm -f "$CONFIG_DIR/kitty"
-  case "$TERMINAL" in
-    kitty) configure_kitty ;;
-    warp) configure_warp ;;
-    *)
-      say "$(msg install_no_terminal_changes)"
-      summary "$SUMMARY · $(msg install_other_summary)" ;;
-  esac
+  for t in ${TERMINAL//,/ }; do
+    case "$t" in
+      kitty) configure_kitty ;;
+      iterm) configure_iterm ;;
+      warp) configure_warp ;;
+      *)
+        say "$(msg install_no_terminal_changes)"
+        summary "$SUMMARY · $(msg install_other_summary)" ;;
+    esac
+  done
 }
 
 has_font() {
@@ -956,8 +1040,14 @@ show_choices() {
   printf '                 %s\n' "$(msg install_choice_visual_hint)"
 }
 
+teach_iterm() {
+  has_terminal iterm || return 0
+  printf '\n  %s\n' "$(msg install_iterm_todo)"
+  printf '%s\n' "$(msg install_iterm_profile_steps)"
+}
+
 teach_warp() {
-  [ "$TERMINAL" = warp ] || return 0
+  has_terminal warp || return 0
   [ "$VISUAL" = yes ] || [ "$OS_NAME" = macOS ] || return 0
   printf '\n  %s\n' "$(msg install_warp_todo)"
   if [ "$VISUAL" = yes ]; then
@@ -980,7 +1070,8 @@ finish() {
     exit 0
   fi
   if [ "$FANCY" = 1 ]; then
-    printf '\n  %s%s%s\n' "$green" "$(msg install_done_fancy "$SECONDS")" "$reset"
+    echo
+    LOGO_INDENT="  " print_logo "" "" "${bold}workdeck${reset} ${dim}${VERSION}${reset}" "${dim}$(msg panel_tagline)${reset}" "" "${green}$(msg install_done_fancy "$SECONDS")${reset}" "" "" ""
   else
     msgln install_done
   fi
@@ -992,9 +1083,9 @@ finish() {
     else
       open_hint="$(next_step "$(msg install_open_kitty_restart)" "$(msg install_open_kitty_reload_hint)")"
     fi
-  elif [ "$TERMINAL" = kitty ] && ! in_kitty && kitty_installed && [ "$VISUAL" = yes ]; then
+  elif has_terminal kitty && ! in_kitty && kitty_installed && [ "$VISUAL" = yes ]; then
     open_hint="$(next_step "$(msg install_open_kitty)" "$(msg install_open_kitty_visual_hint)")"
-  elif [ "$TERMINAL" = kitty ] && ! in_kitty && kitty_installed; then
+  elif has_terminal kitty && ! in_kitty && kitty_installed; then
     open_hint="$(next_step "$(msg install_open_kitty)" "$(msg install_open_kitty_hint)")"
   elif [ "$RESTART_SHELL" = 1 ] && in_warp; then
     open_hint="$(next_step "$(msg install_open_warp_restart)" "$(msg install_open_terminal_restart_hint)")"
@@ -1006,9 +1097,28 @@ finish() {
   printf '\n  %s\n' "$(msg install_now)"
   [ -z "$open_hint" ] || printf '       %s\n' "$open_hint"
   printf '       %s\n\n' "$(next_step work "$(msg install_work_hint)" plain)"
-  printf '%s\n' "$(msg install_navigation)"
+  printf '%s\n' "$(msg install_navigation "$(window_key)" "$(menu_key)")"
+  teach_iterm
   teach_warp
   show_choices
+}
+
+terminal_modifier() {
+  if has_terminal iterm || { has_terminal kitty && on_macos; }; then echo "⌘"
+  elif has_terminal kitty; then echo "Ctrl+Shift+"
+  fi
+}
+
+menu_key() {
+  local mod
+  mod="$(terminal_modifier)"
+  if [ -n "$mod" ]; then echo "${mod}H"; else echo "Ctrl+b h"; fi
+}
+
+window_key() {
+  local mod
+  mod="$(terminal_modifier)"
+  if [ -n "$mod" ]; then echo "${mod}1…9"; else echo "Ctrl+b 1…9"; fi
 }
 
 next_step() {
@@ -1030,6 +1140,7 @@ refuse_windows() {
 }
 
 main() {
+  VERSION="$(git -C "$ROOT" describe --tags --abbrev=0 2>/dev/null || true)"
   refuse_windows
   parse_options "$@"
   setup_output

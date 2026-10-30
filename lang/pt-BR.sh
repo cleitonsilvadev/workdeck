@@ -35,7 +35,7 @@ msg_menu_notify_on="Ligar o aviso quando um agente termina"
 msg_menu_notify_off="Desligar o aviso quando um agente termina"
 msg_menu_update="Atualizar o workdeck"
 msg_menu_press_key="aperte qualquer tecla para fechar"
-msg_menu_split="Dividir a tela"
+msg_menu_split="Abrir um terminal num painel novo"
 msg_menu_zoom="Zoom no painel (de novo volta)"
 msg_menu_close_pane="Fechar este painel"
 msg_menu_key_windows="Shift ← →     projeto anterior / próximo"
@@ -43,7 +43,6 @@ msg_menu_key_panes="Shift ↑ ↓     painel anterior / próximo"
 msg_menu_key_number="Ctrl+b 1…9    vai direto para a janela"
 msg_menu_key_detach="Ctrl+b d      sai e deixa a sessão rodando"
 msg_menu_key_mouse="mouse         clica na barra, arrasta a borda"
-msg_menu_key_cmd="cmd+1…9       o mesmo, sem o Ctrl+b"
 msg_menu_close_hint="q ou Esc fecha o menu"
 msg_layout_invalid="PROJECT_LAYOUT=\"%s\" não existe no settings.conf; use agent-shell ou none. As janelas abrem com o agente e o shell lado a lado."
 msg_active_pane_invalid="workdeck: ACTIVE_PANE=\"%s\" inválido; use none ou line"
@@ -83,7 +82,7 @@ msg_install_help="workdeck — instalador. macOS e Linux.
   ./install.sh --zsh                instala o oh-my-zsh e o zinit sem perguntar
   ./install.sh --with ai-memory     ativa integrações opcionais (vírgula separa)
   ./install.sh --list-integrations  mostra as integrações disponíveis e sai
-  ./install.sh --terminal warp      escolhe o terminal (kitty, warp ou other) sem perguntar
+  ./install.sh --terminal kitty,iterm  escolhe os terminais (kitty, iterm, warp ou other) sem perguntar
   ./install.sh --visual             instala o tema e a fonte no terminal, sem perguntar
   ./install.sh --no-visual          no terminal, só os atalhos
   ./install.sh --yes                não pergunta nada; usa os padrões
@@ -95,7 +94,7 @@ msg_install_help="workdeck — instalador. macOS e Linux.
 nos seus arquivos fica entre marcadores >>> workdeck >>>, e o uninstall.sh
 remove exatamente esse trecho."
 msg_install_needs_value="%s precisa de um valor"
-msg_install_bad_terminal="terminal '%s' não existe. Disponíveis: kitty, warp, other"
+msg_install_bad_terminal="terminal '%s' não existe. Disponíveis: kitty, iterm (só no macOS), warp, other; separe com vírgula para mais de um"
 msg_install_bad_lang="idioma '%s' não existe. Disponíveis: en, pt-BR"
 msg_install_unknown_option="opção desconhecida: %s"
 msg_install_not_regular="%s não é um arquivo comum; não mexi nele"
@@ -191,7 +190,7 @@ msg_install_no="não"
 msg_install_choices="Suas escolhas, que a instalação lembra nas próximas vezes:"
 msg_install_choice_language="idioma"
 msg_install_choice_language_hint="para mudar: ./install.sh --lang en|pt-BR"
-msg_install_choice_terminal_hint="para mudar: ./install.sh --terminal kitty|warp|other"
+msg_install_choice_terminal_hint="para mudar: ./install.sh --terminal kitty,iterm,warp ou other"
 msg_install_choice_visual_hint="para mudar: ./install.sh --visual (tema e fonte) ou --no-visual"
 msg_install_warp_todo="No Warp, falta escolher no app:"
 msg_install_warp_theme_steps="       tema      Settings › Appearance › Themes, e escolha \"workdeck %s\"
@@ -214,10 +213,9 @@ msg_install_open_kitty_hint="com os atalhos cmd do workdeck"
 msg_install_open_terminal_restart="feche e abra o terminal"
 msg_install_now="Agora:"
 msg_install_work_hint="abre o painel, que mostra como adicionar os projetos"
-msg_install_navigation="  Para navegar: Shift+← / Shift+→ troca de janela, Shift+↑ / Shift+↓ troca de
-  painel, e Ctrl+b e depois 1…9 vai direto para uma janela. Clicar na barra
-  também funciona.
-  Ajuda a qualquer hora: Ctrl+b e h dentro do work."
+msg_install_navigation="  Para navegar: Shift+← / Shift+→ troca de projeto, Shift+↑ / Shift+↓ troca de
+  painel e %s vai direto para um projeto. Clicar na barra também funciona.
+  Ajuda a qualquer hora: %s dentro do work."
 msg_install_windows="O workdeck roda em macOS e Linux. No Windows, use pelo WSL: abra o Ubuntu do WSL e rode a instalação de lá."
 msg_install_ask_language="Em que idioma o workdeck mostra as mensagens?"
 
@@ -320,7 +318,7 @@ msg_panel_add_project="work add ~/projeto"
 msg_panel_add_project_hint="cada projeto vira uma janela; Tab completa o caminho"
 msg_panel_in_warp="%sNo Warp%s: o work funciona com os atalhos Alt; os atalhos cmd só valem no kitty."
 msg_panel_outside_kitty="%sFora do kitty%s: o work funciona, mas o tema, a fonte e os atalhos cmd só valem lá."
-msg_panel_menu_hint="Ctrl+b h abre o menu: projetos, review, dividir a tela"
+msg_panel_menu_hint="%s abre o menu: projetos, agente, terminal e review"
 msg_panel_custom_hint="Para pôr o seu no painel: um executável em ~/.config/workdeck/panels/"
 msg_panel_guide="  guia: github.com/thiagofeliperibeiro/workdeck/blob/main/docs/panels.pt-BR.md"
 
@@ -339,3 +337,15 @@ msg_install_warp_shortcuts_steps="       atalhos   Ctrl+b h abre o menu do workd
 msg_install_open_kitty_reload_hint="carrega os atalhos e os comandos do workdeck"
 msg_install_open_new_window="abra uma janela nova"
 msg_install_open_new_window_hint="carrega os comandos do workdeck"
+msg_menu_agent="Abrir o agente num painel novo"
+msg_menu_key_terminal_1="%sH menu    %sP projeto    %sA agente    %sT terminal"
+msg_menu_key_terminal_2="%sZ zoom    %sW fechar     %sR review    %s1…9 projeto"
+msg_agent_pane_none="nenhum agente definido: rode ./install.sh --agent claude (ou o seu agente)"
+msg_install_ask_terminal_numbers="Números separados por espaço, se usar mais de um (Enter para %s): "
+msg_install_terminal_iterm="atalhos do workdeck, mais os atalhos Cmd"
+msg_install_dry_iterm="[dry-run] gravaria o profile do iTerm2 em %s"
+msg_install_iterm_profile="profile workdeck do iTerm2 em %s"
+msg_install_iterm_missing="o iTerm2 ainda não está instalado; o profile workdeck já está pronto. Instale por %s e ele aparece em Settings › Profiles."
+msg_install_iterm_summary="iTerm2 com atalhos (profile workdeck)"
+msg_install_iterm_todo="No iTerm2, falta escolher no app:"
+msg_install_iterm_profile_steps="       profile   Settings › Profiles › workdeck › Other Actions › Set as Default"

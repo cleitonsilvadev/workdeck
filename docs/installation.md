@@ -21,15 +21,18 @@ stops before writing anything when it runs in Git Bash, MSYS or Cygwin.
    `LANGUAGE` in `~/.config/workdeck/settings.conf`.
 2. Detects the system and the package manager (brew on macOS; apt, dnf,
    pacman, zypper or apk on Linux) and installs tmux if it is missing.
-3. Asks which terminal you use: [kitty](https://sw.kovidgoyal.net/kitty/),
-   [Warp](https://www.warp.dev/) or the default terminal (the system one or any
-   other) and sets up its extras. **workdeck does not install a terminal:** if
-   the one you chose is missing, it writes the configuration anyway and tells
-   you where to download it; once you install it, it opens ready. For kitty and Warp, a second question
-   offers the workdeck theme and the JetBrains Mono font. The answers are saved
-   in `~/.config/workdeck/settings.conf` (`TERMINAL` and `VISUAL`), and
-   `--terminal kitty|warp|other` and `--visual` / `--no-visual` answer without
-   asking. Details in [terminals/README.md](../terminals/README.md).
+3. Asks which terminals you use: [kitty](https://sw.kovidgoyal.net/kitty/),
+   [iTerm2](https://iterm2.com/) (Mac), [Warp](https://www.warp.dev/) or the
+   default terminal (the system one or any other); you can pick more than one.
+   kitty and iTerm2 get the workdeck shortcuts. **workdeck does not install a
+   terminal:** if one you chose is missing, it writes the configuration anyway
+   and tells you where to download it; once you install it, it opens ready. For
+   kitty and Warp, a second question offers the workdeck theme and the
+   JetBrains Mono font. The answers are saved in
+   `~/.config/workdeck/settings.conf` (`TERMINAL` and `VISUAL`), and
+   `--terminal kitty,iterm` (or `warp`, `other`) and `--visual` /
+   `--no-visual` answer without asking. Details in
+   [terminals/README.md](../terminals/README.md).
 4. Puts the `work` command in `~/.local/bin`.
 5. Writes the configuration blocks to `.tmux.conf` and `.zshrc` (or
    `.bashrc`). `kitty.conf` only gets its block if you chose kitty and it is

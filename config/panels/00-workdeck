@@ -11,20 +11,8 @@ command -v work >/dev/null && work update --check >/dev/null 2>&1
 version="$(git -C "$code" describe --tags --abbrev=0 2>/dev/null || true)"
 latest="$(sed -n 's/^latest=//p' "${XDG_CACHE_HOME:-$HOME/.cache}/workdeck/update" 2>/dev/null | tail -1)"
 
-m=$'\033[48;5;183m'; e=$'\033[48;5;234m'; x=$'\033[0m'
+x=$'\033[0m'
 purple=$'\033[1;38;5;183m'; dim=$'\033[2m'; yellow=$'\033[33m'; green=$'\033[32m'
-
-logo=(
-  ".MMMMMMMMM."
-  "MMMMMMMMMMM"
-  "MMEMMMMMMMM"
-  "MMMEMMMMMMM"
-  "MMMMEMMMMMM"
-  "MMMEMMMMMMM"
-  "MMEMMEEEEMM"
-  "MMMMMMMMMMM"
-  ".MMMMMMMMM."
-)
 
 if [ "$projects" -gt 0 ]; then
   projects_line="${green}✓${x} $(msg panel_projects)  $projects"
@@ -51,18 +39,7 @@ text=(
   ""
 )
 
-for ((i = 0; i < ${#logo[@]}; i++)); do
-  line=""
-  row="${logo[$i]}"
-  for ((j = 0; j < ${#row}; j++)); do
-    case "${row:$j:1}" in
-      M) line="$line$m  " ;;
-      E) line="$line$e  " ;;
-      *) line="$line$x  " ;;
-    esac
-  done
-  printf '%s%s   %s\n' "$line" "$x" "${text[$i]}"
-done
+print_logo "${text[@]}"
 echo
 
 step() {
@@ -85,7 +62,14 @@ if [ -n "${TMUX:-}" ] && [ "$(tmux display -p '#{client_termname}' 2>/dev/null)"
   fi
 fi
 
-printf '%s%s%s\n' "$dim" "$(msg panel_menu_hint)" "$x"
+menu_key="Ctrl+b h"
+if [ -n "${TMUX:-}" ]; then
+  case "$(tmux display -p '#{client_termname}|#{client_termtype}' 2>/dev/null)" in
+    xterm-kitty\|*|*\|*iTerm2*)
+      if [ "$(uname -s)" = Darwin ]; then menu_key="⌘H"; else menu_key="Ctrl+Shift+H"; fi ;;
+  esac
+fi
+printf '%s%s%s\n' "$dim" "$(msg panel_menu_hint "$menu_key")" "$x"
 
 custom=0
 for f in "$CONFIG_DIR"/panels/*; do

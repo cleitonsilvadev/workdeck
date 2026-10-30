@@ -22,14 +22,16 @@ ou no Cygwin.
    `~/.config/workdeck/settings.conf`.
 2. Detecta o sistema e o gerenciador de pacotes — brew no macOS; apt, dnf,
    pacman, zypper ou apk no Linux — e instala o tmux, se faltar.
-3. Pergunta qual terminal você usa: [kitty](https://sw.kovidgoyal.net/kitty/),
-   [Warp](https://www.warp.dev/) ou o terminal padrão (o do sistema ou qualquer
-   outro) e configura os extras dele. **O workdeck não instala terminal:** se o
-   escolhido faltar, ele grava a configuração mesmo assim e avisa onde baixar;
-   quando você instala, o terminal já abre pronto.
-   No kitty e no Warp, uma segunda pergunta oferece o tema e a fonte JetBrains
-   Mono do workdeck. As respostas ficam em `~/.config/workdeck/settings.conf` (`TERMINAL` e
-   `VISUAL`), e `--terminal kitty|warp|other` e `--visual` /
+3. Pergunta quais terminais você usa: [kitty](https://sw.kovidgoyal.net/kitty/),
+   [iTerm2](https://iterm2.com/) (Mac), [Warp](https://www.warp.dev/) ou o
+   terminal padrão (o do sistema ou qualquer outro); dá para escolher mais de
+   um. O kitty e o iTerm2 ganham os atalhos do workdeck. **O workdeck não
+   instala terminal:** se algum escolhido faltar, ele grava a configuração
+   mesmo assim e avisa onde baixar; quando você instala, o terminal já abre
+   pronto. No kitty e no Warp, uma segunda pergunta oferece o tema e a fonte
+   JetBrains Mono do workdeck. As respostas ficam em
+   `~/.config/workdeck/settings.conf` (`TERMINAL` e `VISUAL`), e
+   `--terminal kitty,iterm` (ou `warp`, `other`) e `--visual` /
    `--no-visual` respondem sem perguntar. Detalhes em
    [terminals/README.pt-BR.md](../terminals/README.pt-BR.md).
 4. Coloca o comando `work` em `~/.local/bin`.

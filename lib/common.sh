@@ -121,6 +121,23 @@ load_messages() {
   return 0
 }
 
+print_logo() {
+  local m=$'\033[48;5;183m' e=$'\033[48;5;234m' x=$'\033[0m' i j row line text=("$@")
+  local logo=(".MMMMMMMMM." "MMMMMMMMMMM" "MMEMMMMMMMM" "MMMEMMMMMMM" "MMMMEMMMMMM" "MMMEMMMMMMM" "MMEMMEEEEMM" "MMMMMMMMMMM" ".MMMMMMMMM.")
+  for ((i = 0; i < ${#logo[@]}; i++)); do
+    line=""
+    row="${logo[$i]}"
+    for ((j = 0; j < ${#row}; j++)); do
+      case "${row:$j:1}" in
+        M) line="$line$m  " ;;
+        E) line="$line$e  " ;;
+        *) line="$line$x  " ;;
+      esac
+    done
+    printf '%s%s%s   %s\n' "${LOGO_INDENT:-}" "$line" "$x" "${text[$i]:-}"
+  done
+}
+
 msgln() {
   msg "$@"
   echo

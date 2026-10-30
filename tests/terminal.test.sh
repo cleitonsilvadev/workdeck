@@ -16,6 +16,7 @@ assert_kitty_shortcuts() {
     return 0
   fi
   assert "no cmd shortcuts outside a Mac" test -z "$(grep '^map cmd\|^macos_' "$(kitty_conf)")"
+  assert "the Ctrl+Shift shortcuts outside a Mac" grep -q '^map ctrl+shift+h ' "$(kitty_conf)"
 }
 
 test_terminal_kitty_installed_gets_the_block() {
@@ -81,7 +82,7 @@ test_install_shows_the_choices_and_how_to_change_them() {
   mkdir -p "$HOME/Applications/kitty.app"
   output="$(install_workdeck --terminal kitty --no-visual 2>&1)" || fail "the install exited with an error"
   assert_contains "$output" "terminal  kitty"
-  assert_contains "$output" "./install.sh --terminal kitty|warp|other"
+  assert_contains "$output" "./install.sh --terminal kitty,iterm,warp ou other"
   assert_contains "$output" "visual    não"
   assert_contains "$output" "./install.sh --visual (tema e fonte) ou --no-visual"
   assert_not_contains "$output" "detectado, não salvo" "everything was saved"
@@ -101,7 +102,7 @@ test_terminal_other_does_not_show_the_visual_choice() {
 test_unknown_terminal_fails() {
   if output="$(install_workdeck --terminal foo 2>&1)"; then fail "the install should fail"; fi
   assert_contains "$output" "terminal 'foo' não existe"
-  assert_contains "$output" "kitty, warp, other"
+  assert_contains "$output" "kitty, iterm (só no macOS), warp, other"
 }
 
 test_visual_on_kitty_puts_theme_and_font_in_the_block() {
@@ -238,4 +239,33 @@ test_panel_outside_kitty_and_warp_keeps_the_notice() {
   install_workdeck >/dev/null || fail "the install exited with an error"
   output="$(TMUX=outside "$CODE/bin/work-panel" --once | sed 's/\x1b\[[0-9;]*m//g')"
   assert_contains "$output" "Fora do kitty"
+}
+
+iterm_profile() { echo "$HOME/Library/Application Support/iTerm2/DynamicProfiles/workdeck.json"; }
+
+test_terminal_iterm_gets_a_valid_profile_and_uninstall_removes_it() {
+  [ "$(uname -s)" = Darwin ] || return 0
+  output="$(install_workdeck --terminal iterm 2>&1)" || fail "the install exited with an error"
+  assert "the profile was written" test -f "$(iterm_profile)"
+  assert "the profile parses as a property list" plutil -convert xml1 -o /dev/null "$(iterm_profile)"
+  assert "Cmd+H sends Ctrl+b h" grep -q '"Text": "0x02 0x68"' "$(iterm_profile)"
+  assert_contains "$output" "o iTerm2 ainda não está instalado; o profile workdeck já está pronto"
+  assert_contains "$output" "Set as Default"
+  assert_equal "$(saved_setting TERMINAL)" iterm "saved choice"
+  bash "$CODE/uninstall.sh" --all >/dev/null 2>&1 </dev/null || fail "the uninstall exited with an error"
+  assert "the uninstall removed the profile" test ! -e "$(iterm_profile)"
+}
+
+test_iterm_is_refused_outside_a_mac() {
+  [ "$(uname -s)" = Darwin ] && return 0
+  if output="$(install_workdeck --terminal iterm 2>&1)"; then fail "iterm should be refused outside a Mac"; fi
+  assert_contains "$output" "só no macOS"
+}
+
+test_several_terminals_are_set_up_together() {
+  output="$(install_workdeck --terminal kitty,warp,other --visual 2>&1)" || fail "the install exited with an error"
+  assert_equal "$(saved_setting TERMINAL)" "kitty,warp" "saved choice without other"
+  assert_kitty_shortcuts
+  assert "the Warp theme was copied" test -f "$(warp_themes_dir)/workdeck-catppuccin-mocha.yaml"
+  assert_contains "$output" "terminal  kitty, Warp"
 }

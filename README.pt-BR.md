@@ -146,20 +146,24 @@ work review
 
 ### Atalhos
 
-| Para | Teclas |
-|---|---|
-| **Abrir o menu** | <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>h</kbd> |
-| Projeto anterior / próximo | <kbd>Shift</kbd>+<kbd>←</kbd> / <kbd>→</kbd> |
-| Painel anterior / próximo | <kbd>Shift</kbd>+<kbd>↑</kbd> / <kbd>↓</kbd> |
-| Ir direto para a janela N | <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>1</kbd>…<kbd>9</kbd> (no Mac: <kbd>cmd</kbd>+<kbd>1</kbd>…<kbd>9</kbd>) |
-| Dividir a tela | <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>Enter</kbd> |
-| Zoom no painel | <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>z</kbd> |
-| Fechar o painel | <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>x</kbd> |
-| Sair e deixar tudo rodando | <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>d</kbd> |
+Escolha o kitty ou o iTerm2 na instalação e o workdeck cria atalhos próprios,
+uma letra cada: <kbd>⌘</kbd> no Mac, <kbd>Ctrl</kbd>+<kbd>Shift</kbd> no kitty do
+Linux.
 
-<kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>h</kbd> quer dizer: aperte
-<kbd>Ctrl</kbd>+<kbd>b</kbd>, solte, e aperte <kbd>h</kbd>. O mouse também
-funciona. Todos os atalhos, inclusive os de uma tecla com Alt, estão em
+| Para | macOS | Linux |
+|---|---|---|
+| **Abrir o menu** | <kbd>⌘</kbd>+<kbd>H</kbd> | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>H</kbd> |
+| Adicionar um projeto | <kbd>⌘</kbd>+<kbd>P</kbd> | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> |
+| Ir para o projeto 1…9 | <kbd>⌘</kbd>+<kbd>1</kbd>…<kbd>9</kbd> | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>1</kbd>…<kbd>9</kbd> |
+| Projeto anterior / próximo | <kbd>Shift</kbd>+<kbd>←</kbd> / <kbd>→</kbd> | <kbd>Shift</kbd>+<kbd>←</kbd> / <kbd>→</kbd> |
+| Abrir o agente / um terminal | <kbd>⌘</kbd>+<kbd>A</kbd> / <kbd>T</kbd> | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>A</kbd> / <kbd>T</kbd> |
+| Zoom / fechar o painel | <kbd>⌘</kbd>+<kbd>Z</kbd> / <kbd>W</kbd> | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd> / <kbd>W</kbd> |
+| Rodar o `work review` | <kbd>⌘</kbd>+<kbd>R</kbd> | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> |
+
+No Warp, no terminal do sistema ou em qualquer outro, valem os atalhos do tmux:
+<kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>h</kbd> abre o menu (aperte
+<kbd>Ctrl</kbd>+<kbd>b</kbd>, solte e aperte <kbd>h</kbd>) e
+<kbd>Shift</kbd>+setas trocam de projeto e de painel. Todos os atalhos estão em
 [docs/shortcuts.pt-BR.md](docs/shortcuts.pt-BR.md).
 
 ### Self code review

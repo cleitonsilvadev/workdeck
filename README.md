@@ -148,20 +148,24 @@ work review
 
 ### Shortcuts
 
-| To | Keys |
-|---|---|
-| **Open the menu** | <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>h</kbd> |
-| Previous / next project | <kbd>Shift</kbd>+<kbd>←</kbd> / <kbd>→</kbd> |
-| Previous / next pane | <kbd>Shift</kbd>+<kbd>↑</kbd> / <kbd>↓</kbd> |
-| Go to window N | <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>1</kbd>…<kbd>9</kbd> (on a Mac: <kbd>cmd</kbd>+<kbd>1</kbd>…<kbd>9</kbd>) |
-| Split the screen | <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>Enter</kbd> |
-| Zoom the pane | <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>z</kbd> |
-| Close the pane | <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>x</kbd> |
-| Detach and leave everything running | <kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>d</kbd> |
+Choose kitty or iTerm2 at install time and workdeck adds its own shortcuts, one
+letter each: <kbd>⌘</kbd> on a Mac, <kbd>Ctrl</kbd>+<kbd>Shift</kbd> in kitty on
+Linux.
 
-<kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>h</kbd> means: press
-<kbd>Ctrl</kbd>+<kbd>b</kbd>, release, then press <kbd>h</kbd>. The mouse works
-too. Every shortcut, including the single-key Alt ones, is in
+| To | macOS | Linux |
+|---|---|---|
+| **Open the menu** | <kbd>⌘</kbd>+<kbd>H</kbd> | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>H</kbd> |
+| Add a project | <kbd>⌘</kbd>+<kbd>P</kbd> | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> |
+| Go to project 1…9 | <kbd>⌘</kbd>+<kbd>1</kbd>…<kbd>9</kbd> | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>1</kbd>…<kbd>9</kbd> |
+| Previous / next project | <kbd>Shift</kbd>+<kbd>←</kbd> / <kbd>→</kbd> | <kbd>Shift</kbd>+<kbd>←</kbd> / <kbd>→</kbd> |
+| Open the agent / a terminal | <kbd>⌘</kbd>+<kbd>A</kbd> / <kbd>T</kbd> | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>A</kbd> / <kbd>T</kbd> |
+| Zoom / close the pane | <kbd>⌘</kbd>+<kbd>Z</kbd> / <kbd>W</kbd> | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd> / <kbd>W</kbd> |
+| Run `work review` | <kbd>⌘</kbd>+<kbd>R</kbd> | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> |
+
+In Warp, the system terminal or any other, the tmux shortcuts apply:
+<kbd>Ctrl</kbd>+<kbd>b</kbd> <kbd>h</kbd> opens the menu (press
+<kbd>Ctrl</kbd>+<kbd>b</kbd>, release, then <kbd>h</kbd>) and
+<kbd>Shift</kbd>+arrows switch projects and panes. Every shortcut is in
 [docs/shortcuts.md](docs/shortcuts.md).
 
 ### Self code review

@@ -285,7 +285,7 @@ review() {
 }
 
 menu() {
-  local client="$1" pane="$2" session id idx name active mark a height lines=9 args=() shortcuts notify
+  local client="$1" pane="$2" session id idx name active mark a height lines=10 args=() shortcuts notify mod
   session="$(tmux display -p -c "$client" '#{session_name}')"
   while IFS='|' read -r id idx active name; do
     mark="  "; [ "$active" = 1 ] && mark="● "
@@ -299,23 +299,31 @@ menu() {
   notify="$(msg menu_notify_on)"
   [ "$(setting_get NOTIFY_AGENTS no)" = yes ] && notify="$(msg menu_notify_off)"
   args+=(""
-    "$(msg menu_add)" + "command-prompt -p '$(msg menu_add_prompt)' \"run-shell \\\"work add '%%'\\\"\""
+    "$(msg menu_add)" p "command-prompt -p '$(msg menu_add_prompt)' \"run-shell \\\"work add '%%'\\\"\""
     "$(msg menu_review)" r "run-shell -c '#{pane_current_path}' 'WORKDECK_FROM_MENU=1 TMUX_PANE=#{pane_id} work review'"
     "$notify" n "run-shell \"work _notify-agents\""
     "$(msg menu_update)" u "display-popup -E -w 90 -h 30 \"bash -c 'work update; printf \\\"  \\\\033[2m$(msg menu_press_key)\\\\033[0m\\\"; read -rsn1'\""
     ""
-    "$(msg menu_split)" v "run-shell \"work _split '#{pane_id}'\""
+    "$(msg menu_agent)" a "run-shell \"work _agent '#{pane_id}'\""
+    "$(msg menu_split)" t "run-shell \"work _split '#{pane_id}'\""
     "$(msg menu_zoom)" z "resize-pane -Z"
-    "$(msg menu_close_pane)" x "kill-pane")
-  shortcuts=(
-    "$(msg menu_key_windows)"
-    "$(msg menu_key_panes)"
-    "$(msg menu_key_number)"
-    "$(msg menu_key_detach)"
-    "$(msg menu_key_mouse)"
-  )
-  if [ "$(uname -s)" = Darwin ] && [ "$(tmux display -p -c "$client" '#{client_termname}')" = xterm-kitty ]; then
-    shortcuts+=("$(msg menu_key_cmd)")
+    "$(msg menu_close_pane)" w "kill-pane")
+  mod="$(terminal_shortcut_modifier "$client")"
+  if [ -n "$mod" ]; then
+    shortcuts=(
+      "$(msg menu_key_terminal_1 "$mod" "$mod" "$mod" "$mod")"
+      "$(msg menu_key_terminal_2 "$mod" "$mod" "$mod" "$mod")"
+      "$(msg menu_key_windows)"
+      "$(msg menu_key_panes)"
+    )
+  else
+    shortcuts=(
+      "$(msg menu_key_windows)"
+      "$(msg menu_key_panes)"
+      "$(msg menu_key_number)"
+      "$(msg menu_key_detach)"
+      "$(msg menu_key_mouse)"
+    )
   fi
   height="$(tmux display -p -c "$client" '#{client_height}')"
   if [ "$height" -ge $((lines + ${#shortcuts[@]} + 5)) ]; then
@@ -324,6 +332,31 @@ menu() {
   fi
   [ "$height" -ge $((lines + 4)) ] && args+=("" "-$(msg menu_close_hint)" "" "")
   tmux display-menu -c "$client" -t "$pane" -x C -y C -T "#[align=centre] workdeck " "${args[@]}"
+}
+
+terminal_shortcut_modifier() {
+  local term
+  term="$(tmux display -p -c "$1" '#{client_termname}|#{client_termtype}' 2>/dev/null)"
+  case "$term" in
+    xterm-kitty\|*|*\|*iTerm2*) ;;
+    *) return 0 ;;
+  esac
+  if [ "$(uname -s)" = Darwin ]; then echo "⌘"; else echo "Ctrl+Shift+"; fi
+}
+
+open_agent_pane() {
+  local pane="${1:-${TMUX_PANE:-}}" agent_cmd new
+  agent_cmd="$(setting_get AGENT_CMD)"
+  if [ -z "$agent_cmd" ]; then
+    tmux display-message -d 6000 "$(msg agent_pane_none)"
+    return 0
+  fi
+  split_grid "$pane"
+  new="$(tmux display -p -t "$(tmux display -p -t "$pane" '#{window_id}')" '#{pane_id}')"
+  (
+    type_into "$new" "$agent_cmd"
+    tmux send-keys -t "$new" Enter
+  ) </dev/null >/dev/null 2>&1 &
 }
 
 split_where_it_fits() {
@@ -592,6 +625,7 @@ apply_settings() {
   local active_pane
   tmux show -gqv @wd_accent >/dev/null 2>&1 || return 0
   tmux set-hook -g client-focus-in 'run-shell -b "work _seen #{window_id} >/dev/null 2>&1"' 2>/dev/null || true
+  if [ "$(uname -s)" = Darwin ]; then tmux set -g @wd_mod "⌘"; else tmux set -g @wd_mod "ctrl+shift+"; fi
   active_pane="$(setting_get ACTIVE_PANE none)"
   case "$active_pane" in
     line) apply_active_pane_line ;;
@@ -716,6 +750,7 @@ case "${1:-}" in
   _seen) shift; mark_seen "${1:-}"; exit 0 ;;
   _notify-agents) toggle_notify_agents; exit 0 ;;
   _split) shift; split_grid "${1:-}"; exit 0 ;;
+  _agent) shift; open_agent_pane "${1:-}"; exit 0 ;;
   _settings) apply_settings; exit 0 ;;
   _panel) shift; exec "$LIB/work-panel" "$@" ;;
   _menu) shift; menu "$@"; exit 0 ;;
