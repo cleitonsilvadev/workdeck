@@ -22,10 +22,10 @@ stops before writing anything when it runs in Git Bash, MSYS or Cygwin.
 2. Detects the system and the package manager (brew on macOS; apt, dnf,
    pacman, zypper or apk on Linux) and installs tmux if it is missing.
 3. Asks which terminal you use: [kitty](https://sw.kovidgoyal.net/kitty/),
-   [Warp](https://www.warp.dev/) or another one. It checks that the terminal is
-   installed and sets up its extras. **workdeck does not install a terminal:**
-   if the one you chose is missing, it tells you where to download it, and you
-   run the installer again afterwards. For kitty and Warp, a second question
+   [Warp](https://www.warp.dev/) or the default terminal (the system one or any
+   other) and sets up its extras. **workdeck does not install a terminal:** if
+   the one you chose is missing, it writes the configuration anyway and tells
+   you where to download it; once you install it, it opens ready. For kitty and Warp, a second question
    offers the workdeck theme and the JetBrains Mono font. The answers are saved
    in `~/.config/workdeck/settings.conf` (`TERMINAL` and `VISUAL`), and
    `--terminal kitty|warp|other` and `--visual` / `--no-visual` answer without

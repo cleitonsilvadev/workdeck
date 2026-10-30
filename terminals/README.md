@@ -6,10 +6,11 @@ tmux is the only dependency, so `work`, the panel and the shortcuts behave the
 same in any terminal. What changes from one terminal to another are the extras:
 the colors, the font and the terminal's own shortcuts.
 
-The installer asks which terminal you use (kitty, Warp or another one), checks
-that it is installed and sets up the extras it supports. **It does not install a
-terminal:** if the one you chose is missing, it tells you where to download it,
-and you run the installer again afterwards. To answer without the question, use
+The installer asks which terminal you use (kitty, Warp or the default terminal,
+which covers the system one and any other) and sets up the extras it supports.
+**It does not install a terminal:** if the one you chose is missing, it writes
+the configuration anyway and tells you where to download it, so the terminal
+opens ready once you install it. To answer without the question, use
 `--terminal kitty`, `--terminal warp` or `--terminal other`; the choice is saved
 in `~/.config/workdeck/settings.conf` (`TERMINAL`).
 

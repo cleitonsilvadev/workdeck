@@ -23,9 +23,10 @@ ou no Cygwin.
 2. Detecta o sistema e o gerenciador de pacotes — brew no macOS; apt, dnf,
    pacman, zypper ou apk no Linux — e instala o tmux, se faltar.
 3. Pergunta qual terminal você usa: [kitty](https://sw.kovidgoyal.net/kitty/),
-   [Warp](https://www.warp.dev/) ou outro. Confere se o terminal está instalado
-   e configura os extras dele. **O workdeck não instala terminal:** se o
-   escolhido faltar, avisa onde baixar, e você roda a instalação de novo depois.
+   [Warp](https://www.warp.dev/) ou o terminal padrão (o do sistema ou qualquer
+   outro) e configura os extras dele. **O workdeck não instala terminal:** se o
+   escolhido faltar, ele grava a configuração mesmo assim e avisa onde baixar;
+   quando você instala, o terminal já abre pronto.
    No kitty e no Warp, uma segunda pergunta oferece o tema e a fonte JetBrains
    Mono do workdeck. As respostas ficam em `~/.config/workdeck/settings.conf` (`TERMINAL` e
    `VISUAL`), e `--terminal kitty|warp|other` e `--visual` /

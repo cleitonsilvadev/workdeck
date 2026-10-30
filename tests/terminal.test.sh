@@ -25,11 +25,25 @@ test_terminal_kitty_installed_gets_the_block() {
   assert_equal "$(saved_setting TERMINAL)" kitty "saved choice"
 }
 
-test_terminal_kitty_missing_warns_and_downloads_nothing() {
+test_terminal_kitty_missing_gets_the_block_and_downloads_nothing() {
   output="$(install_workdeck --terminal kitty 2>&1)" || fail "the install exited with an error"
-  assert_contains "$output" "kitty não encontrado; instale por https://sw.kovidgoyal.net/kitty/binary/"
-  assert "no kitty.conf was created" test ! -e "$(kitty_conf)"
+  assert_contains "$output" "o kitty ainda não está instalado; os atalhos já estão no kitty.conf. Instale por https://sw.kovidgoyal.net/kitty/binary/"
+  assert_kitty_shortcuts
   assert "nothing was downloaded" test ! -e "$HOME/Applications/kitty.app"
+}
+
+test_terminal_warp_missing_still_gets_the_theme() {
+  output="$(install_workdeck --terminal warp --visual 2>&1)" || fail "the install exited with an error"
+  assert_contains "$output" "o Warp ainda não está instalado"
+  assert "the Warp theme was copied" test -f "$(warp_themes_dir)/workdeck-catppuccin-mocha.yaml"
+}
+
+test_finish_asks_for_a_new_window_only_when_needed() {
+  output="$(install_workdeck --terminal other 2>&1)" || fail "first install"
+  assert_contains "$output" "abra uma janela nova"
+  output="$(install_workdeck 2>&1)" || fail "second install"
+  assert_not_contains "$output" "abra uma janela nova" "a reinstall that changed nothing"
+  assert_not_contains "$output" "feche e abra" "a reinstall that changed nothing"
 }
 
 test_terminal_other_leaves_the_terminal_alone() {
@@ -59,7 +73,7 @@ test_requested_terminal_wins_over_saved() {
 test_terminal_without_a_question_uses_the_detected_one_and_saves_nothing() {
   export KITTY_WINDOW_ID=1
   output="$(install_workdeck 2>&1)" || fail "the install exited with an error"
-  assert_contains "$output" "kitty não encontrado" "the detected terminal"
+  assert_contains "$output" "o kitty ainda não está instalado" "the detected terminal"
   assert "nothing was saved without a choice" lacks_saved_setting TERMINAL
 }
 
@@ -80,7 +94,7 @@ test_choices_without_a_saved_answer_say_they_were_detected() {
 
 test_terminal_other_does_not_show_the_visual_choice() {
   output="$(install_workdeck --terminal other 2>&1)" || fail "the install exited with an error"
-  assert_contains "$output" "terminal  outro"
+  assert_contains "$output" "terminal  Terminal padrão"
   assert_not_contains "$output" "visual    "
 }
 

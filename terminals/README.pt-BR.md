@@ -6,10 +6,10 @@ A única dependência é o tmux, então o `work`, o painel e os atalhos funciona
 igual em qualquer terminal. O que muda de um terminal para outro são os extras:
 as cores, a fonte e os atalhos próprios dele.
 
-A instalação pergunta qual terminal você usa (kitty, Warp ou outro), confere se
-ele está instalado e configura os extras que ele aceita. **Ela não instala
-terminal:** se o escolhido faltar, diz onde baixar, e você roda a instalação de
-novo depois. Para responder sem a pergunta, use `--terminal kitty`,
+A instalação pergunta qual terminal você usa (kitty, Warp ou o terminal padrão,
+que cobre o do sistema e qualquer outro) e configura os extras que ele aceita.
+**Ela não instala terminal:** se o escolhido faltar, grava a configuração mesmo
+assim e diz onde baixar, para o terminal já abrir pronto quando você instalar. Para responder sem a pergunta, use `--terminal kitty`,
 `--terminal warp` ou `--terminal other`; a escolha fica salva em
 `~/.config/workdeck/settings.conf` (`TERMINAL`).
 

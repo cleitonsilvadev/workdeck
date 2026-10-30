@@ -23,6 +23,9 @@ TERMINAL_REQUESTED=""
 VISUAL=""
 VISUAL_REQUESTED=""
 RESTART_SHELL=0
+SHELL_CHANGED=0
+KITTY_CHANGED=0
+BLOCK_CHANGED=0
 AGENT=""
 WITH=""
 YES=0
@@ -145,7 +148,8 @@ backup_file() {
 }
 
 write_block() {
-  local file="$1" body="$2" tmp backup
+  local file="$1" body="$2" tmp backup before
+  BLOCK_CHANGED=0
   if [ -e "$file" ] && [ ! -f "$file" ]; then
     warn "$(msg install_not_regular "$(short_path "$file")")"
     return 0
@@ -157,11 +161,13 @@ write_block() {
   [ "$DRY" = 1 ] && { say "$(msg install_dry_block "$file")"; return 0; }
   mkdir -p "$(dirname "$file")"
   touch "$file"
+  before="$(cksum < "$file")"
   tmp="$(mktemp)"
   without_block "$file" > "$tmp"
   awk 'BEGIN{n=0} {l[n++]=$0} END{while(n>0 && l[n-1]~/^[[:space:]]*$/) n--; for(i=0;i<n;i++) print l[i]}' "$tmp" > "$tmp.2"
   { cat "$tmp.2"; [ -s "$tmp.2" ] && echo; echo "$body"; } > "$file"
   rm -f "$tmp" "$tmp.2"
+  [ "$(cksum < "$file")" = "$before" ] || BLOCK_CHANGED=1
 }
 
 can_ask() {
@@ -314,6 +320,7 @@ apply_kitty() {
     block="$(printf '%s\n\n%s\n%s\n' "$block" "$(cat "$ROOT/terminals/kitty-visual.conf")" "$(cat "$ROOT/themes/$THEME.conf")")"
   fi
   write_block "$HOME/.config/kitty/kitty.conf" "$(printf '%s\n' "$block"; echo '# <<< workdeck <<<')"
+  KITTY_CHANGED="$BLOCK_CHANGED"
   if [ "$VISUAL" = yes ]; then say "$(msg install_kitty_full)"; else say "$(msg install_kitty_keys)"; fi
 }
 
@@ -360,14 +367,24 @@ chosen_terminal_name() {
   esac
 }
 
+terminal_hint() {
+  if [ "$OS_NAME" = macOS ]; then msg "install_terminal_$1"; else msg "install_terminal_${1}_linux"; fi
+}
+
+terminal_option() {
+  local width
+  width=$(printf '%s' "$2" | LC_ALL=C tr -d '\200-\277' | wc -c)
+  printf '    %s) %s%*s %s%s%s\n' "$1" "$2" $((16 - width)) "" "$dim" "$3" "$reset"
+}
+
 ask_terminal() {
   local answer
   stop_spin
   echo
   echo "  $(msg install_ask_terminal)"
-  printf '    1) %-7s %s%s%s\n' kitty "$dim" "$(msg install_terminal_kitty)" "$reset"
-  printf '    2) %-7s %s%s%s\n' Warp "$dim" "$(msg install_terminal_warp)" "$reset"
-  printf '    3) %-7s %s%s%s\n' "$(msg install_other_terminal)" "$dim" "$(msg install_terminal_other)" "$reset"
+  terminal_option 1 kitty "$(terminal_hint kitty)"
+  terminal_option 2 Warp "$(terminal_hint warp)"
+  terminal_option 3 "$(msg install_other_terminal)" "$(terminal_hint other)"
   echo
   printf '  %s' "$(msg install_ask_number "$(chosen_terminal_name)")"
   read -r answer || answer=""
@@ -450,12 +467,8 @@ apply_warp_theme() {
 }
 
 configure_kitty() {
-  if ! kitty_installed; then
-    warn "$(msg install_kitty_missing "$KITTY_DOWNLOAD")"
-    summary "$SUMMARY · $(msg install_kitty_missing_short)"
-    return 0
-  fi
   apply_kitty
+  kitty_installed || warn "$(msg install_kitty_missing "$KITTY_DOWNLOAD")"
   if [ "$VISUAL" = yes ]; then
     install_font
     summary "$SUMMARY · $(msg install_kitty_summary_full)"
@@ -465,12 +478,11 @@ configure_kitty() {
 }
 
 configure_warp() {
-  if ! warp_installed; then
+  if warp_installed; then
+    say "$(msg install_warp_found)"
+  else
     warn "$(msg install_warp_missing "$WARP_DOWNLOAD")"
-    summary "$SUMMARY · $(msg install_warp_missing_short)"
-    return 0
   fi
-  say "$(msg install_warp_found)"
   if [ "$VISUAL" = yes ]; then
     apply_warp_theme
     install_font
@@ -485,7 +497,9 @@ configure_terminal() {
   case "$TERMINAL" in
     kitty) configure_kitty ;;
     warp) configure_warp ;;
-    *) say "$(msg install_no_terminal_changes)" ;;
+    *)
+      say "$(msg install_no_terminal_changes)"
+      summary "$SUMMARY · $(msg install_other_summary)" ;;
   esac
 }
 
@@ -788,6 +802,7 @@ configure_shell() {
   esac
   if [ -n "$rc" ]; then
     write_block "$rc" "$(cat "$ROOT/config/shell-snippet.sh")"
+    SHELL_CHANGED="$BLOCK_CHANGED"
     if [ "$(setting_get ZSH)" = yes ] && [ "$DRY" = 0 ] && command -v zsh >/dev/null; then
       zsh -i -c exit </dev/null >> "$LOG" 2>&1 || true
     fi
@@ -943,18 +958,17 @@ show_choices() {
 
 teach_warp() {
   [ "$TERMINAL" = warp ] || return 0
-  warp_installed || return 0
-  [ "$VISUAL" = yes ] || [ "$OS_NAME" = macOS ] || return 0
   printf '\n  %s\n' "$(msg install_warp_todo)"
   if [ "$VISUAL" = yes ]; then
     printf '%s\n' "$(msg install_warp_theme_steps "$THEME")"
   fi
   [ "$OS_NAME" = macOS ] || return 0
   printf '%s\n' "$(msg install_warp_option_steps)"
+  printf '%s\n' "$(msg install_warp_shortcuts_steps)"
 }
 
 finish() {
-  local open_hint
+  local open_hint="" new_window=0
   if [ "$RELOAD" = 1 ] && command -v tmux >/dev/null && tmux info >/dev/null 2>&1; then
     run tmux source-file "$HOME/.tmux.conf" && say "$(msg install_tmux_reloaded)"
   fi
@@ -969,19 +983,27 @@ finish() {
   else
     msgln install_done
   fi
-  if in_kitty; then
-    open_hint="$(next_step "$(msg install_open_kitty_restart)" "$(msg install_open_kitty_restart_hint)")"
-  elif in_warp; then
-    open_hint="$(next_step "$(msg install_open_warp_restart)" "$(msg install_open_terminal_restart_hint)")"
-  elif [ "$TERMINAL" = kitty ] && kitty_installed && [ "$VISUAL" = yes ]; then
+  [ "$SHELL_CHANGED" = 1 ] && new_window=1
+  case ":$PATH:" in *":$BIN_DIR:"*) ;; *) new_window=1 ;; esac
+  if in_kitty && { [ "$RESTART_SHELL" = 1 ] || [ "$new_window" = 1 ] || [ "$KITTY_CHANGED" = 1 ]; }; then
+    if [ "$RESTART_SHELL" = 1 ]; then
+      open_hint="$(next_step "$(msg install_open_kitty_restart)" "$(msg install_open_kitty_restart_hint)")"
+    else
+      open_hint="$(next_step "$(msg install_open_kitty_restart)" "$(msg install_open_kitty_reload_hint)")"
+    fi
+  elif [ "$TERMINAL" = kitty ] && ! in_kitty && kitty_installed && [ "$VISUAL" = yes ]; then
     open_hint="$(next_step "$(msg install_open_kitty)" "$(msg install_open_kitty_visual_hint)")"
-  elif [ "$TERMINAL" = kitty ] && kitty_installed; then
+  elif [ "$TERMINAL" = kitty ] && ! in_kitty && kitty_installed; then
     open_hint="$(next_step "$(msg install_open_kitty)" "$(msg install_open_kitty_hint)")"
-  else
+  elif [ "$RESTART_SHELL" = 1 ] && in_warp; then
+    open_hint="$(next_step "$(msg install_open_warp_restart)" "$(msg install_open_terminal_restart_hint)")"
+  elif [ "$RESTART_SHELL" = 1 ]; then
     open_hint="$(next_step "$(msg install_open_terminal_restart)" "$(msg install_open_terminal_restart_hint)")"
+  elif [ "$new_window" = 1 ]; then
+    open_hint="$(next_step "$(msg install_open_new_window)" "$(msg install_open_new_window_hint)")"
   fi
   printf '\n  %s\n' "$(msg install_now)"
-  printf '       %s\n' "$open_hint"
+  [ -z "$open_hint" ] || printf '       %s\n' "$open_hint"
   printf '       %s\n\n' "$(next_step work "$(msg install_work_hint)" plain)"
   printf '%s\n' "$(msg install_navigation)"
   teach_warp
