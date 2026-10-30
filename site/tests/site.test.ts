@@ -57,7 +57,7 @@ describe.each(locales)("site content in %s", (locale) => {
     expect(unique(terminals.rows.map((r) => r.label))).toBe(true)
     expect(unique(panelRules.map((r) => r.code))).toBe(true)
     expect(unique(uninstall.map((u) => u.cmd))).toBe(true)
-    expect(unique([...shortcuts.navigate, ...shortcuts.act].map((s) => s.desc))).toBe(true)
+    expect(unique(shortcuts.items.map((s) => s.desc))).toBe(true)
   })
 
   test("uninstall starts with work uninstall", () => {

@@ -85,6 +85,15 @@ describe("home page", () => {
     expect(within(group).getByRole("button", { name: "PT" }).getAttribute("aria-pressed")).toBe("false")
   })
 
+  test("the keyboard section shows the workdeck shortcuts and the note for other terminals", async () => {
+    const { container } = render(await page("en"))
+    const keyboard = within(container.querySelector("#atalhos") as HTMLElement)
+    expect(keyboard.getByRole("tab", { name: "macOS" })).toBeTruthy()
+    expect(keyboard.getByRole("tab", { name: "Linux" })).toBeTruthy()
+    expect(keyboard.getByText("Runs work review")).toBeTruthy()
+    expect(keyboard.getByText("Warp and other terminals")).toBeTruthy()
+  })
+
   test("an unknown language is not found", async () => {
     await expect(page("fr")).rejects.toThrow()
   })
