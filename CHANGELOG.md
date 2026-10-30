@@ -6,6 +6,26 @@ se quer atualizar. Cada versão é uma tag `vX.Y.Z`.
 `work update` shows the section of the new version in your language before
 asking whether to update. Each version is a `vX.Y.Z` tag.
 
+## v2.2.0
+
+### Português
+
+- Novos atalhos do workdeck no kitty e no iTerm2, uma letra para cada passo: `⌘H` menu, `⌘P` adicionar projeto, `⌘1…9` ir para o projeto, `⌘A` abrir o agente, `⌘T` abrir um terminal, `⌘Z` zoom, `⌘W` fechar o painel e `⌘R` work review. No kitty do Linux, as mesmas letras com `Ctrl+Shift`. Os atalhos `cmd` antigos (`cmd+d`, `cmd+enter`, `cmd+shift+…`) saíram; o `Ctrl+b` continua igual.
+- O iTerm2 entrou nas opções da instalação, no Mac: o workdeck grava um profile **workdeck** com os atalhos, mesmo antes de o iTerm2 estar instalado. Escolha ele como padrão em Settings › Profiles. O `work uninstall` remove o profile.
+- Dá para escolher mais de um terminal na instalação, como `1 2` ou `--terminal kitty,iterm`. O workdeck configura só os escolhidos e não instala nenhum.
+- O menu, a barra e o painel mostram a tecla do menu do seu terminal (`⌘H`, `Ctrl+Shift+H` ou `Ctrl+b h`). No menu, as letras seguem os atalhos: `p` projeto, `a` agente, `t` terminal, `w` fechar.
+- A instalação ganhou um visual novo: a versão no cabeçalho, o que está sendo feito ao lado do spinner e o logo do workdeck no fim.
+- Correção: no Linux, com o Warp e sem o visual, o fim da instalação mostrava um título sem nada embaixo.
+
+### English
+
+- New workdeck shortcuts in kitty and iTerm2, one letter per step: `⌘H` menu, `⌘P` add a project, `⌘1…9` go to the project, `⌘A` open the agent, `⌘T` open a terminal, `⌘Z` zoom, `⌘W` close the pane and `⌘R` work review. In kitty on Linux, the same letters with `Ctrl+Shift`. The old `cmd` shortcuts (`cmd+d`, `cmd+enter`, `cmd+shift+…`) are gone; `Ctrl+b` stays the same.
+- iTerm2 joins the install options on a Mac: workdeck writes a **workdeck** profile with the shortcuts, even before iTerm2 is installed. Pick it as the default in Settings › Profiles. `work uninstall` removes the profile.
+- You can pick more than one terminal at install time, such as `1 2` or `--terminal kitty,iterm`. workdeck sets up only the ones you chose and installs none.
+- The menu, the status bar and the panel show the menu key of your terminal (`⌘H`, `Ctrl+Shift+H` or `Ctrl+b h`). In the menu, the letters follow the shortcuts: `p` project, `a` agent, `t` terminal, `w` close.
+- The installer has a new look: the version in the header, what is happening next to the spinner and the workdeck logo at the end.
+- Fix: on Linux, with Warp and without the look, the end of the install showed a heading with nothing below it.
+
 ## v2.1.0
 
 ### Português
