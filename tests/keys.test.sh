@@ -35,3 +35,19 @@ test_kitty_sends_shift_enter_in_the_extended_format() {
 test_kitty_sends_shift_enter_only_while_tmux_is_focused() {
   assert_contains "$(cat "$REPO/terminals/kitty.conf")" 'map --when-focus-on cmdline:tmux shift+enter' "Shift+Enter scope"
 }
+
+test_dragging_a_project_shows_it_as_a_ghost_until_it_is_dropped() {
+  local end
+  start_tmux_with_installed_config
+  assert_contains "$(tmux list-keys -T root MouseDrag1Status 2>&1)" "set-option -g @wd_drag 1" "drag binding"
+  assert_not_contains "$(tmux list-keys -T root MouseDrag1Status 2>&1)" "swap-window" "nothing moves before the drop"
+  assert_contains "$(tmux list-keys -T root MouseDragEnd1Status 2>&1)" "work _drop" "the drop swaps the projects"
+  for end in MouseDragEnd1Status MouseDragEnd1StatusDefault MouseDragEnd1StatusLeft MouseDragEnd1StatusRight MouseDragEnd1Pane; do
+    assert_contains "$(tmux list-keys -T root "$end" 2>&1)" "set-option -gu @wd_drag" "$end clears the highlight"
+  done
+  assert_contains "$(tmux list-keys -T root MouseDragEnd1Pane 2>&1)" "send-keys -M" "the pane still gets the mouse"
+  tmux set -g @wd_drag 1
+  assert_contains "$(tmux display -p -t keys '#{E:window-status-current-format}')" "dim" "held project while dragging"
+  tmux set -gu @wd_drag
+  assert_not_contains "$(tmux display -p -t keys '#{E:window-status-current-format}')" "dim" "project after the drop"
+}
