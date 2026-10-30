@@ -91,7 +91,7 @@ describe("home page", () => {
     expect(keyboard.getByRole("tab", { name: "macOS" })).toBeTruthy()
     expect(keyboard.getByRole("tab", { name: "Linux" })).toBeTruthy()
     expect(keyboard.getByText("Runs work review")).toBeTruthy()
-    expect(keyboard.getByText("Warp and other terminals")).toBeTruthy()
+    expect(keyboard.getByText("Other terminals")).toBeTruthy()
   })
 
   test("an unknown language is not found", async () => {
