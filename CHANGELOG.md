@@ -6,6 +6,20 @@ se quer atualizar. Cada versão é uma tag `vX.Y.Z`.
 `work update` shows the section of the new version in your language before
 asking whether to update. Each version is a `vX.Y.Z` tag.
 
+## v2.4.0
+
+### Português
+
+- O `work review` passa a abrir sempre num painel separado, com um agente que começa do zero: ele lê só a mudança e o código em volta, sem a conversa que escreveu o código, e por isso não repete os mesmos pontos cegos. O `REVIEW_AGENT_CMD` continua escolhendo outro modelo ou outra IA para ele.
+- O review no chat que você está usando continua disponível com `work review --chat`. O seu `REVIEW_COMMAND` (como `/bmad-code-review`) vira a primeira mensagem do agente no painel, ou vai para o chat com `--chat`.
+- Sem nada por commitar, o review no painel cobre os commits que ainda não subiram, com qualquer agente.
+
+### English
+
+- `work review` now always opens a separate pane, with an agent that starts from scratch: it reads only the change and the code around it, without the conversation that wrote the code, so it does not repeat the same blind spots. `REVIEW_AGENT_CMD` still picks another model or AI for it.
+- The review in the chat you are using is still there with `work review --chat`. Your `REVIEW_COMMAND` (such as `/bmad-code-review`) becomes the first message of the agent in the pane, or goes to the chat with `--chat`.
+- With nothing to commit, the review in the pane covers the commits not pushed yet, with any agent.
+
 ## v2.3.0
 
 ### Português
