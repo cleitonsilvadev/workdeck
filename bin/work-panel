@@ -64,7 +64,7 @@ toml_string() {
 }
 
 write_tclock_config() {
-  local file="$WORKDECK_CONFIG/tclock/config.toml" panel title accent
+  local file="$WORKDECK_CONFIG/tclock/config.toml" panel title accent position compact
   accent="$(tmux show -gqv @wd_accent 2>/dev/null)"
   mkdir -p "$(dirname "$file")"
   {
@@ -73,8 +73,9 @@ write_tclock_config() {
     printf '[clock]\nshow_date = true\nwidget_themes = ["default"]\n'
     for panel in "$PANELS"/*; do
       [ -x "$panel" ] || continue
-      case "$(basename "$panel")" in 00-*) title="" ;; *) title="$(panel_title "$panel")" ;; esac
-      printf '\n[[clock.widgets]]\ntitle = %s\ncommand = ["/usr/bin/env", %s, %s]\nrefresh_secs = %s\n' "$(toml_string "$title")" "$(toml_string "XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-$HOME/.config}")" "$(toml_string "$panel")" "$INTERVAL"
+      title="$(panel_title "$panel")" position=auto compact=0
+      case "$(basename "$panel")" in 00-*) title="" position=bottom compact=1 ;; esac
+      printf '\n[[clock.widgets]]\ntitle = %s\ncommand = ["/usr/bin/env", %s, %s, %s]\nrefresh_secs = %s\nposition = %s\n' "$(toml_string "$title")" "$(toml_string "XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-$HOME/.config}")" "$(toml_string "WORKDECK_PANEL_COMPACT=$compact")" "$(toml_string "$panel")" "$INTERVAL" "$(toml_string "$position")"
     done
   } > "$file"
 }

@@ -352,3 +352,5 @@ No Mac, ele é compilado com o Rust que você já tem e leva alguns minutos. [s/
 msg_install_ask_clock_mac_no_rust="Quer o painel com o relógio tclock (o relógio no alto e os blocos embaixo)?
 No Mac, ele precisa do Rust, que não está instalado: rode brew install rust e a
 instalação de novo para ter o relógio. [s/N] "
+msg_panel_compact_keys="%sH menu  ·  %sP projeto  ·  %sR review"
+msg_panel_compact_menu="%s abre o menu"

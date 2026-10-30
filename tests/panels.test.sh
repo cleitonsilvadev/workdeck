@@ -52,6 +52,7 @@ test_panel_runs_in_tclock_with_the_blocks_as_widgets() {
   assert_contains "$toml" "\"XDG_CONFIG_HOME=$HOME/.config\"" "the blocks get the original config folder back"
   assert_contains "$toml" 'title = "Projetos"'
   assert_contains "$toml" 'refresh_secs = 60'
+  assert_contains "$toml" 'position = "bottom"' "the workdeck block as a strip at the bottom"
 }
 
 test_tclock_takes_the_theme_accent() {
@@ -69,4 +70,12 @@ test_tclock_takes_the_theme_accent() {
   assert_contains "$toml" "[default]"
   assert_contains "$toml" 'color = "#cba6f7"'
   assert_contains "$toml" 'widget_themes = ["default"]'
+}
+
+test_workdeck_block_is_one_line_inside_tclock() {
+  install_workdeck >/dev/null || fail "install exited with an error"
+  output="$(WORKDECK_PANEL_COMPACT=1 "$CONFIG/panels/00-workdeck" | sed 's/\x1b\[[0-9;]*m//g')"
+  assert_equal "$(printf '%s\n' "$output" | wc -l | tr -d ' ')" 1 "lines in the compact block"
+  assert_contains "$output" "workdeck"
+  assert_contains "$output" "Ctrl+b h abre o menu"
 }

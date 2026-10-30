@@ -353,3 +353,5 @@ On a Mac, it is built with the Rust you already have and takes a few minutes. [y
 msg_install_ask_clock_mac_no_rust="Do you want the panel with the tclock clock (the clock on top and the blocks below)?
 On a Mac, it needs Rust, which is not installed: run brew install rust and the
 installer again to get the clock. [y/N] "
+msg_panel_compact_keys="%sH menu  ·  %sP project  ·  %sR review"
+msg_panel_compact_menu="%s opens the menu"

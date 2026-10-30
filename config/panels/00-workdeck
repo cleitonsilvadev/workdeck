@@ -27,6 +27,18 @@ elif [ -n "$version" ]; then
   version_line="${dim}$version${x}"
 fi
 
+if [ "${WORKDECK_PANEL_COMPACT:-0}" = 1 ]; then
+  keys="Ctrl+b h"
+  if [ -n "${TMUX:-}" ] && [ "$(tmux display -p '#{client_termname}' 2>/dev/null)" = xterm-kitty ]; then
+    if [ "$(uname -s)" = Darwin ]; then keys="⌘"; else keys="Ctrl+Shift+"; fi
+    keys="$(msg panel_compact_keys "$keys" "$keys" "$keys")"
+  else
+    keys="$(msg panel_compact_menu "$keys")"
+  fi
+  printf '%sworkdeck%s %s  %s·  %s%s\n' "$purple" "$x" "$version_line" "$dim" "$keys" "$x"
+  exit 0
+fi
+
 text=(
   ""
   ""
