@@ -338,7 +338,7 @@ msg_uninstall_kitty_kept="kitty stays installed; only the workdeck configuration
 msg_uninstall_kitty_removed="kitty removed from %s"
 msg_uninstall_kitty_failed="could not remove %s; delete it by hand if you want"
 msg_uninstall_goodbye="see you soon."
-msg_install_ask_clock="Do you want the panel with the tclock clock, by Akita (the clock on top and the panel blocks below)? [y/N] "
+msg_install_ask_clock="Do you want the panel with the tclock clock (the clock on top and the panel blocks below)? [y/N] "
 msg_install_clock_present="tclock already installed; the panel uses it"
 msg_install_clock_no_deps="tclock not installed (--no-deps); the panel stays in text mode"
 msg_install_dry_clock="[dry-run] would install tclock"
@@ -348,8 +348,8 @@ msg_install_clock_downloading="downloading tclock…"
 msg_install_clock_installed="tclock installed in %s"
 msg_install_clock_failed="could not install tclock (%s); the panel stays in text mode"
 msg_settings_panel_clock="# Panel with the tclock clock on top and the blocks below. Needs tclock installed."
-msg_install_ask_clock_mac="Do you want the panel with the tclock clock, by Akita (the clock on top and the blocks below)?
+msg_install_ask_clock_mac="Do you want the panel with the tclock clock (the clock on top and the blocks below)?
 On a Mac, it is built with the Rust you already have and takes a few minutes. [y/N] "
-msg_install_ask_clock_mac_no_rust="Do you want the panel with the tclock clock, by Akita (the clock on top and the blocks below)?
+msg_install_ask_clock_mac_no_rust="Do you want the panel with the tclock clock (the clock on top and the blocks below)?
 On a Mac, it needs Rust, which is not installed: run brew install rust and the
 installer again to get the clock. [y/N] "

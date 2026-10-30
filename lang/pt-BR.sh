@@ -337,7 +337,7 @@ msg_uninstall_kitty_kept="o kitty continua instalado; só a configuração do wo
 msg_uninstall_kitty_removed="kitty removido de %s"
 msg_uninstall_kitty_failed="não consegui remover %s; apague à mão se quiser"
 msg_uninstall_goodbye="até breve."
-msg_install_ask_clock="Quer o painel com o relógio tclock, do Akita (o relógio no alto e os blocos do painel embaixo)? [s/N] "
+msg_install_ask_clock="Quer o painel com o relógio tclock (o relógio no alto e os blocos do painel embaixo)? [s/N] "
 msg_install_clock_present="tclock já instalado; o painel usa ele"
 msg_install_clock_no_deps="tclock não instalado (--no-deps); o painel fica no modo de texto"
 msg_install_dry_clock="[dry-run] instalaria o tclock"
@@ -347,8 +347,8 @@ msg_install_clock_downloading="baixando o tclock…"
 msg_install_clock_installed="tclock instalado em %s"
 msg_install_clock_failed="não consegui instalar o tclock (%s); o painel fica no modo de texto"
 msg_settings_panel_clock="# Painel com o relógio tclock no alto e os blocos embaixo. Precisa do tclock instalado."
-msg_install_ask_clock_mac="Quer o painel com o relógio tclock, do Akita (o relógio no alto e os blocos embaixo)?
+msg_install_ask_clock_mac="Quer o painel com o relógio tclock (o relógio no alto e os blocos embaixo)?
 No Mac, ele é compilado com o Rust que você já tem e leva alguns minutos. [s/N] "
-msg_install_ask_clock_mac_no_rust="Quer o painel com o relógio tclock, do Akita (o relógio no alto e os blocos embaixo)?
+msg_install_ask_clock_mac_no_rust="Quer o painel com o relógio tclock (o relógio no alto e os blocos embaixo)?
 No Mac, ele precisa do Rust, que não está instalado: rode brew install rust e a
 instalação de novo para ter o relógio. [s/N] "

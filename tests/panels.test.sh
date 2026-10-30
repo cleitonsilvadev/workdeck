@@ -49,6 +49,7 @@ test_panel_runs_in_tclock_with_the_blocks_as_widgets() {
   toml="$(cat "$BASE/tclock-config" 2>/dev/null)"
   assert_contains "$toml" '[[clock.widgets]]'
   assert_contains "$toml" "$CONFIG/panels/00-workdeck"
+  assert_contains "$toml" "\"XDG_CONFIG_HOME=$HOME/.config\"" "the blocks get the original config folder back"
   assert_contains "$toml" 'title = "Projetos"'
   assert_contains "$toml" 'refresh_secs = 60'
 }
