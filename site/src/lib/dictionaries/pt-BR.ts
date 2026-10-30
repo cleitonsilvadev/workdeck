@@ -23,13 +23,13 @@ export const ptBR = {
   how: {
     eyebrow: "como funciona",
     title: "Do projeto ao review",
-    desc: "Cada projeto é uma janela, o agente fica ao lado do seu shell e, quando ele termina, o work review começa o review no mesmo chat.",
+    desc: "Cada projeto é uma janela, o agente fica ao lado do seu shell e, quando ele termina, o work review abre o review num painel separado, com um agente do zero.",
   },
   cycle: [
-    { label: "work add ~/api", code: true, when: "uma vez", desc: "work abre a sessão no painel; work add põe o projeto nela, numa janela em segundo plano." },
+    { label: "work add ~/api", code: true, when: "uma vez", desc: "work abre a sessão no painel, e work add põe o projeto nela, numa janela em segundo plano." },
     { label: "janela do projeto", code: false, when: "sempre aberta", desc: "Shift+→ vai até ela. Fechou o terminal? work volta onde estava." },
     { label: "agente ao lado", code: false, when: "escreve o código", desc: "Claude Code, Codex ou o que você usar. Quando ele termina, a ✦ na barra avisa, mesmo que você esteja em outra janela." },
-    { label: "work review", code: true, when: "self code review", desc: "Quando o agente termina, o work review começa o review dele no mesmo chat, como um subagente com contexto próprio. Ele aponta o que corrigir e não mexe em nada." },
+    { label: "work review", code: true, when: "self code review", desc: "Quando o agente termina, o work review abre um painel separado com um agente que começa do zero, sem a conversa que escreveu o código. Ele aponta o que corrigir e não mexe em nada." },
   ],
   layers: [
     { name: "workdeck", desc: "projetos, agente ao lado, work review e painel" },
@@ -43,8 +43,8 @@ export const ptBR = {
   },
   commands: [
     { cmd: "work", desc: "Abre a sessão, uma janela por projeto. Ou volta para ela." },
-    { cmd: "work add ~/projeto", desc: "Acrescenta um projeto. Sem caminho, usa a pasta atual; Tab completa o caminho." },
-    { cmd: "work review", desc: "Quando o agente termina, começa o review dele no mesmo chat. Com --pane, ou com o REVIEW_AGENT_CMD apontando outro modelo, abre o review num painel separado." },
+    { cmd: "work add ~/projeto", desc: "Acrescenta um projeto. Sem caminho, usa a pasta atual. Tab completa o caminho." },
+    { cmd: "work review", desc: "Abre o review num painel separado, com um agente que começa do zero. O REVIEW_AGENT_CMD escolhe outro modelo. Com --chat, o review roda no chat que você está usando." },
     { cmd: "work update", desc: "Mostra o que mudou na versão nova e atualiza. O work e o painel avisam quando há uma." },
     { cmd: "work kill", desc: "Fecha a sessão inteira. O próximo work abre com a lista de projetos atual." },
     { cmd: "work uninstall", desc: "Desinstala tudo o que o workdeck instalou. Mostra o que vai sair e pergunta antes." },
@@ -76,8 +76,8 @@ export const ptBR = {
   },
   shortcutsSection: {
     eyebrow: "teclado",
-    title: "Atalhos do kitty, uma tecla para cada passo",
-    desc: "Do projeto ao review sem tirar a mão do teclado. Os atalhos do workdeck são do kitty; os outros terminais ainda não têm suporte.",
+    title: "Um atalho para cada passo, no kitty",
+    desc: "Do projeto ao review sem tirar a mão do teclado. Por enquanto, os atalhos são só do kitty.",
   },
   shortcuts: {
     macTab: "macOS",
@@ -96,7 +96,7 @@ export const ptBR = {
       { key: "R", desc: "Roda o work review" },
     ],
     othersTitle: "Outros terminais",
-    othersText: "Os atalhos acima ainda não funcionam no Warp, no iTerm2 e nos outros terminais. Neles, valem os do tmux: Ctrl+b h abre o menu, e Shift+setas trocam de projeto e de painel.",
+    othersText: "Pro Warp, o iTerm2 e os outros terminais, ainda não temos suporte :( Neles, valem os atalhos do tmux: Ctrl+b h abre o menu, e Shift+setas trocam de projeto e de painel.",
   },
   panelSection: {
     eyebrow: "painel",
@@ -154,9 +154,10 @@ export const ptBR = {
     windows: "4 janelas",
     agentHint: "Ctrl+b v · claude no painel ao lado →",
     agentDone: "o agente terminou",
-    reviewHint: "review começou no chat →",
-    reviewBeside: "← review começou no chat do agente",
-    reviewRunning: "rodando em segundo plano como @code-review",
+    reviewHint: "o review abriu no painel embaixo do agente →",
+    reviewBeside: "← o review abriu embaixo do agente",
+    reviewPane: "review · claude",
+    reviewRunning: "um agente do zero, sem a conversa",
     reviewFound: "2 achados",
     issueEmail: "o regex aceita e-mail sem domínio",
     issueTest: "falta teste para e-mail inválido",

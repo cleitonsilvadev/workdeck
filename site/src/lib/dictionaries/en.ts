@@ -24,13 +24,13 @@ export const en: Dictionary = {
   how: {
     eyebrow: "how it works",
     title: "From project to review",
-    desc: "Each project is a window, the agent sits next to your shell and, once it finishes, work review starts the review in the same chat.",
+    desc: "Each project is a window, the agent sits next to your shell and, once it finishes, work review opens the review in a separate pane, with a fresh agent.",
   },
   cycle: [
-    { label: "work add ~/api", code: true, when: "once", desc: "work opens the session on the panel; work add puts the project in it, in a background window." },
+    { label: "work add ~/api", code: true, when: "once", desc: "work opens the session on the panel, and work add puts the project in it, in a background window." },
     { label: "project window", code: false, when: "always open", desc: "Shift+→ takes you there. Closed the terminal? work brings you back where you were." },
     { label: "agent beside it", code: false, when: "writes the code", desc: "Claude Code, Codex or whatever you use. When it finishes, the ✦ in the status bar tells you, even from another window." },
-    { label: "work review", code: true, when: "self code review", desc: "Once the agent finishes, work review starts its own review in the same chat, as a subagent with its own context. It points out what to fix and changes nothing." },
+    { label: "work review", code: true, when: "self code review", desc: "Once the agent finishes, work review opens a separate pane with an agent that starts from scratch, without the conversation that wrote the code. It points out what to fix and changes nothing." },
   ],
   layers: [
     { name: "workdeck", desc: "projects, the agent beside the code, work review and the panel" },
@@ -44,8 +44,8 @@ export const en: Dictionary = {
   },
   commands: [
     { cmd: "work", desc: "Opens the session, one window per project. Or returns to it." },
-    { cmd: "work add ~/project", desc: "Adds a project. Without a path, uses the current folder; Tab completes the path." },
-    { cmd: "work review", desc: "Once the agent finishes, starts its own review in the same chat. With --pane, or with REVIEW_AGENT_CMD set to another model, opens the review in a separate pane." },
+    { cmd: "work add ~/project", desc: "Adds a project. Without a path, uses the current folder. Tab completes the path." },
+    { cmd: "work review", desc: "Opens the review in a separate pane, with an agent that starts from scratch. REVIEW_AGENT_CMD picks another model. With --chat, the review runs in the chat you are using." },
     { cmd: "work update", desc: "Shows what changed in the new version and updates. work and the panel tell you when there is one." },
     { cmd: "work kill", desc: "Closes the whole session. The next work opens with the current project list." },
     { cmd: "work uninstall", desc: "Uninstalls everything workdeck installed. Shows what will be removed and asks first." },
@@ -77,8 +77,8 @@ export const en: Dictionary = {
   },
   shortcutsSection: {
     eyebrow: "keyboard",
-    title: "kitty shortcuts, one key for each step",
-    desc: "From project to review without leaving the keyboard. The workdeck shortcuts are for kitty; other terminals are not supported yet.",
+    title: "One shortcut for each step, in kitty",
+    desc: "From project to review without leaving the keyboard. For now, the shortcuts are kitty only.",
   },
   shortcuts: {
     macTab: "macOS",
@@ -97,7 +97,7 @@ export const en: Dictionary = {
       { key: "R", desc: "Runs work review" },
     ],
     othersTitle: "Other terminals",
-    othersText: "The shortcuts above do not work in Warp, iTerm2 or other terminals yet. There, the tmux ones apply: Ctrl+b h opens the menu, and Shift+arrows switch projects and panes.",
+    othersText: "We don't support Warp, iTerm2 and other terminals yet :( There, the tmux shortcuts work: Ctrl+b h opens the menu, and Shift+arrows switch projects and panes.",
   },
   panelSection: {
     eyebrow: "panel",
@@ -155,9 +155,10 @@ export const en: Dictionary = {
     windows: "4 windows",
     agentHint: "Ctrl+b v · claude in the pane beside →",
     agentDone: "the agent finished",
-    reviewHint: "review started in the chat →",
-    reviewBeside: "← review started in the agent chat",
-    reviewRunning: "running in the background as @code-review",
+    reviewHint: "the review opened in the pane below the agent →",
+    reviewBeside: "← the review opened below the agent",
+    reviewPane: "review · claude",
+    reviewRunning: "a fresh agent, without the conversation",
     reviewFound: "2 findings",
     issueEmail: "the regex accepts an email without a domain",
     issueTest: "no test for an invalid email",

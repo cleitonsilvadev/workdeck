@@ -12,7 +12,7 @@ export function TerminalDemo({ demo }: { demo: Dictionary["demo"] }) {
 
   const agentOpen = s >= 3
   const reviewSent = s >= 7
-  const focus = s === 6 ? "shell" : s >= 3 ? "agent" : "shell"
+  const focus = s >= 7 ? "review" : s === 6 ? "shell" : s >= 3 ? "agent" : "shell"
 
   return (
     <TerminalWindow>
@@ -32,7 +32,7 @@ export function TerminalDemo({ demo }: { demo: Dictionary["demo"] }) {
 
             <AnimatePresence>
               {agentOpen && (
-                <motion.div key="ia" layout className="grid min-h-0 grid-rows-1 gap-1.5">
+                <motion.div key="ia" layout className={cn("grid min-h-0 gap-1.5", s >= 7 ? "grid-rows-[1fr_auto]" : "grid-rows-1")}>
                   <Pane title={demo.agentPane} active={focus === "agent"}>
                     <Line>
                       <span className="text-ctp-peach">› </span>
@@ -46,19 +46,19 @@ export function TerminalDemo({ demo }: { demo: Dictionary["demo"] }) {
                       </>
                     )}
                     {s >= 5 && <Line className="text-ctp-green">  {demo.done}</Line>}
-                    {s >= 7 && (
-                      <>
-                        <Line className="mt-1">
-                          <span className="text-ctp-peach">› </span>
-                          <span className="text-ctp-text">/code-review</span>
-                        </Line>
-                        <Line className="text-ctp-overlay1">  ⎿ {demo.reviewRunning}</Line>
-                      </>
-                    )}
-                    {s >= 8 && <Line className="mt-1 text-ctp-text" delay={0.05}>  {demo.reviewFound}</Line>}
-                    {s >= 9 && <Line className="text-ctp-subtext0" delay={0.05}>  email.ts:3   <span className="text-ctp-text">{demo.issueEmail}</span></Line>}
-                    {s >= 10 && <Line className="text-ctp-subtext0" delay={0.05}>  login.ts:13  <span className="text-ctp-text">{demo.issueTest}</span></Line>}
                   </Pane>
+                  <AnimatePresence>
+                    {s >= 7 && (
+                      <motion.div key="review" layout initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+                        <Pane title={demo.reviewPane} active>
+                          <Line className="text-ctp-overlay1">{demo.reviewRunning}</Line>
+                          {s >= 8 && <Line className="mt-1 text-ctp-text" delay={0.05}>  {demo.reviewFound}</Line>}
+                          {s >= 9 && <Line className="text-ctp-subtext0" delay={0.05}>  email.ts:3   <span className="text-ctp-text">{demo.issueEmail}</span></Line>}
+                          {s >= 10 && <Line className="text-ctp-subtext0" delay={0.05}>  login.ts:13  <span className="text-ctp-text">{demo.issueTest}</span></Line>}
+                        </Pane>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </motion.div>
               )}
             </AnimatePresence>

@@ -19,7 +19,12 @@
 
 ## Writing style
 
-- Professional and neutral: short sentences, active voice, no first person, no emoji in docs.
+- Human and direct, like a developer talking about their own project: short sentences, active voice,
+  "we" when it reads naturally ("we don't support Warp yet :(").
+- No semicolons. Split into two sentences or use a comma.
+- A simple emoticon such as `:(` or `:)` is fine when it fits, never emoji in a row.
+- Write site copy with a PM and marketing eye: lead with what the person gains, keep it short, and
+  say plainly what is not supported yet.
 
 ## Commits
 
