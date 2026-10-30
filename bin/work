@@ -658,9 +658,14 @@ refresh_panel() {
 }
 
 drop_window() {
-  local client="$1" target="$2" current
+  local client="$1" target="$2" current panel
   current="$(tmux display -p -c "$client" '#{window_id}' 2>/dev/null)"
   [ -n "$current" ] && [ -n "$target" ] && [ "$current" != "$target" ] || return 0
+  panel="$(panel_window)"
+  if [ -n "$panel" ] && { [ "$current" = "$panel" ] || [ "$target" = "$panel" ]; }; then
+    tmux display-message -c "$client" -d 4000 "$(msg drop_panel_fixed)" 2>/dev/null || true
+    return 0
+  fi
   tmux swap-window -s "$current" -t "$target"
   tmux select-window -t "$current"
   tmux set -w -t "$current" @wd_moved 1 \; refresh-client -S -t "$client" 2>/dev/null || true

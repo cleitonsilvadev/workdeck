@@ -264,6 +264,7 @@ msg_agent_set_is_workdeck="'%s' is a workdeck command, not an AI agent."
 msg_agent_set_not_in_path="'%s' is not in the PATH."
 msg_agent_set_done="agent set: %s"
 
+msg_drop_panel_fixed="The panel stays first: drag projects only among themselves"
 msg_window_panel="panel"
 msg_panel_title_20_projetos="Projects"
 msg_panel_help="work-panel shows the output of several commands in a pane and refreshes it.

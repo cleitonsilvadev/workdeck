@@ -263,6 +263,7 @@ msg_agent_set_is_workdeck="'%s' é um comando do workdeck, não um agente de IA.
 msg_agent_set_not_in_path="'%s' não está no PATH."
 msg_agent_set_done="agente definido: %s"
 
+msg_drop_panel_fixed="O painel fica sempre em primeiro: arraste só entre os projetos"
 msg_window_panel="painel"
 msg_panel_title_20_projetos="Projetos"
 msg_panel_help="work-panel mostra a saída de vários comandos em um painel, atualizando sozinho.
