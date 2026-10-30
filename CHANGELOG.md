@@ -6,6 +6,18 @@ se quer atualizar. Cada versão é uma tag `vX.Y.Z`.
 `work update` shows the section of the new version in your language before
 asking whether to update. Each version is a `vX.Y.Z` tag.
 
+## v2.6.0
+
+### Português
+
+- Enquanto você arrasta uma aba, ela fica apagada, como um fantasma, até você soltar. Os outros projetos ficam parados e a troca acontece ao soltar. Rode `Ctrl+b r` depois de atualizar.
+- O painel da IA abre como um shell vazio, sem o `AGENT_CMD` já digitado. Abra o agente nos projetos em que for trabalhar. O comando do servidor continua digitado no shell ao lado.
+
+### English
+
+- While you drag a tab, it is dimmed like a ghost until you drop it. The other projects stay in place and the swap happens on drop. Run `Ctrl+b r` after updating.
+- The AI pane opens as an empty shell, without the `AGENT_CMD` already typed. Start the agent in the projects you are going to work on. The server command is still typed in the shell beside it.
+
 ## v2.5.3
 
 ### Português
