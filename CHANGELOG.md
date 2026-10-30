@@ -12,11 +12,13 @@ asking whether to update. Each version is a `vX.Y.Z` tag.
 
 - Correção: arrastar uma aba na barra não trocava os projetos de lugar. Agora a troca acontece quando você solta a aba em cima de outra, e o painel continua fixo em primeiro.
 - Correção: no Mac, a instalação do relógio tclock falhava ao compilar. Agora ele compila em menos de um minuto com o Rust que você já tem.
+- Correção: com o relógio tclock, o bloco de projetos do painel dizia que não havia nenhum projeto. Agora ele mostra os seus projetos, no seu idioma.
 
 ### English
 
 - Fix: dragging a tab in the bar did not swap the projects. The swap now happens when you drop the tab on another one, and the panel stays first.
 - Fix: on a Mac, installing the tclock clock failed while building. It now builds in under a minute with the Rust you already have.
+- Fix: with the tclock clock, the projects block of the panel said there were no projects. It now shows your projects, in your language.
 
 ## v2.4.1
 
