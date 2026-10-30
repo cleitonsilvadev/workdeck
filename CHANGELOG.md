@@ -6,6 +6,16 @@ se quer atualizar. Cada versão é uma tag `vX.Y.Z`.
 `work update` shows the section of the new version in your language before
 asking whether to update. Each version is a `vX.Y.Z` tag.
 
+## v2.5.1
+
+### Português
+
+- A aba que você solta agora só muda o nome para a cor de destaque por um instante, sem o fundo aceso. Rode `Ctrl+b r` depois de atualizar.
+
+### English
+
+- A dropped tab now only turns its name to the accent color for a moment, without the lit background. Run `Ctrl+b r` after updating.
+
 ## v2.5.0
 
 ### Português
