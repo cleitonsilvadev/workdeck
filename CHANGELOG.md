@@ -6,6 +6,18 @@ se quer atualizar. Cada versão é uma tag `vX.Y.Z`.
 `work update` shows the section of the new version in your language before
 asking whether to update. Each version is a `vX.Y.Z` tag.
 
+## v2.4.2
+
+### Português
+
+- Correção: arrastar uma aba na barra não trocava os projetos de lugar. Agora a troca acontece quando você solta a aba em cima de outra, e o painel continua fixo em primeiro.
+- Correção: no Mac, a instalação do relógio tclock falhava ao compilar. Agora ele compila em menos de um minuto com o Rust que você já tem.
+
+### English
+
+- Fix: dragging a tab in the bar did not swap the projects. The swap now happens when you drop the tab on another one, and the panel stays first.
+- Fix: on a Mac, installing the tclock clock failed while building. It now builds in under a minute with the Rust you already have.
+
 ## v2.4.1
 
 ### Português
