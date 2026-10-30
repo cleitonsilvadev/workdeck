@@ -958,6 +958,7 @@ show_choices() {
 
 teach_warp() {
   [ "$TERMINAL" = warp ] || return 0
+  [ "$VISUAL" = yes ] || [ "$OS_NAME" = macOS ] || return 0
   printf '\n  %s\n' "$(msg install_warp_todo)"
   if [ "$VISUAL" = yes ]; then
     printf '%s\n' "$(msg install_warp_theme_steps "$THEME")"
