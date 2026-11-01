@@ -6,29 +6,19 @@ se quer atualizar. Cada versão é uma tag `vX.Y.Z`.
 `work update` shows the section of the new version in your language before
 asking whether to update. Each version is a `vX.Y.Z` tag.
 
-## v2.6.0
-
-### Português
-
-- Enquanto você arrasta uma aba, ela fica apagada, como um fantasma, até você soltar. Os outros projetos ficam parados e a troca acontece ao soltar. Rode `Ctrl+b r` depois de atualizar.
-- O painel da IA abre como um shell vazio, sem o `AGENT_CMD` já digitado. Abra o agente nos projetos em que for trabalhar. O comando do servidor continua digitado no shell ao lado.
-
-### English
-
-- While you drag a tab, it is dimmed like a ghost until you drop it. The other projects stay in place and the swap happens on drop. Run `Ctrl+b r` after updating.
-- The AI pane opens as an empty shell, without the `AGENT_CMD` already typed. Start the agent in the projects you are going to work on. The server command is still typed in the shell beside it.
-
 ## v2.5.4
 
 ### Português
 
 - O workdeck abre bem mais rápido. O kitty entra no `work` sem carregar todo o seu `.zshrc`, e o painel aparece logo, enquanto as abas dos projetos vão surgindo em segundo plano. Rode `work update` e abra o kitty de novo.
-- A aba que você arrasta agora fica acesa com a cor de destaque, em vez de apagada.
+- A aba que você arrasta fica acesa com a cor de destaque até você soltar. Os outros projetos ficam parados e a troca acontece ao soltar. Rode `Ctrl+b r` depois de atualizar.
+- O painel da IA abre como um shell vazio, sem o `AGENT_CMD` já digitado. Abra o agente nos projetos em que for trabalhar. O comando do servidor continua digitado no shell ao lado.
 
 ### English
 
 - workdeck opens much faster. kitty starts `work` without loading your whole `.zshrc`, and the panel shows up right away while the project tabs open in the background. Run `work update` and open kitty again.
-- The tab you drag now lights up in the accent color instead of fading out.
+- The tab you drag lights up in the accent color until you drop it. The other projects stay in place and the swap happens on drop. Run `Ctrl+b r` after updating.
+- The AI pane opens as an empty shell, without the `AGENT_CMD` already typed. Start the agent in the projects you are going to work on. The server command is still typed in the shell beside it.
 
 ## v2.5.3
 
