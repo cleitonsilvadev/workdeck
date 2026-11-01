@@ -336,11 +336,16 @@ kitty_opens_work() {
   return 0
 }
 
-write_kitty_session() {
+kitty_work_command() {
   local shell_bin="${SHELL:-/bin/zsh}"
+  printf "%s -lc 'command -v tmux >/dev/null || exec %s -lic \"work; exec %s -l\"; %s/work; exec %s -l'" \
+    "$shell_bin" "$shell_bin" "$shell_bin" "$BIN_DIR" "$shell_bin"
+}
+
+write_kitty_session() {
   [ "$DRY" = 1 ] && return 0
   mkdir -p "$(dirname "$KITTY_SESSION")"
-  printf 'launch --title workdeck %s -lic "work; exec %s -l"\n' "$shell_bin" "$shell_bin" > "$KITTY_SESSION"
+  printf 'launch --title workdeck %s\n' "$(kitty_work_command)" > "$KITTY_SESSION"
 }
 
 apply_kitty() {
@@ -358,7 +363,7 @@ apply_kitty() {
   write_block "$HOME/.config/kitty/kitty.conf" "$(printf '%s\n' "$block"; echo '# <<< workdeck <<<')"
   KITTY_CHANGED="$BLOCK_CHANGED"
   if kitty_opens_work; then
-    write_block "$HOME/.config/kitty/quick-access-terminal.conf" "$(printf '%s\n' '# >>> workdeck >>>' 'edge center-sized' 'lines 40' 'columns 160' 'hide_on_focus_loss yes' 'kitty_override startup_session=none' "kitty_override shell=${SHELL:-/bin/zsh} -lic \"work; exec ${SHELL:-/bin/zsh} -l\"" '# <<< workdeck <<<')"
+    write_block "$HOME/.config/kitty/quick-access-terminal.conf" "$(printf '%s\n' '# >>> workdeck >>>' 'edge center-sized' 'lines 40' 'columns 160' 'hide_on_focus_loss yes' 'kitty_override startup_session=none' "kitty_override shell=$(kitty_work_command)" '# <<< workdeck <<<')"
     QUICK_ACCESS=1
   fi
   if [ "$VISUAL" = yes ]; then say "$(msg install_kitty_full)"; else say "$(msg install_kitty_keys)"; fi

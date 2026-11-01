@@ -220,7 +220,8 @@ test_install_picks_the_agent_in_the_path_without_asking() {
 test_kitty_opens_straight_into_work() {
   install_workdeck --terminal kitty >/dev/null || fail "the install exited with an error"
   assert "the block points to the session" grep -q "^startup_session $CONFIG/kitty-session$" "$(kitty_conf)"
-  assert_contains "$(cat "$CONFIG/kitty-session")" '-lic "work; exec '
+  assert_contains "$(cat "$CONFIG/kitty-session")" "-lc 'command -v tmux >/dev/null || exec "
+  assert_contains "$(cat "$CONFIG/kitty-session")" "; $HOME/.local/bin/work; exec "
 }
 
 test_kitty_session_respects_the_user_and_the_setting() {
