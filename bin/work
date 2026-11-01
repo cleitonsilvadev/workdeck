@@ -830,32 +830,46 @@ if ! any_project_exists; then
   fi
 fi
 
-if ! tmux has-session -t "$SESSION" 2>/dev/null; then
+open_window() {
+  local name="$1" dir="$2" cmd="$3" layout="$4" win
+  win="$(tmux new-window -d -P -F '#{window_id}' -t "$SESSION:" -n "$name" -c "$dir" ${cmd:+"$cmd"})"
+  [ -n "$cmd" ] || { tmux set -w -t "$win" @project "$dir"; setup_project_window "$win" "$dir" "$layout"; }
+  [ "${cmd%% *}" = work ] && add_shell_pane "$SESSION:$name"
+  return 0
+}
+
+open_session() {
+  local layout entry name dir cmd size rows cols win rest=()
   layout="$(project_layout)"
-  first=1
   for entry in "${windows[@]}"; do
     IFS="|" read -r name dir cmd <<< "$entry"
     dir="$(expand_path "$dir")"
     [ -d "$dir" ] || { msgln skip_project "$name" "$dir"; continue; }
     case "$cmd" in work-panel|"work-panel "*) cmd="work _panel${cmd#work-panel}" ;; esac
-    if [ "$first" = 1 ]; then
-      size=()
-      if [ -t 1 ] && read -r rows cols < <(stty size </dev/tty 2>/dev/null) && [ "${cols:-0}" -gt 0 ]; then
-        size=(-x "$cols" -y "$rows")
-      fi
-      win="$(tmux new-session -d -P -F '#{window_id}' -s "$SESSION" "${size[@]+"${size[@]}"}" -n "$name" -c "$dir" ${cmd:+"$cmd"})"
-      [ -n "$cmd" ] || { tmux set -w -t "$win" @project "$dir"; setup_project_window "$win" "$dir" "$layout"; }
-      [ "${cmd%% *}" = work ] && add_shell_pane "$SESSION:$name"
-      first=0
-    else
-      win="$(tmux new-window -P -F '#{window_id}' -t "$SESSION:" -n "$name" -c "$dir" ${cmd:+"$cmd"})"
-      [ -n "$cmd" ] || { tmux set -w -t "$win" @project "$dir"; setup_project_window "$win" "$dir" "$layout"; }
-      [ "${cmd%% *}" = work ] && add_shell_pane "$SESSION:$name"
+    if tmux has-session -t "$SESSION" 2>/dev/null; then
+      rest+=("$name|$dir|$cmd")
+      continue
     fi
+    size=()
+    if [ -t 1 ] && read -r rows cols < <(stty size </dev/tty 2>/dev/null) && [ "${cols:-0}" -gt 0 ]; then
+      size=(-x "$cols" -y "$rows")
+    fi
+    win="$(tmux new-session -d -P -F '#{window_id}' -s "$SESSION" "${size[@]+"${size[@]}"}" -n "$name" -c "$dir" ${cmd:+"$cmd"})"
+    [ -n "$cmd" ] || { tmux set -w -t "$win" @project "$dir"; setup_project_window "$win" "$dir" "$layout"; }
+    [ "${cmd%% *}" = work ] && add_shell_pane "$SESSION:$name"
   done
-  tmux set -t "$SESSION" @workdeck_session 1
-  tmux select-window -t "$SESSION:1"
-fi
+  (
+    set +e
+    for entry in ${rest[@]+"${rest[@]}"}; do
+      IFS="|" read -r name dir cmd <<< "$entry"
+      tmux has-session -t "$SESSION" 2>/dev/null || exit 0
+      open_window "$name" "$dir" "$cmd" "$layout"
+    done
+    tmux set -t "$SESSION" @workdeck_session 1
+  ) </dev/null >/dev/null 2>&1 &
+}
+
+tmux has-session -t "$SESSION" 2>/dev/null || open_session
 
 if [ -n "$(panel_pane TERMINAL)" ]; then
   (
