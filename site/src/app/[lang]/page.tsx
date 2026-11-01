@@ -15,8 +15,8 @@ import { TerminalDemo } from "@/components/terminal-demo"
 import { TerminalTable } from "@/components/terminal-table"
 import { getDictionary } from "@/lib/dictionaries"
 import { hasLocale } from "@/lib/i18n"
-import { installCommand, repoUrl, version } from "@/lib/site"
-import { getStars } from "@/lib/github"
+import { installCommand, repoUrl } from "@/lib/site"
+import { getStars, getVersion } from "@/lib/github"
 import { formatStars, showStars } from "@/lib/stars"
 import { cn } from "@/lib/utils"
 
@@ -49,7 +49,7 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
   const { lang } = await params
   if (!hasLocale(lang)) notFound()
   const t = getDictionary(lang)
-  const stars = await getStars()
+  const [stars, version] = await Promise.all([getStars(), getVersion()])
 
   return (
     <>
@@ -181,7 +181,7 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
         <Section id="painel" eyebrow={t.panelSection.eyebrow} title={t.panelSection.title} desc={t.panelSection.desc}>
           <div className="grid items-center gap-10 lg:grid-cols-[1.15fr_1fr]">
             <Reveal className="min-w-0">
-              <PanelDemo demo={t.demo} />
+              <PanelDemo demo={t.demo} version={version} />
             </Reveal>
             <Reveal delay={0.1} className="min-w-0 space-y-4">
               <p className="text-sm text-ctp-subtext0">

@@ -4,7 +4,6 @@ import type React from "react"
 import { AnimatePresence, motion } from "motion/react"
 import { Line, Pane, Prompt, StatusBar, TerminalWindow, useTimeline } from "@/components/terminal-parts"
 import type { Dictionary } from "@/lib/dictionaries"
-import { version } from "@/lib/site"
 import { cn } from "@/lib/utils"
 
 const timeline = [2300, 500, 700, 500, 2000, 900, 5600]
@@ -80,7 +79,7 @@ function Logo() {
   )
 }
 
-export function PanelDemo({ demo }: { demo: Dictionary["demo"] }) {
+export function PanelDemo({ demo, version }: { demo: Dictionary["demo"]; version: string }) {
   const s = useTimeline(timeline)
   const saved = s >= 5
   const shown = s >= 6

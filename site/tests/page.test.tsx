@@ -2,13 +2,13 @@ import { describe, expect, test, vi } from "vitest"
 import { render, screen, within } from "@testing-library/react"
 import Home from "@/app/[lang]/page"
 import { getDictionary } from "@/lib/dictionaries"
-import { installCommand, repoUrl, version } from "@/lib/site"
+import { installCommand, repoUrl } from "@/lib/site"
 
 vi.mock("next/font/google", () => ({ Geist: () => ({ variable: "" }), JetBrains_Mono: () => ({ variable: "" }) }))
 
-const github = vi.hoisted(() => ({ stars: 23456 as number | null }))
+const github = vi.hoisted(() => ({ stars: 23456 as number | null, version: "v9.8.7" }))
 
-vi.mock("@/lib/github", () => ({ getStars: async () => github.stars }))
+vi.mock("@/lib/github", () => ({ getStars: async () => github.stars, getVersion: async () => github.version }))
 
 vi.mock("next/navigation", async (original) => ({
   ...(await original<typeof import("next/navigation")>()),
@@ -65,7 +65,7 @@ describe("home page", () => {
 
   test("shows the version, GitHub and the install command", async () => {
     render(await page())
-    expect(screen.getByText(new RegExp(`${version} · open source`))).toBeTruthy()
+    expect(screen.getByText(new RegExp(`${github.version} · open source`))).toBeTruthy()
     expect(document.querySelectorAll(`a[href="${repoUrl}"]`).length).toBeGreaterThan(0)
     expect(screen.getAllByText(installCommand).length).toBeGreaterThan(0)
     expect(screen.queryByText(/em breve/)).toBeNull()

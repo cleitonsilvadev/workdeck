@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test, vi } from "vitest"
-import { getStars } from "@/lib/github"
-import { repoUrl } from "@/lib/site"
+import { getStars, getVersion, newestTag } from "@/lib/github"
+import { repoUrl, version } from "@/lib/site"
 import { formatStars } from "@/lib/stars"
 
 vi.mock("next/cache", () => ({ cacheLife: () => {} }))
@@ -27,5 +27,28 @@ describe("GitHub stars", () => {
     expect(await getStars()).toBeNull()
     vi.stubGlobal("fetch", vi.fn(async () => { throw new Error("offline") }))
     expect(await getStars()).toBeNull()
+  })
+})
+
+describe("latest version", () => {
+  afterEach(() => vi.unstubAllGlobals())
+
+  test("picks the highest vX.Y.Z tag, not the last in alphabetical order", () => {
+    expect(newestTag(["v2.9.0", "v2.10.0", "v2.5.4", "beta", "v3.0.0-rc1"])).toBe("v2.10.0")
+    expect(newestTag([])).toBeNull()
+  })
+
+  test("reads the tags of the workdeck repository", async () => {
+    const fetch = vi.fn(async () => Response.json([{ name: "v2.5.3" }, { name: "v2.5.4" }]))
+    vi.stubGlobal("fetch", fetch)
+    expect(await getVersion()).toBe("v2.5.4")
+    expect(fetch).toHaveBeenCalledWith(`https://api.github.com/repos${new URL(repoUrl).pathname}/tags?per_page=100`, expect.anything())
+  })
+
+  test("falls back to the version in the code when the API fails", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => new Response("", { status: 403 })))
+    expect(await getVersion()).toBe(version)
+    vi.stubGlobal("fetch", vi.fn(async () => { throw new Error("offline") }))
+    expect(await getVersion()).toBe(version)
   })
 })
