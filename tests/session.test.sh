@@ -35,7 +35,7 @@ test_work_without_code_explains_what_to_do() {
   rm -rf "$CODE"
   if output="$(work 2>&1)"; then fail "work should fail without the code"; fi
   assert_contains "$output" "o código do workdeck não está em"
-  assert_contains "$output" "get.sh"
+  assert_contains "$output" "https://workdeck.dev/install"
 }
 
 project_with_server_command() {

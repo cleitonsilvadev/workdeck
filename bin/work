@@ -10,7 +10,7 @@ if [ ! -f "$LIB/../lib/common.sh" ]; then
     pt*) echo "o código do workdeck não está em ${LIB%/bin}. Instale de novo:" ;;
     *) echo "the workdeck code is not in ${LIB%/bin}. Install it again:" ;;
   esac
-  echo "curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/get.sh | bash"
+  echo "curl -fsSL https://workdeck.dev/install | bash"
   exit 1
 fi
 . "$LIB/../lib/common.sh"
@@ -18,6 +18,7 @@ case ":$PATH:" in *":$WORKDECK_BIN:"*) ;; *) PATH="$WORKDECK_BIN:$PATH" ;; esac
 CONFIG="$WORKDECK_CONFIG/projects.conf"
 CODE="$WORKDECK_CODE"
 UPDATE_CACHE="$WORKDECK_CACHE/update"
+VERSION_URL="${WORKDECK_VERSION_URL:-https://www.workdeck.dev/api/version}"
 SESSION="${WORKDECK_SESSION:-work}"
 
 if [ -n "${TERM:-}" ] && command -v infocmp >/dev/null && ! infocmp "$TERM" >/dev/null 2>&1; then
@@ -102,8 +103,12 @@ check_in_background() {
   last="$(cache_get checked)"
   if [ -n "$last" ] && [ $((now - last)) -lt 86400 ]; then return 0; fi
   (
-    quiet_git fetch -q --tags --force --prune --prune-tags origin || exit 0
-    cache_set latest "$(git -C "$CODE" tag -l 'v*' | latest_version)"
+    latest="$(curl -fsS --max-time 5 -A "workdeck/$(current_version)" "$VERSION_URL" 2>/dev/null | latest_version || true)"
+    if [ -z "$latest" ]; then
+      quiet_git fetch -q --tags --force --prune --prune-tags origin || exit 0
+      latest="$(git -C "$CODE" tag -l 'v*' | latest_version)"
+    fi
+    cache_set latest "$latest"
     cache_set checked "$now"
   ) </dev/null >/dev/null 2>&1 &
   return 0

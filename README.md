@@ -78,7 +78,7 @@ work add ~/api  →  project window  →  agent beside it  →  work review  →
 ## Installation
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/get.sh | bash
+curl -fsSL https://workdeck.dev/install | bash
 ```
 
 Runs on macOS and Linux (including WSL). The installer detects the system,

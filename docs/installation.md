@@ -3,7 +3,7 @@
 # Installation
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/get.sh | bash
+curl -fsSL https://workdeck.dev/install | bash
 ```
 
 `get.sh` downloads the latest published version to `~/.local/share/workdeck`
@@ -110,6 +110,11 @@ happens. When there is a new version, `work` shows what changed and asks before
 opening the session; if you say no, it does not ask again about that version.
 While a version is waiting to be installed, the panel shows
 `● v1.0.0 → v1.1.0: work update`.
+
+The check asks `https://www.workdeck.dev/api/version` for the newest version
+and sends nothing besides the request itself, with the installed version in the
+user agent. That is how we know how many people use workdeck. If the site does
+not answer, the check asks GitHub instead. `work update --off` turns it off.
 
 Only versions published as tags (`v1.2.0`) count, not every commit. Updating
 replaces the code and reapplies the installation; projects, panels, theme and

@@ -14,7 +14,7 @@ The Warp version of each theme stays in `themes/` for manual use.
 ## Switching
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/get.sh | bash -s -- --theme nord
+curl -fsSL https://workdeck.dev/install | bash -s -- --theme nord
 ```
 
 The choice is saved as `THEME` in `~/.config/workdeck/settings.conf`, and `work update` keeps the

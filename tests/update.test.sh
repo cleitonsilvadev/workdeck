@@ -15,3 +15,18 @@ test_update_check_runs_without_errors() {
   assert_not_contains "$output" "not found"
   wait_for test -s "$HOME/.cache/workdeck/update" || fail "the background check did not write the cache"
 }
+
+test_update_check_asks_the_site_first() {
+  install_workdeck >/dev/null || fail "the install exited with an error"
+  printf 'v9.9.9\n' > "$HOME/version"
+  WORKDECK_VERSION_URL="file://$HOME/version" work update --check >/dev/null 2>&1 || fail "work update --check exited with an error"
+  wait_for grep -q '^latest=v9.9.9$' "$HOME/.cache/workdeck/update" || fail "the version from the site did not reach the cache"
+}
+
+test_update_check_falls_back_to_git_when_the_site_answers_junk() {
+  git -C "$REPO" tag v1.2.3
+  install_workdeck >/dev/null || fail "the install exited with an error"
+  printf '<html>oops</html>\n' > "$HOME/version"
+  WORKDECK_VERSION_URL="file://$HOME/version" work update --check >/dev/null 2>&1 || fail "work update --check exited with an error"
+  wait_for grep -qE '^latest=v[0-9]+\.[0-9]+\.[0-9]+$' "$HOME/.cache/workdeck/update" || fail "the git fallback did not reach the cache"
+}
