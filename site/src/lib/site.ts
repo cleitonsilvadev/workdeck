@@ -2,7 +2,9 @@ export const version = "v2.5.4"
 
 export const repoUrl = "https://github.com/thiagofeliperibeiro/workdeck"
 
-export const installCommand = "curl -fsSL https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/get.sh | bash"
+export const installScriptUrl = "https://raw.githubusercontent.com/thiagofeliperibeiro/workdeck/main/get.sh"
+
+export const installCommand = "curl -fsSL https://workdeck.dev/install | bash"
 
 export const testimonials = [
   {

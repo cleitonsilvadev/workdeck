@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest"
 import { getDictionary } from "@/lib/dictionaries"
 import { locales } from "@/lib/i18n"
-import { installCommand, repoUrl, version } from "@/lib/site"
+import { installCommand, installScriptUrl, repoUrl, version } from "@/lib/site"
 
 function unique(values: readonly string[]) {
   return new Set(values).size === values.length
@@ -39,9 +39,10 @@ describe.each(locales)("site content in %s", (locale) => {
     for (const c of cycle) expect(c.desc.length).toBeGreaterThan(0)
   })
 
-  test("the install command downloads get.sh from the repository with curl -fsSL", () => {
+  test("the install command goes through workdeck.dev/install, which serves get.sh from the repository", () => {
     const [, owner, repo] = new URL(repoUrl).pathname.split("/")
-    expect(installCommand).toBe(`curl -fsSL https://raw.githubusercontent.com/${owner}/${repo}/main/get.sh | bash`)
+    expect(installCommand).toBe("curl -fsSL https://workdeck.dev/install | bash")
+    expect(installScriptUrl).toBe(`https://raw.githubusercontent.com/${owner}/${repo}/main/get.sh`)
     for (const steps of Object.values(install)) {
       expect(steps[0].cmd).toBe(installCommand)
       expect(steps.at(-1)?.cmd).toBe("work")

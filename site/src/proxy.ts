@@ -20,6 +20,7 @@ export function proxy(request: NextRequest) {
     request.nextUrl.pathname = `/${preferredLocale(request)}`
     return NextResponse.redirect(request.nextUrl)
   }
+  if (pathname === "/install") return
   if (hasLocale(pathname.split("/")[1] ?? "")) return
   return new NextResponse("Not found", { status: 404, headers: { "content-type": "text/plain; charset=utf-8" } })
 }

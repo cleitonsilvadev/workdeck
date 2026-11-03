@@ -1,5 +1,5 @@
 import { cacheLife } from "next/cache"
-import { repoUrl, version } from "@/lib/site"
+import { installScriptUrl, repoUrl, version } from "@/lib/site"
 
 export async function getStars() {
   "use cache"
@@ -42,5 +42,18 @@ export async function getVersion() {
     return newestTag(names) ?? version
   } catch {
     return version
+  }
+}
+
+export async function getInstallScript() {
+  "use cache"
+  cacheLife("minutes")
+  try {
+    const res = await fetch(installScriptUrl)
+    if (!res.ok) return null
+    const script = await res.text()
+    return script.startsWith("#!") ? script : null
+  } catch {
+    return null
   }
 }

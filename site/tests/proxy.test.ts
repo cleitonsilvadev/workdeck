@@ -17,6 +17,10 @@ describe("proxy", () => {
     expect(proxy(request("/en/anything"))).toBeUndefined()
   })
 
+  test("lets the install script through", () => {
+    expect(proxy(request("/install"))).toBeUndefined()
+  })
+
   test("answers 404 for unknown paths without rendering the page", async () => {
     const response = proxy(request("/junk123"))
     expect(response?.status).toBe(404)
