@@ -10,7 +10,7 @@ msg_settings_notify_agents="# System notification when an agent finishes in a wi
 msg_work_help="The commands are:
   work                opens the session, or goes back to it
   work add <folder>   adds a project
-  work remove <name>  removes a project
+  work remove <name>  removes a project (short: work rm)
   work review         your agent reviews the change before the commit
   work update         updates workdeck
   work kill           closes the whole session
